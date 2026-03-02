@@ -20,8 +20,14 @@ class WbiSign {
   /// Concatenates both keys and reorders characters according to
   /// [_mixinKeyEncTab], taking the first 32 characters.
   static String getMixinKey(String imgKey, String subKey) {
-    // TODO: implement character reordering
-    throw UnimplementedError();
+    final raw = imgKey + subKey;
+    final buffer = StringBuffer();
+    for (final idx in _mixinKeyEncTab) {
+      if (idx < raw.length) {
+        buffer.write(raw[idx]);
+      }
+    }
+    return buffer.toString().substring(0, 32);
   }
 
   /// Encode request [params] with WBI signature.
@@ -38,8 +44,32 @@ class WbiSign {
     required String imgKey,
     required String subKey,
   }) {
-    // TODO: implement WBI encoding algorithm
-    throw UnimplementedError();
+    final mixinKey = getMixinKey(imgKey, subKey);
+    final wts = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
+
+    // Copy params and add wts
+    final signedParams = Map<String, dynamic>.from(params);
+    signedParams['wts'] = wts;
+
+    // Sort by key
+    final sortedKeys = signedParams.keys.toList()..sort();
+
+    // Build query string, filtering special chars from values
+    final queryParts = <String>[];
+    final filterRegex = RegExp(r"[!'()*]");
+    for (final key in sortedKeys) {
+      final value = signedParams[key].toString();
+      final encodedValue =
+          Uri.encodeComponent(value).replaceAll(filterRegex, '');
+      queryParts.add('$key=$encodedValue');
+    }
+    final queryString = queryParts.join('&');
+
+    // Calculate MD5 hash
+    final hash = md5.convert(utf8.encode(queryString + mixinKey)).toString();
+
+    signedParams['w_rid'] = hash;
+    return signedParams;
   }
 
   /// Extract imgKey and subKey from the nav API response's wbi_img URLs.
@@ -51,7 +81,19 @@ class WbiSign {
     required String imgUrl,
     required String subUrl,
   }) {
-    // TODO: implement key extraction from URLs
-    throw UnimplementedError();
+    // Extract filename stem from URL path
+    String extractStem(String url) {
+      final uri = Uri.parse(url);
+      final pathSegments = uri.pathSegments;
+      if (pathSegments.isEmpty) return '';
+      final filename = pathSegments.last;
+      final dotIndex = filename.lastIndexOf('.');
+      return dotIndex > 0 ? filename.substring(0, dotIndex) : filename;
+    }
+
+    return (
+      imgKey: extractStem(imgUrl),
+      subKey: extractStem(subUrl),
+    );
   }
 }

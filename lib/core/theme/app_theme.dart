@@ -25,7 +25,23 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.light,
-      // TODO: customize typography, card theme, appbar theme, etc.
+      cardTheme: const CardTheme(
+        elevation: 1,
+        clipBehavior: Clip.antiAlias,
+      ),
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
+        scrolledUnderElevation: 1,
+        backgroundColor: colorScheme.surface,
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: colorScheme.primaryContainer,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: colorScheme.primaryContainer,
+      ),
     );
   }
 
@@ -42,7 +58,23 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.dark,
-      // TODO: customize typography, card theme, appbar theme, etc.
+      cardTheme: const CardTheme(
+        elevation: 1,
+        clipBehavior: Clip.antiAlias,
+      ),
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
+        scrolledUnderElevation: 1,
+        backgroundColor: colorScheme.surface,
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: colorScheme.primaryContainer,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: colorScheme.primaryContainer,
+      ),
     );
   }
 

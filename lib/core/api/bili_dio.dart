@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 /// Singleton Dio HTTP client configured for Bilibili API requests.
 ///
@@ -12,7 +15,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 class BiliDio {
   static BiliDio? _instance;
   late final Dio _dio;
-  late final CookieJar _cookieJar;
+  late final PersistCookieJar _cookieJar;
 
   BiliDio._internal() {
     _cookieJar = PersistCookieJar();
@@ -23,7 +26,7 @@ class BiliDio {
         receiveTimeout: const Duration(seconds: 30),
         headers: {
           'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Referer': 'https://www.bilibili.com',
         },
       ),
@@ -31,7 +34,6 @@ class BiliDio {
     _dio.interceptors.addAll([
       CookieManager(_cookieJar),
       _BiliRefererInterceptor(),
-      // TODO: add WBI signature interceptor
     ]);
   }
 
@@ -39,6 +41,20 @@ class BiliDio {
   factory BiliDio() {
     _instance ??= BiliDio._internal();
     return _instance!;
+  }
+
+  /// Initialize persistent cookie storage.
+  static Future<void> initCookieStorage() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final cookiePath = p.join(dir.path, 'busic', 'cookies');
+    final cookieDir = Directory(cookiePath);
+    if (!await cookieDir.exists()) {
+      await cookieDir.create(recursive: true);
+    }
+    BiliDio()._cookieJar = PersistCookieJar(storage: FileStorage(cookiePath));
+    // Re-add cookie manager with persistent storage
+    BiliDio()._dio.interceptors.removeWhere((i) => i is CookieManager);
+    BiliDio()._dio.interceptors.insert(0, CookieManager(BiliDio()._cookieJar));
   }
 
   /// The underlying [Dio] instance for direct use.
@@ -54,8 +70,12 @@ class BiliDio {
     Options? options,
     CancelToken? cancelToken,
   }) {
-    // TODO: implement with WBI signing for protected endpoints
-    throw UnimplementedError();
+    return _dio.get<T>(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+    );
   }
 
   /// Perform a POST request to [path] with optional [data].
@@ -66,20 +86,40 @@ class BiliDio {
     Options? options,
     CancelToken? cancelToken,
   }) {
-    // TODO: implement
-    throw UnimplementedError();
+    return _dio.post<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+    );
   }
 
   /// Update stored cookies (e.g., after QR login).
   Future<void> updateCookies(Uri uri, List<Cookie> cookies) async {
-    // TODO: implement
-    throw UnimplementedError();
+    await _cookieJar.saveFromResponse(uri, cookies);
   }
 
   /// Clear all stored cookies (logout).
   Future<void> clearCookies() async {
-    // TODO: implement
-    throw UnimplementedError();
+    await _cookieJar.deleteAll();
+  }
+
+  /// Download a file from [url] to [savePath] with progress callback.
+  Future<Response> download(
+    String url,
+    String savePath, {
+    void Function(int received, int total)? onReceiveProgress,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+  }) {
+    return _dio.download(
+      url,
+      savePath,
+      onReceiveProgress: onReceiveProgress,
+      cancelToken: cancelToken,
+      options: Options(headers: headers),
+    );
   }
 }
 

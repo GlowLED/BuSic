@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../auth/application/auth_notifier.dart';
 import '../data/playlist_repository.dart';
+import '../data/playlist_repository_impl.dart';
 import '../domain/models/playlist.dart';
 import '../domain/models/song_item.dart';
 
@@ -13,26 +15,28 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
 
   @override
   Future<List<Playlist>> build() async {
-    // TODO: inject repository, load all playlists
-    throw UnimplementedError();
+    _repository = PlaylistRepositoryImpl(
+      db: ref.read(databaseProvider),
+    );
+    return _repository.getAllPlaylists();
   }
 
   /// Create a new playlist with [name].
   Future<void> createPlaylist(String name) async {
-    // TODO: call repository.createPlaylist, refresh state
-    throw UnimplementedError();
+    await _repository.createPlaylist(name);
+    ref.invalidateSelf();
   }
 
   /// Delete a playlist by [id].
   Future<void> deletePlaylist(int id) async {
-    // TODO: call repository.deletePlaylist, refresh state
-    throw UnimplementedError();
+    await _repository.deletePlaylist(id);
+    ref.invalidateSelf();
   }
 
   /// Rename a playlist.
   Future<void> renamePlaylist(int id, String name) async {
-    // TODO: call repository.renamePlaylist, refresh state
-    throw UnimplementedError();
+    await _repository.renamePlaylist(id, name);
+    ref.invalidateSelf();
   }
 }
 
@@ -43,26 +47,28 @@ class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
 
   @override
   Future<List<SongItem>> build(int playlistId) async {
-    // TODO: inject repository, load songs for playlistId
-    throw UnimplementedError();
+    _repository = PlaylistRepositoryImpl(
+      db: ref.read(databaseProvider),
+    );
+    return _repository.getSongsInPlaylist(playlistId);
   }
 
   /// Add a song to this playlist.
   Future<void> addSong(int songId) async {
-    // TODO: call repository.addSongToPlaylist, refresh state
-    throw UnimplementedError();
+    await _repository.addSongToPlaylist(playlistId, songId);
+    ref.invalidateSelf();
   }
 
   /// Remove a song from this playlist.
   Future<void> removeSong(int songId) async {
-    // TODO: call repository.removeSongFromPlaylist, refresh state
-    throw UnimplementedError();
+    await _repository.removeSongFromPlaylist(playlistId, songId);
+    ref.invalidateSelf();
   }
 
   /// Reorder songs in this playlist.
   Future<void> reorderSongs(int oldIndex, int newIndex) async {
-    // TODO: call repository.reorderSongs, refresh state
-    throw UnimplementedError();
+    await _repository.reorderSongs(playlistId, oldIndex, newIndex);
+    ref.invalidateSelf();
   }
 
   /// Update metadata for a song.
@@ -72,7 +78,12 @@ class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
     String? artist,
     String? coverUrl,
   }) async {
-    // TODO: call repository.updateSongMetadata, refresh state
-    throw UnimplementedError();
+    await _repository.updateSongMetadata(
+      songId,
+      customTitle: title,
+      customArtist: artist,
+      coverUrl: coverUrl,
+    );
+    ref.invalidateSelf();
   }
 }

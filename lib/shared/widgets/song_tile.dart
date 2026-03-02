@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 /// A reusable song list tile widget.
 ///
@@ -39,12 +40,74 @@ class SongTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement song tile UI
-    // Leading: 48x48 cover image (cached_network_image) or placeholder
-    // Title + subtitle rows
-    // Trailing: duration text + more button
-    return const ListTile(
-      title: Text('TODO: SongTile'),
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return ListTile(
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: coverUrl != null && coverUrl!.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: coverUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(
+                    color: colorScheme.surfaceContainerHighest,
+                    child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+                  ),
+                  errorWidget: (_, __, ___) => Container(
+                    color: colorScheme.surfaceContainerHighest,
+                    child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+                  ),
+                )
+              : Container(
+                  color: colorScheme.surfaceContainerHighest,
+                  child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+                ),
+        ),
+      ),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: textTheme.bodyLarge?.copyWith(
+          color: isPlaying ? colorScheme.primary : null,
+          fontWeight: isPlaying ? FontWeight.bold : null,
+        ),
+      ),
+      subtitle: Text(
+        artist,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: textTheme.bodySmall?.copyWith(
+          color: isPlaying ? colorScheme.primary : colorScheme.onSurfaceVariant,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (duration != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                duration!,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          if (onMorePressed != null)
+            IconButton(
+              icon: const Icon(Icons.more_vert, size: 20),
+              onPressed: onMorePressed,
+            ),
+        ],
+      ),
+      onTap: onTap,
+      selected: isPlaying,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     );
   }
 }

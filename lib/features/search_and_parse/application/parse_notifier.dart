@@ -1,7 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/api/bili_dio.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../core/utils/logger.dart';
+import '../../playlist/data/playlist_repository.dart';
+import '../../playlist/data/playlist_repository_impl.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../data/parse_repository.dart';
+import '../data/parse_repository_impl.dart';
 import '../domain/models/bvid_info.dart';
 import '../domain/models/page_info.dart';
 
@@ -34,43 +41,108 @@ class ParseState with _$ParseState {
 @riverpod
 class ParseNotifier extends _$ParseNotifier {
   late final ParseRepository _repository;
+  late final PlaylistRepository _playlistRepository;
 
   @override
   ParseState build() {
-    // TODO: inject repository
+    _repository = ParseRepositoryImpl(biliDio: BiliDio());
+    _playlistRepository = PlaylistRepositoryImpl(
+      db: ref.read(databaseProvider),
+    );
     return const ParseState.idle();
   }
 
   /// Parse a BV number or Bilibili URL.
-  ///
-  /// Extracts the BV number, fetches video info, and transitions to
-  /// either [ParseState.success] (single page) or
-  /// [ParseState.selectingPages] (multi-page).
   Future<void> parseInput(String input) async {
-    // TODO: extract bvid, call repository.getVideoInfo
-    // If pages.length > 1 → selectingPages
-    // If pages.length == 1 → success
-    throw UnimplementedError();
+    state = const ParseState.parsing();
+    try {
+      final bvid = Formatters.parseBvid(input);
+      if (bvid == null) {
+        state = const ParseState.error('无效的BV号或链接');
+        return;
+      }
+
+      final info = await _repository.getVideoInfo(bvid);
+      if (info.pages.length > 1) {
+        state = ParseState.selectingPages(info, List.from(info.pages));
+      } else {
+        state = ParseState.success(info);
+      }
+    } catch (e) {
+      AppLogger.error('Parse failed', tag: 'Parse', error: e);
+      state = ParseState.error('解析失败: $e');
+    }
   }
 
   /// Update page selection during multi-page selection state.
   void togglePageSelection(PageInfo page) {
-    // TODO: add/remove page from selectedPages list
-    throw UnimplementedError();
+    final current = state;
+    if (current is! _SelectingPages) return;
+    final selected = List<PageInfo>.from(current.selectedPages);
+    final index = selected.indexWhere((p) => p.cid == page.cid);
+    if (index >= 0) {
+      selected.removeAt(index);
+    } else {
+      selected.add(page);
+    }
+    state = ParseState.selectingPages(current.info, selected);
   }
 
   /// Select all pages.
   void selectAllPages() {
-    // TODO: set selectedPages to all pages from BvidInfo
-    throw UnimplementedError();
+    final current = state;
+    if (current is! _SelectingPages) return;
+    state = ParseState.selectingPages(current.info, List.from(current.info.pages));
+  }
+
+  /// Deselect all pages.
+  void deselectAllPages() {
+    final current = state;
+    if (current is! _SelectingPages) return;
+    state = ParseState.selectingPages(current.info, []);
   }
 
   /// Confirm the selected pages and create song entries.
-  ///
-  /// Returns the list of created song database IDs.
   Future<List<int>> confirmSelection() async {
-    // TODO: create song entries via playlist repository for each selected page
-    throw UnimplementedError();
+    final current = state;
+    BvidInfo? info;
+    List<PageInfo> pages;
+
+    if (current is _Success) {
+      info = current.info;
+      pages = info.pages;
+    } else if (current is _SelectingPages) {
+      info = current.info;
+      pages = current.selectedPages;
+    } else {
+      return [];
+    }
+
+    final songIds = <int>[];
+    for (final page in pages) {
+      final songId = await _playlistRepository.upsertSong(
+        bvid: info!.bvid,
+        cid: page.cid,
+        originTitle: pages.length > 1 ? page.partTitle : info.title,
+        originArtist: info.owner,
+        coverUrl: info.coverUrl,
+        duration: page.duration,
+      );
+      songIds.add(songId);
+    }
+
+    state = const ParseState.idle();
+    return songIds;
+  }
+
+  /// Search videos on Bilibili.
+  Future<List<BvidInfo>> searchVideos(String keyword) async {
+    try {
+      return await _repository.searchVideos(keyword);
+    } catch (e) {
+      AppLogger.error('Search failed', tag: 'Parse', error: e);
+      return [];
+    }
   }
 
   /// Reset to idle state.

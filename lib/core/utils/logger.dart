@@ -7,16 +7,24 @@ import 'package:flutter/foundation.dart';
 class AppLogger {
   AppLogger._();
 
+  static String _format(String level, String message, String? tag) {
+    final timestamp = DateTime.now().toIso8601String().substring(11, 23);
+    final prefix = tag != null ? '[$level][$tag]' : '[$level]';
+    return '$timestamp $prefix $message';
+  }
+
   /// Log an informational message.
   static void info(String message, {String? tag}) {
-    // TODO: implement with conditional logging
-    throw UnimplementedError();
+    if (kDebugMode) {
+      debugPrint(_format('INFO', message, tag));
+    }
   }
 
   /// Log a warning message.
   static void warning(String message, {String? tag}) {
-    // TODO: implement with conditional logging
-    throw UnimplementedError();
+    if (kDebugMode) {
+      debugPrint(_format('WARN', message, tag));
+    }
   }
 
   /// Log an error message with optional [error] and [stackTrace].
@@ -26,7 +34,14 @@ class AppLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    // TODO: implement with conditional logging
-    throw UnimplementedError();
+    if (kDebugMode) {
+      debugPrint(_format('ERROR', message, tag));
+      if (error != null) {
+        debugPrint('  Error: $error');
+      }
+      if (stackTrace != null) {
+        debugPrint('  StackTrace: $stackTrace');
+      }
+    }
   }
 }

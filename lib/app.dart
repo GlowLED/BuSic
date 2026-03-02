@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/settings/application/settings_notifier.dart';
 
 /// Root application widget.
 ///
@@ -18,6 +19,7 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final settings = ref.watch(settingsNotifierProvider);
 
     return MaterialApp.router(
       title: 'BuSic',
@@ -26,12 +28,13 @@ class App extends ConsumerWidget {
       // Theme
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
-      themeMode: ThemeMode.system, // TODO: bind to settings notifier
+      themeMode: settings.themeMode,
 
       // Routing
       routerConfig: router,
 
       // Localization
+      locale: settings.locale != null ? Locale(settings.locale!) : null,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

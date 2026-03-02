@@ -31,13 +31,23 @@ class PlatformUtils {
   /// - Desktop: `~/Music/BuSic/cache/` or platform equivalent
   /// - Android: App-specific external storage directory
   static Future<String> getCachePath() async {
-    // TODO: implement platform-specific cache path resolution
-    throw UnimplementedError();
+    final dir = await getApplicationCacheDirectory();
+    final cachePath = p.join(dir.path, 'busic', 'cache');
+    final cacheDir = Directory(cachePath);
+    if (!await cacheDir.exists()) {
+      await cacheDir.create(recursive: true);
+    }
+    return cachePath;
   }
 
   /// Get the application's data directory path for database and config.
   static Future<String> getDataPath() async {
-    // TODO: implement
-    throw UnimplementedError();
+    final dir = await getApplicationDocumentsDirectory();
+    final dataPath = p.join(dir.path, 'busic');
+    final dataDir = Directory(dataPath);
+    if (!await dataDir.exists()) {
+      await dataDir.create(recursive: true);
+    }
+    return dataPath;
   }
 }

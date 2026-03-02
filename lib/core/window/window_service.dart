@@ -38,21 +38,19 @@ class WindowService {
   /// Update the window title.
   static Future<void> setTitle(String title) async {
     if (!PlatformUtils.isDesktop) return;
-    // TODO: implement
-    throw UnimplementedError();
+    await windowManager.setTitle(title);
   }
 
   /// Set the minimum window size.
   static Future<void> setMinSize(Size size) async {
     if (!PlatformUtils.isDesktop) return;
-    // TODO: implement
-    throw UnimplementedError();
+    await windowManager.setMinimumSize(size);
   }
 
   /// Toggle fullscreen mode.
   static Future<void> toggleFullScreen() async {
     if (!PlatformUtils.isDesktop) return;
-    // TODO: implement
-    throw UnimplementedError();
+    final isFullScreen = await windowManager.isFullScreen();
+    await windowManager.setFullScreen(!isFullScreen);
   }
 }
