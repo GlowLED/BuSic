@@ -1,0 +1,80 @@
+name: busic
+description: A modern cross-platform music player powered by Bilibili.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: '>=3.16.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management (Riverpod code generation)
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Database (Drift - SQLite ORM)
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.21
+
+  # Immutable Models
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+
+  # Network
+  dio: ^5.4.3+1
+  cookie_jar: ^4.0.8
+  dio_cookie_manager: ^3.1.1
+
+  # Media Playback
+  media_kit: ^1.1.10+1
+  media_kit_libs_linux: ^1.1.3
+  media_kit_libs_windows_audio: ^1.0.9
+  media_kit_libs_macos_audio: ^1.0.0
+  media_kit_libs_android_audio: ^1.3.6
+
+  # Desktop Window Management
+  window_manager: ^0.3.9
+
+  # Storage & Path
+  path_provider: ^2.1.3
+  path: ^1.9.0
+
+  # Utilities
+  crypto: ^3.0.3
+  intl: ^0.19.0
+  qr_flutter: ^4.1.0
+  cached_network_image: ^3.3.1
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # Code Generation
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  drift_dev: ^2.18.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/fonts/
+
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: assets/fonts/CustomFont-Regular.ttf
