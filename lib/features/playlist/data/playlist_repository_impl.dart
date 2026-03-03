@@ -11,14 +11,30 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   PlaylistRepositoryImpl({required AppDatabase db}) : _db = db;
 
-  domain.Playlist _mapPlaylist(Playlist row, {int songCount = 0}) {
+  domain.Playlist _mapPlaylist(Playlist row, {int songCount = 0, String? effectiveCoverUrl}) {
     return domain.Playlist(
       id: row.id,
       name: row.name,
-      coverUrl: row.coverUrl,
+      coverUrl: effectiveCoverUrl ?? row.coverUrl,
       songCount: songCount,
       createdAt: row.createdAt,
     );
+  }
+
+  Future<String?> _getFirstSongCover(int playlistId) async {
+    final row = await (_db.select(_db.songs).join([
+      innerJoin(
+        _db.playlistSongs,
+        _db.playlistSongs.songId.equalsExp(_db.songs.id),
+      ),
+    ])
+          ..where(_db.playlistSongs.playlistId.equals(playlistId))
+          ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)])
+          ..limit(1))
+        .getSingleOrNull();
+
+    if (row == null) return null;
+    return row.readTable(_db.songs).coverUrl;
   }
 
   SongItem _mapSong(Song row) {
@@ -50,7 +66,12 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
             ..where(_db.playlistSongs.playlistId.equals(row.id)))
           .map((r) => r.read(_db.playlistSongs.songId.count()))
           .getSingle();
-      result.add(_mapPlaylist(row, songCount: count ?? 0));
+      final effectiveCoverUrl = row.coverUrl ?? await _getFirstSongCover(row.id);
+      result.add(_mapPlaylist(
+        row,
+        songCount: count ?? 0,
+        effectiveCoverUrl: effectiveCoverUrl,
+      ));
     }
     return result;
   }
@@ -67,7 +88,12 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
           ..where(_db.playlistSongs.playlistId.equals(id)))
         .map((r) => r.read(_db.playlistSongs.songId.count()))
         .getSingle();
-    return _mapPlaylist(row, songCount: count ?? 0);
+    final effectiveCoverUrl = row.coverUrl ?? await _getFirstSongCover(row.id);
+    return _mapPlaylist(
+      row,
+      songCount: count ?? 0,
+      effectiveCoverUrl: effectiveCoverUrl,
+    );
   }
 
   @override

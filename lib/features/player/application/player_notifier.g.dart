@@ -6,12 +6,13 @@ part of 'player_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playerNotifierHash() => r'c71c8d1e82e61fde8fdef705e51991cd49aee1f5';
+String _$playerNotifierHash() => r'9a4ee6ab3c7e313ff08456c6817c193948cf8b8d';
 
 /// State notifier managing the audio player lifecycle.
 ///
 /// Controls playback, queue management, and mode switching.
 /// Listens to the [PlayerRepository] streams and updates [PlayerState] accordingly.
+/// Persists playback state (track, queue, position) for restore on next launch.
 ///
 /// Copied from [PlayerNotifier].
 @ProviderFor(PlayerNotifier)

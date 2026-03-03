@@ -82,7 +82,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     if (context.mounted && songIds.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已添加 ${songIds.length} 首歌曲到歌单')),
+        SnackBar(
+          content: Text('已添加 ${songIds.length} 首歌曲到歌单'),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
       );
       ref.invalidate(playlistListNotifierProvider);
     }

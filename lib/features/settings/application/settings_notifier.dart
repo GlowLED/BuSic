@@ -15,8 +15,8 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyThemeMode = 'theme_mode';
   static const _keyLocale = 'locale';
   static const _keyCachePath = 'cache_path';
-  static const _keyAutoCache = 'auto_cache';
   static const _keyPreferredQuality = 'preferred_quality';
+  static const _keyThemeSeedColor = 'theme_seed_color';
 
   @override
   UserPreferences build() {
@@ -30,8 +30,8 @@ class SettingsNotifier extends _$SettingsNotifier {
     final themeModeIndex = prefs.getInt(_keyThemeMode);
     final locale = prefs.getString(_keyLocale);
     final cachePath = prefs.getString(_keyCachePath);
-    final autoCache = prefs.getBool(_keyAutoCache) ?? false;
     final preferredQuality = prefs.getInt(_keyPreferredQuality) ?? 0;
+    final themeSeedColor = prefs.getInt(_keyThemeSeedColor) ?? 0xFF4CAF50;
 
     state = UserPreferences(
       themeMode: themeModeIndex != null
@@ -39,8 +39,8 @@ class SettingsNotifier extends _$SettingsNotifier {
           : ThemeMode.system,
       locale: locale,
       cachePath: cachePath,
-      autoCache: autoCache,
       preferredQuality: preferredQuality,
+      themeSeedColor: themeSeedColor,
     );
   }
 
@@ -73,18 +73,18 @@ class SettingsNotifier extends _$SettingsNotifier {
     }
   }
 
-  /// Toggle automatic caching on/off.
-  Future<void> setAutoCache(bool enabled) async {
-    state = state.copyWith(autoCache: enabled);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyAutoCache, enabled);
-  }
-
   /// Set the preferred audio quality.
   Future<void> setPreferredQuality(int quality) async {
     state = state.copyWith(preferredQuality: quality);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyPreferredQuality, quality);
+  }
+
+  /// Set the seed color used for the app color scheme.
+  Future<void> setThemeSeedColor(int colorValue) async {
+    state = state.copyWith(themeSeedColor: colorValue);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyThemeSeedColor, colorValue);
   }
 
   /// Reset all settings to defaults.
@@ -94,7 +94,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyThemeMode);
     await prefs.remove(_keyLocale);
     await prefs.remove(_keyCachePath);
-    await prefs.remove(_keyAutoCache);
     await prefs.remove(_keyPreferredQuality);
+    await prefs.remove(_keyThemeSeedColor);
   }
 }

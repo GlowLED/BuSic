@@ -1,10 +1,38 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../application/settings_notifier.dart';
+
+/// Pick a directory using zenity (Linux) or text input fallback.
+Future<String?> _pickDirectory({
+  String? title,
+  String? initialDirectory,
+}) async {
+  // Try zenity on Linux
+  if (Platform.isLinux) {
+    try {
+      final result = await Process.run('zenity', [
+        '--file-selection',
+        '--directory',
+        if (title != null) '--title=$title',
+        if (initialDirectory != null) '--filename=$initialDirectory/',
+      ]);
+      if (result.exitCode == 0) {
+        final path = (result.stdout as String).trim();
+        if (path.isNotEmpty) return path;
+      }
+    } catch (_) {
+      // zenity not available, fall through
+    }
+  }
+  return null;
+}
 
 /// Settings screen with app configuration options.
 class SettingsScreen extends ConsumerWidget {
@@ -44,6 +72,27 @@ class SettingsScreen extends ConsumerWidget {
                 ref
                     .read(settingsNotifierProvider.notifier)
                     .setThemeMode(modes.first);
+              },
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('配色方案'),
+            trailing: DropdownButton<int>(
+              value: settings.themeSeedColor,
+              underline: const SizedBox.shrink(),
+              items: const [
+                DropdownMenuItem(value: 0xFF4CAF50, child: Text('绿色')),
+                DropdownMenuItem(value: 0xFFE91E63, child: Text('粉色')),
+                DropdownMenuItem(value: 0xFF9C27B0, child: Text('紫色')),
+                DropdownMenuItem(value: 0xFFFBC02D, child: Text('黄色')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  ref
+                      .read(settingsNotifierProvider.notifier)
+                      .setThemeSeedColor(value);
+                }
               },
             ),
           ),
@@ -107,26 +156,12 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
-          SwitchListTile(
-            secondary: const Icon(Icons.cached),
-            title: Text(l10n.autoCache),
-            value: settings.autoCache,
-            onChanged: (value) {
-              ref
-                  .read(settingsNotifierProvider.notifier)
-                  .setAutoCache(value);
-            },
-          ),
 
           const Divider(),
 
           // ── Storage ──
           _SectionHeader(title: l10n.cachePath),
-          ListTile(
-            leading: const Icon(Icons.folder),
-            title: Text(l10n.cachePath),
-            subtitle: Text(settings.cachePath ?? 'Default'),
-          ),
+          _CachePathTile(settings: settings, ref: ref),
 
           const Divider(),
 
@@ -211,5 +246,140 @@ class _SectionHeader extends StatelessWidget {
             ),
       ),
     );
+  }
+}
+
+/// Tile showing the cache/download path with ability to edit it.
+class _CachePathTile extends StatefulWidget {
+  final dynamic settings;
+  final WidgetRef ref;
+
+  const _CachePathTile({required this.settings, required this.ref});
+
+  @override
+  State<_CachePathTile> createState() => _CachePathTileState();
+}
+
+class _CachePathTileState extends State<_CachePathTile> {
+  String? _defaultPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveDefaultPath();
+  }
+
+  Future<void> _resolveDefaultPath() async {
+    final dir = await getApplicationDocumentsDirectory();
+    if (mounted) {
+      setState(() {
+        _defaultPath = '${dir.path}/busic/downloads';
+      });
+    }
+  }
+
+  String get _displayPath =>
+      widget.settings.cachePath ?? _defaultPath ?? '...';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return ListTile(
+      leading: const Icon(Icons.folder),
+      title: Text(l10n.cachePath),
+      subtitle: Text(
+        _displayPath,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.folder_open, size: 20),
+            tooltip: '选择目录',
+            onPressed: () => _selectDirectory(context),
+          ),
+          if (widget.settings.cachePath != null)
+            IconButton(
+              icon: const Icon(Icons.restore, size: 20),
+              tooltip: l10n.reset,
+              onPressed: () {
+                widget.ref
+                    .read(settingsNotifierProvider.notifier)
+                    .setCachePath(null);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _selectDirectory(BuildContext context) async {
+    // Try native directory picker first
+    var result = await _pickDirectory(
+      title: '选择缓存目录',
+      initialDirectory: _displayPath,
+    );
+
+    // If zenity is not available, fall back to text input dialog
+    if (result == null && context.mounted) {
+      bool zenityAvailable = false;
+      if (Platform.isLinux) {
+        try {
+          final which = await Process.run('which', ['zenity']);
+          zenityAvailable = which.exitCode == 0;
+        } catch (_) {}
+      }
+
+      // Only show text input if zenity is not available
+      // (if zenity IS available, result==null means user cancelled)
+      if (!zenityAvailable && context.mounted) {
+        final controller = TextEditingController(text: _displayPath);
+        result = await showDialog<String>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('输入缓存路径'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: '/home/user/Music',
+              ),
+              onSubmitted: (v) => Navigator.of(ctx).pop(v),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(null),
+                child: Text(context.l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(controller.text),
+                child: Text(context.l10n.confirm),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    if (result == null || result.trim().isEmpty) return;
+    result = result.trim();
+
+    // Validate directory exists or can be created
+    final dir = Directory(result);
+    if (!await dir.exists()) {
+      try {
+        await dir.create(recursive: true);
+      } catch (e) {
+        if (context.mounted) {
+          context.showSnackBar('无法创建目录: $e');
+        }
+        return;
+      }
+    }
+    widget.ref
+        .read(settingsNotifierProvider.notifier)
+        .setCachePath(result);
   }
 }

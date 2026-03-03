@@ -25,10 +25,14 @@ extension ContextExtensions on BuildContext {
   /// Whether the current layout is considered desktop width (>= 840).
   bool get isDesktop => screenWidth >= 840;
 
-  /// Show a [SnackBar] with the given [message].
+  /// Show a [SnackBar] with the given [message], floating above the player bar.
   void showSnackBar(String message) {
     ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+      ),
     );
   }
 }

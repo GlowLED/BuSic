@@ -20,14 +20,15 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final settings = ref.watch(settingsNotifierProvider);
+    final seedColor = Color(settings.themeSeedColor);
 
     return MaterialApp.router(
       title: 'BuSic',
       debugShowCheckedModeBanner: false,
 
       // Theme
-      theme: AppTheme.lightTheme(),
-      darkTheme: AppTheme.darkTheme(),
+      theme: AppTheme.lightTheme(seedColor: seedColor),
+      darkTheme: AppTheme.darkTheme(seedColor: seedColor),
       themeMode: settings.themeMode,
 
       // Routing

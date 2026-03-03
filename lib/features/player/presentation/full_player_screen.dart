@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -28,12 +29,7 @@ class FullPlayerScreen extends ConsumerWidget {
           if (track?.coverUrl != null)
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-              child: CachedNetworkImage(
-                imageUrl: track!.coverUrl!,
-                fit: BoxFit.cover,
-                color: Colors.black54,
-                colorBlendMode: BlendMode.darken,
-              ),
+              child: _buildBackgroundCover(track!.coverUrl!),
             ),
 
           // Content
@@ -77,10 +73,7 @@ class FullPlayerScreen extends ConsumerWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: track?.coverUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: track!.coverUrl!,
-                              fit: BoxFit.cover,
-                            )
+                          ? _buildMainCover(track!.coverUrl!)
                           : Container(
                               color: context.colorScheme.primaryContainer,
                               child: const Icon(Icons.music_note,
@@ -303,4 +296,46 @@ class FullPlayerScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget _buildBackgroundCover(String coverUrl) {
+  final isLocal = coverUrl.startsWith('/') || coverUrl.startsWith('file://');
+  if (isLocal) {
+    final path = coverUrl.startsWith('file://')
+        ? Uri.parse(coverUrl).toFilePath()
+        : coverUrl;
+    return Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      color: Colors.black54,
+      colorBlendMode: BlendMode.darken,
+      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black54),
+    );
+  }
+
+  return CachedNetworkImage(
+    imageUrl: coverUrl,
+    fit: BoxFit.cover,
+    color: Colors.black54,
+    colorBlendMode: BlendMode.darken,
+  );
+}
+
+Widget _buildMainCover(String coverUrl) {
+  final isLocal = coverUrl.startsWith('/') || coverUrl.startsWith('file://');
+  if (isLocal) {
+    final path = coverUrl.startsWith('file://')
+        ? Uri.parse(coverUrl).toFilePath()
+        : coverUrl;
+    return Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black12),
+    );
+  }
+
+  return CachedNetworkImage(
+    imageUrl: coverUrl,
+    fit: BoxFit.cover,
+  );
 }

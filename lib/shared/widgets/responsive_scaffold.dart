@@ -17,34 +17,13 @@ import '../../features/auth/presentation/widgets/user_avatar_widget.dart';
 ///
 /// The bottom [PlayerBar] is always visible when a track is playing.
 class ResponsiveScaffold extends StatelessWidget {
-  /// The child widget to display in the main content area (from ShellRoute).
-  final Widget child;
+  /// Stateful navigation shell for preserving per-tab stacks.
+  final StatefulNavigationShell navigationShell;
 
-  const ResponsiveScaffold({super.key, required this.child});
+  const ResponsiveScaffold({super.key, required this.navigationShell});
 
-  int _currentIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/search')) return 1;
-    if (location.startsWith('/downloads')) return 2;
-    if (location.startsWith('/settings')) return 3;
-    return 0; // home / playlists
-  }
-
-  void _onDestinationSelected(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/');
-        break;
-      case 1:
-        context.go('/search');
-        break;
-      case 2:
-        context.go('/downloads');
-        break;
-      case 3:
-        context.go('/settings');
-        break;
-    }
+  void _onDestinationSelected(int index) {
+    navigationShell.goBranch(index, initialLocation: false);
   }
 
   @override
@@ -53,7 +32,7 @@ class ResponsiveScaffold extends StatelessWidget {
     final isDesktop = width >= AppTheme.desktopBreakpoint;
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final currentIdx = _currentIndex(context);
+    final currentIdx = navigationShell.currentIndex;
 
     if (isDesktop) {
       return Scaffold(
@@ -70,7 +49,7 @@ class ResponsiveScaffold extends StatelessWidget {
                   NavigationRail(
                     selectedIndex: currentIdx,
                     onDestinationSelected: (idx) =>
-                        _onDestinationSelected(context, idx),
+                        _onDestinationSelected(idx),
                     extended: width >= 1100,
                     leading: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -121,7 +100,7 @@ class ResponsiveScaffold extends StatelessWidget {
                   ),
                   const VerticalDivider(thickness: 1, width: 1),
                   // Main content
-                  Expanded(child: child),
+                  Expanded(child: navigationShell),
                 ],
               ),
             ),
@@ -136,14 +115,14 @@ class ResponsiveScaffold extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Expanded(child: child),
+          Expanded(child: navigationShell),
           const PlayerBar(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIdx,
         onDestinationSelected: (idx) =>
-            _onDestinationSelected(context, idx),
+            _onDestinationSelected(idx),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.library_music_outlined),

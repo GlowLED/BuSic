@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -34,15 +36,7 @@ class PlaylistTile extends StatelessWidget {
           children: [
             // Cover area
             Expanded(
-              child: playlist.coverUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: playlist.coverUrl!,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => _buildPlaceholder(colorScheme),
-                      errorWidget: (_, __, ___) =>
-                          _buildPlaceholder(colorScheme),
-                    )
-                  : _buildPlaceholder(colorScheme),
+              child: _buildCover(colorScheme),
             ),
             // Info area
             Padding(
@@ -89,6 +83,30 @@ class PlaylistTile extends StatelessWidget {
         size: 48,
         color: colorScheme.onPrimaryContainer.withValues(alpha: 0.5),
       ),
+    );
+  }
+
+  Widget _buildCover(ColorScheme colorScheme) {
+    final cover = playlist.coverUrl;
+    if (cover == null || cover.isEmpty) return _buildPlaceholder(colorScheme);
+
+    final isLocal = cover.startsWith('/') || cover.startsWith('file://');
+    if (isLocal) {
+      final path = cover.startsWith('file://')
+          ? Uri.parse(cover).toFilePath()
+          : cover;
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildPlaceholder(colorScheme),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: cover,
+      fit: BoxFit.cover,
+      placeholder: (_, __) => _buildPlaceholder(colorScheme),
+      errorWidget: (_, __, ___) => _buildPlaceholder(colorScheme),
     );
   }
 }

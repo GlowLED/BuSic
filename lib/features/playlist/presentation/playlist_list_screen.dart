@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,23 @@ import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
 import '../application/playlist_notifier.dart';
 import 'widgets/playlist_tile.dart';
+
+Future<String?> _pickImageFile({String? title}) async {
+  if (!Platform.isLinux) return null;
+  try {
+    final result = await Process.run('zenity', [
+      '--file-selection',
+      '--title=${title ?? '选择封面图片'}',
+      '--file-filter=Image files | *.png *.jpg *.jpeg *.webp *.bmp',
+      '--file-filter=All files | *',
+    ]);
+    if (result.exitCode == 0) {
+      final path = (result.stdout as String).trim();
+      if (path.isNotEmpty) return path;
+    }
+  } catch (_) {}
+  return null;
+}
 
 /// Screen displaying all user playlists.
 ///
@@ -124,6 +143,29 @@ class PlaylistListScreen extends ConsumerWidget {
                       .read(playlistListNotifierProvider.notifier)
                       .renamePlaylist(id, newName.trim());
                 }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.image_outlined),
+              title: const Text('修改封面'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final path = await _pickImageFile(title: '选择歌单封面');
+                if (path != null && path.isNotEmpty) {
+                  await ref
+                      .read(playlistListNotifierProvider.notifier)
+                      .updatePlaylistCover(id, path);
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.image_not_supported_outlined),
+              title: const Text('恢复默认封面'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                await ref
+                    .read(playlistListNotifierProvider.notifier)
+                    .updatePlaylistCover(id, null);
               },
             ),
             ListTile(

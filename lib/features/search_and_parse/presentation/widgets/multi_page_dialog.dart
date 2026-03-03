@@ -117,7 +117,9 @@ class MultiPageDialog extends ConsumerWidget {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('已添加 ${ids.length} 首歌曲')),
+                          content: Text('已添加 ${ids.length} 首歌曲'),
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16)),
                     );
                   }
                 },

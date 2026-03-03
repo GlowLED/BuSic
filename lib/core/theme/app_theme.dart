@@ -7,16 +7,18 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  // ── Brand Colors ──────────────────────────────────────────────────────
-  static const Color _primaryColor = Color(0xFF00A1D6); // Bilibili blue
-  static const Color _secondaryColor = Color(0xFFFB7299); // Bilibili pink
+  // ── Theme Seed Presets ────────────────────────────────────────────────
+  static const Color greenSeed = Color(0xFF4CAF50);
+  static const Color pinkSeed = Color(0xFFE91E63);
+  static const Color purpleSeed = Color(0xFF9C27B0);
+  static const Color yellowSeed = Color(0xFFFBC02D);
+
   static const Color _errorColor = Color(0xFFE53935);
 
   // ── Light Theme ───────────────────────────────────────────────────────
-  static ThemeData lightTheme() {
+  static ThemeData lightTheme({required Color seedColor}) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: _primaryColor,
-      secondary: _secondaryColor,
+      seedColor: seedColor,
       error: _errorColor,
       brightness: Brightness.light,
     );
@@ -46,10 +48,9 @@ class AppTheme {
   }
 
   // ── Dark Theme ────────────────────────────────────────────────────────
-  static ThemeData darkTheme() {
+  static ThemeData darkTheme({required Color seedColor}) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: _primaryColor,
-      secondary: _secondaryColor,
+      seedColor: seedColor,
       error: _errorColor,
       brightness: Brightness.dark,
     );

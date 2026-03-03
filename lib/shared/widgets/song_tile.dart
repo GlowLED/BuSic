@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -57,23 +59,7 @@ class SongTile extends StatelessWidget {
         child: SizedBox(
           width: 48,
           height: 48,
-          child: coverUrl != null && coverUrl!.isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: coverUrl!,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    color: colorScheme.surfaceContainerHighest,
-                    child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    color: colorScheme.surfaceContainerHighest,
-                    child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
-                  ),
-                )
-              : Container(
-                  color: colorScheme.surfaceContainerHighest,
-                  child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
-                ),
+          child: _buildCover(colorScheme),
         ),
       ),
       title: Text(
@@ -145,6 +131,44 @@ class SongTile extends StatelessWidget {
       onTap: onTap,
       selected: isPlaying,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    );
+  }
+
+  Widget _buildCover(ColorScheme colorScheme) {
+    if (coverUrl == null || coverUrl!.isEmpty) {
+      return Container(
+        color: colorScheme.surfaceContainerHighest,
+        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+      );
+    }
+
+    final cover = coverUrl!;
+    final isLocal = cover.startsWith('/') || cover.startsWith('file://');
+    if (isLocal) {
+      final path = cover.startsWith('file://')
+          ? Uri.parse(cover).toFilePath()
+          : cover;
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          color: colorScheme.surfaceContainerHighest,
+          child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+        ),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: cover,
+      fit: BoxFit.cover,
+      placeholder: (_, __) => Container(
+        color: colorScheme.surfaceContainerHighest,
+        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+      ),
+      errorWidget: (_, __, ___) => Container(
+        color: colorScheme.surfaceContainerHighest,
+        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
+      ),
     );
   }
 }

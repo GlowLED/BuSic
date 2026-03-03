@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/bili_dio.dart';
 import '../../../core/utils/logger.dart';
 import '../../playlist/domain/models/song_item.dart';
 import '../../search_and_parse/data/parse_repository.dart';
 import '../../search_and_parse/data/parse_repository_impl.dart';
+import '../../settings/application/settings_notifier.dart';
 import '../data/player_repository.dart';
 import '../data/player_repository_impl.dart';
 import '../domain/models/audio_track.dart';
@@ -20,11 +23,27 @@ part 'player_notifier.g.dart';
 ///
 /// Controls playback, queue management, and mode switching.
 /// Listens to the [PlayerRepository] streams and updates [PlayerState] accordingly.
+/// Persists playback state (track, queue, position) for restore on next launch.
 @riverpod
 class PlayerNotifier extends _$PlayerNotifier {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
   final List<StreamSubscription> _subscriptions = [];
+  DateTime _lastPersist = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static const _keyCurrentTrack = 'player_current_track';
+  static const _keyQueue = 'player_queue';
+  static const _keyCurrentIndex = 'player_current_index';
+  static const _keyPosition = 'player_position_ms';
+  static const _keyPlayMode = 'player_play_mode';
+  static const _keyPlaylistName = 'player_playlist_name';
+  static const _keyPlaylistId = 'player_playlist_id';
+  static const _keyVolume = 'player_volume';
+
+  int? get _preferredQuality {
+    final quality = ref.read(settingsNotifierProvider).preferredQuality;
+    return quality == 0 ? null : quality;
+  }
 
   @override
   PlayerState build() {
@@ -35,6 +54,12 @@ class PlayerNotifier extends _$PlayerNotifier {
     _subscriptions.add(
       _repository.positionStream.listen((pos) {
         state = state.copyWith(position: pos);
+        // Throttle persist to once every 5 seconds
+        final now = DateTime.now();
+        if (now.difference(_lastPersist).inSeconds >= 5) {
+          _lastPersist = now;
+          _persistState();
+        }
       }),
     );
     _subscriptions.add(
@@ -60,7 +85,89 @@ class PlayerNotifier extends _$PlayerNotifier {
       _repository.dispose();
     });
 
+    // Restore last session asynchronously
+    _restoreState();
+
     return const PlayerState();
+  }
+
+  /// Persist current playback state to shared preferences.
+  Future<void> _persistState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final track = state.currentTrack;
+      if (track != null) {
+        await prefs.setString(_keyCurrentTrack, jsonEncode(track.toJson()));
+        await prefs.setString(
+          _keyQueue,
+          jsonEncode(state.queue.map((t) => t.toJson()).toList()),
+        );
+        await prefs.setInt(_keyCurrentIndex, state.currentIndex);
+        await prefs.setInt(_keyPosition, state.position.inMilliseconds);
+        await prefs.setInt(_keyPlayMode, state.playMode.index);
+        await prefs.setDouble(_keyVolume, state.volume);
+        if (state.playlistName != null) {
+          await prefs.setString(_keyPlaylistName, state.playlistName!);
+        }
+        if (state.playlistId != null) {
+          await prefs.setInt(_keyPlaylistId, state.playlistId!);
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Failed to persist player state', tag: 'Player', error: e);
+    }
+  }
+
+  /// Restore last session's playback state (paused).
+  Future<void> _restoreState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final trackJson = prefs.getString(_keyCurrentTrack);
+      if (trackJson == null) return;
+
+      final track = AudioTrack.fromJson(
+        jsonDecode(trackJson) as Map<String, dynamic>,
+      );
+
+      final queueJson = prefs.getString(_keyQueue);
+      List<AudioTrack> queue = [track];
+      if (queueJson != null) {
+        final queueList = jsonDecode(queueJson) as List;
+        queue = queueList
+            .map((e) => AudioTrack.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+
+      final currentIndex = prefs.getInt(_keyCurrentIndex) ?? 0;
+      final positionMs = prefs.getInt(_keyPosition) ?? 0;
+      final playModeIndex = prefs.getInt(_keyPlayMode) ?? 0;
+      final volume = prefs.getDouble(_keyVolume) ?? 1.0;
+      final playlistName = prefs.getString(_keyPlaylistName);
+      final playlistId = prefs.getInt(_keyPlaylistId);
+
+      state = state.copyWith(
+        currentTrack: track,
+        queue: queue,
+        currentIndex: currentIndex.clamp(0, queue.length - 1),
+        position: Duration(milliseconds: positionMs),
+        duration: track.duration,
+        isPlaying: false,
+        playMode: PlayMode.values[playModeIndex.clamp(0, PlayMode.values.length - 1)],
+        volume: volume,
+        playlistName: playlistName,
+        playlistId: playlistId,
+      );
+
+      // Set volume on the player engine
+      await _repository.setVolume(volume);
+
+      AppLogger.info(
+        'Restored last session: ${track.title}',
+        tag: 'Player',
+      );
+    } catch (e) {
+      AppLogger.error('Failed to restore player state', tag: 'Player', error: e);
+    }
   }
 
   /// Play a specific track, optionally replacing the queue.
@@ -76,15 +183,22 @@ class PlayerNotifier extends _$PlayerNotifier {
     );
 
     await _repository.play(track);
+    _hasActiveMedia = true;
   }
 
   /// Convert a [SongItem] to an [AudioTrack] by resolving the audio stream URL.
   Future<AudioTrack> _resolveAudioTrack(SongItem song) async {
     String? streamUrl;
+    int quality = song.audioQuality;
     if (song.localPath == null) {
       try {
-        final streamInfo = await _parseRepository.getAudioStream(song.bvid, song.cid);
+        final streamInfo = await _parseRepository.getAudioStream(
+          song.bvid,
+          song.cid,
+          quality: _preferredQuality,
+        );
         streamUrl = streamInfo.url;
+        quality = streamInfo.quality;
       } catch (e) {
         AppLogger.error('Failed to resolve stream for ${song.bvid}', tag: 'Player', error: e);
         rethrow;
@@ -100,6 +214,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       duration: Duration(seconds: song.duration),
       streamUrl: streamUrl,
       localPath: song.localPath,
+      quality: quality,
     );
   }
 
@@ -126,6 +241,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       duration: Duration(seconds: s.duration),
       streamUrl: s.id == song.id ? track.streamUrl : null,
       localPath: s.localPath,
+      quality: s.audioQuality,
     )).toList();
 
     // Update the resolved track in queue
@@ -143,6 +259,7 @@ class PlayerNotifier extends _$PlayerNotifier {
     );
 
     await _repository.play(track);
+    _hasActiveMedia = true;
   }
 
   /// Pause the current playback.
@@ -151,9 +268,59 @@ class PlayerNotifier extends _$PlayerNotifier {
   }
 
   /// Resume the current playback.
+  ///
+  /// If the player has no active media (e.g. restored from saved state),
+  /// resolves the stream URL and starts playback from the saved position.
   Future<void> resume() async {
+    final track = state.currentTrack;
+    if (track == null) return;
+
+    // Check if the player needs to load the media first (restored state)
+    if (!_hasActiveMedia) {
+      var playableTrack = track;
+      if (playableTrack.streamUrl == null && playableTrack.localPath == null) {
+        try {
+          final streamInfo = await _parseRepository.getAudioStream(
+            playableTrack.bvid,
+            playableTrack.cid,
+            quality: _preferredQuality,
+          );
+          playableTrack = playableTrack.copyWith(
+            streamUrl: streamInfo.url,
+            quality: streamInfo.quality,
+          );
+          // Update in queue & state
+          final updatedQueue = List<AudioTrack>.from(state.queue);
+          if (state.currentIndex < updatedQueue.length) {
+            updatedQueue[state.currentIndex] = playableTrack;
+          }
+          state = state.copyWith(
+            currentTrack: playableTrack,
+            queue: updatedQueue,
+          );
+        } catch (e) {
+          AppLogger.error('Failed to resolve stream for resume',
+              tag: 'Player', error: e);
+          return;
+        }
+      }
+      final savedPosition = state.position;
+      await _repository.play(playableTrack);
+      _hasActiveMedia = true;
+      // Seek to saved position after a short delay for media to load
+      if (savedPosition > Duration.zero) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          _repository.seek(savedPosition);
+        });
+      }
+      return;
+    }
+
     await _repository.resume();
   }
+
+  /// Whether the player engine has an active media loaded.
+  bool _hasActiveMedia = false;
 
   /// Skip to the next track in the queue.
   Future<void> next() async {
@@ -167,11 +334,18 @@ class PlayerNotifier extends _$PlayerNotifier {
     }
 
     var track = state.queue[nextIndex];
-    // Resolve stream URL if needed
+    // Resolve stream URL if needed (next)
     if (track.streamUrl == null && track.localPath == null) {
       try {
-        final streamInfo = await _parseRepository.getAudioStream(track.bvid, track.cid);
-        track = track.copyWith(streamUrl: streamInfo.url);
+        final streamInfo = await _parseRepository.getAudioStream(
+          track.bvid,
+          track.cid,
+          quality: _preferredQuality,
+        );
+        track = track.copyWith(
+          streamUrl: streamInfo.url,
+          quality: streamInfo.quality,
+        );
         final updatedQueue = List<AudioTrack>.from(state.queue);
         updatedQueue[nextIndex] = track;
         state = state.copyWith(queue: updatedQueue);
@@ -186,6 +360,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       position: Duration.zero,
     );
     await _repository.play(track);
+    _hasActiveMedia = true;
   }
 
   /// Skip to the previous track in the queue.
@@ -203,11 +378,18 @@ class PlayerNotifier extends _$PlayerNotifier {
         : state.queue.length - 1;
 
     var track = state.queue[prevIndex];
-    // Resolve stream URL if needed
+    // Resolve stream URL if needed (previous)
     if (track.streamUrl == null && track.localPath == null) {
       try {
-        final streamInfo = await _parseRepository.getAudioStream(track.bvid, track.cid);
-        track = track.copyWith(streamUrl: streamInfo.url);
+        final streamInfo = await _parseRepository.getAudioStream(
+          track.bvid,
+          track.cid,
+          quality: _preferredQuality,
+        );
+        track = track.copyWith(
+          streamUrl: streamInfo.url,
+          quality: streamInfo.quality,
+        );
         final updatedQueue = List<AudioTrack>.from(state.queue);
         updatedQueue[prevIndex] = track;
         state = state.copyWith(queue: updatedQueue);
@@ -222,6 +404,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       position: Duration.zero,
     );
     await _repository.play(track);
+    _hasActiveMedia = true;
   }
 
   /// Seek to a specific position in the current track.

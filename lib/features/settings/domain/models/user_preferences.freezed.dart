@@ -29,12 +29,12 @@ mixin _$UserPreferences {
   /// Custom cache directory path (null = default platform path).
   String? get cachePath => throw _privateConstructorUsedError;
 
-  /// Whether to automatically cache audio when playing.
-  bool get autoCache => throw _privateConstructorUsedError;
-
   /// Preferred audio quality identifier.
   /// 0 = auto (best available), or specific quality code.
   int get preferredQuality => throw _privateConstructorUsedError;
+
+  /// Theme seed color value.
+  int get themeSeedColor => throw _privateConstructorUsedError;
 
   /// Serializes this UserPreferences to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,8 +56,8 @@ abstract class $UserPreferencesCopyWith<$Res> {
       {ThemeMode themeMode,
       String? locale,
       String? cachePath,
-      bool autoCache,
-      int preferredQuality});
+      int preferredQuality,
+      int themeSeedColor});
 }
 
 /// @nodoc
@@ -78,8 +78,8 @@ class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
     Object? themeMode = null,
     Object? locale = freezed,
     Object? cachePath = freezed,
-    Object? autoCache = null,
     Object? preferredQuality = null,
+    Object? themeSeedColor = null,
   }) {
     return _then(_value.copyWith(
       themeMode: null == themeMode
@@ -94,13 +94,13 @@ class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
           ? _value.cachePath
           : cachePath // ignore: cast_nullable_to_non_nullable
               as String?,
-      autoCache: null == autoCache
-          ? _value.autoCache
-          : autoCache // ignore: cast_nullable_to_non_nullable
-              as bool,
       preferredQuality: null == preferredQuality
           ? _value.preferredQuality
           : preferredQuality // ignore: cast_nullable_to_non_nullable
+              as int,
+      themeSeedColor: null == themeSeedColor
+          ? _value.themeSeedColor
+          : themeSeedColor // ignore: cast_nullable_to_non_nullable
               as int,
     ) as $Val);
   }
@@ -118,8 +118,8 @@ abstract class _$$UserPreferencesImplCopyWith<$Res>
       {ThemeMode themeMode,
       String? locale,
       String? cachePath,
-      bool autoCache,
-      int preferredQuality});
+      int preferredQuality,
+      int themeSeedColor});
 }
 
 /// @nodoc
@@ -138,8 +138,8 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
     Object? themeMode = null,
     Object? locale = freezed,
     Object? cachePath = freezed,
-    Object? autoCache = null,
     Object? preferredQuality = null,
+    Object? themeSeedColor = null,
   }) {
     return _then(_$UserPreferencesImpl(
       themeMode: null == themeMode
@@ -154,13 +154,13 @@ class __$$UserPreferencesImplCopyWithImpl<$Res>
           ? _value.cachePath
           : cachePath // ignore: cast_nullable_to_non_nullable
               as String?,
-      autoCache: null == autoCache
-          ? _value.autoCache
-          : autoCache // ignore: cast_nullable_to_non_nullable
-              as bool,
       preferredQuality: null == preferredQuality
           ? _value.preferredQuality
           : preferredQuality // ignore: cast_nullable_to_non_nullable
+              as int,
+      themeSeedColor: null == themeSeedColor
+          ? _value.themeSeedColor
+          : themeSeedColor // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -173,8 +173,8 @@ class _$UserPreferencesImpl implements _UserPreferences {
       {this.themeMode = ThemeMode.system,
       this.locale,
       this.cachePath,
-      this.autoCache = false,
-      this.preferredQuality = 0});
+      this.preferredQuality = 0,
+      this.themeSeedColor = 0xFF4CAF50});
 
   factory _$UserPreferencesImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserPreferencesImplFromJson(json);
@@ -192,20 +192,20 @@ class _$UserPreferencesImpl implements _UserPreferences {
   @override
   final String? cachePath;
 
-  /// Whether to automatically cache audio when playing.
-  @override
-  @JsonKey()
-  final bool autoCache;
-
   /// Preferred audio quality identifier.
   /// 0 = auto (best available), or specific quality code.
   @override
   @JsonKey()
   final int preferredQuality;
 
+  /// Theme seed color value.
+  @override
+  @JsonKey()
+  final int themeSeedColor;
+
   @override
   String toString() {
-    return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, autoCache: $autoCache, preferredQuality: $preferredQuality)';
+    return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
   }
 
   @override
@@ -218,16 +218,16 @@ class _$UserPreferencesImpl implements _UserPreferences {
             (identical(other.locale, locale) || other.locale == locale) &&
             (identical(other.cachePath, cachePath) ||
                 other.cachePath == cachePath) &&
-            (identical(other.autoCache, autoCache) ||
-                other.autoCache == autoCache) &&
             (identical(other.preferredQuality, preferredQuality) ||
-                other.preferredQuality == preferredQuality));
+                other.preferredQuality == preferredQuality) &&
+            (identical(other.themeSeedColor, themeSeedColor) ||
+                other.themeSeedColor == themeSeedColor));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, themeMode, locale, cachePath, autoCache, preferredQuality);
+  int get hashCode => Object.hash(runtimeType, themeMode, locale, cachePath,
+      preferredQuality, themeSeedColor);
 
   /// Create a copy of UserPreferences
   /// with the given fields replaced by the non-null parameter values.
@@ -251,8 +251,8 @@ abstract class _UserPreferences implements UserPreferences {
       {final ThemeMode themeMode,
       final String? locale,
       final String? cachePath,
-      final bool autoCache,
-      final int preferredQuality}) = _$UserPreferencesImpl;
+      final int preferredQuality,
+      final int themeSeedColor}) = _$UserPreferencesImpl;
 
   factory _UserPreferences.fromJson(Map<String, dynamic> json) =
       _$UserPreferencesImpl.fromJson;
@@ -269,14 +269,14 @@ abstract class _UserPreferences implements UserPreferences {
   @override
   String? get cachePath;
 
-  /// Whether to automatically cache audio when playing.
-  @override
-  bool get autoCache;
-
   /// Preferred audio quality identifier.
   /// 0 = auto (best available), or specific quality code.
   @override
   int get preferredQuality;
+
+  /// Theme seed color value.
+  @override
+  int get themeSeedColor;
 
   /// Create a copy of UserPreferences
   /// with the given fields replaced by the non-null parameter values.

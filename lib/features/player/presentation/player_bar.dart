@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,12 +53,51 @@ class PlayerBar extends ConsumerWidget {
     return modes[(modes.indexOf(current) + 1) % modes.length];
   }
 
+  String _qualityLabel(int quality) {
+    switch (quality) {
+      case 30216:
+        return '64kbps';
+      case 30232:
+        return '132kbps';
+      case 30280:
+        return '192kbps';
+      case 30250:
+        return 'Dolby';
+      case 30251:
+        return 'Hi-Res';
+      default:
+        return '${quality}';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerState = ref.watch(playerNotifierProvider);
     final track = playerState.currentTrack;
 
-    if (track == null) return const SizedBox.shrink();
+    // Show placeholder bar when no track is loaded
+    if (track == null) {
+      return Container(
+        height: 72,
+        decoration: BoxDecoration(
+          color: context.colorScheme.surfaceContainerHighest,
+          border: Border(
+            top: BorderSide(
+              color: context.colorScheme.outlineVariant,
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            context.l10n.noPlayingMusic,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
+    }
 
     final progress = playerState.duration.inMilliseconds > 0
         ? playerState.position.inMilliseconds /
@@ -112,19 +153,7 @@ class PlayerBar extends ConsumerWidget {
                       child: SizedBox(
                         width: 48,
                         height: 48,
-                        child: track.coverUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: track.coverUrl!,
-                                fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => Container(
-                                  color: context.colorScheme.primaryContainer,
-                                  child: const Icon(Icons.music_note, size: 24),
-                                ),
-                              )
-                            : Container(
-                                color: context.colorScheme.primaryContainer,
-                                child: const Icon(Icons.music_note, size: 24),
-                              ),
+                        child: _buildCover(context, track.coverUrl),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -158,6 +187,27 @@ class PlayerBar extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    // Quality badge
+                    if (track.quality > 0)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: context.colorScheme.tertiaryContainer,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            _qualityLabel(track.quality),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: context.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
                     // Time display
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -242,6 +292,39 @@ class PlayerBar extends ConsumerWidget {
         ),
     );
   }
+}
+
+Widget _buildCover(BuildContext context, String? coverUrl) {
+  if (coverUrl == null || coverUrl.isEmpty) {
+    return Container(
+      color: context.colorScheme.primaryContainer,
+      child: const Icon(Icons.music_note, size: 24),
+    );
+  }
+
+  final isLocal = coverUrl.startsWith('/') || coverUrl.startsWith('file://');
+  if (isLocal) {
+    final path = coverUrl.startsWith('file://')
+        ? Uri.parse(coverUrl).toFilePath()
+        : coverUrl;
+    return Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: context.colorScheme.primaryContainer,
+        child: const Icon(Icons.music_note, size: 24),
+      ),
+    );
+  }
+
+  return CachedNetworkImage(
+    imageUrl: coverUrl,
+    fit: BoxFit.cover,
+    errorWidget: (_, __, ___) => Container(
+      color: context.colorScheme.primaryContainer,
+      child: const Icon(Icons.music_note, size: 24),
+    ),
+  );
 }
 
 /// Volume button with popup slider.

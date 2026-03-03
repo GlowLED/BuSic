@@ -13,8 +13,8 @@ _$UserPreferencesImpl _$$UserPreferencesImplFromJson(
           ThemeMode.system,
       locale: json['locale'] as String?,
       cachePath: json['cachePath'] as String?,
-      autoCache: json['autoCache'] as bool? ?? false,
       preferredQuality: (json['preferredQuality'] as num?)?.toInt() ?? 0,
+      themeSeedColor: (json['themeSeedColor'] as num?)?.toInt() ?? 0xFF4CAF50,
     );
 
 Map<String, dynamic> _$$UserPreferencesImplToJson(
@@ -23,8 +23,8 @@ Map<String, dynamic> _$$UserPreferencesImplToJson(
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'locale': instance.locale,
       'cachePath': instance.cachePath,
-      'autoCache': instance.autoCache,
       'preferredQuality': instance.preferredQuality,
+      'themeSeedColor': instance.themeSeedColor,
     };
 
 const _$ThemeModeEnumMap = {

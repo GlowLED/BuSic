@@ -19,12 +19,12 @@ class UserPreferences with _$UserPreferences {
     /// Custom cache directory path (null = default platform path).
     String? cachePath,
 
-    /// Whether to automatically cache audio when playing.
-    @Default(false) bool autoCache,
-
     /// Preferred audio quality identifier.
     /// 0 = auto (best available), or specific quality code.
     @Default(0) int preferredQuality,
+
+    /// Theme seed color value.
+    @Default(0xFF4CAF50) int themeSeedColor,
   }) = _UserPreferences;
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>

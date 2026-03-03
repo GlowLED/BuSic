@@ -47,6 +47,21 @@ mixin _$DownloadTask {
   /// Song artist (populated from songs table for display).
   String? get songArtist => throw _privateConstructorUsedError;
 
+  /// Cover image URL (populated from songs table for display).
+  String? get coverUrl => throw _privateConstructorUsedError;
+
+  /// Total bytes of the download (runtime only, not persisted).
+  int get totalBytes => throw _privateConstructorUsedError;
+
+  /// Bytes received so far (runtime only).
+  int get receivedBytes => throw _privateConstructorUsedError;
+
+  /// Current download speed in bytes/s (runtime only).
+  double get speed => throw _privateConstructorUsedError;
+
+  /// File size on disk in bytes (for completed downloads).
+  int get fileSize => throw _privateConstructorUsedError;
+
   /// Serializes this DownloadTask to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
@@ -72,7 +87,12 @@ abstract class $DownloadTaskCopyWith<$Res> {
       String? errorMessage,
       DateTime createdAt,
       String? songTitle,
-      String? songArtist});
+      String? songArtist,
+      String? coverUrl,
+      int totalBytes,
+      int receivedBytes,
+      double speed,
+      int fileSize});
 }
 
 /// @nodoc
@@ -99,6 +119,11 @@ class _$DownloadTaskCopyWithImpl<$Res, $Val extends DownloadTask>
     Object? createdAt = null,
     Object? songTitle = freezed,
     Object? songArtist = freezed,
+    Object? coverUrl = freezed,
+    Object? totalBytes = null,
+    Object? receivedBytes = null,
+    Object? speed = null,
+    Object? fileSize = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -137,6 +162,26 @@ class _$DownloadTaskCopyWithImpl<$Res, $Val extends DownloadTask>
           ? _value.songArtist
           : songArtist // ignore: cast_nullable_to_non_nullable
               as String?,
+      coverUrl: freezed == coverUrl
+          ? _value.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      totalBytes: null == totalBytes
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      receivedBytes: null == receivedBytes
+          ? _value.receivedBytes
+          : receivedBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      speed: null == speed
+          ? _value.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as double,
+      fileSize: null == fileSize
+          ? _value.fileSize
+          : fileSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -158,7 +203,12 @@ abstract class _$$DownloadTaskImplCopyWith<$Res>
       String? errorMessage,
       DateTime createdAt,
       String? songTitle,
-      String? songArtist});
+      String? songArtist,
+      String? coverUrl,
+      int totalBytes,
+      int receivedBytes,
+      double speed,
+      int fileSize});
 }
 
 /// @nodoc
@@ -183,6 +233,11 @@ class __$$DownloadTaskImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? songTitle = freezed,
     Object? songArtist = freezed,
+    Object? coverUrl = freezed,
+    Object? totalBytes = null,
+    Object? receivedBytes = null,
+    Object? speed = null,
+    Object? fileSize = null,
   }) {
     return _then(_$DownloadTaskImpl(
       id: null == id
@@ -221,6 +276,26 @@ class __$$DownloadTaskImplCopyWithImpl<$Res>
           ? _value.songArtist
           : songArtist // ignore: cast_nullable_to_non_nullable
               as String?,
+      coverUrl: freezed == coverUrl
+          ? _value.coverUrl
+          : coverUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      totalBytes: null == totalBytes
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      receivedBytes: null == receivedBytes
+          ? _value.receivedBytes
+          : receivedBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      speed: null == speed
+          ? _value.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as double,
+      fileSize: null == fileSize
+          ? _value.fileSize
+          : fileSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -237,7 +312,12 @@ class _$DownloadTaskImpl implements _DownloadTask {
       this.errorMessage,
       required this.createdAt,
       this.songTitle,
-      this.songArtist});
+      this.songArtist,
+      this.coverUrl,
+      this.totalBytes = 0,
+      this.receivedBytes = 0,
+      this.speed = 0.0,
+      this.fileSize = 0});
 
   factory _$DownloadTaskImpl.fromJson(Map<String, dynamic> json) =>
       _$$DownloadTaskImplFromJson(json);
@@ -279,9 +359,33 @@ class _$DownloadTaskImpl implements _DownloadTask {
   @override
   final String? songArtist;
 
+  /// Cover image URL (populated from songs table for display).
+  @override
+  final String? coverUrl;
+
+  /// Total bytes of the download (runtime only, not persisted).
+  @override
+  @JsonKey()
+  final int totalBytes;
+
+  /// Bytes received so far (runtime only).
+  @override
+  @JsonKey()
+  final int receivedBytes;
+
+  /// Current download speed in bytes/s (runtime only).
+  @override
+  @JsonKey()
+  final double speed;
+
+  /// File size on disk in bytes (for completed downloads).
+  @override
+  @JsonKey()
+  final int fileSize;
+
   @override
   String toString() {
-    return 'DownloadTask(id: $id, songId: $songId, status: $status, progress: $progress, filePath: $filePath, errorMessage: $errorMessage, createdAt: $createdAt, songTitle: $songTitle, songArtist: $songArtist)';
+    return 'DownloadTask(id: $id, songId: $songId, status: $status, progress: $progress, filePath: $filePath, errorMessage: $errorMessage, createdAt: $createdAt, songTitle: $songTitle, songArtist: $songArtist, coverUrl: $coverUrl, totalBytes: $totalBytes, receivedBytes: $receivedBytes, speed: $speed, fileSize: $fileSize)';
   }
 
   @override
@@ -303,13 +407,36 @@ class _$DownloadTaskImpl implements _DownloadTask {
             (identical(other.songTitle, songTitle) ||
                 other.songTitle == songTitle) &&
             (identical(other.songArtist, songArtist) ||
-                other.songArtist == songArtist));
+                other.songArtist == songArtist) &&
+            (identical(other.coverUrl, coverUrl) ||
+                other.coverUrl == coverUrl) &&
+            (identical(other.totalBytes, totalBytes) ||
+                other.totalBytes == totalBytes) &&
+            (identical(other.receivedBytes, receivedBytes) ||
+                other.receivedBytes == receivedBytes) &&
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.fileSize, fileSize) ||
+                other.fileSize == fileSize));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, songId, status, progress,
-      filePath, errorMessage, createdAt, songTitle, songArtist);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      songId,
+      status,
+      progress,
+      filePath,
+      errorMessage,
+      createdAt,
+      songTitle,
+      songArtist,
+      coverUrl,
+      totalBytes,
+      receivedBytes,
+      speed,
+      fileSize);
 
   /// Create a copy of DownloadTask
   /// with the given fields replaced by the non-null parameter values.
@@ -337,7 +464,12 @@ abstract class _DownloadTask implements DownloadTask {
       final String? errorMessage,
       required final DateTime createdAt,
       final String? songTitle,
-      final String? songArtist}) = _$DownloadTaskImpl;
+      final String? songArtist,
+      final String? coverUrl,
+      final int totalBytes,
+      final int receivedBytes,
+      final double speed,
+      final int fileSize}) = _$DownloadTaskImpl;
 
   factory _DownloadTask.fromJson(Map<String, dynamic> json) =
       _$DownloadTaskImpl.fromJson;
@@ -377,6 +509,26 @@ abstract class _DownloadTask implements DownloadTask {
   /// Song artist (populated from songs table for display).
   @override
   String? get songArtist;
+
+  /// Cover image URL (populated from songs table for display).
+  @override
+  String? get coverUrl;
+
+  /// Total bytes of the download (runtime only, not persisted).
+  @override
+  int get totalBytes;
+
+  /// Bytes received so far (runtime only).
+  @override
+  int get receivedBytes;
+
+  /// Current download speed in bytes/s (runtime only).
+  @override
+  double get speed;
+
+  /// File size on disk in bytes (for completed downloads).
+  @override
+  int get fileSize;
 
   /// Create a copy of DownloadTask
   /// with the given fields replaced by the non-null parameter values.

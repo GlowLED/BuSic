@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,7 +56,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                 expandedHeight: 160,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.go('/playlists'),
+                  onPressed: () => context.go('/'),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
@@ -195,7 +196,11 @@ class PlaylistDetailScreen extends ConsumerWidget {
                   _songToTrack(song),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('已添加到播放队列')),
+                  const SnackBar(
+                    content: Text('已添加到播放队列'),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+                  ),
                 );
               },
             ),
@@ -235,7 +240,11 @@ class PlaylistDetailScreen extends ConsumerWidget {
 
       if (qualities.isEmpty) {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(l10n.noQualities)),
+          SnackBar(
+            content: Text(l10n.noQualities),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
         );
         return;
       }
@@ -251,7 +260,11 @@ class PlaylistDetailScreen extends ConsumerWidget {
           isLoggedIn: isLoggedIn,
           onSelect: (selected) async {
             scaffoldMessenger.showSnackBar(
-              SnackBar(content: Text(l10n.downloadStarted)),
+              SnackBar(
+                content: Text(l10n.downloadStarted),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+              ),
             );
             await ref
                 .read(downloadNotifierProvider.notifier)
@@ -265,9 +278,14 @@ class PlaylistDetailScreen extends ConsumerWidget {
           },
         ),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('获取音质列表失败: $e\n$stackTrace');
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('获取音质列表失败: $e')),
+        SnackBar(
+          content: Text('获取音质列表失败: $e'),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
       );
     }
   }

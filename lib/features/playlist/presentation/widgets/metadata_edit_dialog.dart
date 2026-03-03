@@ -1,9 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/playlist_notifier.dart';
 import '../../domain/models/song_item.dart';
+
+Future<String?> _pickImageFile({String? title}) async {
+  if (!Platform.isLinux) return null;
+  try {
+    final result = await Process.run('zenity', [
+      '--file-selection',
+      '--title=${title ?? '选择封面图片'}',
+      '--file-filter=Image files | *.png *.jpg *.jpeg *.webp *.bmp',
+      '--file-filter=All files | *',
+    ]);
+    if (result.exitCode == 0) {
+      final path = (result.stdout as String).trim();
+      if (path.isNotEmpty) return path;
+    }
+  } catch (_) {}
+  return null;
+}
 
 /// Dialog for editing song metadata (title, artist, cover).
 ///
@@ -84,6 +103,16 @@ class _MetadataEditDialogState extends ConsumerState<MetadataEditDialog> {
                 labelText: l10n.cover,
                 hintText: 'https://...',
                 border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.folder_open),
+                  tooltip: '选择本地图片',
+                  onPressed: () async {
+                    final path = await _pickImageFile(title: '选择歌曲封面');
+                    if (path != null && mounted) {
+                      _coverController.text = path;
+                    }
+                  },
+                ),
               ),
             ),
           ],

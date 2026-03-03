@@ -64,7 +64,7 @@ class ParseRepositoryImpl implements ParseRepository {
       {
         'bvid': bvid,
         'cid': cid,
-        'fnval': 16, // Request DASH format
+        'fnval': 4048, // DASH + all quality flags
         'fnver': 0,
         'fourk': 1,
       },
@@ -77,25 +77,53 @@ class ParseRepositoryImpl implements ParseRepository {
       queryParameters: params,
     );
     final data = response.data['data'];
-    final dash = data['dash'];
+    if (data == null) {
+      throw Exception('playurl returned null data');
+    }
+    final dash = data['dash'] as Map<String, dynamic>?;
+    if (dash == null) {
+      throw Exception('No DASH data available');
+    }
     final audioStreams = dash['audio'] as List? ?? [];
 
-    if (audioStreams.isEmpty) {
+    // Collect all audio streams (standard + Dolby + Hi-Res)
+    final allStreams = <Map<String, dynamic>>[
+      ...List<Map<String, dynamic>>.from(audioStreams),
+    ];
+
+    // Dolby Atmos streams
+    final dolby = dash['dolby'] as Map<String, dynamic>?;
+    if (dolby != null) {
+      final dolbyAudio = dolby['audio'];
+      if (dolbyAudio is List) {
+        allStreams.addAll(List<Map<String, dynamic>>.from(dolbyAudio));
+      }
+    }
+
+    // Hi-Res FLAC stream
+    final flac = dash['flac'] as Map<String, dynamic>?;
+    if (flac != null) {
+      final flacAudio = flac['audio'];
+      if (flacAudio is Map<String, dynamic>) {
+        allStreams.add(flacAudio);
+      }
+    }
+
+    if (allStreams.isEmpty) {
       throw Exception('No audio streams available');
     }
 
     // Sort by quality descending, pick best or requested
-    final sorted = List<Map<String, dynamic>>.from(audioStreams)
-      ..sort((a, b) => (b['id'] as int).compareTo(a['id'] as int));
+    allStreams.sort((a, b) => (b['id'] as int).compareTo(a['id'] as int));
 
     Map<String, dynamic> selected;
     if (quality != null) {
-      selected = sorted.firstWhere(
+      selected = allStreams.firstWhere(
         (s) => s['id'] == quality,
-        orElse: () => sorted.first,
+        orElse: () => allStreams.first,
       );
     } else {
-      selected = sorted.first;
+      selected = allStreams.first;
     }
 
     final backupUrls = (selected['backupUrl'] as List?)
@@ -121,7 +149,7 @@ class ParseRepositoryImpl implements ParseRepository {
       {
         'bvid': bvid,
         'cid': cid,
-        'fnval': 16, // Request DASH format
+        'fnval': 4048, // DASH + HDR + 4K + DolbyAudio + DolbyVision + 8K + AV1
         'fnver': 0,
         'fourk': 1,
       },
@@ -134,8 +162,25 @@ class ParseRepositoryImpl implements ParseRepository {
       queryParameters: params,
     );
     final data = response.data['data'];
-    final dash = data['dash'];
+    if (data == null) {
+      // Fallback: retry with fnval=16 if extended flags fail
+      AppLogger.info('Retrying getAvailableQualities with fnval=16', tag: 'Parse');
+      return _getAvailableQualitiesFallback(bvid, cid);
+    }
+    final dash = data['dash'] as Map<String, dynamic>?;
+    if (dash == null) {
+      AppLogger.error('playurl returned null dash', tag: 'Parse');
+      return [];
+    }
     final audioStreams = dash['audio'] as List? ?? [];
+    AppLogger.info(
+      'DASH audio streams: ${audioStreams.length}, '
+      'dolby: ${dash['dolby']?.runtimeType}, '
+      'dolby.audio: ${(dash['dolby'] as Map<String, dynamic>?)?['audio']?.runtimeType}, '
+      'flac: ${dash['flac']?.runtimeType}, '
+      'flac.audio: ${(dash['flac'] as Map<String, dynamic>?)?['audio']?.runtimeType}',
+      tag: 'Parse',
+    );
 
     final results = <AudioStreamInfo>[];
     for (final stream in audioStreams) {
@@ -150,7 +195,86 @@ class ParseRepositoryImpl implements ParseRepository {
       ));
     }
 
+    // Dolby Atmos streams
+    final dolby = dash['dolby'] as Map<String, dynamic>?;
+    if (dolby != null) {
+      final dolbyAudio = dolby['audio'];
+      if (dolbyAudio is List) {
+        for (final stream in dolbyAudio) {
+          final backupUrls = (stream['backupUrl'] as List?)
+              ?.map((e) => e.toString()).toList() ?? [];
+          results.add(AudioStreamInfo(
+            url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
+            quality: stream['id'] as int,
+            mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
+            bandwidth: stream['bandwidth'] as int?,
+            backupUrls: backupUrls,
+          ));
+        }
+      }
+    }
+
+    // Hi-Res FLAC stream
+    final flac = dash['flac'] as Map<String, dynamic>?;
+    if (flac != null) {
+      final flacAudio = flac['audio'];
+      if (flacAudio is Map<String, dynamic>) {
+        final backupUrls = (flacAudio['backupUrl'] as List?)
+            ?.map((e) => e.toString()).toList() ?? [];
+        results.add(AudioStreamInfo(
+          url: flacAudio['baseUrl'] as String? ?? flacAudio['base_url'] as String,
+          quality: flacAudio['id'] as int,
+          mimeType: flacAudio['mimeType'] as String? ?? 'audio/mp4',
+          bandwidth: flacAudio['bandwidth'] as int?,
+          backupUrls: backupUrls,
+        ));
+      }
+    }
+
     // Sort by quality descending
+    results.sort((a, b) => b.quality.compareTo(a.quality));
+    return results;
+  }
+
+  /// Fallback quality fetch using fnval=16 (basic DASH only).
+  Future<List<AudioStreamInfo>> _getAvailableQualitiesFallback(
+    String bvid,
+    int cid,
+  ) async {
+    final params = WbiSign.encodeWbi(
+      {
+        'bvid': bvid,
+        'cid': cid,
+        'fnval': 16,
+        'fnver': 0,
+        'fourk': 1,
+      },
+      imgKey: _imgKey!,
+      subKey: _subKey!,
+    );
+
+    final response = await _biliDio.get(
+      '/x/player/wbi/playurl',
+      queryParameters: params,
+    );
+    final data = response.data['data'];
+    if (data == null) return [];
+    final dash = data['dash'] as Map<String, dynamic>?;
+    if (dash == null) return [];
+    final audioStreams = dash['audio'] as List? ?? [];
+
+    final results = <AudioStreamInfo>[];
+    for (final stream in audioStreams) {
+      final backupUrls = (stream['backupUrl'] as List?)
+          ?.map((e) => e.toString()).toList() ?? [];
+      results.add(AudioStreamInfo(
+        url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
+        quality: stream['id'] as int,
+        mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
+        bandwidth: stream['bandwidth'] as int?,
+        backupUrls: backupUrls,
+      ));
+    }
     results.sort((a, b) => b.quality.compareTo(a.quality));
     return results;
   }

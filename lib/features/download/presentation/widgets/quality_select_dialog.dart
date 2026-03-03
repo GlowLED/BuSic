@@ -5,8 +5,9 @@ import '../../../search_and_parse/domain/models/audio_stream_info.dart';
 
 /// Dialog to select audio quality before downloading.
 ///
-/// Shows all available qualities for the video and indicates
-/// which ones require login or VIP membership.
+/// Shows available qualities returned by the API.
+/// Qualities requiring login (>=30280) are filtered out when not logged in.
+/// Dolby/Hi-Res show a "大会员" badge for info.
 class QualitySelectDialog extends StatelessWidget {
   final List<AudioStreamInfo> qualities;
   final bool isLoggedIn;
@@ -18,6 +19,14 @@ class QualitySelectDialog extends StatelessWidget {
     required this.isLoggedIn,
     required this.onSelect,
   });
+
+  /// Filter qualities based on login status.
+  /// Non-logged-in users can only see free qualities (64kbps, 132kbps).
+  List<AudioStreamInfo> get _filteredQualities {
+    if (isLoggedIn) return qualities;
+    const freeQualities = {30216, 30232};
+    return qualities.where((q) => freeQualities.contains(q.quality)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,18 +60,19 @@ class QualitySelectDialog extends StatelessWidget {
                   ],
                 ),
               ),
-            if (qualities.isEmpty)
+            if (_filteredQualities.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Center(child: Text(l10n.noQualities)),
               )
             else
-              ...qualities.map((q) {
+              ..._filteredQualities.map((q) {
                 final label = _qualityLabel(q.quality);
                 final badge = _qualityBadge(q.quality);
                 final bitrateStr = q.bandwidth != null
                     ? '${(q.bandwidth! / 1000).round()} kbps'
                     : '';
+
                 return ListTile(
                   leading: Icon(
                     _qualityIcon(q.quality),
@@ -71,11 +81,18 @@ class QualitySelectDialog extends StatelessWidget {
                   title: Text(label),
                   subtitle: bitrateStr.isNotEmpty ? Text(bitrateStr) : null,
                   trailing: badge != null
-                      ? Chip(
-                          label: Text(badge,
-                              style: const TextStyle(fontSize: 11)),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: colorScheme.tertiaryContainer,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(badge,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colorScheme.onTertiaryContainer,
+                              )),
                         )
                       : null,
                   onTap: () {
@@ -113,14 +130,12 @@ class QualitySelectDialog extends StatelessWidget {
     }
   }
 
+  /// Informational badge for premium qualities.
   String? _qualityBadge(int quality) {
     switch (quality) {
-      case 30280:
-        return '登录';
       case 30250:
-        return 'SVIP';
       case 30251:
-        return 'SVIP';
+        return '大会员';
       default:
         return null;
     }

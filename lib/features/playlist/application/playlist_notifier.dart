@@ -39,6 +39,12 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
     await _repository.renamePlaylist(id, name);
     ref.invalidateSelf();
   }
+
+  /// Update playlist cover.
+  Future<void> updatePlaylistCover(int id, String? coverUrl) async {
+    await _repository.updatePlaylistCover(id, coverUrl);
+    ref.invalidateSelf();
+  }
 }
 
 /// State notifier managing songs within a specific playlist.
@@ -64,6 +70,8 @@ class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
   Future<void> removeSong(int songId) async {
     await _repository.removeSongFromPlaylist(playlistId, songId);
     ref.invalidateSelf();
+    // Also refresh playlist list so song count updates immediately
+    ref.invalidate(playlistListNotifierProvider);
   }
 
   /// Reorder songs in this playlist.

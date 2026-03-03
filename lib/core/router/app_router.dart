@@ -28,46 +28,56 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     routes: [
-      // Shell route wrapping main navigation scaffold
-      ShellRoute(
-        builder: (context, state, child) {
-          return ResponsiveScaffold(child: child);
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ResponsiveScaffold(navigationShell: navigationShell);
         },
-        routes: [
-          GoRoute(
-            path: AppRoutes.home,
-            name: 'home',
-            builder: (context, state) => const PlaylistListScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.playlists,
-            name: 'playlists',
-            builder: (context, state) => const PlaylistListScreen(),
+        branches: [
+          StatefulShellBranch(
             routes: [
               GoRoute(
-                path: ':id',
-                name: 'playlistDetail',
-                builder: (context, state) {
-                  final id = int.parse(state.pathParameters['id']!);
-                  return PlaylistDetailScreen(playlistId: id);
-                },
+                path: AppRoutes.home,
+                name: 'home',
+                builder: (context, state) => const PlaylistListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'playlists/:id',
+                    name: 'playlistDetail',
+                    builder: (context, state) {
+                      final id = int.parse(state.pathParameters['id']!);
+                      return PlaylistDetailScreen(playlistId: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          GoRoute(
-            path: AppRoutes.search,
-            name: 'search',
-            builder: (context, state) => const SearchScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.search,
+                name: 'search',
+                builder: (context, state) => const SearchScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: AppRoutes.downloads,
-            name: 'downloads',
-            builder: (context, state) => const DownloadScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.downloads,
+                name: 'downloads',
+                builder: (context, state) => const DownloadScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: AppRoutes.settings,
-            name: 'settings',
-            builder: (context, state) => const SettingsScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.settings,
+                name: 'settings',
+                builder: (context, state) => const SettingsScreen(),
+              ),
+            ],
           ),
         ],
       ),

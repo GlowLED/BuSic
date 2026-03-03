@@ -7,7 +7,7 @@ part of 'playlist_notifier.dart';
 // **************************************************************************
 
 String _$playlistListNotifierHash() =>
-    r'8b99b9edf0065ad0f9ab29eb2064456db60f86ea';
+    r'2169fa903539dd81609a34d99fd5cf72ea367ec5';
 
 /// State notifier managing playlist list and CRUD operations.
 ///
@@ -26,7 +26,7 @@ final playlistListNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$PlaylistListNotifier = AutoDisposeAsyncNotifier<List<Playlist>>;
 String _$playlistDetailNotifierHash() =>
-    r'b89750b195b8fb1c806295252424ac6d17c7698a';
+    r'a0a263408cf71d7973453bb99e426d33dd7cc829';
 
 /// Copied from Dart SDK
 class _SystemHash {

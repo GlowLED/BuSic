@@ -48,6 +48,21 @@ class DownloadTask with _$DownloadTask {
 
     /// Song artist (populated from songs table for display).
     String? songArtist,
+
+    /// Cover image URL (populated from songs table for display).
+    String? coverUrl,
+
+    /// Total bytes of the download (runtime only, not persisted).
+    @Default(0) int totalBytes,
+
+    /// Bytes received so far (runtime only).
+    @Default(0) int receivedBytes,
+
+    /// Current download speed in bytes/s (runtime only).
+    @Default(0.0) double speed,
+
+    /// File size on disk in bytes (for completed downloads).
+    @Default(0) int fileSize,
   }) = _DownloadTask;
 
   factory DownloadTask.fromJson(Map<String, dynamic> json) =>
