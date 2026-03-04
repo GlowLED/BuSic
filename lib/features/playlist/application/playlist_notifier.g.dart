@@ -26,7 +26,7 @@ final playlistListNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$PlaylistListNotifier = AutoDisposeAsyncNotifier<List<Playlist>>;
 String _$playlistDetailNotifierHash() =>
-    r'a0a263408cf71d7973453bb99e426d33dd7cc829';
+    r'936542285ace71022b51a38321711553218839a3';
 
 /// Copied from Dart SDK
 class _SystemHash {

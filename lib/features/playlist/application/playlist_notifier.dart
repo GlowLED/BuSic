@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/application/auth_notifier.dart';
+import '../../download/application/download_notifier.dart';
 import '../data/playlist_repository.dart';
 import '../data/playlist_repository_impl.dart';
 import '../domain/models/playlist.dart';
@@ -57,6 +58,9 @@ class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
     _repository = PlaylistRepositoryImpl(
       db: ref.read(databaseProvider),
     );
+    // Watch download change signal so the list refreshes when
+    // songs are downloaded or their cache files are deleted.
+    ref.watch(downloadChangeSignalProvider);
     return _repository.getSongsInPlaylist(playlistId);
   }
 

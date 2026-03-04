@@ -6,7 +6,7 @@ part of 'parse_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$parseNotifierHash() => r'aa4dc86aca2eafa6c8d8ccbb0a0df0e517e706d8';
+String _$parseNotifierHash() => r'8df6785cd6232e016aaf9ad40ebc99c4787b12d7';
 
 /// State notifier managing the BV number parsing and page selection flow.
 ///

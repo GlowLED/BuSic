@@ -12,6 +12,12 @@ class AppTheme {
   static const Color pinkSeed = Color(0xFFE91E63);
   static const Color purpleSeed = Color(0xFF9C27B0);
   static const Color yellowSeed = Color(0xFFFBC02D);
+  static const Color blueSeed = Color(0xFF2196F3);
+  static const Color tealSeed = Color(0xFF009688);
+  static const Color orangeSeed = Color(0xFFFF9800);
+  static const Color redSeed = Color(0xFFF44336);
+  static const Color indigoSeed = Color(0xFF3F51B5);
+  static const Color cyanSeed = Color(0xFF00BCD4);
 
   static const Color _errorColor = Color(0xFFE53935);
 

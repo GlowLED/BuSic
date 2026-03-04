@@ -20,6 +20,9 @@ class DownloadTasks extends Table {
   /// Target local file path.
   TextColumn get filePath => text().nullable()();
 
+  /// Audio quality identifier used for this download (e.g. 30280).
+  IntColumn get quality => integer().withDefault(const Constant(0))();
+
   /// Timestamp when the download task was created.
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();

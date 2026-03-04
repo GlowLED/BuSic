@@ -70,5 +70,7 @@
   "deleteDownloadConfirm": "Are you sure you want to delete the downloaded file?",
   "activeDownloads": "Active Downloads",
   "completedDownloads": "Completed",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "logoutConfirm": "Are you sure you want to logout?",
+  "paused": "Paused"
 }

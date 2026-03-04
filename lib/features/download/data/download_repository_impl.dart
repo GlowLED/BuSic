@@ -78,6 +78,7 @@ class DownloadRepositoryImpl implements DownloadRepository {
           DownloadTasksCompanion.insert(
             songId: songId,
             filePath: Value(savePath),
+            quality: Value(quality),
           ),
         );
 
@@ -106,8 +107,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
     int songId,
     String url,
     String savePath,
-    int quality,
-  ) async {
+    int quality, {
+    int startOffset = 0,
+  }) async {
     final cancelToken = CancelToken();
     _cancelTokens[taskId] = cancelToken;
     final metrics = _DownloadMetrics();
@@ -121,20 +123,63 @@ class DownloadRepositoryImpl implements DownloadRepository {
             cached.copyWith(status: domain.DownloadStatus.downloading);
       }
 
-      await _dio.download(
+      final headers = <String, dynamic>{
+        'Referer': 'https://www.bilibili.com',
+      };
+      if (startOffset > 0) {
+        headers['Range'] = 'bytes=$startOffset-';
+      }
+
+      final response = await _dio.get(
         url,
-        savePath,
+        options: Options(
+          responseType: ResponseType.stream,
+          headers: headers,
+        ),
         cancelToken: cancelToken,
-        headers: {
-          'Referer': 'https://www.bilibili.com',
-        },
-        onReceiveProgress: (received, total) {
-          if (total > 0) {
-            final progress = ((received / total) * 100).round();
-            metrics.update(received, total);
+      );
+
+      // Determine actual offset and total file size
+      int actualOffset = startOffset;
+      int totalBytes = 0;
+      if (startOffset > 0 && response.statusCode == 206) {
+        // Range request accepted — parse total from Content-Range header
+        final contentRange = response.headers.value('content-range');
+        if (contentRange != null) {
+          final match = RegExp(r'/(\d+)$').firstMatch(contentRange);
+          if (match != null) totalBytes = int.parse(match.group(1)!);
+        }
+      } else {
+        // Fresh download (or server doesn't support range)
+        actualOffset = 0;
+        final cl = response.headers.value(Headers.contentLengthHeader);
+        totalBytes = int.tryParse(cl ?? '') ?? 0;
+      }
+
+      final file = File(savePath);
+      final raf = await file.open(
+        mode: actualOffset > 0 ? FileMode.append : FileMode.write,
+      );
+
+      int receivedBytes = actualOffset;
+
+      try {
+        // response.data is ResponseBody when responseType is stream
+        final dynamic responseData = response.data;
+        await for (final chunk in responseData.stream) {
+          if (cancelToken.isCancelled) break;
+          final bytes = chunk as List<int>;
+          await raf.writeFrom(bytes);
+          receivedBytes += bytes.length;
+
+          if (totalBytes > 0) {
+            final progress =
+                ((receivedBytes / totalBytes) * 100).round().clamp(0, 100);
+            metrics.update(receivedBytes, totalBytes);
 
             // Persist to DB every 5%
-            final lastDb = _lastDbProgress[taskId] ?? 0;
+            final lastDb = _lastDbProgress[taskId] ??
+                (actualOffset > 0 ? (actualOffset * 100 ~/ totalBytes) : 0);
             if (progress - lastDb >= 5) {
               _lastDbProgress[taskId] = progress;
               (_db.update(_db.downloadTasks)
@@ -152,15 +197,19 @@ class DownloadRepositoryImpl implements DownloadRepository {
                 _taskUpdateController.add(c.copyWith(
                   status: domain.DownloadStatus.downloading,
                   progress: progress / 100.0,
-                  totalBytes: total,
-                  receivedBytes: received,
+                  totalBytes: totalBytes,
+                  receivedBytes: receivedBytes,
                   speed: metrics.speed,
                 ));
               }
             }
           }
-        },
-      );
+        }
+      } finally {
+        await raf.close();
+      }
+
+      if (cancelToken.isCancelled) return;
 
       // Mark completed
       await (_db.update(_db.downloadTasks)
@@ -209,23 +258,90 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
   @override
   Future<void> retryDownload(int taskId) async {
+    // Legacy: only resets status. Use restartDownload() for full retry.
+    await _updateTaskStatus(taskId, 0, progress: 0);
+  }
+
+  @override
+  Future<void> restartDownload(
+      int taskId, String url, String savePath, int quality) async {
     final row = await (_db.select(_db.downloadTasks)
           ..where((t) => t.id.equals(taskId)))
         .getSingleOrNull();
-    if (row == null || row.filePath == null) return;
+    if (row == null) return;
 
+    // Check for existing partial file to determine resume offset
+    int startOffset = 0;
+    final file = File(savePath);
+    if (await file.exists()) {
+      startOffset = await file.length();
+    }
+
+    // Update file path and quality; preserve progress if resuming
+    if (startOffset > 0) {
+      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
+          .write(DownloadTasksCompanion(
+        status: const Value(0),
+        filePath: Value(savePath),
+        quality: Value(quality),
+      ));
+    } else {
+      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
+          .write(DownloadTasksCompanion(
+        status: const Value(0),
+        progress: const Value(0),
+        filePath: Value(savePath),
+        quality: Value(quality),
+      ));
+    }
+
+    // Cache task info for progress emissions
     final song = await (_db.select(_db.songs)
           ..where((t) => t.id.equals(row.songId)))
         .getSingleOrNull();
-    if (song == null) return;
+    _activeTaskCache[taskId] = domain.DownloadTask(
+      id: taskId,
+      songId: row.songId,
+      status: domain.DownloadStatus.pending,
+      createdAt: row.createdAt,
+      songTitle: song?.customTitle ?? song?.originTitle,
+      songArtist: song?.customArtist ?? song?.originArtist,
+      coverUrl: song?.coverUrl,
+      filePath: savePath,
+    );
 
-    await _updateTaskStatus(taskId, 0, progress: 0);
+    _taskUpdateController.add(null); // structural change
+    _downloadFile(taskId, row.songId, url, savePath, quality,
+        startOffset: startOffset);
+  }
+
+  @override
+  Future<({String bvid, int cid})?> getSongBvidCid(int songId) async {
+    final song = await (_db.select(_db.songs)
+          ..where((t) => t.id.equals(songId)))
+        .getSingleOrNull();
+    if (song == null) return null;
+    return (bvid: song.bvid, cid: song.cid);
+  }
+
+  @override
+  Future<int> getTaskQuality(int taskId) async {
+    final row = await (_db.select(_db.downloadTasks)
+          ..where((t) => t.id.equals(taskId)))
+        .getSingleOrNull();
+    return row?.quality ?? 0;
   }
 
   @override
   Future<void> pauseDownload(int taskId) async {
     _cancelTokens[taskId]?.cancel();
     _cancelTokens.remove(taskId);
+    _metricsMap.remove(taskId);
+    _lastDbProgress.remove(taskId);
+    _lastEmitTime.remove(taskId);
+    _activeTaskCache.remove(taskId);
+    // Set status back to pending so it can be retried/resumed
+    await _updateTaskStatus(taskId, 0);
   }
 
   @override
@@ -351,9 +467,20 @@ class DownloadRepositoryImpl implements DownloadRepository {
           ..where((t) => t.id.equals(taskId)))
         .getSingleOrNull();
 
-    if (deleteFile && row?.filePath != null) {
+    // Determine whether to delete the file on disk:
+    // - Always delete partial files for non-completed tasks
+    // - For completed tasks, only delete when deleteFile is true
+    final shouldDeleteFile = deleteFile ||
+        (row != null &&
+            row.status != 2 && // not completed
+            row.filePath != null);
+
+    if (shouldDeleteFile && row?.filePath != null) {
       try {
-        await File(row!.filePath!).delete();
+        final file = File(row!.filePath!);
+        if (await file.exists()) {
+          await file.delete();
+        }
       } catch (_) {
         // Ignore file deletion errors
       }
@@ -373,5 +500,13 @@ class DownloadRepositoryImpl implements DownloadRepository {
     await (_db.delete(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
         .go();
     _taskUpdateController.add(null);
+  }
+
+  /// Get the current audio quality stored for a song in the database.
+  Future<int> getSongAudioQuality(int songId) async {
+    final song = await (_db.select(_db.songs)
+          ..where((t) => t.id.equals(songId)))
+        .getSingleOrNull();
+    return song?.audioQuality ?? 0;
   }
 }

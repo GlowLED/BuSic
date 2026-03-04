@@ -1226,6 +1226,14 @@ class $DownloadTasksTable extends DownloadTasks
   late final GeneratedColumn<String> filePath = GeneratedColumn<String>(
       'file_path', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _qualityMeta =
+      const VerificationMeta('quality');
+  @override
+  late final GeneratedColumn<int> quality = GeneratedColumn<int>(
+      'quality', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1236,7 +1244,7 @@ class $DownloadTasksTable extends DownloadTasks
       defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, songId, status, progress, filePath, createdAt];
+      [id, songId, status, progress, filePath, quality, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1268,6 +1276,10 @@ class $DownloadTasksTable extends DownloadTasks
       context.handle(_filePathMeta,
           filePath.isAcceptableOrUnknown(data['file_path']!, _filePathMeta));
     }
+    if (data.containsKey('quality')) {
+      context.handle(_qualityMeta,
+          quality.isAcceptableOrUnknown(data['quality']!, _qualityMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -1291,6 +1303,8 @@ class $DownloadTasksTable extends DownloadTasks
           .read(DriftSqlType.int, data['${effectivePrefix}progress'])!,
       filePath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}file_path']),
+      quality: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}quality'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -1318,6 +1332,9 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
   /// Target local file path.
   final String? filePath;
 
+  /// Audio quality identifier used for this download (e.g. 30280).
+  final int quality;
+
   /// Timestamp when the download task was created.
   final DateTime createdAt;
   const DownloadTask(
@@ -1326,6 +1343,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
       required this.status,
       required this.progress,
       this.filePath,
+      required this.quality,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1337,6 +1355,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
     if (!nullToAbsent || filePath != null) {
       map['file_path'] = Variable<String>(filePath);
     }
+    map['quality'] = Variable<int>(quality);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1350,6 +1369,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
       filePath: filePath == null && nullToAbsent
           ? const Value.absent()
           : Value(filePath),
+      quality: Value(quality),
       createdAt: Value(createdAt),
     );
   }
@@ -1363,6 +1383,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
       status: serializer.fromJson<int>(json['status']),
       progress: serializer.fromJson<int>(json['progress']),
       filePath: serializer.fromJson<String?>(json['filePath']),
+      quality: serializer.fromJson<int>(json['quality']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1375,6 +1396,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
       'status': serializer.toJson<int>(status),
       'progress': serializer.toJson<int>(progress),
       'filePath': serializer.toJson<String?>(filePath),
+      'quality': serializer.toJson<int>(quality),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1385,6 +1407,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
           int? status,
           int? progress,
           Value<String?> filePath = const Value.absent(),
+          int? quality,
           DateTime? createdAt}) =>
       DownloadTask(
         id: id ?? this.id,
@@ -1392,6 +1415,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
         status: status ?? this.status,
         progress: progress ?? this.progress,
         filePath: filePath.present ? filePath.value : this.filePath,
+        quality: quality ?? this.quality,
         createdAt: createdAt ?? this.createdAt,
       );
   DownloadTask copyWithCompanion(DownloadTasksCompanion data) {
@@ -1401,6 +1425,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
       status: data.status.present ? data.status.value : this.status,
       progress: data.progress.present ? data.progress.value : this.progress,
       filePath: data.filePath.present ? data.filePath.value : this.filePath,
+      quality: data.quality.present ? data.quality.value : this.quality,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1413,6 +1438,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
           ..write('status: $status, ')
           ..write('progress: $progress, ')
           ..write('filePath: $filePath, ')
+          ..write('quality: $quality, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1420,7 +1446,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
 
   @override
   int get hashCode =>
-      Object.hash(id, songId, status, progress, filePath, createdAt);
+      Object.hash(id, songId, status, progress, filePath, quality, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1430,6 +1456,7 @@ class DownloadTask extends DataClass implements Insertable<DownloadTask> {
           other.status == this.status &&
           other.progress == this.progress &&
           other.filePath == this.filePath &&
+          other.quality == this.quality &&
           other.createdAt == this.createdAt);
 }
 
@@ -1439,6 +1466,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
   final Value<int> status;
   final Value<int> progress;
   final Value<String?> filePath;
+  final Value<int> quality;
   final Value<DateTime> createdAt;
   const DownloadTasksCompanion({
     this.id = const Value.absent(),
@@ -1446,6 +1474,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
     this.status = const Value.absent(),
     this.progress = const Value.absent(),
     this.filePath = const Value.absent(),
+    this.quality = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   DownloadTasksCompanion.insert({
@@ -1454,6 +1483,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
     this.status = const Value.absent(),
     this.progress = const Value.absent(),
     this.filePath = const Value.absent(),
+    this.quality = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : songId = Value(songId);
   static Insertable<DownloadTask> custom({
@@ -1462,6 +1492,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
     Expression<int>? status,
     Expression<int>? progress,
     Expression<String>? filePath,
+    Expression<int>? quality,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -1470,6 +1501,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
       if (status != null) 'status': status,
       if (progress != null) 'progress': progress,
       if (filePath != null) 'file_path': filePath,
+      if (quality != null) 'quality': quality,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -1480,6 +1512,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
       Value<int>? status,
       Value<int>? progress,
       Value<String?>? filePath,
+      Value<int>? quality,
       Value<DateTime>? createdAt}) {
     return DownloadTasksCompanion(
       id: id ?? this.id,
@@ -1487,6 +1520,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
       status: status ?? this.status,
       progress: progress ?? this.progress,
       filePath: filePath ?? this.filePath,
+      quality: quality ?? this.quality,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -1509,6 +1543,9 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
     if (filePath.present) {
       map['file_path'] = Variable<String>(filePath.value);
     }
+    if (quality.present) {
+      map['quality'] = Variable<int>(quality.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1523,6 +1560,7 @@ class DownloadTasksCompanion extends UpdateCompanion<DownloadTask> {
           ..write('status: $status, ')
           ..write('progress: $progress, ')
           ..write('filePath: $filePath, ')
+          ..write('quality: $quality, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -2939,6 +2977,7 @@ typedef $$DownloadTasksTableCreateCompanionBuilder = DownloadTasksCompanion
   Value<int> status,
   Value<int> progress,
   Value<String?> filePath,
+  Value<int> quality,
   Value<DateTime> createdAt,
 });
 typedef $$DownloadTasksTableUpdateCompanionBuilder = DownloadTasksCompanion
@@ -2948,6 +2987,7 @@ typedef $$DownloadTasksTableUpdateCompanionBuilder = DownloadTasksCompanion
   Value<int> status,
   Value<int> progress,
   Value<String?> filePath,
+  Value<int> quality,
   Value<DateTime> createdAt,
 });
 
@@ -2991,6 +3031,9 @@ class $$DownloadTasksTableFilterComposer
 
   ColumnFilters<String> get filePath => $composableBuilder(
       column: $table.filePath, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get quality => $composableBuilder(
+      column: $table.quality, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -3037,6 +3080,9 @@ class $$DownloadTasksTableOrderingComposer
   ColumnOrderings<String> get filePath => $composableBuilder(
       column: $table.filePath, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get quality => $composableBuilder(
+      column: $table.quality, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -3081,6 +3127,9 @@ class $$DownloadTasksTableAnnotationComposer
 
   GeneratedColumn<String> get filePath =>
       $composableBuilder(column: $table.filePath, builder: (column) => column);
+
+  GeneratedColumn<int> get quality =>
+      $composableBuilder(column: $table.quality, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -3134,6 +3183,7 @@ class $$DownloadTasksTableTableManager extends RootTableManager<
             Value<int> status = const Value.absent(),
             Value<int> progress = const Value.absent(),
             Value<String?> filePath = const Value.absent(),
+            Value<int> quality = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               DownloadTasksCompanion(
@@ -3142,6 +3192,7 @@ class $$DownloadTasksTableTableManager extends RootTableManager<
             status: status,
             progress: progress,
             filePath: filePath,
+            quality: quality,
             createdAt: createdAt,
           ),
           createCompanionCallback: ({
@@ -3150,6 +3201,7 @@ class $$DownloadTasksTableTableManager extends RootTableManager<
             Value<int> status = const Value.absent(),
             Value<int> progress = const Value.absent(),
             Value<String?> filePath = const Value.absent(),
+            Value<int> quality = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               DownloadTasksCompanion.insert(
@@ -3158,6 +3210,7 @@ class $$DownloadTasksTableTableManager extends RootTableManager<
             status: status,
             progress: progress,
             filePath: filePath,
+            quality: quality,
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0

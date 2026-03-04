@@ -111,6 +111,32 @@ class AuthNotifier extends _$AuthNotifier {
     state = const AsyncData(null);
   }
 
+  /// Log in by manually providing cookie values obtained from a browser.
+  ///
+  /// Saves the session and attempts to refresh user profile info.
+  Future<void> loginWithCookie({
+    required String sessdata,
+    required String biliJct,
+    required String dedeUserId,
+  }) async {
+    final user = User(
+      userId: dedeUserId,
+      nickname: '用户',
+      sessdata: sessdata,
+      biliJct: biliJct,
+      isLoggedIn: true,
+    );
+    await _repository.saveSession(user);
+    final refreshed = await _repository.refreshSession();
+    if (refreshed != null) {
+      state = AsyncData(refreshed);
+    } else {
+      // Cookie might be invalid — clear and throw
+      await _repository.clearSession();
+      throw Exception('Cookie无效或已过期');
+    }
+  }
+
   /// Check if the current session is still valid.
   Future<void> checkSession() async {
     final current = state.valueOrNull;

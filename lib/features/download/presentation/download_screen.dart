@@ -70,11 +70,24 @@ class DownloadScreen extends ConsumerWidget {
                       final task = activeTasks[index];
                       return DownloadTaskTile(
                         task: task,
+                        onPause: task.status == DownloadStatus.downloading
+                            ? () => ref
+                                .read(downloadNotifierProvider.notifier)
+                                .pauseDownload(task.id)
+                            : null,
                         onCancel: task.status == DownloadStatus.downloading
                             ? () => ref
                                 .read(downloadNotifierProvider.notifier)
                                 .cancelDownload(task.id)
                             : null,
+                        onRetry: task.status == DownloadStatus.pending
+                            ? () => ref
+                                .read(downloadNotifierProvider.notifier)
+                                .retryDownload(task.id)
+                            : null,
+                        onDelete: () => ref
+                            .read(downloadNotifierProvider.notifier)
+                            .deleteTask(task.id),
                       );
                     },
                     childCount: activeTasks.length,

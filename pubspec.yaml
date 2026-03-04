@@ -1,7 +1,7 @@
 name: busic
 description: A modern cross-platform music player powered by Bilibili.
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -55,6 +55,7 @@ dependencies:
   cached_network_image: ^3.3.1
   collection: ^1.18.0
   file_picker: ^10.3.10
+  audio_service: ^0.18.18
 
 dev_dependencies:
   flutter_test:

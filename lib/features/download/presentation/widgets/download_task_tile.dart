@@ -33,6 +33,7 @@ String _formatEta(double seconds) {
 class DownloadTaskTile extends StatelessWidget {
   final DownloadTask task;
   final VoidCallback? onCancel;
+  final VoidCallback? onPause;
   final VoidCallback? onRetry;
   final VoidCallback? onDelete;
   final VoidCallback? onAddToPlaylist;
@@ -41,6 +42,7 @@ class DownloadTaskTile extends StatelessWidget {
     super.key,
     required this.task,
     this.onCancel,
+    this.onPause,
     this.onRetry,
     this.onDelete,
     this.onAddToPlaylist,
@@ -111,14 +113,24 @@ class DownloadTaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-            // Status overlay for pending
+            // Status overlay for pending (waiting or paused)
             if (task.status == DownloadStatus.pending)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black26,
-                  child: const Center(
-                    child: Icon(Icons.hourglass_empty,
-                        color: Colors.white, size: 20),
+                  color: task.progress > 0 ? Colors.black38 : Colors.black26,
+                  child: Center(
+                    child: task.progress > 0
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              value: task.progress,
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.hourglass_empty,
+                            color: Colors.white, size: 20),
                   ),
                 ),
               ),
@@ -156,6 +168,28 @@ class DownloadTaskTile extends StatelessWidget {
     final l10n = context.l10n;
     switch (task.status) {
       case DownloadStatus.pending:
+        if (task.progress > 0) {
+          // Paused with progress
+          final parts = <String>[
+            if (task.songArtist != null && task.songArtist!.isNotEmpty)
+              task.songArtist!,
+            '${(task.progress * 100).toInt()}%',
+            l10n.paused,
+          ];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LinearProgressIndicator(value: task.progress),
+              const SizedBox(height: 4),
+              Text(
+                parts.join('  ·  '),
+                style: context.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          );
+        }
         return Text(
           [task.songArtist, l10n.pending].where((s) => s != null && s.isNotEmpty).join(' · '),
           maxLines: 1,
@@ -215,13 +249,21 @@ class DownloadTaskTile extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (task.status == DownloadStatus.downloading && onPause != null)
+          IconButton(
+            icon: const Icon(Icons.pause),
+            onPressed: onPause,
+            tooltip: '暂停',
+          ),
         if (task.status == DownloadStatus.downloading && onCancel != null)
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: onCancel,
             tooltip: '取消',
           ),
-        if (task.status == DownloadStatus.failed && onRetry != null)
+        if ((task.status == DownloadStatus.pending ||
+                task.status == DownloadStatus.failed) &&
+            onRetry != null)
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: onRetry,
@@ -234,7 +276,8 @@ class DownloadTaskTile extends StatelessWidget {
             tooltip: '添加到歌单',
           ),
         if ((task.status == DownloadStatus.completed ||
-                task.status == DownloadStatus.pending) &&
+                task.status == DownloadStatus.pending ||
+                task.status == DownloadStatus.failed) &&
             onDelete != null)
           IconButton(
             icon: const Icon(Icons.delete_outline),

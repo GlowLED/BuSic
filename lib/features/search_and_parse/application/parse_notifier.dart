@@ -139,10 +139,10 @@ class ParseNotifier extends _$ParseNotifier {
     return songIds;
   }
 
-  /// Search videos on Bilibili.
-  Future<List<BvidInfo>> searchVideos(String keyword) async {
+  /// Search videos on Bilibili with pagination support.
+  Future<List<BvidInfo>> searchVideos(String keyword, {int page = 1, int pageSize = 20}) async {
     try {
-      return await _repository.searchVideos(keyword);
+      return await _repository.searchVideos(keyword, page: page, pageSize: pageSize);
     } catch (e) {
       AppLogger.error('Search failed', tag: 'Parse', error: e);
       return [];

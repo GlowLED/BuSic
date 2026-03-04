@@ -80,12 +80,19 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('配色方案'),
             subtitle: Wrap(
               spacing: 8,
+              runSpacing: 4,
               children: [
                 for (final entry in const {
                   0xFF4CAF50: '绿色',
+                  0xFF2196F3: '蓝色',
+                  0xFF009688: '青色',
                   0xFFE91E63: '粉色',
                   0xFF9C27B0: '紫色',
+                  0xFF3F51B5: '靛蓝',
                   0xFFFBC02D: '黄色',
+                  0xFFFF9800: '橙色',
+                  0xFFF44336: '红色',
+                  0xFF00BCD4: '蓝绿',
                 }.entries)
                   ChoiceChip(
                     label: Text(entry.value),
@@ -187,8 +194,27 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(user.nickname),
                   subtitle: Text('UID: ${user.userId}'),
                   trailing: TextButton(
-                    onPressed: () {
-                      ref.read(authNotifierProvider.notifier).logout();
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(l10n.logout),
+                          content: Text(l10n.logoutConfirm),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: Text(l10n.cancel),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(l10n.confirm),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        ref.read(authNotifierProvider.notifier).logout();
+                      }
                     },
                     child: Text(l10n.logout),
                   ),
@@ -211,12 +237,12 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.about),
-            subtitle: const Text('BuSic v1.0.0'),
+            subtitle: const Text('BuSic v0.1.1'),
             onTap: () {
               showAboutDialog(
                 context: context,
                 applicationName: 'BuSic',
-                applicationVersion: '1.0.0',
+                applicationVersion: '0.1.1',
                 applicationLegalese: 'A cross-platform Bilibili music player.',
               );
             },

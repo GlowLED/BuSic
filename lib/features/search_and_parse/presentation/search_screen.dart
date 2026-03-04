@@ -5,7 +5,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../download/application/download_notifier.dart';
+import '../../download/presentation/widgets/quality_select_dialog.dart';
+import '../../player/application/player_notifier.dart';
+import '../../player/domain/models/audio_track.dart';
 import '../../playlist/application/playlist_notifier.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../application/parse_notifier.dart';
 import '../domain/models/bvid_info.dart';
 import '../domain/models/page_info.dart';
@@ -29,6 +34,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   List<BvidInfo> _searchResults = [];
   bool _isSearching = false;
+  int _currentPage = 1;
+  String _currentKeyword = '';
+  bool _hasMorePages = true;
 
   @override
   void dispose() {
@@ -46,19 +54,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       setState(() => _searchResults = []);
       ref.read(parseNotifierProvider.notifier).parseInput(text);
     } else {
-      _performSearch(text);
+      _currentKeyword = text;
+      _performSearch(text, page: 1);
     }
   }
 
-  Future<void> _performSearch(String keyword) async {
+  Future<void> _performSearch(String keyword, {int page = 1}) async {
     ref.read(parseNotifierProvider.notifier).reset();
-    setState(() => _isSearching = true);
+    setState(() {
+      _isSearching = true;
+      _currentPage = page;
+    });
     final results =
-        await ref.read(parseNotifierProvider.notifier).searchVideos(keyword);
+        await ref.read(parseNotifierProvider.notifier).searchVideos(keyword, page: page);
     setState(() {
       _searchResults = results;
       _isSearching = false;
+      // If returned less than 20 results, no more pages
+      _hasMorePages = results.length >= 20;
     });
+  }
+
+  void _goToPage(int page) {
+    if (_currentKeyword.isNotEmpty && page >= 1) {
+      _performSearch(_currentKeyword, page: page);
+    }
   }
 
   void _onVideoTap(BvidInfo video) {
@@ -67,6 +87,134 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   void _backToResults() {
     ref.read(parseNotifierProvider.notifier).reset();
+  }
+
+  /// Play parsed video pages directly without adding to a playlist.
+  Future<void> _playParsedVideo(
+    BuildContext context,
+    BvidInfo videoInfo,
+    List<PageInfo> pages,
+  ) async {
+    final pagesToPlay =
+        pages.isNotEmpty ? pages : videoInfo.pages;
+    if (pagesToPlay.isEmpty) return;
+
+    // Build AudioTrack list — stream URLs will be resolved by the player
+    final tracks = pagesToPlay.map((page) => AudioTrack(
+          songId: 0,
+          bvid: videoInfo.bvid,
+          cid: page.cid,
+          title: pagesToPlay.length > 1
+              ? page.partTitle
+              : videoInfo.title,
+          artist: videoInfo.owner,
+          coverUrl: videoInfo.coverUrl,
+          duration: Duration(seconds: page.duration),
+        )).toList();
+
+    try {
+      await ref
+          .read(playerNotifierProvider.notifier)
+          .playTrackList(tracks, 0, playlistName: videoInfo.title);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('播放失败: $e'),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+      }
+    }
+  }
+
+  /// Download parsed video pages with quality selection.
+  Future<void> _downloadParsedVideo(
+    BuildContext context,
+    BvidInfo videoInfo,
+    List<PageInfo> pages,
+  ) async {
+    final pagesToDownload =
+        pages.isNotEmpty ? pages : videoInfo.pages;
+    if (pagesToDownload.isEmpty) return;
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      // First, ensure songs exist in DB (upsert)
+      final songIds = await ref
+          .read(parseNotifierProvider.notifier)
+          .confirmSelection();
+
+      // re-parse to restore state (confirmSelection resets to idle)
+      ref.read(parseNotifierProvider.notifier).parseInput(videoInfo.bvid);
+
+      // Get available qualities from the first page
+      final qualities = await ref
+          .read(downloadNotifierProvider.notifier)
+          .getAvailableQualities(
+            bvid: videoInfo.bvid,
+            cid: pagesToDownload.first.cid,
+          );
+
+      if (qualities.isEmpty) {
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text('未获取到可用音质'),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+        return;
+      }
+
+      if (!context.mounted) return;
+      final isLoggedIn = ref.read(authNotifierProvider).value != null;
+
+      showDialog(
+        context: context,
+        builder: (_) => QualitySelectDialog(
+          qualities: qualities,
+          isLoggedIn: isLoggedIn,
+          onSelect: (selected) async {
+            int startedCount = 0;
+            for (int i = 0; i < pagesToDownload.length; i++) {
+              final page = pagesToDownload[i];
+              final songId = i < songIds.length ? songIds[i] : songIds.last;
+              final title = pagesToDownload.length > 1
+                  ? page.partTitle
+                  : videoInfo.title;
+              final started = await ref
+                  .read(downloadNotifierProvider.notifier)
+                  .downloadSongWithQuality(
+                    songId: songId,
+                    bvid: videoInfo.bvid,
+                    cid: page.cid,
+                    quality: selected.quality,
+                    title: title,
+                  );
+              if (started) startedCount++;
+            }
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text('已开始下载 $startedCount 首歌曲'),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.only(
+                    bottom: 80, left: 16, right: 16),
+              ),
+            );
+          },
+        ),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('下载失败: $e'),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
+      );
+    }
   }
 
   Future<void> _addToPlaylist(BuildContext context) async {
@@ -89,6 +237,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       );
       ref.invalidate(playlistListNotifierProvider);
+      ref.invalidate(playlistDetailNotifierProvider(selectedPlaylistId));
     }
   }
 
@@ -203,37 +352,112 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildSearchResults(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return ListView.builder(
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final video = _searchResults[index];
-        return ListTile(
-          leading: video.coverUrl != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    video.coverUrl!,
-                    width: 80,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 80,
-                      height: 50,
-                      color: colorScheme.surfaceContainerHighest,
-                      child: const Icon(Icons.video_library),
-                    ),
-                  ),
-                )
-              : null,
-          title: Text(video.title,
-              maxLines: 2, overflow: TextOverflow.ellipsis),
-          subtitle: Text(
-            '${video.owner} · ${Formatters.formatDuration(Duration(seconds: video.duration))}',
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: _searchResults.length,
+            itemBuilder: (context, index) {
+              final video = _searchResults[index];
+              return ListTile(
+                leading: video.coverUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          video.coverUrl!,
+                          width: 80,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 80,
+                            height: 50,
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Icon(Icons.video_library),
+                          ),
+                        ),
+                      )
+                    : null,
+                title: Text(video.title,
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
+                subtitle: Text(
+                  '${video.owner} · ${Formatters.formatDuration(Duration(seconds: video.duration))}',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _onVideoTap(video),
+              );
+            },
           ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => _onVideoTap(video),
-        );
-      },
+        ),
+        // Pagination controls
+        _buildPaginationBar(colorScheme),
+      ],
+    );
+  }
+
+  Widget _buildPaginationBar(ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: Border(
+          top: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
+            tooltip: '上一页',
+          ),
+          const SizedBox(width: 8),
+          // Show page number buttons
+          for (int i = _pageStart; i <= _pageEnd; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: _buildPageButton(i, colorScheme),
+            ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: _hasMorePages ? () => _goToPage(_currentPage + 1) : null,
+            tooltip: '下一页',
+          ),
+        ],
+      ),
+    );
+  }
+
+  int get _pageStart => (_currentPage - 2).clamp(1, _currentPage);
+  int get _pageEnd {
+    final end = _pageStart + 4;
+    if (!_hasMorePages) return _currentPage;
+    return end;
+  }
+
+  Widget _buildPageButton(int page, ColorScheme colorScheme) {
+    final isActive = page == _currentPage;
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: Material(
+        color: isActive ? colorScheme.primary : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: isActive ? null : () => _goToPage(page),
+          child: Center(
+            child: Text(
+              '$page',
+              style: TextStyle(
+                color: isActive ? colorScheme.onPrimary : colorScheme.onSurface,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -360,6 +584,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               icon: const Icon(Icons.playlist_add),
               label: Text(l10n.addToPlaylist),
             ),
+          ),
+
+          // ── Play / Download buttons ──
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  onPressed: (isMultiPage && selectedPages.isEmpty)
+                      ? null
+                      : () => _playParsedVideo(context, videoInfo, selectedPages),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('播放'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: (isMultiPage && selectedPages.isEmpty)
+                      ? null
+                      : () => _downloadParsedVideo(context, videoInfo, selectedPages),
+                  icon: const Icon(Icons.download),
+                  label: Text(l10n.downloads),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
         ],

@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../../shared/widgets/common_dialogs.dart';
 import '../../../shared/widgets/song_tile.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../download/application/download_notifier.dart';
@@ -16,22 +16,88 @@ import '../application/playlist_notifier.dart';
 import '../domain/models/song_item.dart';
 import 'widgets/metadata_edit_dialog.dart';
 
+/// Editing mode for the playlist detail screen.
+enum _EditMode {
+  /// Normal browsing mode.
+  none,
+  /// Reorder mode — drag handle visible, drag to reorder.
+  reorder,
+  /// Batch selection mode — checkboxes visible, batch actions available.
+  batchSelect,
+}
+
 /// Screen displaying songs within a specific playlist.
 ///
 /// Features:
 /// - Playlist header with name, cover, song count
 /// - Scrollable list of songs (using SongTile)
-/// - Drag to reorder
+/// - Toggle reorder mode (drag handle appears)
+/// - Long press to enter batch selection mode
 /// - "Play all" / "Shuffle" buttons
 /// - Context menu per song: edit metadata, remove, add to queue
-class PlaylistDetailScreen extends ConsumerWidget {
+class PlaylistDetailScreen extends ConsumerStatefulWidget {
   /// The playlist database ID.
   final int playlistId;
 
   const PlaylistDetailScreen({super.key, required this.playlistId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlaylistDetailScreen> createState() =>
+      _PlaylistDetailScreenState();
+}
+
+class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
+  int get playlistId => widget.playlistId;
+
+  _EditMode _editMode = _EditMode.none;
+  final Set<int> _selectedSongIds = {};
+
+  void _toggleEditMode(_EditMode mode) {
+    setState(() {
+      if (_editMode == mode) {
+        _editMode = _EditMode.none;
+        _selectedSongIds.clear();
+      } else {
+        _editMode = mode;
+        _selectedSongIds.clear();
+      }
+    });
+  }
+
+  void _exitEditMode() {
+    setState(() {
+      _editMode = _EditMode.none;
+      _selectedSongIds.clear();
+    });
+  }
+
+  void _toggleSongSelection(int songId) {
+    setState(() {
+      if (_selectedSongIds.contains(songId)) {
+        _selectedSongIds.remove(songId);
+        if (_selectedSongIds.isEmpty) {
+          _editMode = _EditMode.none;
+        }
+      } else {
+        _selectedSongIds.add(songId);
+      }
+    });
+  }
+
+  void _selectAll(List<SongItem> songs) {
+    setState(() {
+      _selectedSongIds.addAll(songs.map((s) => s.id));
+    });
+  }
+
+  void _deselectAll() {
+    setState(() {
+      _selectedSongIds.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final songsAsync = ref.watch(playlistDetailNotifierProvider(playlistId));
     final playlistAsync = ref.watch(playlistListNotifierProvider);
     final l10n = context.l10n;
@@ -54,13 +120,22 @@ class PlaylistDetailScreen extends ConsumerWidget {
               SliverAppBar(
                 pinned: true,
                 expandedHeight: 160,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.go('/'),
-                ),
+                leading: _editMode != _EditMode.none
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: _exitEditMode,
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => context.go('/'),
+                      ),
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
-                    playlistName ?? 'Playlist',
+                    _editMode == _EditMode.batchSelect
+                        ? '已选 ${_selectedSongIds.length} 首'
+                        : _editMode == _EditMode.reorder
+                            ? '排序模式'
+                            : playlistName ?? 'Playlist',
                     style: context.textTheme.titleMedium,
                   ),
                   background: Container(
@@ -76,21 +151,13 @@ class PlaylistDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                actions: [
-                  if (songs.isNotEmpty) ...[
-                    IconButton(
-                      icon: const Icon(Icons.play_arrow),
-                      tooltip: l10n.play,
-                      onPressed: () => _playAll(ref, songs, playlistName),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.shuffle),
-                      tooltip: l10n.shuffle,
-                      onPressed: () => _shufflePlay(ref, songs, playlistName),
-                    ),
-                  ],
-                ],
+                actions: _buildActions(context, songs, playlistName, l10n),
               ),
+              // Batch action bar
+              if (_editMode == _EditMode.batchSelect && _selectedSongIds.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: _buildBatchActionBar(context, songs),
+                ),
               if (songs.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
@@ -103,7 +170,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 )
-              else
+              else if (_editMode == _EditMode.reorder)
                 SliverReorderableList(
                   itemCount: songs.length,
                   onReorder: (oldIndex, newIndex) {
@@ -115,38 +182,263 @@ class PlaylistDetailScreen extends ConsumerWidget {
                   },
                   itemBuilder: (context, index) {
                     final song = songs[index];
-                    final playerState = ref.watch(playerNotifierProvider);
-                    final isCurrentSong = playerState.currentTrack?.songId == song.id;
                     return ReorderableDragStartListener(
                       key: ValueKey(song.id),
                       index: index,
-                      child: SongTile(
-                        title: song.displayTitle,
-                        artist: song.displayArtist,
-                        coverUrl: song.coverUrl,
-                        duration: Formatters.formatDuration(Duration(seconds: song.duration)),
-                        isPlaying: isCurrentSong && playerState.isPlaying,
-                        isCached: song.isCached,
-                        qualityLabel: song.isCached ? song.qualityLabel : null,
-                        onTap: () {
-                          if (isCurrentSong && playerState.isPlaying) {
-                            ref.read(playerNotifierProvider.notifier).pause();
-                          } else if (isCurrentSong) {
-                            ref.read(playerNotifierProvider.notifier).resume();
-                          } else {
-                            _playSong(ref, song, songs, playlistName);
-                          }
-                        },
-                        onMorePressed: () {
-                          _showSongMenu(context, ref, song);
-                        },
+                      child: ListTile(
+                        leading: const Icon(Icons.drag_handle),
+                        title: Text(
+                          song.displayTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          song.displayArtist,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     );
                   },
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final song = songs[index];
+                      final playerState = ref.watch(playerNotifierProvider);
+                      final isCurrentSong =
+                          playerState.currentTrack?.songId == song.id;
+                      final isSelected = _selectedSongIds.contains(song.id);
+                      return _editMode == _EditMode.batchSelect
+                          ? CheckboxListTile(
+                              value: isSelected,
+                              onChanged: (_) => _toggleSongSelection(song.id),
+                              title: Text(
+                                song.displayTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                song.displayArtist,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              secondary: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: SizedBox(
+                                  width: 48,
+                                  height: 48,
+                                  child: song.coverUrl != null
+                                      ? Image.network(
+                                          song.coverUrl!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              Container(
+                                            color: context.colorScheme
+                                                .surfaceContainerHighest,
+                                            child: const Icon(
+                                                Icons.music_note, size: 24),
+                                          ),
+                                        )
+                                      : Container(
+                                          color: context.colorScheme
+                                              .surfaceContainerHighest,
+                                          child: const Icon(
+                                              Icons.music_note, size: 24),
+                                        ),
+                                ),
+                              ),
+                            )
+                          : GestureDetector(
+                              onLongPress: () {
+                                // Enter batch select mode on long press
+                                setState(() {
+                                  _editMode = _EditMode.batchSelect;
+                                  _selectedSongIds.add(song.id);
+                                });
+                              },
+                              child: SongTile(
+                                title: song.displayTitle,
+                                artist: song.displayArtist,
+                                coverUrl: song.coverUrl,
+                                duration: Formatters.formatDuration(
+                                    Duration(seconds: song.duration)),
+                                isPlaying:
+                                    isCurrentSong && playerState.isPlaying,
+                                isCached: song.isCached,
+                                qualityLabel:
+                                    song.isCached ? song.qualityLabel : null,
+                                onTap: () {
+                                  if (isCurrentSong &&
+                                      playerState.isPlaying) {
+                                    ref
+                                        .read(
+                                            playerNotifierProvider.notifier)
+                                        .pause();
+                                  } else if (isCurrentSong) {
+                                    ref
+                                        .read(
+                                            playerNotifierProvider.notifier)
+                                        .resume();
+                                  } else {
+                                    _playSong(
+                                        ref, song, songs, playlistName);
+                                  }
+                                },
+                                onMorePressed: () {
+                                  _showSongMenu(context, ref, song);
+                                },
+                              ),
+                            );
+                    },
+                    childCount: songs.length,
+                  ),
                 ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  List<Widget> _buildActions(BuildContext context, List<SongItem> songs,
+      String? playlistName, dynamic l10n) {
+    if (_editMode == _EditMode.batchSelect) {
+      final allSelected = _selectedSongIds.length == songs.length;
+      return [
+        IconButton(
+          icon: Icon(allSelected ? Icons.deselect : Icons.select_all),
+          tooltip: allSelected ? '取消全选' : '全选',
+          onPressed: () {
+            if (allSelected) {
+              _deselectAll();
+            } else {
+              _selectAll(songs);
+            }
+          },
+        ),
+      ];
+    }
+    if (_editMode == _EditMode.reorder) {
+      return [
+        IconButton(
+          icon: const Icon(Icons.done),
+          tooltip: '完成排序',
+          onPressed: _exitEditMode,
+        ),
+      ];
+    }
+    return [
+      if (songs.isNotEmpty) ...[
+        IconButton(
+          icon: const Icon(Icons.play_arrow),
+          tooltip: l10n.play,
+          onPressed: () => _playAll(ref, songs, playlistName),
+        ),
+        IconButton(
+          icon: const Icon(Icons.shuffle),
+          tooltip: l10n.shuffle,
+          onPressed: () => _shufflePlay(ref, songs, playlistName),
+        ),
+        PopupMenuButton<_EditMode>(
+          icon: const Icon(Icons.more_vert),
+          tooltip: '更多',
+          onSelected: _toggleEditMode,
+          itemBuilder: (_) => [
+            const PopupMenuItem(
+              value: _EditMode.reorder,
+              child: ListTile(
+                leading: Icon(Icons.swap_vert),
+                title: Text('排序'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            const PopupMenuItem(
+              value: _EditMode.batchSelect,
+              child: ListTile(
+                leading: Icon(Icons.checklist),
+                title: Text('批量操作'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ];
+  }
+
+  Widget _buildBatchActionBar(BuildContext context, List<SongItem> songs) {
+    final colorScheme = context.colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: colorScheme.surfaceContainerHighest,
+      child: Row(
+        children: [
+          Text(
+            '已选 ${_selectedSongIds.length} 首',
+            style: context.textTheme.bodyMedium,
+          ),
+          const Spacer(),
+          TextButton.icon(
+            icon: const Icon(Icons.playlist_add, size: 18),
+            label: const Text('加入歌单'),
+            onPressed: () async {
+              final targetPlaylistId = await showDialog<int>(
+                context: context,
+                builder: (_) => _PlaylistPickerDialog(excludePlaylistId: playlistId),
+              );
+              if (targetPlaylistId == null || !context.mounted) return;
+              final selectedSongIds = _selectedSongIds.toList();
+              final notifier = ref.read(
+                  playlistDetailNotifierProvider(targetPlaylistId).notifier);
+              for (final songId in selectedSongIds) {
+                await notifier.addSong(songId);
+              }
+              if (context.mounted) {
+                context.showSnackBar('已添加 ${selectedSongIds.length} 首歌曲到歌单');
+              }
+              _exitEditMode();
+            },
+          ),
+          const SizedBox(width: 8),
+          TextButton.icon(
+            icon: Icon(Icons.delete_outline, size: 18, color: colorScheme.error),
+            label: Text('删除', style: TextStyle(color: colorScheme.error)),
+            onPressed: () async {
+              final count = _selectedSongIds.length;
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('确认删除'),
+                  content: Text('确定从歌单中移除 $count 首歌曲？'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('取消'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text('删除',
+                          style: TextStyle(color: colorScheme.error)),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                for (final songId in _selectedSongIds.toList()) {
+                  await ref
+                      .read(playlistDetailNotifierProvider(playlistId).notifier)
+                      .removeSong(songId);
+                }
+                if (context.mounted) {
+                  context.showSnackBar('已移除 $count 首歌曲');
+                }
+                _exitEditMode();
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -337,5 +629,93 @@ class PlaylistDetailScreen extends ConsumerWidget {
       duration: Duration(seconds: song.duration),
       localPath: song.localPath,
     );
+  }
+}
+
+/// Dialog for selecting a target playlist (excludes the current one).
+class _PlaylistPickerDialog extends ConsumerWidget {
+  final int excludePlaylistId;
+  const _PlaylistPickerDialog({required this.excludePlaylistId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playlistsAsync = ref.watch(playlistListNotifierProvider);
+    final l10n = context.l10n;
+    final colorScheme = context.colorScheme;
+
+    return AlertDialog(
+      title: Text(l10n.addToPlaylist),
+      content: SizedBox(
+        width: 320,
+        height: 400,
+        child: playlistsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text(e.toString())),
+          data: (playlists) {
+            final filtered =
+                playlists.where((p) => p.id != excludePlaylistId).toList();
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.add_circle_outline,
+                      color: colorScheme.primary),
+                  title: Text(l10n.createPlaylist),
+                  onTap: () => _createAndSelect(context, ref, l10n),
+                ),
+                const Divider(),
+                if (filtered.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: Text(l10n.noPlaylists,
+                          style: TextStyle(
+                              color: colorScheme.onSurfaceVariant)),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final playlist = filtered[index];
+                        return ListTile(
+                          leading: const Icon(Icons.library_music),
+                          title: Text(playlist.name),
+                          subtitle: Text('${playlist.songCount} 首歌曲'),
+                          onTap: () =>
+                              Navigator.of(context).pop(playlist.id),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: Text(l10n.cancel),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _createAndSelect(
+      BuildContext context, WidgetRef ref, dynamic l10n) async {
+    final name = await CommonDialogs.showInputDialog(
+      context,
+      title: l10n.createPlaylist,
+      hint: l10n.title,
+    );
+    if (name != null && name.trim().isNotEmpty && context.mounted) {
+      final playlist = await ref
+          .read(playlistListNotifierProvider.notifier)
+          .createPlaylist(name.trim());
+      if (context.mounted) {
+        Navigator.of(context).pop(playlist.id);
+      }
+    }
   }
 }

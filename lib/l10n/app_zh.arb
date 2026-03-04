@@ -69,5 +69,7 @@
   "deleteDownloadConfirm": "确定要删除已下载的文件吗？",
   "activeDownloads": "正在下载",
   "completedDownloads": "已完成",
-  "confirm": "确定"
+  "confirm": "确定",
+  "logoutConfirm": "确定要退出登录吗？",
+  "paused": "已暂停"
 }

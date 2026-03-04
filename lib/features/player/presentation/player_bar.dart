@@ -1,11 +1,11 @@
-import 'dart:ui';
-
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../application/player_notifier.dart';
@@ -74,7 +74,7 @@ class _PlayerBarState extends ConsumerState<PlayerBar> {
       case 30251:
         return 'Hi-Res';
       default:
-        return '${quality}';
+        return '$quality';
     }
   }
 
@@ -160,50 +160,68 @@ class _PlayerBarState extends ConsumerState<PlayerBar> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    // Cover
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: _buildCover(context, track.coverUrl),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Title, artist & playlist
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            track.title,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // On narrow screens (< 500), hide quality badge, play mode, volume
+                    final isCompact = constraints.maxWidth < 500;
+                    return Row(
+                      children: [
+                        // Cover + Title — tappable to open full player
+                        GestureDetector(
+                          onTap: () => context.push(AppRoutes.player),
+                          behavior: HitTestBehavior.opaque,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Cover
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: SizedBox(
+                                  width: 48,
+                                  height: 48,
+                                  child: _buildCover(context, track.coverUrl),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            [
-                              track.artist,
-                              if (playerState.playlistName != null)
-                                playerState.playlistName!,
-                            ].join(' · '),
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
+                        ),
+                        // Title, artist & playlist — also tappable
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => context.push(AppRoutes.player),
+                            behavior: HitTestBehavior.opaque,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  track.title,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  [
+                                    track.artist,
+                                    if (playerState.playlistName != null)
+                                      playerState.playlistName!,
+                                  ].join(' · '),
+                                  style: context.textTheme.bodySmall?.copyWith(
+                                    color: context.colorScheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
-                    ),
-                    // Quality badge
-                    if (track.quality > 0)
+                        ),
+                    // Quality badge (desktop only)
+                    if (!isCompact && track.quality > 0)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Container(
@@ -223,47 +241,50 @@ class _PlayerBarState extends ConsumerState<PlayerBar> {
                           ),
                         ),
                       ),
-                    // Time display
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        '${Formatters.formatDuration(playerState.position)} / ${Formatters.formatDuration(playerState.duration)}',
-                        style: context.textTheme.labelSmall?.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
-                          fontFeatures: [const FontFeature.tabularFigures()],
+                    // Time display — use compact format on mobile
+                    if (!isCompact)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          '${Formatters.formatDuration(playerState.position)} / ${Formatters.formatDuration(playerState.duration)}',
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
+                            fontFeatures: [const FontFeature.tabularFigures()],
+                          ),
                         ),
                       ),
-                    ),
-                    // Play mode button
-                    IconButton(
-                      icon: Icon(
-                        _playModeIcon(playerState.playMode),
-                        size: 20,
-                        color: context.colorScheme.onSurfaceVariant,
+                    // Play mode button (desktop only)
+                    if (!isCompact)
+                      IconButton(
+                        icon: Icon(
+                          _playModeIcon(playerState.playMode),
+                          size: 20,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                        tooltip: _playModeLabel(playerState.playMode),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () {
+                          final next = _nextMode(playerState.playMode);
+                          ref.read(playerNotifierProvider.notifier).setMode(next);
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(_playModeLabel(next)),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+                            ),
+                          );
+                        },
                       ),
-                      tooltip: _playModeLabel(playerState.playMode),
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () {
-                        final next = _nextMode(playerState.playMode);
-                        ref.read(playerNotifierProvider.notifier).setMode(next);
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(_playModeLabel(next)),
-                            duration: const Duration(seconds: 1),
-                            behavior: SnackBarBehavior.floating,
-                            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
-                          ),
-                        );
-                      },
-                    ),
-                    // Volume button
-                    _VolumeButton(
-                      volume: playerState.volume,
-                      onChanged: (v) {
-                        ref.read(playerNotifierProvider.notifier).setVolume(v);
-                      },
-                    ),
+                    // Volume button (desktop only)
+                    if (!isCompact)
+                      _VolumeButton(
+                        volume: playerState.volume,
+                        onChanged: (v) {
+                          ref.read(playerNotifierProvider.notifier).setVolume(v);
+                        },
+                      ),
                     // Previous button
                     IconButton(
                       icon: const Icon(Icons.skip_previous, size: 24),
@@ -300,6 +321,8 @@ class _PlayerBarState extends ConsumerState<PlayerBar> {
                       },
                     ),
                   ],
+                );
+                  },
                 ),
               ),
             ),

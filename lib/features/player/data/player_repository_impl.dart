@@ -12,13 +12,13 @@ class PlayerRepositoryImpl implements PlayerRepository {
 
   PlayerRepositoryImpl() : _player = Player() {
     // Configure mpv properties for better audio output:
-    // 1. Allow volume amplification up to 150% (mpv default is 130).
-    // 2. Enable loudness normalization (loudnorm) to bring quiet audio
-    //    closer to standard broadcast level (-14 LUFS), which helps match
-    //    the perceived loudness of B站 native player.
+    // 1. Allow volume amplification up to 200% for headroom.
+    // 2. Enable loudness normalization (loudnorm) targeting -10 LUFS
+    //    (louder than EBU R128's -14) to match perceived loudness of
+    //    B站 native player and other music apps.
     final nativePlayer = _player.platform as NativePlayer;
-    nativePlayer.setProperty('volume-max', '150');
-    nativePlayer.setProperty('af', 'loudnorm=I=-14:TP=-1:LRA=11');
+    nativePlayer.setProperty('volume-max', '200');
+    nativePlayer.setProperty('af', 'loudnorm=I=-10:TP=-1:LRA=7');
   }
 
   @override

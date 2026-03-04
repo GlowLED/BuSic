@@ -205,7 +205,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                           color: Colors.white70,
                         ),
                         onPressed: () {
-                          final modes = PlayMode.values;
+                          const modes = PlayMode.values;
                           final next =
                               (playerState.playMode.index + 1) % modes.length;
                           ref

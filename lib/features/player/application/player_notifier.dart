@@ -6,7 +6,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/bili_dio.dart';
+import '../../../core/services/audio_handler.dart';
 import '../../../core/utils/logger.dart';
+import '../../../main.dart';
 import '../../playlist/domain/models/song_item.dart';
 import '../../search_and_parse/data/parse_repository.dart';
 import '../../search_and_parse/data/parse_repository_impl.dart';
@@ -28,8 +30,14 @@ part 'player_notifier.g.dart';
 class PlayerNotifier extends _$PlayerNotifier {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
+  late BusicAudioHandler _audioHandler;
   final List<StreamSubscription> _subscriptions = [];
   DateTime _lastPersist = DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// Whether the media_kit player currently has loaded media.
+  /// After app restart, the player state is restored from prefs but
+  /// no media is loaded — this flag prevents spurious resume calls.
+  bool _hasActiveMedia = false;
 
   static const _keyCurrentTrack = 'player_current_track';
   static const _keyQueue = 'player_queue';
@@ -49,11 +57,25 @@ class PlayerNotifier extends _$PlayerNotifier {
   PlayerState build() {
     _repository = PlayerRepositoryImpl();
     _parseRepository = ParseRepositoryImpl(biliDio: BiliDio());
+    _audioHandler = ref.read(audioHandlerProvider);
+
+    // Connect media button callbacks (lock screen / notification controls)
+    _audioHandler.onPlay = () => resume();
+    _audioHandler.onPause = () => pause();
+    _audioHandler.onSkipToNext = () => next();
+    _audioHandler.onSkipToPrevious = () => previous();
+    _audioHandler.onSeek = (pos) => seekTo(pos);
+    _audioHandler.onStop = () => pause();
 
     // Listen to player streams
     _subscriptions.add(
       _repository.positionStream.listen((pos) {
         state = state.copyWith(position: pos);
+        // Update media session position
+        _audioHandler.updatePlaybackState(
+          playing: state.isPlaying,
+          position: pos,
+        );
         // Throttle persist to once every 5 seconds
         final now = DateTime.now();
         if (now.difference(_lastPersist).inSeconds >= 5) {
@@ -65,11 +87,17 @@ class PlayerNotifier extends _$PlayerNotifier {
     _subscriptions.add(
       _repository.durationStream.listen((dur) {
         state = state.copyWith(duration: dur);
+        // Update media session with the correct duration
+        _audioHandler.setCurrentTrack(state.currentTrack, duration: dur);
       }),
     );
     _subscriptions.add(
       _repository.playingStream.listen((playing) {
         state = state.copyWith(isPlaying: playing);
+        _audioHandler.updatePlaybackState(
+          playing: playing,
+          position: state.position,
+        );
       }),
     );
     _subscriptions.add(
@@ -170,6 +198,14 @@ class PlayerNotifier extends _$PlayerNotifier {
     }
   }
 
+  /// Update the platform media session (notification, lock screen controls).
+  void _updateMediaSession(AudioTrack track) {
+    _audioHandler.setCurrentTrack(track);
+    _audioHandler.updatePlaybackState(
+      playing: true,
+      position: Duration.zero,
+    );
+  }
   /// Play a specific track, optionally replacing the queue.
   Future<void> playTrack(AudioTrack track, {List<AudioTrack>? queue}) async {
     final newQueue = queue ?? [track];
@@ -182,6 +218,48 @@ class PlayerNotifier extends _$PlayerNotifier {
       position: Duration.zero,
     );
 
+    _updateMediaSession(track);
+    await _repository.play(track);
+    _hasActiveMedia = true;
+  }
+
+  /// Play a list of [AudioTrack]s starting from [index].
+  ///
+  /// The track at [index] is resolved for immediate playback;
+  /// others will be resolved when they become current.
+  Future<void> playTrackList(
+    List<AudioTrack> tracks,
+    int index, {
+    String? playlistName,
+  }) async {
+    if (tracks.isEmpty) return;
+    index = index.clamp(0, tracks.length - 1);
+
+    var track = tracks[index];
+    // Resolve stream URL if not already available
+    if (track.streamUrl == null && track.localPath == null) {
+      final streamInfo = await _parseRepository.getAudioStream(
+        track.bvid,
+        track.cid,
+        quality: _preferredQuality,
+      );
+      track = track.copyWith(
+        streamUrl: streamInfo.url,
+        quality: streamInfo.quality,
+      );
+    }
+
+    final queue = List<AudioTrack>.from(tracks)..[index] = track;
+    state = state.copyWith(
+      currentTrack: track,
+      queue: queue,
+      currentIndex: index,
+      position: Duration.zero,
+      playlistId: null,
+      playlistName: playlistName,
+    );
+
+    _updateMediaSession(track);
     await _repository.play(track);
     _hasActiveMedia = true;
   }
@@ -258,6 +336,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       playlistName: playlistName,
     );
 
+    _updateMediaSession(track);
     await _repository.play(track);
     _hasActiveMedia = true;
   }
@@ -319,9 +398,6 @@ class PlayerNotifier extends _$PlayerNotifier {
     await _repository.resume();
   }
 
-  /// Whether the player engine has an active media loaded.
-  bool _hasActiveMedia = false;
-
   /// Skip to the next track in the queue.
   Future<void> next() async {
     if (state.queue.isEmpty) return;
@@ -359,6 +435,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       currentIndex: nextIndex,
       position: Duration.zero,
     );
+    _updateMediaSession(track);
     await _repository.play(track);
     _hasActiveMedia = true;
   }
@@ -403,6 +480,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       currentIndex: prevIndex,
       position: Duration.zero,
     );
+    _updateMediaSession(track);
     await _repository.play(track);
     _hasActiveMedia = true;
   }
