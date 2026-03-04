@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../share/application/share_notifier.dart';
+import '../../share/presentation/widgets/import_preview_dialog.dart';
 import '../application/playlist_notifier.dart';
 import 'widgets/playlist_tile.dart';
 
@@ -93,9 +95,22 @@ class PlaylistListScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _createPlaylist(context, ref),
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'import',
+            onPressed: () => _importFromClipboard(context, ref),
+            tooltip: context.l10n.importFromClipboard,
+            child: const Icon(Icons.paste),
+          ),
+          const SizedBox(width: 12),
+          FloatingActionButton(
+            heroTag: 'create',
+            onPressed: () => _createPlaylist(context, ref),
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }
@@ -112,6 +127,51 @@ class PlaylistListScreen extends ConsumerWidget {
           .read(playlistListNotifierProvider.notifier)
           .createPlaylist(name.trim());
     }
+  }
+
+  /// 从剪贴板导入歌单
+  Future<void> _importFromClipboard(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(shareNotifierProvider.notifier);
+    final playlist = await notifier.parseFromClipboard();
+
+    if (playlist == null) {
+      // 解析失败，状态已在 notifier 中设置为 error
+      final state = ref.read(shareNotifierProvider);
+      if (context.mounted) {
+        state.whenOrNull(
+          error: (msg) => context.showSnackBar(msg),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    // 显示导入预览弹窗
+    showDialog(
+      context: context,
+      builder: (_) => ImportPreviewDialog(
+        playlist: playlist,
+        onConfirm: (name) async {
+          await notifier.confirmImport(playlist, name: name);
+          final state = ref.read(shareNotifierProvider);
+          if (context.mounted) {
+            state.whenOrNull(
+              importSuccess: (result) {
+                context.showSnackBar(
+                  context.l10n.importResult(
+                    result.imported,
+                    result.reused,
+                    result.failed,
+                  ),
+                );
+              },
+              error: (msg) => context.showSnackBar(msg),
+            );
+          }
+        },
+      ),
+    );
   }
 
   void _showPlaylistMenu(

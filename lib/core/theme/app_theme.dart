@@ -33,7 +33,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.light,
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 1,
         clipBehavior: Clip.antiAlias,
       ),
@@ -65,7 +65,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: Brightness.dark,
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 1,
         clipBehavior: Clip.antiAlias,
       ),

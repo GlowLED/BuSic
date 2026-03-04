@@ -72,5 +72,67 @@
   "completedDownloads": "Completed",
   "confirm": "Confirm",
   "logoutConfirm": "Are you sure you want to logout?",
-  "paused": "Paused"
+  "paused": "Paused",
+  "sharePlaylist": "Share Playlist",
+  "copyToClipboard": "Copy to Clipboard",
+  "offlineShare": "Offline Share",
+  "generateShareLink": "Generate Share Link",
+  "onlineShareComingSoon": "Online Share (Coming Soon)",
+  "importPlaylist": "Import Playlist",
+  "importPlaylistPreview": "Import Playlist Preview",
+  "playlistName": "Playlist Name",
+  "songCount": "Song Count",
+  "songList": "Song List",
+  "confirmImport": "Confirm Import",
+  "importFromClipboard": "Import from Clipboard",
+  "copiedToClipboard": "Copied to clipboard",
+  "exportFailed": "Export failed",
+  "importSuccess": "Import successful",
+  "importFailed": "Import failed",
+  "importResult": "Imported {imported}, reused {reused}, failed {failed}",
+  "@importResult": {
+    "placeholders": {
+      "imported": { "type": "int" },
+      "reused": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
+  "dataManagement": "Data Management",
+  "exportBackup": "Export Backup",
+  "exportBackupDesc": "Export all playlists and songs to a file",
+  "importBackup": "Import Backup",
+  "importBackupDesc": "Restore data from a backup file",
+  "importDataBackup": "Import Data Backup",
+  "backupTime": "Backup Time",
+  "appVersionLabel": "App Version",
+  "playlistCount": "Playlist Count",
+  "importStrategy": "Import Strategy",
+  "mergeStrategy": "Merge (Recommended)",
+  "mergeStrategyDesc": "Keep existing data, only add new content",
+  "overwriteStrategy": "Overwrite",
+  "overwriteStrategyDesc": "Clear playlists before importing",
+  "overwriteConfirmTitle": "Confirm Overwrite",
+  "overwriteConfirmMessage": "Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?",
+  "exportSuccess": "Export successful",
+  "backupExportedTo": "Backup exported to: {path}",
+  "@backupExportedTo": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "backupImportResult": "Created {created} playlists, merged {merged}, created {songs} songs",
+  "@backupImportResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "merged": { "type": "int" },
+      "songs": { "type": "int" }
+    }
+  },
+  "clipboardEmpty": "Clipboard is empty",
+  "notBusicData": "Clipboard content is not BuSic playlist data",
+  "dataFormatError": "Data format error, cannot parse",
+  "dataCorrupted": "Playlist data corrupted or version incompatible",
+  "pleaseUpgrade": "Please upgrade BuSic before importing",
+  "emptyPlaylist": "Playlist has no songs",
+  "importing": "Importing..."
 }

@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../share/application/sync_notifier.dart';
+import '../../share/presentation/widgets/backup_overview_dialog.dart';
 import '../application/settings_notifier.dart';
 
 /// Pick a directory using zenity (Linux) or text input fallback.
@@ -233,6 +235,23 @@ class SettingsScreen extends ConsumerWidget {
 
           const Divider(),
 
+          // ── Data Management ──
+          _SectionHeader(title: l10n.dataManagement),
+          ListTile(
+            leading: const Icon(Icons.upload_file),
+            title: Text(l10n.exportBackup),
+            subtitle: Text(l10n.exportBackupDesc),
+            onTap: () => _exportBackup(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.download),
+            title: Text(l10n.importBackup),
+            subtitle: Text(l10n.importBackupDesc),
+            onTap: () => _importBackup(context, ref),
+          ),
+
+          const Divider(),
+
           // ── About ──
           ListTile(
             leading: const Icon(Icons.info_outline),
@@ -260,6 +279,69 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 导出数据备份
+  Future<void> _exportBackup(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final notifier = ref.read(syncNotifierProvider.notifier);
+    await notifier.exportToFile();
+    final state = ref.read(syncNotifierProvider);
+    if (context.mounted) {
+      state.whenOrNull(
+        exportSuccess: (path) => context.showSnackBar(
+          l10n.backupExportedTo(path),
+        ),
+        error: (msg) => context.showSnackBar(msg),
+      );
+    }
+  }
+
+  /// 导入数据备份
+  Future<void> _importBackup(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(syncNotifierProvider.notifier);
+    final backup = await notifier.parseFromFile();
+    if (backup == null) {
+      final state = ref.read(syncNotifierProvider);
+      if (context.mounted) {
+        state.whenOrNull(
+          error: (msg) => context.showSnackBar(msg),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    final l10n = context.l10n;
+    showDialog(
+      context: context,
+      builder: (_) => BackupOverviewDialog(
+        backup: backup,
+        onConfirm: (isMerge) async {
+          if (isMerge) {
+            await notifier.importMerge(backup);
+          } else {
+            await notifier.importOverwrite(backup);
+          }
+          final importState = ref.read(syncNotifierProvider);
+          if (context.mounted) {
+            importState.whenOrNull(
+              importSuccess: (result) {
+                context.showSnackBar(
+                  l10n.backupImportResult(
+                    result.playlistsCreated,
+                    result.playlistsMerged,
+                    result.songsCreated,
+                  ),
+                );
+              },
+              error: (msg) => context.showSnackBar(msg),
+            );
+          }
+        },
       ),
     );
   }
