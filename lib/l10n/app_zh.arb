@@ -69,5 +69,67 @@
   "deleteDownloadConfirm": "确定要删除已下载的文件吗？",
   "activeDownloads": "正在下载",
   "completedDownloads": "已完成",
-  "confirm": "确定"
+  "confirm": "确定",
+  "sharePlaylist": "分享歌单",
+  "copyToClipboard": "复制到剪贴板",
+  "offlineShare": "离线分享",
+  "generateShareLink": "生成分享链接",
+  "onlineShareComingSoon": "在线分享（即将推出）",
+  "importPlaylist": "导入歌单",
+  "importPlaylistPreview": "导入歌单预览",
+  "playlistName": "歌单名称",
+  "songCount": "歌曲数量",
+  "songList": "歌曲列表",
+  "confirmImport": "确认导入",
+  "importFromClipboard": "从剪贴板导入",
+  "copiedToClipboard": "已复制到剪贴板",
+  "exportFailed": "导出失败",
+  "importSuccess": "导入成功",
+  "importFailed": "导入失败",
+  "importResult": "导入{imported}首，复用{reused}首，失败{failed}首",
+  "@importResult": {
+    "placeholders": {
+      "imported": { "type": "int" },
+      "reused": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
+  "dataManagement": "数据管理",
+  "exportBackup": "导出备份",
+  "exportBackupDesc": "将所有歌单和歌曲数据导出为文件",
+  "importBackup": "导入备份",
+  "importBackupDesc": "从备份文件恢复数据",
+  "importDataBackup": "导入数据备份",
+  "backupTime": "备份时间",
+  "appVersionLabel": "App 版本",
+  "playlistCount": "歌单数量",
+  "importStrategy": "导入策略",
+  "mergeStrategy": "合并（推荐）",
+  "mergeStrategyDesc": "保留现有数据，仅添加新内容",
+  "overwriteStrategy": "覆盖",
+  "overwriteStrategyDesc": "清空歌单后导入",
+  "overwriteConfirmTitle": "确认覆盖",
+  "overwriteConfirmMessage": "覆盖将清空所有现有歌单和关联关系，此操作不可撤销。确定要继续吗？",
+  "exportSuccess": "导出成功",
+  "backupExportedTo": "备份已导出到: {path}",
+  "@backupExportedTo": {
+    "placeholders": {
+      "path": { "type": "String" }
+    }
+  },
+  "backupImportResult": "新建歌单{created}个，合并{merged}个，新建歌曲{songs}首",
+  "@backupImportResult": {
+    "placeholders": {
+      "created": { "type": "int" },
+      "merged": { "type": "int" },
+      "songs": { "type": "int" }
+    }
+  },
+  "clipboardEmpty": "剪贴板中没有内容",
+  "notBusicData": "剪贴板内容不是 BuSic 歌单数据",
+  "dataFormatError": "数据格式错误，无法解析",
+  "dataCorrupted": "歌单数据损坏或版本不兼容",
+  "pleaseUpgrade": "请升级 BuSic 后再导入",
+  "emptyPlaylist": "歌单中没有歌曲",
+  "importing": "导入中..."
 }

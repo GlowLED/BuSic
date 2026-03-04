@@ -217,4 +217,139 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get confirm => '确定';
+
+  @override
+  String get sharePlaylist => '分享歌单';
+
+  @override
+  String get copyToClipboard => '复制到剪贴板';
+
+  @override
+  String get offlineShare => '离线分享';
+
+  @override
+  String get generateShareLink => '生成分享链接';
+
+  @override
+  String get onlineShareComingSoon => '在线分享（即将推出）';
+
+  @override
+  String get importPlaylist => '导入歌单';
+
+  @override
+  String get importPlaylistPreview => '导入歌单预览';
+
+  @override
+  String get playlistName => '歌单名称';
+
+  @override
+  String get songCount => '歌曲数量';
+
+  @override
+  String get songList => '歌曲列表';
+
+  @override
+  String get confirmImport => '确认导入';
+
+  @override
+  String get importFromClipboard => '从剪贴板导入';
+
+  @override
+  String get copiedToClipboard => '已复制到剪贴板';
+
+  @override
+  String get exportFailed => '导出失败';
+
+  @override
+  String get importSuccess => '导入成功';
+
+  @override
+  String get importFailed => '导入失败';
+
+  @override
+  String importResult(int imported, int reused, int failed) {
+    return '导入$imported首，复用$reused首，失败$failed首';
+  }
+
+  @override
+  String get dataManagement => '数据管理';
+
+  @override
+  String get exportBackup => '导出备份';
+
+  @override
+  String get exportBackupDesc => '将所有歌单和歌曲数据导出为文件';
+
+  @override
+  String get importBackup => '导入备份';
+
+  @override
+  String get importBackupDesc => '从备份文件恢复数据';
+
+  @override
+  String get importDataBackup => '导入数据备份';
+
+  @override
+  String get backupTime => '备份时间';
+
+  @override
+  String get appVersionLabel => 'App 版本';
+
+  @override
+  String get playlistCount => '歌单数量';
+
+  @override
+  String get importStrategy => '导入策略';
+
+  @override
+  String get mergeStrategy => '合并（推荐）';
+
+  @override
+  String get mergeStrategyDesc => '保留现有数据，仅添加新内容';
+
+  @override
+  String get overwriteStrategy => '覆盖';
+
+  @override
+  String get overwriteStrategyDesc => '清空歌单后导入';
+
+  @override
+  String get overwriteConfirmTitle => '确认覆盖';
+
+  @override
+  String get overwriteConfirmMessage => '覆盖将清空所有现有歌单和关联关系，此操作不可撤销。确定要继续吗？';
+
+  @override
+  String get exportSuccess => '导出成功';
+
+  @override
+  String backupExportedTo(String path) {
+    return '备份已导出到: $path';
+  }
+
+  @override
+  String backupImportResult(int created, int merged, int songs) {
+    return '新建歌单$created个，合并$merged个，新建歌曲$songs首';
+  }
+
+  @override
+  String get clipboardEmpty => '剪贴板中没有内容';
+
+  @override
+  String get notBusicData => '剪贴板内容不是 BuSic 歌单数据';
+
+  @override
+  String get dataFormatError => '数据格式错误，无法解析';
+
+  @override
+  String get dataCorrupted => '歌单数据损坏或版本不兼容';
+
+  @override
+  String get pleaseUpgrade => '请升级 BuSic 后再导入';
+
+  @override
+  String get emptyPlaylist => '歌单中没有歌曲';
+
+  @override
+  String get importing => '导入中...';
 }

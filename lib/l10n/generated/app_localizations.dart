@@ -517,6 +517,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirm;
+
+  /// No description provided for @sharePlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Playlist'**
+  String get sharePlaylist;
+
+  /// No description provided for @copyToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to Clipboard'**
+  String get copyToClipboard;
+
+  /// No description provided for @offlineShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Share'**
+  String get offlineShare;
+
+  /// No description provided for @generateShareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Share Link'**
+  String get generateShareLink;
+
+  /// No description provided for @onlineShareComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Share (Coming Soon)'**
+  String get onlineShareComingSoon;
+
+  /// No description provided for @importPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Playlist'**
+  String get importPlaylist;
+
+  /// No description provided for @importPlaylistPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Playlist Preview'**
+  String get importPlaylistPreview;
+
+  /// No description provided for @playlistName.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist Name'**
+  String get playlistName;
+
+  /// No description provided for @songCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Song Count'**
+  String get songCount;
+
+  /// No description provided for @songList.
+  ///
+  /// In en, this message translates to:
+  /// **'Song List'**
+  String get songList;
+
+  /// No description provided for @confirmImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Import'**
+  String get confirmImport;
+
+  /// No description provided for @importFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from Clipboard'**
+  String get importFromClipboard;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get exportFailed;
+
+  /// No description provided for @importSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Import successful'**
+  String get importSuccess;
+
+  /// No description provided for @importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed'**
+  String get importFailed;
+
+  /// No description provided for @importResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {imported}, reused {reused}, failed {failed}'**
+  String importResult(int imported, int reused, int failed);
+
+  /// No description provided for @dataManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Management'**
+  String get dataManagement;
+
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Backup'**
+  String get exportBackup;
+
+  /// No description provided for @exportBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all playlists and songs to a file'**
+  String get exportBackupDesc;
+
+  /// No description provided for @importBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Backup'**
+  String get importBackup;
+
+  /// No description provided for @importBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore data from a backup file'**
+  String get importBackupDesc;
+
+  /// No description provided for @importDataBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Data Backup'**
+  String get importDataBackup;
+
+  /// No description provided for @backupTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Time'**
+  String get backupTime;
+
+  /// No description provided for @appVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'App Version'**
+  String get appVersionLabel;
+
+  /// No description provided for @playlistCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist Count'**
+  String get playlistCount;
+
+  /// No description provided for @importStrategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Strategy'**
+  String get importStrategy;
+
+  /// No description provided for @mergeStrategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge (Recommended)'**
+  String get mergeStrategy;
+
+  /// No description provided for @mergeStrategyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep existing data, only add new content'**
+  String get mergeStrategyDesc;
+
+  /// No description provided for @overwriteStrategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get overwriteStrategy;
+
+  /// No description provided for @overwriteStrategyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear playlists before importing'**
+  String get overwriteStrategyDesc;
+
+  /// No description provided for @overwriteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Overwrite'**
+  String get overwriteConfirmTitle;
+
+  /// No description provided for @overwriteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?'**
+  String get overwriteConfirmMessage;
+
+  /// No description provided for @exportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Export successful'**
+  String get exportSuccess;
+
+  /// No description provided for @backupExportedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported to: {path}'**
+  String backupExportedTo(String path);
+
+  /// No description provided for @backupImportResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {created} playlists, merged {merged}, created {songs} songs'**
+  String backupImportResult(int created, int merged, int songs);
+
+  /// No description provided for @clipboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard is empty'**
+  String get clipboardEmpty;
+
+  /// No description provided for @notBusicData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard content is not BuSic playlist data'**
+  String get notBusicData;
+
+  /// No description provided for @dataFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Data format error, cannot parse'**
+  String get dataFormatError;
+
+  /// No description provided for @dataCorrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist data corrupted or version incompatible'**
+  String get dataCorrupted;
+
+  /// No description provided for @pleaseUpgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upgrade BuSic before importing'**
+  String get pleaseUpgrade;
+
+  /// No description provided for @emptyPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist has no songs'**
+  String get emptyPlaylist;
+
+  /// No description provided for @importing.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing...'**
+  String get importing;
 }
 
 class _AppLocalizationsDelegate

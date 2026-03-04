@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +11,8 @@ import '../../download/presentation/widgets/quality_select_dialog.dart';
 import '../../player/application/player_notifier.dart';
 import '../../player/domain/models/audio_track.dart';
 import '../../player/domain/models/play_mode.dart';
+import '../../share/application/share_notifier.dart';
+import '../../share/presentation/widgets/share_dialog.dart';
 import '../application/playlist_notifier.dart';
 import '../domain/models/song_item.dart';
 import 'widgets/metadata_edit_dialog.dart';
@@ -87,6 +88,11 @@ class PlaylistDetailScreen extends ConsumerWidget {
                       icon: const Icon(Icons.shuffle),
                       tooltip: l10n.shuffle,
                       onPressed: () => _shufflePlay(ref, songs, playlistName),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      tooltip: l10n.sharePlaylist,
+                      onPressed: () => _showShareDialog(context, ref),
                     ),
                   ],
                 ],
@@ -323,6 +329,37 @@ class PlaylistDetailScreen extends ConsumerWidget {
       playlistId: playlistId,
       playlistName: playlistName,
     );
+  }
+
+  /// 显示分享方式选择弹窗
+  void _showShareDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (_) => ShareDialog(
+        onSelected: (method) {
+          if (method == ShareMethod.clipboard) {
+            _exportToClipboard(context, ref);
+          }
+        },
+      ),
+    );
+  }
+
+  /// 导出歌单到剪贴板
+  void _exportToClipboard(BuildContext context, WidgetRef ref) async {
+    await ref.read(shareNotifierProvider.notifier).exportToClipboard(playlistId);
+    final state = ref.read(shareNotifierProvider);
+    if (context.mounted) {
+      state.when(
+        idle: () {},
+        exporting: () {},
+        exported: (_) => context.showSnackBar(context.l10n.copiedToClipboard),
+        importing: (_, __) {},
+        preview: (_) {},
+        importSuccess: (_) {},
+        error: (msg) => context.showSnackBar(msg),
+      );
+    }
   }
 
   /// Convert a SongItem to an AudioTrack (without stream URL — for queue only).

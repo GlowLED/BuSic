@@ -218,4 +218,140 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm => 'Confirm';
+
+  @override
+  String get sharePlaylist => 'Share Playlist';
+
+  @override
+  String get copyToClipboard => 'Copy to Clipboard';
+
+  @override
+  String get offlineShare => 'Offline Share';
+
+  @override
+  String get generateShareLink => 'Generate Share Link';
+
+  @override
+  String get onlineShareComingSoon => 'Online Share (Coming Soon)';
+
+  @override
+  String get importPlaylist => 'Import Playlist';
+
+  @override
+  String get importPlaylistPreview => 'Import Playlist Preview';
+
+  @override
+  String get playlistName => 'Playlist Name';
+
+  @override
+  String get songCount => 'Song Count';
+
+  @override
+  String get songList => 'Song List';
+
+  @override
+  String get confirmImport => 'Confirm Import';
+
+  @override
+  String get importFromClipboard => 'Import from Clipboard';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get exportFailed => 'Export failed';
+
+  @override
+  String get importSuccess => 'Import successful';
+
+  @override
+  String get importFailed => 'Import failed';
+
+  @override
+  String importResult(int imported, int reused, int failed) {
+    return 'Imported $imported, reused $reused, failed $failed';
+  }
+
+  @override
+  String get dataManagement => 'Data Management';
+
+  @override
+  String get exportBackup => 'Export Backup';
+
+  @override
+  String get exportBackupDesc => 'Export all playlists and songs to a file';
+
+  @override
+  String get importBackup => 'Import Backup';
+
+  @override
+  String get importBackupDesc => 'Restore data from a backup file';
+
+  @override
+  String get importDataBackup => 'Import Data Backup';
+
+  @override
+  String get backupTime => 'Backup Time';
+
+  @override
+  String get appVersionLabel => 'App Version';
+
+  @override
+  String get playlistCount => 'Playlist Count';
+
+  @override
+  String get importStrategy => 'Import Strategy';
+
+  @override
+  String get mergeStrategy => 'Merge (Recommended)';
+
+  @override
+  String get mergeStrategyDesc => 'Keep existing data, only add new content';
+
+  @override
+  String get overwriteStrategy => 'Overwrite';
+
+  @override
+  String get overwriteStrategyDesc => 'Clear playlists before importing';
+
+  @override
+  String get overwriteConfirmTitle => 'Confirm Overwrite';
+
+  @override
+  String get overwriteConfirmMessage =>
+      'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
+
+  @override
+  String get exportSuccess => 'Export successful';
+
+  @override
+  String backupExportedTo(String path) {
+    return 'Backup exported to: $path';
+  }
+
+  @override
+  String backupImportResult(int created, int merged, int songs) {
+    return 'Created $created playlists, merged $merged, created $songs songs';
+  }
+
+  @override
+  String get clipboardEmpty => 'Clipboard is empty';
+
+  @override
+  String get notBusicData => 'Clipboard content is not BuSic playlist data';
+
+  @override
+  String get dataFormatError => 'Data format error, cannot parse';
+
+  @override
+  String get dataCorrupted => 'Playlist data corrupted or version incompatible';
+
+  @override
+  String get pleaseUpgrade => 'Please upgrade BuSic before importing';
+
+  @override
+  String get emptyPlaylist => 'Playlist has no songs';
+
+  @override
+  String get importing => 'Importing...';
 }
