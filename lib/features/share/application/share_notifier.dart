@@ -10,6 +10,7 @@ import '../data/share_repository.dart';
 import '../data/share_repository_impl.dart';
 import '../domain/models/share_state.dart';
 import '../domain/models/shared_playlist.dart';
+import '../domain/models/song_metadata_preview.dart';
 
 part 'share_notifier.g.dart';
 
@@ -30,8 +31,9 @@ class ShareNotifier extends _$ShareNotifier {
 
   /// 离线分享：导出歌单到剪贴板
   Future<void> exportToClipboard(int playlistId) async {
-    state = const ShareState.exporting();
+    final link = ref.keepAlive();
     try {
+      state = const ShareState.exporting();
       final playlist = await _shareRepo.exportPlaylist(playlistId);
       final encoded = _shareRepo.encodeForClipboard(playlist);
       await Clipboard.setData(ClipboardData(text: encoded));
@@ -40,6 +42,8 @@ class ShareNotifier extends _$ShareNotifier {
     } catch (e) {
       AppLogger.error('导出歌单失败', tag: 'Share', error: e);
       state = ShareState.error('导出失败: $e');
+    } finally {
+      link.close();
     }
   }
 
@@ -47,6 +51,7 @@ class ShareNotifier extends _$ShareNotifier {
   ///
   /// 成功后进入 preview 状态，等待用户确认导入。
   Future<SharedPlaylist?> parseFromClipboard() async {
+    final link = ref.keepAlive();
     try {
       final clipData = await Clipboard.getData(Clipboard.kTextPlain);
       if (clipData?.text == null || clipData!.text!.isEmpty) {
@@ -68,6 +73,8 @@ class ShareNotifier extends _$ShareNotifier {
       AppLogger.error('解析剪贴板数据失败', tag: 'Share', error: e);
       state = ShareState.error('解析失败: $e');
       return null;
+    } finally {
+      link.close();
     }
   }
 
@@ -78,8 +85,9 @@ class ShareNotifier extends _$ShareNotifier {
     SharedPlaylist playlist, {
     String? name,
   }) async {
-    state = ShareState.importing(total: playlist.songs.length);
+    final link = ref.keepAlive();
     try {
+      state = ShareState.importing(total: playlist.songs.length);
       final result = await _shareRepo.importPlaylist(
         playlist,
         overrideName: name,
@@ -97,11 +105,25 @@ class ShareNotifier extends _$ShareNotifier {
     } catch (e) {
       AppLogger.error('导入歌单失败', tag: 'Share', error: e);
       state = ShareState.error('导入失败: $e');
+    } finally {
+      link.close();
     }
   }
 
   /// 重置为空闲状态
   void reset() {
     state = const ShareState.idle();
+  }
+
+  /// 预取歌曲元数据（标题、作者）用于导入预览
+  Future<List<SongMetadataPreview>?> prefetchSongMetadata(
+    SharedPlaylist playlist,
+  ) async {
+    try {
+      return await _shareRepo.prefetchMetadata(playlist.songs);
+    } catch (e) {
+      AppLogger.error('预取元数据失败', tag: 'Share', error: e);
+      return null;
+    }
   }
 }

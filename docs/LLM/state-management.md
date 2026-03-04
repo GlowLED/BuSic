@@ -201,3 +201,62 @@ void main() async {
   );
 }
 ```
+
+## AutoDispose 生命周期陷阱
+
+`@riverpod` 注解默认生成 `AutoDispose` Provider。当没有任何 Widget `watch` 该 Provider 时，
+Notifier 会在帧结束时被自动回收。**这在跨异步间隙（如 `showDialog`）使用 Notifier 时极易引发问题。**
+
+### 典型错误场景
+
+```dart
+// ❌ 错误示例：onConfirm 回调在对话框关闭后执行，此时 notifier 可能已被 AutoDispose 回收
+final notifier = ref.read(someNotifierProvider.notifier);
+showDialog(
+  builder: (_) => SomeDialog(
+    onConfirm: (data) async {
+      await notifier.doSomething(); // 💥 StateError: notifier 已 disposed
+    },
+  ),
+);
+```
+
+### 解决方案
+
+**方案 A：在 Notifier 异步方法中使用 `ref.keepAlive()`**（推荐）
+
+```dart
+Future<void> doSomething() async {
+  final link = ref.keepAlive(); // 阻止 AutoDispose 回收
+  try {
+    state = SomeState.loading();
+    final result = await _repo.fetchData();
+    state = SomeState.success(result);
+  } catch (e) {
+    state = SomeState.error('失败: $e');
+  } finally {
+    link.close(); // 操作完成后允许回收
+  }
+}
+```
+
+**方案 B：将对话框结果通过 `Navigator.pop()` 返回，而非使用回调**
+
+```dart
+// ✅ 正确：await 对话框结果，在同一作用域内完成操作
+final result = await showDialog<(String, List<Item>)>(
+  context: context,
+  builder: (_) => SelectionDialog(...),
+);
+if (result == null) return;
+// 重新获取 notifier（确保拿到活跃实例）
+final freshNotifier = ref.read(someNotifierProvider.notifier);
+await freshNotifier.doSomething(result);
+```
+
+### 关键规则
+
+1. **所有修改 `state` 或调用 `ref` 的异步方法都必须使用 `ref.keepAlive()`**
+2. **`state = ...` 必须放在 `try` 块内部**，不可放在 `try` 之前
+3. **跨对话框/异步间隙使用 notifier 前，用 `ref.read()` 重新获取**
+4. **对话框回调优先使用 `Navigator.pop(result)` 返回数据**，避免 fire-and-forget async 回调

@@ -451,4 +451,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fetchMetadataError => 'Failed to fetch song info';
+
+  @override
+  String get importingPlaylist => 'Importing playlist...';
 }

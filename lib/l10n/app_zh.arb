@@ -178,5 +178,6 @@
   "noSongsSelected": "请至少选择一首歌曲",
   "existsLocallyLabel": "本地已有",
   "metadataFetchFailed": "信息获取失败",
-  "fetchMetadataError": "获取歌曲信息失败"
+  "fetchMetadataError": "获取歌曲信息失败",
+  "importingPlaylist": "正在导入歌单..."
 }

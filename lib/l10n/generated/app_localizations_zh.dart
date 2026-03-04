@@ -451,4 +451,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fetchMetadataError => '获取歌曲信息失败';
+
+  @override
+  String get importingPlaylist => '正在导入歌单...';
 }

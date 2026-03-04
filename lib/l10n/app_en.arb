@@ -179,5 +179,6 @@
   "noSongsSelected": "Please select at least one song",
   "existsLocallyLabel": "Exists locally",
   "metadataFetchFailed": "Fetch failed",
-  "fetchMetadataError": "Failed to fetch song info"
+  "fetchMetadataError": "Failed to fetch song info",
+  "importingPlaylist": "Importing playlist..."
 }

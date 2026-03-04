@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
 import '../../share/application/share_notifier.dart';
+import '../../share/domain/models/shared_playlist.dart';
 import '../../share/presentation/widgets/import_preview_dialog.dart';
 import '../application/playlist_notifier.dart';
 import 'widgets/cover_selection_dialog.dart';
@@ -135,6 +136,7 @@ class PlaylistListScreen extends ConsumerWidget {
 
   /// 从剪贴板导入歌单
   Future<void> _importFromClipboard(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final notifier = ref.read(shareNotifierProvider.notifier);
     final playlist = await notifier.parseFromClipboard();
 
@@ -151,31 +153,92 @@ class PlaylistListScreen extends ConsumerWidget {
 
     if (!context.mounted) return;
 
-    // 显示导入预览弹窗
+    // 显示加载弹窗，预取元数据
     showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Flexible(child: Text(l10n.fetchingMetadata)),
+          ],
+        ),
+      ),
+    );
+
+    final metadata = await notifier.prefetchSongMetadata(playlist);
+
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); // 关闭加载弹窗
+
+    if (metadata == null) {
+      context.showSnackBar(l10n.fetchMetadataError);
+      return;
+    }
+
+    // 显示带选择框的导入预览弹窗，等待用户操作结果
+    final selection = await showDialog<(String, List<SharedSong>)>(
       context: context,
       builder: (_) => ImportPreviewDialog(
         playlist: playlist,
-        onConfirm: (name) async {
-          await notifier.confirmImport(playlist, name: name);
-          final state = ref.read(shareNotifierProvider);
-          if (context.mounted) {
-            state.whenOrNull(
-              importSuccess: (result) {
-                context.showSnackBar(
-                  context.l10n.importResult(
-                    result.imported,
-                    result.reused,
-                    result.failed,
-                  ),
-                );
-              },
-              error: (msg) => context.showSnackBar(msg),
-            );
-          }
-        },
+        songsMetadata: metadata,
       ),
     );
+
+    if (selection == null || !context.mounted) return;
+
+    final (name, selectedSongs) = selection;
+    final filteredPlaylist = SharedPlaylist(
+      name: name,
+      songs: selectedSongs,
+    );
+
+    // 显示导入进度弹窗
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 16),
+            Flexible(child: Text(l10n.importingPlaylist)),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // 重新获取 notifier，确保未被 AutoDispose 回收
+      final importNotifier = ref.read(shareNotifierProvider.notifier);
+      await importNotifier.confirmImport(filteredPlaylist, name: name);
+
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // 关闭导入进度弹窗
+
+      final state = ref.read(shareNotifierProvider);
+      state.whenOrNull(
+        importSuccess: (result) {
+          context.showSnackBar(
+            l10n.importResult(
+              result.imported,
+              result.reused,
+              result.failed,
+            ),
+          );
+        },
+        error: (msg) => context.showSnackBar(msg),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop(); // 关闭导入进度弹窗
+        context.showSnackBar(l10n.importFailed);
+      }
+    }
   }
 
   void _showPlaylistMenu(

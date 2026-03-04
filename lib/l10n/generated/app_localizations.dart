@@ -958,6 +958,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to fetch song info'**
   String get fetchMetadataError;
+
+  /// No description provided for @importingPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing playlist...'**
+  String get importingPlaylist;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
