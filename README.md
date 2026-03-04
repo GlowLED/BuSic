@@ -23,3 +23,6 @@ A BiliBili Music Player.
 
 ## 许可证
 本项目采用 GPLv3 许可证。
+
+## 参与贡献
+欢迎提交 Issue 和 Pull Request！提交代码前请阅读 [贡献指南](CONTRIBUTING.md)。
