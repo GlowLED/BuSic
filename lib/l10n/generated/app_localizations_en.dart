@@ -550,6 +550,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get retry => 'Retry';
+
+  @override
   String get pleaseLoginFirst => 'Please sign in to Bilibili first';
 
   @override

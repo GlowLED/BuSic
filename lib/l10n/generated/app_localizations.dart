@@ -1145,6 +1145,12 @@ abstract class AppLocalizations {
   /// **'Importing ({current}/{total})'**
   String importingProgress(int current, int total);
 
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
   /// No description provided for @pleaseLoginFirst.
   ///
   /// In en, this message translates to:

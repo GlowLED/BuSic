@@ -223,6 +223,7 @@
       "total": { "type": "int" }
     }
   },
+  "retry": "Retry",
   "pleaseLoginFirst": "Please sign in to Bilibili first",
   "biliFavSongCount": "{count} songs",
   "@biliFavSongCount": {

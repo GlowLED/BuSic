@@ -550,6 +550,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get retry => '重试';
+
+  @override
   String get pleaseLoginFirst => '请先登录 B 站账号';
 
   @override

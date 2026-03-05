@@ -1,4 +1,6 @@
 import '../domain/models/audio_stream_info.dart';
+import '../domain/models/bili_fav_folder.dart';
+import '../domain/models/bili_fav_item.dart';
 import '../domain/models/bvid_info.dart';
 
 /// Abstract repository for Bilibili video parsing and audio stream resolution.
@@ -47,4 +49,21 @@ abstract class ParseRepository {
   ///
   /// Returns the (imgKey, subKey) pair needed for WBI-signed requests.
   Future<({String imgKey, String subKey})> fetchWbiKeys();
+
+  // ── B 站收藏夹 ───────────────────────────────────────────────────────
+
+  /// 获取用户的所有收藏夹列表（需要登录）。
+  ///
+  /// [mid] 为用户 UID，从已登录的 User 对象获取。
+  Future<List<BiliFavFolder>> getFavoriteFolders(int mid);
+
+  /// 获取收藏夹中的所有视频（自动分页拉取全量）。
+  ///
+  /// [mediaId] 为收藏夹 ID（[BiliFavFolder.id]）。
+  /// 自动过滤已失效视频。
+  /// [onProgress] 回调 (已拉取数, 总数) 用于进度提示。
+  Future<List<BiliFavItem>> getFavoriteFolderItems(
+    int mediaId, {
+    void Function(int fetched, int total)? onProgress,
+  });
 }

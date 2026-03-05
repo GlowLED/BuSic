@@ -2,6 +2,8 @@ import '../../../core/api/bili_dio.dart';
 import '../../../core/api/wbi_sign.dart';
 import '../../../core/utils/logger.dart';
 import '../domain/models/audio_stream_info.dart';
+import '../domain/models/bili_fav_folder.dart';
+import '../domain/models/bili_fav_item.dart';
 import '../domain/models/bvid_info.dart';
 import '../domain/models/page_info.dart';
 import 'parse_repository.dart';
@@ -343,5 +345,84 @@ class ParseRepositoryImpl implements ParseRepository {
 
     AppLogger.info('Fetched WBI keys', tag: 'Parse');
     return WbiSign.extractKeys(imgUrl: imgUrl, subUrl: subUrl);
+  }
+
+  // ── B 站收藏夹 ───────────────────────────────────────────────────────
+
+  @override
+  Future<List<BiliFavFolder>> getFavoriteFolders(int mid) async {
+    final response = await _biliDio.get(
+      '/x/v3/fav/folder/created/list-all',
+      queryParameters: {'up_mid': mid},
+    );
+    final data = response.data['data'];
+    if (data == null) {
+      AppLogger.warning('getFavoriteFolders: data is null', tag: 'Parse');
+      return [];
+    }
+    final list = data['list'] as List<dynamic>? ?? [];
+    return list
+        .map((item) => BiliFavFolder(
+              id: item['id'] as int,
+              title: item['title'] as String,
+              mediaCount: item['media_count'] as int,
+            ))
+        .toList();
+  }
+
+  @override
+  Future<List<BiliFavItem>> getFavoriteFolderItems(
+    int mediaId, {
+    void Function(int fetched, int total)? onProgress,
+  }) async {
+    final items = <BiliFavItem>[];
+    int page = 1;
+    bool hasMore = true;
+
+    while (hasMore) {
+      final response = await _biliDio.get(
+        '/x/v3/fav/resource/list',
+        queryParameters: {
+          'media_id': mediaId,
+          'pn': page,
+          'ps': 20,
+        },
+      );
+      final data = response.data['data'];
+      if (data == null) break;
+
+      final medias = data['medias'] as List<dynamic>? ?? [];
+      final totalCount =
+          (data['info'] as Map<String, dynamic>?)?['media_count'] as int? ?? 0;
+
+      for (final media in medias) {
+        final attr = media['attr'] as int? ?? 0;
+        final isInvalid = ((attr >> 9) & 1) == 1;
+        // 跳过已失效视频
+        if (isInvalid) continue;
+
+        final bvid = media['bvid'] as String?;
+        if (bvid == null || bvid.isEmpty) continue;
+
+        items.add(BiliFavItem(
+          bvid: bvid,
+          title: media['title'] as String? ?? '',
+          upper: (media['upper'] as Map<String, dynamic>?)?['name']
+                  as String? ??
+              '',
+          cover: media['cover'] as String?,
+          duration: media['duration'] as int? ?? 0,
+          firstCid:
+              (media['ugc'] as Map<String, dynamic>?)?['first_cid'] as int? ??
+                  0,
+        ));
+      }
+
+      hasMore = data['has_more'] as bool? ?? false;
+      onProgress?.call(items.length, totalCount);
+      page++;
+    }
+
+    return items;
   }
 }

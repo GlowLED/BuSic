@@ -9,6 +9,8 @@ import 'package:busic/features/share/data/share_repository_impl.dart';
 import 'package:busic/features/share/domain/models/shared_playlist.dart';
 import 'package:busic/features/search_and_parse/data/parse_repository.dart';
 import 'package:busic/features/search_and_parse/domain/models/audio_stream_info.dart';
+import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.dart';
+import 'package:busic/features/search_and_parse/domain/models/bili_fav_item.dart';
 import 'package:busic/features/search_and_parse/domain/models/bvid_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/page_info.dart';
 
@@ -58,6 +60,19 @@ class MockParseRepository implements ParseRepository {
 
   @override
   Future<({String imgKey, String subKey})> fetchWbiKeys() async {
+    throw UnimplementedError('测试中不需要');
+  }
+
+  @override
+  Future<List<BiliFavFolder>> getFavoriteFolders(int mid) async {
+    throw UnimplementedError('测试中不需要');
+  }
+
+  @override
+  Future<List<BiliFavItem>> getFavoriteFolderItems(
+    int mediaId, {
+    void Function(int fetched, int total)? onProgress,
+  }) async {
     throw UnimplementedError('测试中不需要');
   }
 }

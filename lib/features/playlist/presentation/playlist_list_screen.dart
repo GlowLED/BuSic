@@ -4,11 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../auth/application/auth_notifier.dart';
 import '../../share/application/share_notifier.dart';
 import '../../share/domain/models/shared_playlist.dart';
 import '../../share/presentation/widgets/import_preview_dialog.dart';
 import '../application/playlist_notifier.dart';
+import 'widgets/bili_fav_import_dialog.dart';
 import 'widgets/cover_selection_dialog.dart';
+import 'widgets/create_playlist_dialog.dart';
 import 'widgets/playlist_tile.dart';
 
 /// Screen displaying all user playlists.
@@ -124,16 +127,54 @@ class PlaylistListScreen extends ConsumerWidget {
   }
 
   Future<void> _createPlaylist(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final name = await CommonDialogs.showInputDialog(
-      context,
-      title: l10n.createPlaylist,
-      hint: l10n.title,
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (_) => const CreatePlaylistDialog(),
     );
-    if (name != null && name.trim().isNotEmpty) {
-      await ref
-          .read(playlistListNotifierProvider.notifier)
-          .createPlaylist(name.trim());
+
+    if (choice == null || !context.mounted) return;
+
+    if (choice == 'manual') {
+      final l10n = context.l10n;
+      final name = await CommonDialogs.showInputDialog(
+        context,
+        title: l10n.createPlaylist,
+        hint: l10n.title,
+      );
+      if (name != null && name.trim().isNotEmpty && context.mounted) {
+        await ref
+            .read(playlistListNotifierProvider.notifier)
+            .createPlaylist(name.trim());
+      }
+    } else if (choice == 'biliFav') {
+      await _importFromBiliFav(context, ref);
+    }
+  }
+
+  /// 从 B 站收藏夹导入
+  Future<void> _importFromBiliFav(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    // 检查登录状态
+    final user = await ref.read(authNotifierProvider.future);
+    if (user == null) {
+      if (context.mounted) {
+        context.showSnackBar(context.l10n.pleaseLoginFirst);
+      }
+      return;
+    }
+    if (!context.mounted) return;
+
+    // 弹出一体化导入对话框，内部管理全部流程
+    final resultPlaylistId = await showDialog<int>(
+      context: context,
+      builder: (_) => const BiliFavImportDialog(),
+    );
+
+    // 如果导入成功，跳转到新歌单详情页
+    if (resultPlaylistId != null && context.mounted) {
+      context.go('/playlists/$resultPlaylistId');
     }
   }
 

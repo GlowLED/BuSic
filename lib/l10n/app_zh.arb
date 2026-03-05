@@ -222,6 +222,7 @@
       "total": { "type": "int" }
     }
   },
+  "retry": "重试",
   "pleaseLoginFirst": "请先登录 B 站账号",
   "biliFavSongCount": "{count} 首",
   "@biliFavSongCount": {
