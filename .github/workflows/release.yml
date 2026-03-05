@@ -148,6 +148,9 @@ jobs:
   build-android:
     needs: check
     runs-on: ubuntu-latest
+    env:
+      ANDROID_NDK_VERSION: '27.0.12077973'
+      ANDROID_CMAKE_VERSION: '3.22.1'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -157,6 +160,35 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+
+      # Pre-install NDK & CMake via sdkmanager so Gradle doesn't download
+      # them on every build (~1 GB NDK + CMake, takes 5-8 min without cache).
+      - name: Install Android NDK & CMake
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "ndk;${{ env.ANDROID_NDK_VERSION }}" \
+            "cmake;${{ env.ANDROID_CMAKE_VERSION }}" \
+            --sdk_root=$ANDROID_HOME 2>/dev/null || true
+
+      # Cache NDK + CMake across runs (keyed by version)
+      - name: Cache Android NDK & CMake
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/ndk/${{ env.ANDROID_NDK_VERSION }}
+            ${{ env.ANDROID_HOME }}/cmake/${{ env.ANDROID_CMAKE_VERSION }}
+          key: android-ndk-${{ env.ANDROID_NDK_VERSION }}-cmake-${{ env.ANDROID_CMAKE_VERSION }}
+
+      # Cache Gradle wrapper, dependencies, and build cache
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
 
       - uses: subosito/flutter-action@v2
         with:
