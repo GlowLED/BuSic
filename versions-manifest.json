@@ -1,7 +1,35 @@
 {
-  "latest": "0.3.2",
+  "latest": "0.3.3",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.3.3",
+      "build": 9,
+      "date": "2026-03-05",
+      "changelog": "添加歌词功能、优化播放体验.",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.3/busic-android.apk",
+          "lanzou": {
+            "url": "https://wwbnl.lanzouw.com/iJpZJ3jv2pwd",
+            "password": "gp8y"
+          }
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.3/busic-windows-x64.zip",
+          "lanzou": {
+            "url": "https://wwbnl.lanzouw.com/iMoiE3jv2qtg"
+          }
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.3/busic-linux-x64.tar.gz"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.3/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.3.2",
       "build": 8,
