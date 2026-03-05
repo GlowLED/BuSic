@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../comment/presentation/comment_section.dart';
 import '../../playlist/application/favorite_notifier.dart';
 import '../application/player_notifier.dart';
 import '../domain/models/play_mode.dart';
@@ -267,6 +268,30 @@ class PlayerBar extends ConsumerWidget {
                                     playerNotifierProvider.notifier)
                                 .updateCurrentTrackSongId(newId);
                           }
+                        },
+                      ),
+                      // 💬 评论按钮
+                      IconButton(
+                        icon: Icon(
+                          Icons.comment_outlined,
+                          size: 20,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                        tooltip: context.l10n.commentSection,
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => DraggableScrollableSheet(
+                              initialChildSize: 0.75,
+                              minChildSize: 0.4,
+                              maxChildSize: 0.95,
+                              expand: false,
+                              builder: (context, _) =>
+                                  CommentSection(bvid: track.bvid),
+                            ),
+                          );
                         },
                       ),
                       // ── 宽屏独有：播放模式、音量 ──

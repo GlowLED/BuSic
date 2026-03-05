@@ -282,7 +282,7 @@ class ParseRepositoryImpl implements ParseRepository {
   }
 
   @override
-  Future<List<BvidInfo>> searchVideos(
+  Future<({List<BvidInfo> results, int numPages})> searchVideos(
     String keyword, {
     int page = 1,
     int pageSize = 20,
@@ -305,9 +305,10 @@ class ParseRepositoryImpl implements ParseRepository {
       queryParameters: params,
     );
     final data = response.data['data'];
+    final numPages = data['numPages'] as int? ?? 1;
     final results = data['result'] as List? ?? [];
 
-    return results.map((item) {
+    final videoList = results.map((item) {
       final title = (item['title'] as String? ?? '')
           .replaceAll(RegExp(r'<[^>]*>'), ''); // Strip HTML tags
       return BvidInfo(
@@ -318,6 +319,8 @@ class ParseRepositoryImpl implements ParseRepository {
         duration: _parseDuration(item['duration'] as String? ?? '0'),
       );
     }).toList();
+
+    return (results: videoList, numPages: numPages);
   }
 
   int _parseDuration(String durationStr) {

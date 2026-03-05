@@ -30,7 +30,7 @@ abstract class ParseRepository {
   ///
   /// Returns a list of [BvidInfo] matching the search query.
   /// [page] is 1-based for pagination.
-  Future<List<BvidInfo>> searchVideos(
+  Future<({List<BvidInfo> results, int numPages})> searchVideos(
     String keyword, {
     int page = 1,
     int pageSize = 20,

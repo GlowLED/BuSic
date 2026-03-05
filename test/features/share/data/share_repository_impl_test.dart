@@ -42,7 +42,7 @@ class MockParseRepository implements ParseRepository {
   }
 
   @override
-  Future<List<BvidInfo>> searchVideos(
+  Future<({List<BvidInfo> results, int numPages})> searchVideos(
     String keyword, {
     int page = 1,
     int pageSize = 20,

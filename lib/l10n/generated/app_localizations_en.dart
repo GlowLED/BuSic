@@ -559,4 +559,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String biliFavSongCount(int count) {
     return '$count songs';
   }
+
+  @override
+  String get comments => 'Comments';
+
+  @override
+  String get noComments => 'No comments yet';
+
+  @override
+  String get loadCommentsFailed => 'Failed to load comments';
+
+  @override
+  String get allCommentsLoaded => 'All comments loaded';
+
+  @override
+  String get popular => 'Popular';
+
+  @override
+  String get latest => 'Latest';
+
+  @override
+  String get loginToComment => 'Login to comment';
+
+  @override
+  String get writeComment => 'Write a comment...';
+
+  @override
+  String replyTo(String username) {
+    return 'Reply to @$username';
+  }
+
+  @override
+  String get sendFailed => 'Send failed';
+
+  @override
+  String commentCount(int count) {
+    return 'Comments $count';
+  }
+
+  @override
+  String repliesCount(int count) {
+    return '$count replies';
+  }
+
+  @override
+  String viewAllReplies(int count) {
+    return 'View all $count replies >';
+  }
+
+  @override
+  String get commentSection => 'Comment Section';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String minutesAgo(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String daysAgo(int count) {
+    return '${count}d ago';
+  }
+
+  @override
+  String get loginToLike => 'Login to like';
+
+  @override
+  String get loginToReply => 'Login to reply';
 }

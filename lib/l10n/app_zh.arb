@@ -229,5 +229,60 @@
     "placeholders": {
       "count": { "type": "int" }
     }
-  }
+  },
+  "comments": "评论",
+  "noComments": "暂无评论",
+  "loadCommentsFailed": "加载评论失败",
+  "allCommentsLoaded": "已加载全部评论",
+  "popular": "热门",
+  "latest": "最新",
+  "loginToComment": "登录后发表评论",
+  "writeComment": "发表评论...",
+  "replyTo": "回复 @{username}",
+  "@replyTo": {
+    "placeholders": {
+      "username": { "type": "String" }
+    }
+  },
+  "sendFailed": "发送失败",
+  "commentCount": "评论 {count}",
+  "@commentCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "repliesCount": "{count}条回复",
+  "@repliesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "viewAllReplies": "查看全部{count}条回复 >",
+  "@viewAllReplies": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "commentSection": "评论区",
+  "justNow": "刚刚",
+  "minutesAgo": "{count}分钟前",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "hoursAgo": "{count}小时前",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "daysAgo": "{count}天前",
+  "@daysAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loginToLike": "登录后可点赞",
+  "loginToReply": "登录后可回复"
 }

@@ -230,5 +230,60 @@
     "placeholders": {
       "count": { "type": "int" }
     }
-  }
+  },
+  "comments": "Comments",
+  "noComments": "No comments yet",
+  "loadCommentsFailed": "Failed to load comments",
+  "allCommentsLoaded": "All comments loaded",
+  "popular": "Popular",
+  "latest": "Latest",
+  "loginToComment": "Login to comment",
+  "writeComment": "Write a comment...",
+  "replyTo": "Reply to @{username}",
+  "@replyTo": {
+    "placeholders": {
+      "username": { "type": "String" }
+    }
+  },
+  "sendFailed": "Send failed",
+  "commentCount": "Comments {count}",
+  "@commentCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "repliesCount": "{count} replies",
+  "@repliesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "viewAllReplies": "View all {count} replies >",
+  "@viewAllReplies": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "commentSection": "Comment Section",
+  "justNow": "Just now",
+  "minutesAgo": "{count}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "hoursAgo": "{count}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "daysAgo": "{count}d ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loginToLike": "Login to like",
+  "loginToReply": "Login to reply"
 }

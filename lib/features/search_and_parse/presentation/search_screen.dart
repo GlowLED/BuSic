@@ -5,6 +5,7 @@ import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../comment/presentation/comment_section.dart';
 import '../../download/application/download_notifier.dart';
 import '../../download/presentation/widgets/quality_select_dialog.dart';
 import '../../player/application/player_notifier.dart';
@@ -35,8 +36,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   List<BvidInfo> _searchResults = [];
   bool _isSearching = false;
   int _currentPage = 1;
+  int _totalPages = 1;
   String _currentKeyword = '';
-  bool _hasMorePages = true;
+  bool _showComments = false;
 
   @override
   void dispose() {
@@ -65,18 +67,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _isSearching = true;
       _currentPage = page;
     });
-    final results =
+    final searchResult =
         await ref.read(parseNotifierProvider.notifier).searchVideos(keyword, page: page);
     setState(() {
-      _searchResults = results;
+      _searchResults = searchResult.results;
+      _totalPages = searchResult.numPages;
       _isSearching = false;
-      // If returned less than 20 results, no more pages
-      _hasMorePages = results.length >= 20;
     });
   }
 
   void _goToPage(int page) {
-    if (_currentKeyword.isNotEmpty && page >= 1) {
+    if (_currentKeyword.isNotEmpty && page >= 1 && page <= _totalPages) {
       _performSearch(_currentKeyword, page: page);
     }
   }
@@ -395,6 +396,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Widget _buildPaginationBar(ColorScheme colorScheme) {
+    if (_totalPages <= 1) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
@@ -406,53 +409,156 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Previous page button
           IconButton(
             icon: const Icon(Icons.chevron_left),
+            iconSize: 20,
+            visualDensity: VisualDensity.compact,
             onPressed: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
             tooltip: '上一页',
           ),
-          const SizedBox(width: 8),
-          // Show page number buttons
-          for (int i = _pageStart; i <= _pageEnd; i++)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: _buildPageButton(i, colorScheme),
-            ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
+          // Dynamic page buttons with ellipsis
+          ..._buildPageNumbers(colorScheme),
+          const SizedBox(width: 4),
+          // Next page button
           IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: _hasMorePages ? () => _goToPage(_currentPage + 1) : null,
+            iconSize: 20,
+            visualDensity: VisualDensity.compact,
+            onPressed: _currentPage < _totalPages ? () => _goToPage(_currentPage + 1) : null,
             tooltip: '下一页',
           ),
+          const SizedBox(width: 8),
+          // Jump to page input
+          _buildJumpToPage(colorScheme),
         ],
       ),
     );
   }
 
-  int get _pageStart => (_currentPage - 2).clamp(1, _currentPage);
-  int get _pageEnd {
-    final end = _pageStart + 4;
-    if (!_hasMorePages) return _currentPage;
-    return end;
+  /// Build page number buttons with ellipsis, Google/browser style:
+  /// [1] ... [4] [5] [*6*] [7] [8] ... [50]
+  List<Widget> _buildPageNumbers(ColorScheme colorScheme) {
+    final pages = <Widget>[];
+    const int siblings = 2; // pages on each side of current
+
+    final int rangeStart = (_currentPage - siblings).clamp(1, _totalPages);
+    final int rangeEnd = (_currentPage + siblings).clamp(1, _totalPages);
+
+    // Always show page 1
+    if (rangeStart > 1) {
+      pages.add(_buildPageButton(1, colorScheme));
+      if (rangeStart > 2) {
+        pages.add(_buildEllipsis(colorScheme));
+      }
+    }
+
+    // Sibling range
+    for (int i = rangeStart; i <= rangeEnd; i++) {
+      pages.add(_buildPageButton(i, colorScheme));
+    }
+
+    // Always show last page
+    if (rangeEnd < _totalPages) {
+      if (rangeEnd < _totalPages - 1) {
+        pages.add(_buildEllipsis(colorScheme));
+      }
+      pages.add(_buildPageButton(_totalPages, colorScheme));
+    }
+
+    return pages;
+  }
+
+  Widget _buildEllipsis(ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: Center(
+          child: Text(
+            '…',
+            style: TextStyle(
+              fontSize: 13,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJumpToPage(ColorScheme colorScheme) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 48,
+          height: 32,
+          child: Center(
+            child: TextField(
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: colorScheme.onSurface, height: 1.0),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                isDense: true,
+                hintText: '$_currentPage',
+                hintStyle: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+              ),
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onSubmitted: (value) {
+                final page = int.tryParse(value);
+                if (page != null && page >= 1 && page <= _totalPages) {
+                  _goToPage(page);
+                }
+              },
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '/ $_totalPages',
+          style: TextStyle(
+            fontSize: 13,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildPageButton(int page, ColorScheme colorScheme) {
     final isActive = page == _currentPage;
-    return SizedBox(
-      width: 36,
-      height: 36,
-      child: Material(
-        color: isActive ? colorScheme.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: isActive ? null : () => _goToPage(page),
-          child: Center(
-            child: Text(
-              '$page',
-              style: TextStyle(
-                color: isActive ? colorScheme.onPrimary : colorScheme.onSurface,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: Material(
+          color: isActive ? colorScheme.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: isActive ? null : () => _goToPage(page),
+            child: Center(
+              child: Text(
+                '$page',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: isActive ? colorScheme.onPrimary : colorScheme.onSurface,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ),
@@ -610,6 +716,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 ),
               ),
             ],
+          ),
+          // ── Comment Section ──
+          const SizedBox(height: 16),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.comment),
+                  title: const Text('评论区'),
+                  trailing: Icon(
+                    _showComments
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  onTap: () {
+                    setState(() => _showComments = !_showComments);
+                  },
+                ),
+                if (_showComments)
+                  SizedBox(
+                    height: 400,
+                    child: CommentSection(bvid: videoInfo.bvid),
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
         ],
