@@ -235,6 +235,9 @@ jobs:
         with:
           merge-multiple: true
 
+      - name: Generate checksums
+        run: sha256sum busic-* > checksums.sha256
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -246,3 +249,4 @@ jobs:
             busic-macos.zip
             busic-android.apk
             busic-ios-unsigned.ipa
+            checksums.sha256
