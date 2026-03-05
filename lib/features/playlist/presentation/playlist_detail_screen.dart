@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
-import '../../../shared/widgets/common_dialogs.dart';
 import '../../../shared/widgets/song_tile.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../comment/presentation/comment_section.dart';
@@ -16,6 +15,7 @@ import '../../player/domain/models/play_mode.dart';
 import '../../share/application/share_notifier.dart';
 import '../application/favorite_notifier.dart';
 import '../../share/presentation/widgets/share_dialog.dart';
+import '../../../shared/widgets/playlist_picker_dialog.dart';
 import '../application/playlist_notifier.dart';
 import '../domain/models/song_item.dart';
 import 'widgets/cover_selection_dialog.dart';
@@ -449,7 +449,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
             onPressed: () async {
               final targetPlaylistId = await showDialog<int>(
                 context: context,
-                builder: (_) => _PlaylistPickerDialog(excludePlaylistId: playlistId),
+                builder: (_) => PlaylistPickerDialog(excludePlaylistId: playlistId),
               );
               if (targetPlaylistId == null || !context.mounted) return;
               final selectedSongIds = _selectedSongIds.toList();
@@ -852,94 +852,4 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }
 }
 
-/// Dialog for selecting a target playlist (excludes the current one).
-class _PlaylistPickerDialog extends ConsumerWidget {
-  final int excludePlaylistId;
-  const _PlaylistPickerDialog({required this.excludePlaylistId});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playlistsAsync = ref.watch(playlistListNotifierProvider);
-    final l10n = context.l10n;
-    final colorScheme = context.colorScheme;
-
-    return AlertDialog(
-      title: Text(l10n.addToPlaylist),
-      content: SizedBox(
-        width: 320,
-        height: 400,
-        child: playlistsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(e.toString())),
-          data: (playlists) {
-            final filtered =
-                playlists.where((p) => p.id != excludePlaylistId).toList();
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: Icon(Icons.add_circle_outline,
-                      color: colorScheme.primary),
-                  title: Text(l10n.createPlaylist),
-                  onTap: () => _createAndSelect(context, ref, l10n),
-                ),
-                const Divider(),
-                if (filtered.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Text(l10n.noPlaylists,
-                          style: TextStyle(
-                              color: colorScheme.onSurfaceVariant)),
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filtered.length,
-                      itemBuilder: (context, index) {
-                        final playlist = filtered[index];
-                        return ListTile(
-                          leading: Icon(playlist.isFavorite
-                              ? Icons.favorite
-                              : Icons.library_music),
-                          title: Text(playlist.isFavorite
-                              ? l10n.myFavorites
-                              : playlist.name),
-                          subtitle: Text('${playlist.songCount} 首歌曲'),
-                          onTap: () =>
-                              Navigator.of(context).pop(playlist.id),
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(null),
-          child: Text(l10n.cancel),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _createAndSelect(
-      BuildContext context, WidgetRef ref, dynamic l10n) async {
-    final name = await CommonDialogs.showInputDialog(
-      context,
-      title: l10n.createPlaylist,
-      hint: l10n.title,
-    );
-    if (name != null && name.trim().isNotEmpty && context.mounted) {
-      final playlist = await ref
-          .read(playlistListNotifierProvider.notifier)
-          .createPlaylist(name.trim());
-      if (context.mounted) {
-        Navigator.of(context).pop(playlist.id);
-      }
-    }
-  }
-}

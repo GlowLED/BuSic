@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../core/utils/formatters.dart';
-import '../../../shared/widgets/common_dialogs.dart';
 import '../../comment/presentation/comment_section.dart';
 import '../../download/application/download_notifier.dart';
 import '../../download/presentation/widgets/quality_select_dialog.dart';
 import '../../player/application/player_notifier.dart';
 import '../../player/domain/models/audio_track.dart';
 import '../../playlist/application/playlist_notifier.dart';
+import '../../../shared/widgets/playlist_picker_dialog.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../application/parse_notifier.dart';
 import '../domain/models/bvid_info.dart';
@@ -221,7 +221,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Future<void> _addToPlaylist(BuildContext context) async {
     final selectedPlaylistId = await showDialog<int>(
       context: context,
-      builder: (_) => const _PlaylistPickerDialog(),
+      builder: (_) => const PlaylistPickerDialog(),
     );
     if (selectedPlaylistId == null || !context.mounted) return;
 
@@ -843,95 +843,3 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════
-// Playlist picker dialog
-// ══════════════════════════════════════════════════════════════════════
-
-/// Dialog for selecting a target playlist to add songs to.
-class _PlaylistPickerDialog extends ConsumerWidget {
-  const _PlaylistPickerDialog();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playlistsAsync = ref.watch(playlistListNotifierProvider);
-    final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return AlertDialog(
-      title: Text(l10n.addToPlaylist),
-      content: SizedBox(
-        width: 320,
-        height: 400,
-        child: playlistsAsync.when(
-          loading: () =>
-              const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(e.toString())),
-          data: (playlists) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.add_circle_outline,
-                    color: colorScheme.primary),
-                title: Text(l10n.createPlaylist),
-                onTap: () => _createAndSelect(context, ref, l10n),
-              ),
-              const Divider(),
-              if (playlists.isEmpty)
-                Expanded(
-                  child: Center(
-                    child: Text(l10n.noPlaylists,
-                        style: TextStyle(
-                            color: colorScheme.onSurfaceVariant)),
-                  ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: playlists.length,
-                    itemBuilder: (context, index) {
-                      final playlist = playlists[index];
-                      return ListTile(
-                        leading: Icon(playlist.isFavorite
-                            ? Icons.favorite
-                            : Icons.library_music),
-                        title: Text(playlist.isFavorite
-                            ? l10n.myFavorites
-                            : playlist.name),
-                        subtitle:
-                            Text('${playlist.songCount} 首歌曲'),
-                        onTap: () =>
-                            Navigator.of(context).pop(playlist.id),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(null),
-          child: Text(l10n.cancel),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _createAndSelect(
-      BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
-    final name = await CommonDialogs.showInputDialog(
-      context,
-      title: l10n.createPlaylist,
-      hint: l10n.title,
-    );
-    if (name != null && name.trim().isNotEmpty && context.mounted) {
-      final playlist = await ref
-          .read(playlistListNotifierProvider.notifier)
-          .createPlaylist(name.trim());
-      if (context.mounted) {
-        Navigator.of(context).pop(playlist.id);
-      }
-    }
-  }
-}

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../search_and_parse/domain/models/bili_fav_folder.dart';
 import '../../../search_and_parse/domain/models/bili_fav_item.dart';
 import '../../application/bili_fav_import_notifier.dart';
+import 'bili_fav_error_view.dart';
+import 'bili_fav_folder_list.dart';
+import 'bili_fav_preview.dart';
+import 'bili_fav_progress.dart';
 
 /// B 站收藏夹导入一体化对话框。
 ///
@@ -288,10 +291,6 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
     });
   }
 
-  String _fmtDuration(int seconds) {
-    return Formatters.formatDuration(Duration(seconds: seconds));
-  }
-
   // ── 监听 notifier 的导入进度 ──────────────────────────────────────────
 
   void _listenImportProgress() {
@@ -407,77 +406,49 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
   Widget _buildBody(BuildContext context, dynamic l10n) {
     switch (_phase) {
       case _Phase.folderList:
-        return _buildFolderList(context, l10n);
+        return BiliFavFolderListView(
+          folders: _folders,
+          isLoading: _foldersLoading,
+          errorMessage: _foldersError,
+          onFolderTapped: _onFolderTapped,
+          onRetry: _loadFolders,
+        );
       case _Phase.loadingItems:
         return _buildLoadingItems(context, l10n);
       case _Phase.preview:
-        return _buildPreview(context, l10n);
-      case _Phase.importing:
-        return _buildImporting(context, l10n);
-      case _Phase.completed:
-        return _buildCompleted(context, l10n);
-      case _Phase.error:
-        return _buildError(context, l10n);
-    }
-  }
-
-  // ── Phase 1: 收藏夹列表 ───────────────────────────────────────────────
-
-  Widget _buildFolderList(BuildContext context, dynamic l10n) {
-    if (_foldersLoading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (_foldersError != null) {
-      return _buildErrorContent(
-        context,
-        _foldersError!,
-        onRetry: _loadFolders,
-      );
-    }
-
-    final folders = _folders;
-    if (folders == null || folders.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Text(
-            l10n.favFolderEmpty,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: folders.length,
-      itemBuilder: (context, index) {
-        final folder = folders[index];
-        return ListTile(
-          leading: const Icon(Icons.folder_outlined),
-          title: Text(
-            folder.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: Text(
-            l10n.biliFavSongCount(folder.mediaCount),
-            style: context.textTheme.bodySmall?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          onTap: () => _onFolderTapped(folder),
+        return BiliFavPreviewView(
+          items: _items,
+          selected: _selected,
+          nameController: _nameController,
+          selectedCount: _selectedCount,
+          allSelected: _allSelected,
+          onToggleAll: _toggleAll,
+          onToggleItem: (index, val) =>
+              setState(() => _selected[index] = val),
+          onStartImport: _selectedCount > 0 ? _startImport : null,
+          onCancel: () => Navigator.of(context).pop(),
         );
-      },
-    );
+      case _Phase.importing:
+        return BiliFavProgressView.importing(
+          importCurrent: _importCurrent,
+          importTotal: _importTotal,
+        );
+      case _Phase.completed:
+        return BiliFavProgressView.completed(
+          resultImported: _resultImported,
+          resultReused: _resultReused,
+          resultFailed: _resultFailed,
+          onConfirm: () => Navigator.of(context).pop(_resultPlaylistId),
+        );
+      case _Phase.error:
+        return BiliFavErrorView(
+          message: _errorMessage,
+          onRetry: () {
+            AppLogger.info('用户点击重试，返回收藏夹列表', tag: 'BiliFavUI');
+            _loadFolders();
+          },
+        );
+    }
   }
 
   // ── Phase 1.5: 加载收藏夹内容 ──────────────────────────────────────────
@@ -502,206 +473,6 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
                 color: context.colorScheme.onSurfaceVariant,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Phase 2: 预览 ────────────────────────────────────────────────────
-
-  Widget _buildPreview(BuildContext context, dynamic l10n) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 歌单名称输入
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: l10n.playlistName,
-              border: const OutlineInputBorder(),
-              isDense: true,
-            ),
-          ),
-        ),
-
-        // 选择控制行
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Row(
-            children: [
-              Text(
-                l10n.selectedSongCount(_selectedCount, _items.length),
-                style: context.textTheme.bodySmall,
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: _toggleAll,
-                child:
-                    Text(_allSelected ? l10n.deselectAll : l10n.selectAll),
-              ),
-            ],
-          ),
-        ),
-
-        // 歌曲列表
-        Flexible(
-          child: ListView.builder(
-            itemCount: _items.length,
-            itemBuilder: (context, index) {
-              final item = _items[index];
-              return CheckboxListTile(
-                value: _selected[index],
-                onChanged: (val) {
-                  if (val != null) setState(() => _selected[index] = val);
-                },
-                dense: true,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodyMedium,
-                ),
-                subtitle: Text(
-                  '${item.upper}  ${_fmtDuration(item.duration)}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        // 底部操作栏
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.cancel),
-              ),
-              const SizedBox(width: 8),
-              FilledButton(
-                onPressed: _selectedCount > 0 ? _startImport : null,
-                child: Text(l10n.confirmImport),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── Phase 3: 导入中 ──────────────────────────────────────────────────
-
-  Widget _buildImporting(BuildContext context, dynamic l10n) {
-    final progress =
-        _importTotal > 0 ? _importCurrent / _importTotal : 0.0;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(value: progress > 0 ? progress : null),
-            const SizedBox(height: 16),
-            Text(
-              l10n.importingProgress(_importCurrent, _importTotal),
-              style: context.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(value: progress > 0 ? progress : null),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Phase 4: 完成 ────────────────────────────────────────────────────
-
-  Widget _buildCompleted(BuildContext context, dynamic l10n) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.check_circle_outline,
-              size: 48,
-              color: context.colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.importResult(_resultImported, _resultReused, _resultFailed),
-              style: context.textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop(_resultPlaylistId);
-              },
-              child: Text(l10n.confirmImport),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── 错误 ─────────────────────────────────────────────────────────────
-
-  Widget _buildError(BuildContext context, dynamic l10n) {
-    return _buildErrorContent(
-      context,
-      _errorMessage,
-      onRetry: () {
-        AppLogger.info('用户点击重试，返回收藏夹列表', tag: 'BiliFavUI');
-        _loadFolders();
-      },
-    );
-  }
-
-  Widget _buildErrorContent(
-    BuildContext context,
-    String message, {
-    VoidCallback? onRetry,
-  }) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: context.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: context.textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            if (onRetry != null) ...[
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(context.l10n.retry),
-              ),
-            ],
           ],
         ),
       ),
