@@ -121,3 +121,6 @@ app.*.symbols
 .idea
 .vscode
 .github/copilot-instructions.md
+
+# Local dev / experiment scripts
+temp/
