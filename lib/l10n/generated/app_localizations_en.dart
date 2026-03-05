@@ -366,6 +366,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importing => 'Importing...';
 
   @override
+  String get downloadAll => 'Download All';
+
+  @override
+  String get downloadAllUncached => 'Download uncached songs';
+
+  @override
+  String get allSongsCached => 'All songs are already cached';
+
+  @override
+  String downloadAllStarted(int count) {
+    return 'Started downloading $count songs';
+  }
+
+  @override
+  String downloadAllFailed(String error) {
+    return 'Batch download failed: $error';
+  }
+
+  @override
+  String get downloadingQueue => 'Downloading';
+
+  @override
+  String get pendingQueue => 'Pending';
+
+  @override
+  String get noUncachedSongs => 'No uncached songs to download';
+
+  @override
+  String get changeCover => 'Change Cover';
+
+  @override
+  String get resetCover => 'Reset Cover';
+
+  @override
+  String get selectLocalImage => 'Select Local Image';
+
+  @override
+  String get selectSongCover => 'Use Song Cover';
+
+  @override
+  String get selectCoverSource => 'Select Cover Source';
+
+  @override
+  String get coverUpdated => 'Cover updated';
+
+  @override
+  String get coverReset => 'Cover reset to default';
+
+  @override
+  String get noImageSelected => 'No image selected';
+
+  @override
+  String get selectSongAsCover => 'Select a song to use its cover';
+
+  @override
+  String get importLabel => 'Import';
+
+  @override
+  String get createLabel => 'New';
+
+  @override
+  String get fetchingMetadata => 'Fetching song info...';
+
+  @override
+  String get selectAll => 'Select All';
+
+  @override
+  String get deselectAll => 'Deselect All';
+
+  @override
+  String selectedSongCount(int count, int total) {
+    return 'Selected $count/$total';
+  }
+
+  @override
+  String get noSongsSelected => 'Please select at least one song';
+
+  @override
+  String get existsLocallyLabel => 'Exists locally';
+
+  @override
+  String get metadataFetchFailed => 'Fetch failed';
+
+  @override
+  String get fetchMetadataError => 'Failed to fetch song info';
+
+  @override
+  String get importingPlaylist => 'Importing playlist...';
+
+  @override
   String get comments => 'Comments';
 
   @override

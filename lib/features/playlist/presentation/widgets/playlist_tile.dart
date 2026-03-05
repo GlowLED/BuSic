@@ -90,7 +90,9 @@ class PlaylistTile extends StatelessWidget {
     final cover = playlist.coverUrl;
     if (cover == null || cover.isEmpty) return _buildPlaceholder(colorScheme);
 
-    final isLocal = cover.startsWith('/') || cover.startsWith('file://');
+    final isLocal = cover.startsWith('/') ||
+        cover.startsWith('file://') ||
+        RegExp(r'^[A-Za-z]:[/\\]').hasMatch(cover);
     if (isLocal) {
       final path = cover.startsWith('file://')
           ? Uri.parse(cover).toFilePath()

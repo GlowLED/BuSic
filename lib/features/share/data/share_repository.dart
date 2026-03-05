@@ -1,5 +1,6 @@
 import '../domain/models/shared_playlist.dart';
 import '../domain/models/share_state.dart';
+import '../domain/models/song_metadata_preview.dart';
 
 /// 歌单分享 Repository 抽象接口（离线分享核心）
 ///
@@ -25,4 +26,9 @@ abstract class ShareRepository {
     String? overrideName,
     void Function(int current, int total)? onProgress,
   });
+
+  /// 预取歌曲元数据（标题、作者）用于导入预览
+  ///
+  /// 按 bvid 去重调用 B 站 API，返回每首歌的展示信息。
+  Future<List<SongMetadataPreview>> prefetchMetadata(List<SharedSong> songs);
 }

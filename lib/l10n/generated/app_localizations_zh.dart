@@ -366,6 +366,96 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importing => '导入中...';
 
   @override
+  String get downloadAll => '一键下载';
+
+  @override
+  String get downloadAllUncached => '下载未缓存的歌曲';
+
+  @override
+  String get allSongsCached => '所有歌曲都已缓存';
+
+  @override
+  String downloadAllStarted(int count) {
+    return '已开始下载 $count 首歌曲';
+  }
+
+  @override
+  String downloadAllFailed(String error) {
+    return '批量下载失败: $error';
+  }
+
+  @override
+  String get downloadingQueue => '正在下载';
+
+  @override
+  String get pendingQueue => '等待中';
+
+  @override
+  String get noUncachedSongs => '没有未缓存的歌曲';
+
+  @override
+  String get changeCover => '修改封面';
+
+  @override
+  String get resetCover => '恢复默认封面';
+
+  @override
+  String get selectLocalImage => '选择本地图片';
+
+  @override
+  String get selectSongCover => '使用歌曲封面';
+
+  @override
+  String get selectCoverSource => '选择封面来源';
+
+  @override
+  String get coverUpdated => '封面已更新';
+
+  @override
+  String get coverReset => '已恢复默认封面';
+
+  @override
+  String get noImageSelected => '未选择图片';
+
+  @override
+  String get selectSongAsCover => '选择一首歌曲作为封面';
+
+  @override
+  String get importLabel => '导入';
+
+  @override
+  String get createLabel => '新建';
+
+  @override
+  String get fetchingMetadata => '正在获取歌曲信息...';
+
+  @override
+  String get selectAll => '全选';
+
+  @override
+  String get deselectAll => '取消全选';
+
+  @override
+  String selectedSongCount(int count, int total) {
+    return '已选 $count/$total';
+  }
+
+  @override
+  String get noSongsSelected => '请至少选择一首歌曲';
+
+  @override
+  String get existsLocallyLabel => '本地已有';
+
+  @override
+  String get metadataFetchFailed => '信息获取失败';
+
+  @override
+  String get fetchMetadataError => '获取歌曲信息失败';
+
+  @override
+  String get importingPlaylist => '正在导入歌单...';
+
+  @override
   String get comments => '评论';
 
   @override

@@ -17,6 +17,7 @@ import '../../share/application/share_notifier.dart';
 import '../../share/presentation/widgets/share_dialog.dart';
 import '../application/playlist_notifier.dart';
 import '../domain/models/song_item.dart';
+import 'widgets/cover_selection_dialog.dart';
 import 'widgets/metadata_edit_dialog.dart';
 
 /// Editing mode for the playlist detail screen.
@@ -349,13 +350,27 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
           tooltip: l10n.sharePlaylist,
           onPressed: () => _showShareDialog(context, ref),
         ),
-        PopupMenuButton<_EditMode>(
+        PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           tooltip: '更多',
-          onSelected: _toggleEditMode,
+          onSelected: (value) {
+            switch (value) {
+              case 'reorder':
+                _toggleEditMode(_EditMode.reorder);
+              case 'batchSelect':
+                _toggleEditMode(_EditMode.batchSelect);
+              case 'changeCover':
+                showDialog(
+                  context: context,
+                  builder: (_) => CoverSelectionDialog(playlistId: playlistId),
+                );
+              case 'downloadAll':
+                _downloadAllUncached(context, ref, songs);
+            }
+          },
           itemBuilder: (_) => [
             const PopupMenuItem(
-              value: _EditMode.reorder,
+              value: 'reorder',
               child: ListTile(
                 leading: Icon(Icons.swap_vert),
                 title: Text('排序'),
@@ -363,10 +378,26 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
               ),
             ),
             const PopupMenuItem(
-              value: _EditMode.batchSelect,
+              value: 'batchSelect',
               child: ListTile(
                 leading: Icon(Icons.checklist),
                 title: Text('批量操作'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            PopupMenuItem(
+              value: 'changeCover',
+              child: ListTile(
+                leading: const Icon(Icons.image_outlined),
+                title: Text(l10n.changeCover),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            PopupMenuItem(
+              value: 'downloadAll',
+              child: ListTile(
+                leading: const Icon(Icons.download),
+                title: Text(l10n.downloadAll),
                 contentPadding: EdgeInsets.zero,
               ),
             ),
@@ -606,6 +637,93 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('获取音质列表失败: $e'),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
+      );
+    }
+  }
+
+  /// Download all uncached songs in the playlist with a selected quality.
+  void _downloadAllUncached(
+    BuildContext context,
+    WidgetRef ref,
+    List<SongItem> songs,
+  ) async {
+    final l10n = context.l10n;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    // Filter uncached songs
+    final uncached = songs.where((s) => !s.isCached).toList();
+    if (uncached.isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.allSongsCached),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Get available qualities from the first uncached song
+      final qualities = await ref
+          .read(downloadNotifierProvider.notifier)
+          .getAvailableQualities(
+              bvid: uncached.first.bvid, cid: uncached.first.cid);
+
+      if (qualities.isEmpty) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.noQualities),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+        return;
+      }
+
+      if (!context.mounted) return;
+
+      final isLoggedIn = ref.read(authNotifierProvider).value != null;
+
+      showDialog(
+        context: context,
+        builder: (_) => QualitySelectDialog(
+          qualities: qualities,
+          isLoggedIn: isLoggedIn,
+          onSelect: (selected) async {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(l10n.downloadAllStarted(uncached.length)),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+              ),
+            );
+            final songData = uncached
+                .map((s) => (
+                      id: s.id,
+                      bvid: s.bvid,
+                      cid: s.cid,
+                      title: s.displayTitle,
+                      isCached: s.isCached,
+                    ))
+                .toList();
+            await ref
+                .read(downloadNotifierProvider.notifier)
+                .downloadAllUncached(
+                  songs: songData,
+                  quality: selected.quality,
+                );
+          },
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('获取音质列表失败: $e\n$stackTrace');
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.downloadAllFailed(e.toString())),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
         ),

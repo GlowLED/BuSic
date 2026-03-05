@@ -23,7 +23,10 @@ class ResponsiveScaffold extends StatelessWidget {
   const ResponsiveScaffold({super.key, required this.navigationShell});
 
   void _onDestinationSelected(int index) {
-    navigationShell.goBranch(index, initialLocation: false);
+    // If user taps the already-active branch, go back to the branch root
+    // (e.g., from playlist detail back to playlist list).
+    final isCurrentBranch = navigationShell.currentIndex == index;
+    navigationShell.goBranch(index, initialLocation: isCurrentBranch);
   }
 
   @override

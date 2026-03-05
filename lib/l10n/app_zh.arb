@@ -136,6 +136,50 @@
   "pleaseUpgrade": "请升级 BuSic 后再导入",
   "emptyPlaylist": "歌单中没有歌曲",
   "importing": "导入中...",
+  "downloadAll": "一键下载",
+  "downloadAllUncached": "下载未缓存的歌曲",
+  "allSongsCached": "所有歌曲都已缓存",
+  "downloadAllStarted": "已开始下载 {count} 首歌曲",
+  "@downloadAllStarted": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "downloadAllFailed": "批量下载失败: {error}",
+  "@downloadAllFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "downloadingQueue": "正在下载",
+  "pendingQueue": "等待中",
+  "noUncachedSongs": "没有未缓存的歌曲",
+  "changeCover": "修改封面",
+  "resetCover": "恢复默认封面",
+  "selectLocalImage": "选择本地图片",
+  "selectSongCover": "使用歌曲封面",
+  "selectCoverSource": "选择封面来源",
+  "coverUpdated": "封面已更新",
+  "coverReset": "已恢复默认封面",
+  "noImageSelected": "未选择图片",
+  "selectSongAsCover": "选择一首歌曲作为封面",
+  "importLabel": "导入",
+  "createLabel": "新建",
+  "fetchingMetadata": "正在获取歌曲信息...",
+  "selectAll": "全选",
+  "deselectAll": "取消全选",
+  "selectedSongCount": "已选 {count}/{total}",
+  "@selectedSongCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "noSongsSelected": "请至少选择一首歌曲",
+  "existsLocallyLabel": "本地已有",
+  "metadataFetchFailed": "信息获取失败",
+  "fetchMetadataError": "获取歌曲信息失败",
+  "importingPlaylist": "正在导入歌单...",
   "comments": "评论",
   "noComments": "暂无评论",
   "loadCommentsFailed": "加载评论失败",

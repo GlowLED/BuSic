@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/api/bili_dio.dart';
+import '../../../core/database/app_database.dart';
 import '../../../core/services/audio_handler.dart';
 import '../../../core/utils/logger.dart';
 import '../../../main.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../download/application/download_notifier.dart';
 import '../../playlist/domain/models/song_item.dart';
 import '../../search_and_parse/data/parse_repository.dart';
 import '../../search_and_parse/data/parse_repository_impl.dart';
@@ -31,6 +35,7 @@ class PlayerNotifier extends _$PlayerNotifier {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
   late BusicAudioHandler _audioHandler;
+  late AppDatabase _db;
   final List<StreamSubscription> _subscriptions = [];
   DateTime _lastPersist = DateTime.fromMillisecondsSinceEpoch(0);
 
@@ -58,6 +63,12 @@ class PlayerNotifier extends _$PlayerNotifier {
     _repository = PlayerRepositoryImpl();
     _parseRepository = ParseRepositoryImpl(biliDio: BiliDio());
     _audioHandler = ref.read(audioHandlerProvider);
+    _db = ref.read(databaseProvider);
+
+    // Listen for download completions and refresh queue localPaths.
+    ref.listen(downloadChangeSignalProvider, (_, __) {
+      _refreshQueueLocalPaths();
+    });
 
     // Connect media button callbacks (lock screen / notification controls)
     _audioHandler.onPlay = () => resume();
@@ -117,6 +128,46 @@ class PlayerNotifier extends _$PlayerNotifier {
     _restoreState();
 
     return const PlayerState();
+  }
+
+  /// Query the database for the latest localPath of a song.
+  /// Returns the path only if it exists on disk; otherwise returns null.
+  Future<String?> _getFreshLocalPath(int songId) async {
+    final song = await (_db.select(_db.songs)
+          ..where((t) => t.id.equals(songId)))
+        .getSingleOrNull();
+    final path = song?.localPath;
+    if (path == null) return null;
+    try {
+      if (await File(path).exists()) return path;
+    } catch (_) {
+      // Ignore file-system errors
+    }
+    return null;
+  }
+
+  /// Refresh localPath for all tracks in the current queue from the database.
+  /// Called when downloads complete so offline playback uses cached files.
+  Future<void> _refreshQueueLocalPaths() async {
+    if (state.queue.isEmpty) return;
+    var changed = false;
+    final updatedQueue = List<AudioTrack>.from(state.queue);
+    for (int i = 0; i < updatedQueue.length; i++) {
+      final track = updatedQueue[i];
+      if (track.localPath != null) continue; // already has local path
+      final freshPath = await _getFreshLocalPath(track.songId);
+      if (freshPath != null) {
+        updatedQueue[i] = track.copyWith(localPath: freshPath);
+        changed = true;
+      }
+    }
+    if (changed) {
+      final currentTrack = state.currentIndex < updatedQueue.length
+          ? updatedQueue[state.currentIndex]
+          : state.currentTrack;
+      state = state.copyWith(queue: updatedQueue, currentTrack: currentTrack);
+      AppLogger.info('Refreshed queue local paths after download', tag: 'Player');
+    }
   }
 
   /// Persist current playback state to shared preferences.
@@ -236,6 +287,13 @@ class PlayerNotifier extends _$PlayerNotifier {
     index = index.clamp(0, tracks.length - 1);
 
     var track = tracks[index];
+    // Refresh localPath from DB and verify file exists
+    if (track.localPath == null) {
+      final freshPath = await _getFreshLocalPath(track.songId);
+      if (freshPath != null) {
+        track = track.copyWith(localPath: freshPath);
+      }
+    }
     // Resolve stream URL if not already available
     if (track.streamUrl == null && track.localPath == null) {
       final streamInfo = await _parseRepository.getAudioStream(
@@ -265,10 +323,18 @@ class PlayerNotifier extends _$PlayerNotifier {
   }
 
   /// Convert a [SongItem] to an [AudioTrack] by resolving the audio stream URL.
+  ///
+  /// Checks the database for the latest localPath (the song may have been
+  /// downloaded since the [SongItem] was fetched) and verifies the file exists.
   Future<AudioTrack> _resolveAudioTrack(SongItem song) async {
+    // Always check DB for the latest localPath and verify file exists.
+    // This handles both freshly-downloaded songs and stale SongItem data.
+    final effectiveLocalPath = await _getFreshLocalPath(song.id);
+
     String? streamUrl;
     int quality = song.audioQuality;
-    if (song.localPath == null) {
+
+    if (effectiveLocalPath == null) {
       try {
         final streamInfo = await _parseRepository.getAudioStream(
           song.bvid,
@@ -291,7 +357,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       coverUrl: song.coverUrl,
       duration: Duration(seconds: song.duration),
       streamUrl: streamUrl,
-      localPath: song.localPath,
+      localPath: effectiveLocalPath,
       quality: quality,
     );
   }
@@ -350,6 +416,8 @@ class PlayerNotifier extends _$PlayerNotifier {
   ///
   /// If the player has no active media (e.g. restored from saved state),
   /// resolves the stream URL and starts playback from the saved position.
+  /// Always checks the database for the latest localPath so that songs
+  /// downloaded after the queue was built can be played offline.
   Future<void> resume() async {
     final track = state.currentTrack;
     if (track == null) return;
@@ -357,6 +425,16 @@ class PlayerNotifier extends _$PlayerNotifier {
     // Check if the player needs to load the media first (restored state)
     if (!_hasActiveMedia) {
       var playableTrack = track;
+
+      // Refresh localPath from DB — the song may have been downloaded
+      // after the queue was built or after the state was persisted.
+      if (playableTrack.localPath == null) {
+        final freshPath = await _getFreshLocalPath(playableTrack.songId);
+        if (freshPath != null) {
+          playableTrack = playableTrack.copyWith(localPath: freshPath);
+        }
+      }
+
       if (playableTrack.streamUrl == null && playableTrack.localPath == null) {
         try {
           final streamInfo = await _parseRepository.getAudioStream(
@@ -368,21 +446,23 @@ class PlayerNotifier extends _$PlayerNotifier {
             streamUrl: streamInfo.url,
             quality: streamInfo.quality,
           );
-          // Update in queue & state
-          final updatedQueue = List<AudioTrack>.from(state.queue);
-          if (state.currentIndex < updatedQueue.length) {
-            updatedQueue[state.currentIndex] = playableTrack;
-          }
-          state = state.copyWith(
-            currentTrack: playableTrack,
-            queue: updatedQueue,
-          );
         } catch (e) {
           AppLogger.error('Failed to resolve stream for resume',
               tag: 'Player', error: e);
           return;
         }
       }
+
+      // Update in queue & state
+      final updatedQueue = List<AudioTrack>.from(state.queue);
+      if (state.currentIndex < updatedQueue.length) {
+        updatedQueue[state.currentIndex] = playableTrack;
+      }
+      state = state.copyWith(
+        currentTrack: playableTrack,
+        queue: updatedQueue,
+      );
+
       final savedPosition = state.position;
       await _repository.play(playableTrack);
       _hasActiveMedia = true;
@@ -410,7 +490,17 @@ class PlayerNotifier extends _$PlayerNotifier {
     }
 
     var track = state.queue[nextIndex];
-    // Resolve stream URL if needed (next)
+
+    // Refresh localPath from DB in case the song was downloaded after
+    // the queue was built.
+    if (track.localPath == null) {
+      final freshPath = await _getFreshLocalPath(track.songId);
+      if (freshPath != null) {
+        track = track.copyWith(localPath: freshPath);
+      }
+    }
+
+    // Resolve stream URL if no local file available
     if (track.streamUrl == null && track.localPath == null) {
       try {
         final streamInfo = await _parseRepository.getAudioStream(
@@ -422,15 +512,15 @@ class PlayerNotifier extends _$PlayerNotifier {
           streamUrl: streamInfo.url,
           quality: streamInfo.quality,
         );
-        final updatedQueue = List<AudioTrack>.from(state.queue);
-        updatedQueue[nextIndex] = track;
-        state = state.copyWith(queue: updatedQueue);
       } catch (e) {
         AppLogger.error('Failed to resolve next track', tag: 'Player', error: e);
         return;
       }
     }
+    final updatedQueue = List<AudioTrack>.from(state.queue);
+    updatedQueue[nextIndex] = track;
     state = state.copyWith(
+      queue: updatedQueue,
       currentTrack: track,
       currentIndex: nextIndex,
       position: Duration.zero,
@@ -455,7 +545,17 @@ class PlayerNotifier extends _$PlayerNotifier {
         : state.queue.length - 1;
 
     var track = state.queue[prevIndex];
-    // Resolve stream URL if needed (previous)
+
+    // Refresh localPath from DB in case the song was downloaded after
+    // the queue was built.
+    if (track.localPath == null) {
+      final freshPath = await _getFreshLocalPath(track.songId);
+      if (freshPath != null) {
+        track = track.copyWith(localPath: freshPath);
+      }
+    }
+
+    // Resolve stream URL if no local file available
     if (track.streamUrl == null && track.localPath == null) {
       try {
         final streamInfo = await _parseRepository.getAudioStream(
@@ -467,15 +567,15 @@ class PlayerNotifier extends _$PlayerNotifier {
           streamUrl: streamInfo.url,
           quality: streamInfo.quality,
         );
-        final updatedQueue = List<AudioTrack>.from(state.queue);
-        updatedQueue[prevIndex] = track;
-        state = state.copyWith(queue: updatedQueue);
       } catch (e) {
         AppLogger.error('Failed to resolve prev track', tag: 'Player', error: e);
         return;
       }
     }
+    final updatedQueue = List<AudioTrack>.from(state.queue);
+    updatedQueue[prevIndex] = track;
     state = state.copyWith(
+      queue: updatedQueue,
       currentTrack: track,
       currentIndex: prevIndex,
       position: Duration.zero,

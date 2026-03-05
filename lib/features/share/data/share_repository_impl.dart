@@ -6,8 +6,10 @@ import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/utils/logger.dart';
 import '../../search_and_parse/data/parse_repository.dart';
+import '../../search_and_parse/domain/models/bvid_info.dart';
 import '../domain/models/shared_playlist.dart';
 import '../domain/models/share_state.dart';
+import '../domain/models/song_metadata_preview.dart';
 import 'share_repository.dart';
 
 /// [ShareRepository] 的具体实现
@@ -192,6 +194,75 @@ class ShareRepositoryImpl implements ShareRepository {
       failed: failed,
       failedBvids: failedBvids,
     );
+  }
+
+  @override
+  Future<List<SongMetadataPreview>> prefetchMetadata(
+    List<SharedSong> songs,
+  ) async {
+    // 按 bvid 分组，避免重复 API 调用
+    final uniqueBvids = <String>{};
+    for (final song in songs) {
+      uniqueBvids.add(song.bvid);
+    }
+
+    // 并发拉取元数据（信号量控制并发数）
+    final bvidInfoMap = <String, BvidInfo>{};
+    final semaphore = _Semaphore(_maxConcurrency);
+
+    final futures = uniqueBvids.map((bvid) async {
+      await semaphore.acquire();
+      try {
+        final info = await _parseRepo.getVideoInfo(bvid);
+        bvidInfoMap[bvid] = info;
+      } catch (e) {
+        AppLogger.warning('预取元数据失败: $bvid', tag: 'ShareRepo');
+      } finally {
+        semaphore.release();
+      }
+    });
+
+    await Future.wait(futures);
+
+    // 构建预览列表
+    final results = <SongMetadataPreview>[];
+    for (final song in songs) {
+      // 检查本地是否已有
+      final existing = await (_db.select(_db.songs)
+            ..where(
+                (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid)))
+          .getSingleOrNull();
+
+      final bvidInfo = bvidInfoMap[song.bvid];
+      String displayTitle;
+      String displayArtist;
+
+      if (existing != null) {
+        displayTitle = existing.customTitle ?? existing.originTitle;
+        displayArtist = existing.customArtist ?? existing.originArtist;
+      } else if (bvidInfo != null) {
+        final page = bvidInfo.pages.firstWhere(
+          (p) => p.cid == song.cid,
+          orElse: () => bvidInfo.pages.first,
+        );
+        displayTitle = song.customTitle ??
+            (page.partTitle.isNotEmpty ? page.partTitle : bvidInfo.title);
+        displayArtist = song.customArtist ?? bvidInfo.owner;
+      } else {
+        displayTitle = song.customTitle ?? song.bvid;
+        displayArtist = song.customArtist ?? '';
+      }
+
+      results.add(SongMetadataPreview(
+        song: song,
+        displayTitle: displayTitle,
+        displayArtist: displayArtist,
+        existsLocally: existing != null,
+        fetchFailed: bvidInfo == null && existing == null,
+      ));
+    }
+
+    return results;
   }
 
   /// 处理单首歌曲：检查本地是否已有，否则通过 API 拉取元数据

@@ -137,6 +137,50 @@
   "pleaseUpgrade": "Please upgrade BuSic before importing",
   "emptyPlaylist": "Playlist has no songs",
   "importing": "Importing...",
+  "downloadAll": "Download All",
+  "downloadAllUncached": "Download uncached songs",
+  "allSongsCached": "All songs are already cached",
+  "downloadAllStarted": "Started downloading {count} songs",
+  "@downloadAllStarted": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "downloadAllFailed": "Batch download failed: {error}",
+  "@downloadAllFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "downloadingQueue": "Downloading",
+  "pendingQueue": "Pending",
+  "noUncachedSongs": "No uncached songs to download",
+  "changeCover": "Change Cover",
+  "resetCover": "Reset Cover",
+  "selectLocalImage": "Select Local Image",
+  "selectSongCover": "Use Song Cover",
+  "selectCoverSource": "Select Cover Source",
+  "coverUpdated": "Cover updated",
+  "coverReset": "Cover reset to default",
+  "noImageSelected": "No image selected",
+  "selectSongAsCover": "Select a song to use its cover",
+  "importLabel": "Import",
+  "createLabel": "New",
+  "fetchingMetadata": "Fetching song info...",
+  "selectAll": "Select All",
+  "deselectAll": "Deselect All",
+  "selectedSongCount": "Selected {count}/{total}",
+  "@selectedSongCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "noSongsSelected": "Please select at least one song",
+  "existsLocallyLabel": "Exists locally",
+  "metadataFetchFailed": "Fetch failed",
+  "fetchMetadataError": "Failed to fetch song info",
+  "importingPlaylist": "Importing playlist...",
   "comments": "Comments",
   "noComments": "No comments yet",
   "loadCommentsFailed": "Failed to load comments",

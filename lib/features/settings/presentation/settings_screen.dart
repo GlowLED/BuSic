@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../core/utils/app_info.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../share/application/sync_notifier.dart';
@@ -253,16 +254,25 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
 
           // ── About ──
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: Text(l10n.about),
-            subtitle: const Text('BuSic v0.1.1'),
-            onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'BuSic',
-                applicationVersion: '0.2.1',
-                applicationLegalese: 'A cross-platform Bilibili music player.',
+          Consumer(
+            builder: (context, ref, _) {
+              final info = ref.watch(appInfoProvider).valueOrNull;
+              final versionDisplay = info != null
+                  ? 'v${info.version}+${info.buildNumber}'
+                  : '';
+              return ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(l10n.about),
+                subtitle: Text('BuSic $versionDisplay'),
+                onTap: () {
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'BuSic',
+                    applicationVersion: versionDisplay,
+                    applicationLegalese:
+                        'A cross-platform Bilibili music player.',
+                  );
+                },
               );
             },
           ),

@@ -797,6 +797,174 @@ abstract class AppLocalizations {
   /// **'Importing...'**
   String get importing;
 
+  /// No description provided for @downloadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Download All'**
+  String get downloadAll;
+
+  /// No description provided for @downloadAllUncached.
+  ///
+  /// In en, this message translates to:
+  /// **'Download uncached songs'**
+  String get downloadAllUncached;
+
+  /// No description provided for @allSongsCached.
+  ///
+  /// In en, this message translates to:
+  /// **'All songs are already cached'**
+  String get allSongsCached;
+
+  /// No description provided for @downloadAllStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Started downloading {count} songs'**
+  String downloadAllStarted(int count);
+
+  /// No description provided for @downloadAllFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch download failed: {error}'**
+  String downloadAllFailed(String error);
+
+  /// No description provided for @downloadingQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get downloadingQueue;
+
+  /// No description provided for @pendingQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pendingQueue;
+
+  /// No description provided for @noUncachedSongs.
+  ///
+  /// In en, this message translates to:
+  /// **'No uncached songs to download'**
+  String get noUncachedSongs;
+
+  /// No description provided for @changeCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Cover'**
+  String get changeCover;
+
+  /// No description provided for @resetCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Cover'**
+  String get resetCover;
+
+  /// No description provided for @selectLocalImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Local Image'**
+  String get selectLocalImage;
+
+  /// No description provided for @selectSongCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Song Cover'**
+  String get selectSongCover;
+
+  /// No description provided for @selectCoverSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Cover Source'**
+  String get selectCoverSource;
+
+  /// No description provided for @coverUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover updated'**
+  String get coverUpdated;
+
+  /// No description provided for @coverReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover reset to default'**
+  String get coverReset;
+
+  /// No description provided for @noImageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No image selected'**
+  String get noImageSelected;
+
+  /// No description provided for @selectSongAsCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a song to use its cover'**
+  String get selectSongAsCover;
+
+  /// No description provided for @importLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importLabel;
+
+  /// No description provided for @createLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get createLabel;
+
+  /// No description provided for @fetchingMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching song info...'**
+  String get fetchingMetadata;
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get selectAll;
+
+  /// No description provided for @deselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get deselectAll;
+
+  /// No description provided for @selectedSongCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected {count}/{total}'**
+  String selectedSongCount(int count, int total);
+
+  /// No description provided for @noSongsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one song'**
+  String get noSongsSelected;
+
+  /// No description provided for @existsLocallyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exists locally'**
+  String get existsLocallyLabel;
+
+  /// No description provided for @metadataFetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch failed'**
+  String get metadataFetchFailed;
+
+  /// No description provided for @fetchMetadataError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch song info'**
+  String get fetchMetadataError;
+
+  /// No description provided for @importingPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing playlist...'**
+  String get importingPlaylist;
+
   /// No description provided for @comments.
   ///
   /// In en, this message translates to:

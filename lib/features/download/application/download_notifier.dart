@@ -296,4 +296,38 @@ class DownloadNotifier extends _$DownloadNotifier {
     await _repository.pauseDownload(taskId);
     ref.invalidateSelf();
   }
+
+  /// Download all uncached songs from a playlist in batch.
+  ///
+  /// Filters [songs] for those that are not yet cached, then downloads
+  /// each with the given [quality]. Returns the count of songs that
+  /// were successfully queued for download.
+  Future<int> downloadAllUncached({
+    required List<({int id, String bvid, int cid, String title, bool isCached})>
+        songs,
+    required int quality,
+  }) async {
+    final uncached = songs.where((s) => !s.isCached).toList();
+    if (uncached.isEmpty) return 0;
+
+    int started = 0;
+    for (final song in uncached) {
+      try {
+        final didStart = await downloadSongWithQuality(
+          songId: song.id,
+          bvid: song.bvid,
+          cid: song.cid,
+          quality: quality,
+          title: song.title,
+        );
+        if (didStart) started++;
+      } catch (e) {
+        AppLogger.error(
+          'Batch download failed for song ${song.id}: $e',
+          tag: 'Download',
+        );
+      }
+    }
+    return started;
+  }
 }

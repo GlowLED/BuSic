@@ -45,10 +45,11 @@ class DownloadScreen extends ConsumerWidget {
             );
           }
 
-          final activeTasks = tasks
-              .where((t) =>
-                  t.status == DownloadStatus.pending ||
-                  t.status == DownloadStatus.downloading)
+          final downloadingTasks = tasks
+              .where((t) => t.status == DownloadStatus.downloading)
+              .toList();
+          final pendingTasks = tasks
+              .where((t) => t.status == DownloadStatus.pending)
               .toList();
           final completedTasks = tasks
               .where((t) => t.status == DownloadStatus.completed)
@@ -61,36 +62,49 @@ class DownloadScreen extends ConsumerWidget {
 
           return CustomScrollView(
             slivers: [
-              // Active downloads section
-              if (activeTasks.isNotEmpty) ...[
-                _SectionHeader(title: l10n.activeDownloads),
+              // Downloading section
+              if (downloadingTasks.isNotEmpty) ...[
+                _SectionHeader(title: l10n.downloadingQueue),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final task = activeTasks[index];
+                      final task = downloadingTasks[index];
                       return DownloadTaskTile(
                         task: task,
-                        onPause: task.status == DownloadStatus.downloading
-                            ? () => ref
-                                .read(downloadNotifierProvider.notifier)
-                                .pauseDownload(task.id)
-                            : null,
-                        onCancel: task.status == DownloadStatus.downloading
-                            ? () => ref
-                                .read(downloadNotifierProvider.notifier)
-                                .cancelDownload(task.id)
-                            : null,
-                        onRetry: task.status == DownloadStatus.pending
-                            ? () => ref
-                                .read(downloadNotifierProvider.notifier)
-                                .retryDownload(task.id)
-                            : null,
+                        onPause: () => ref
+                            .read(downloadNotifierProvider.notifier)
+                            .pauseDownload(task.id),
+                        onCancel: () => ref
+                            .read(downloadNotifierProvider.notifier)
+                            .cancelDownload(task.id),
                         onDelete: () => ref
                             .read(downloadNotifierProvider.notifier)
                             .deleteTask(task.id),
                       );
                     },
-                    childCount: activeTasks.length,
+                    childCount: downloadingTasks.length,
+                  ),
+                ),
+              ],
+
+              // Pending queue section
+              if (pendingTasks.isNotEmpty) ...[
+                _SectionHeader(title: l10n.pendingQueue),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final task = pendingTasks[index];
+                      return DownloadTaskTile(
+                        task: task,
+                        onRetry: () => ref
+                            .read(downloadNotifierProvider.notifier)
+                            .retryDownload(task.id),
+                        onDelete: () => ref
+                            .read(downloadNotifierProvider.notifier)
+                            .deleteTask(task.id),
+                      );
+                    },
+                    childCount: pendingTasks.length,
                   ),
                 ),
               ],
