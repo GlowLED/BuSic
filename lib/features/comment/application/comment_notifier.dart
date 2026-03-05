@@ -27,8 +27,8 @@ class CommentState with _$CommentState {
     /// Whether all comments have been loaded.
     @Default(false) bool isEnd,
 
-    /// Sort mode: 2 = popularity, 3 = time.
-    @Default(2) int sortMode,
+    /// Sort mode: 2 = time (最新), 3 = popularity (热门).
+    @Default(3) int sortMode,
 
     /// Total comment count.
     @Default(0) int totalCount,
@@ -43,7 +43,13 @@ class CommentState with _$CommentState {
 /// Family parameter is the video's `bvid` string.
 @riverpod
 class CommentNotifier extends _$CommentNotifier {
-  late final CommentRepository _repository;
+  late CommentRepository _repository;
+
+  /// Comments posted by the current user during this session.
+  /// These are preserved across sort-mode switches and reloads so that
+  /// newly posted comments (which may not yet appear in the "hot" API
+  /// response) are always shown at the top.
+  final List<Comment> _myPostedComments = [];
 
   @override
   Future<CommentState> build(String bvid) async {
@@ -52,12 +58,12 @@ class CommentNotifier extends _$CommentNotifier {
     // Resolve bvid → aid
     final aid = await _repository.getAidByBvid(bvid);
 
-    // Fetch first page of comments
-    final page = await _repository.getComments(oid: aid);
+    // Fetch first page of comments (mode 3 = 热门)
+    final page = await _repository.getComments(oid: aid, mode: 3);
 
     return CommentState(
       aid: aid,
-      comments: page.replies,
+      comments: _pinMyComments(page.replies),
       nextCursor: page.next,
       isEnd: page.isEnd,
       totalCount: page.totalCount,
@@ -79,7 +85,7 @@ class CommentNotifier extends _$CommentNotifier {
       );
 
       state = AsyncData(current.copyWith(
-        comments: [...current.comments, ...page.replies],
+        comments: _pinMyComments([...current.comments, ...page.replies]),
         nextCursor: page.next,
         isEnd: page.isEnd,
         isLoadingMore: false,
@@ -105,7 +111,7 @@ class CommentNotifier extends _$CommentNotifier {
 
       state = AsyncData(CommentState(
         aid: current.aid,
-        comments: page.replies,
+        comments: _pinMyComments(page.replies),
         nextCursor: page.next,
         isEnd: page.isEnd,
         sortMode: mode,
@@ -131,6 +137,7 @@ class CommentNotifier extends _$CommentNotifier {
         csrf: user.biliJct,
       );
 
+      _myPostedComments.add(newComment);
       state = AsyncData(current.copyWith(
         comments: [newComment, ...current.comments],
         totalCount: current.totalCount + 1,
@@ -162,8 +169,17 @@ class CommentNotifier extends _$CommentNotifier {
         parent: parentRpid,
       );
 
-      // Refresh the comment list to show the new reply
-      ref.invalidateSelf();
+      // Reload current page to reflect the new reply count
+      final reloaded = await _repository.getComments(
+        oid: current.aid,
+        mode: current.sortMode,
+      );
+      state = AsyncData(current.copyWith(
+        comments: _pinMyComments(reloaded.replies),
+        nextCursor: reloaded.next,
+        isEnd: reloaded.isEnd,
+        totalCount: reloaded.totalCount,
+      ));
     } catch (e) {
       AppLogger.error('Failed to reply: $e', tag: 'Comment');
       rethrow;
@@ -210,6 +226,37 @@ class CommentNotifier extends _$CommentNotifier {
       AppLogger.error('Failed to toggle like: $e', tag: 'Comment');
       rethrow;
     }
+  }
+
+  /// Pin the current user's comments at the top of the list.
+  ///
+  /// 1. Any comments posted during this session ([_myPostedComments]) that
+  ///    are NOT already in the API results are prepended.
+  /// 2. Among the API results, comments whose [Comment.mid] matches the
+  ///    current user are moved to the front.
+  List<Comment> _pinMyComments(List<Comment> comments) {
+    final user = ref.read(authNotifierProvider).valueOrNull;
+    final myMid = user != null ? int.tryParse(user.userId) : null;
+
+    // Separate API-returned own comments from others
+    final mine = <Comment>[];
+    final others = <Comment>[];
+    final existingRpids = <int>{};
+    for (final c in comments) {
+      existingRpids.add(c.rpid);
+      if (myMid != null && c.mid == myMid) {
+        mine.add(c);
+      } else {
+        others.add(c);
+      }
+    }
+
+    // Prepend session-cached comments that the API did not return
+    final missingPosted = _myPostedComments
+        .where((c) => !existingRpids.contains(c.rpid))
+        .toList();
+
+    return [...missingPosted, ...mine, ...others];
   }
 }
 

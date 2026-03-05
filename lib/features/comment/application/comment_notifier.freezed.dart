@@ -28,7 +28,7 @@ mixin _$CommentState {
   /// Whether all comments have been loaded.
   bool get isEnd => throw _privateConstructorUsedError;
 
-  /// Sort mode: 2 = popularity, 3 = time.
+  /// Sort mode: 2 = time (最新), 3 = popularity (热门).
   int get sortMode => throw _privateConstructorUsedError;
 
   /// Total comment count.
@@ -196,7 +196,7 @@ class _$CommentStateImpl implements _CommentState {
       final List<Comment> comments = const [],
       this.nextCursor = 0,
       this.isEnd = false,
-      this.sortMode = 2,
+      this.sortMode = 3,
       this.totalCount = 0,
       this.isLoadingMore = false})
       : _comments = comments;
@@ -228,7 +228,7 @@ class _$CommentStateImpl implements _CommentState {
   @JsonKey()
   final bool isEnd;
 
-  /// Sort mode: 2 = popularity, 3 = time.
+  /// Sort mode: 2 = time (最新), 3 = popularity (热门).
   @override
   @JsonKey()
   final int sortMode;
@@ -312,7 +312,7 @@ abstract class _CommentState implements CommentState {
   @override
   bool get isEnd;
 
-  /// Sort mode: 2 = popularity, 3 = time.
+  /// Sort mode: 2 = time (最新), 3 = popularity (热门).
   @override
   int get sortMode;
 

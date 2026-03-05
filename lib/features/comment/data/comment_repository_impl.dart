@@ -15,7 +15,7 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   Future<CommentPage> getComments({
     required int oid,
-    int mode = 2,
+    int mode = 3,
     int next = 0,
     int ps = 20,
   }) async {

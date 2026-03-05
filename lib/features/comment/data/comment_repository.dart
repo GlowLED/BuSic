@@ -12,7 +12,7 @@ abstract class CommentRepository {
   /// [next] is the pagination cursor (starts at 0).
   Future<CommentPage> getComments({
     required int oid,
-    int mode = 2,
+    int mode = 3,
     int next = 0,
     int ps = 20,
   });
