@@ -199,14 +199,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Widget _buildQrCodeTab(ColorScheme colorScheme) {
-    return Center(
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.all(32),
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return SingleChildScrollView(
+      child: Center(
+        child: Card(
+          elevation: 4,
+          margin: const EdgeInsets.all(32),
+          child: Padding(
+            padding: const EdgeInsets.all(40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.music_note, size: 48, color: colorScheme.primary),
               const SizedBox(height: 16),
@@ -252,6 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ],
           ),
         ),
+      ),
       ),
     );
   }

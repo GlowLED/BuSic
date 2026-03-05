@@ -19,7 +19,7 @@ final appInfoProvider = FutureProvider<PackageInfo>((ref) async {
 /// Convenience getter – returns a display string like `"0.2.1+3"`.
 ///
 /// Returns `null` while the future is still loading.
-String? appVersionString(ProviderRef<Object?> ref) {
+String? appVersionString(Ref<Object?> ref) {
   final info = ref.watch(appInfoProvider).valueOrNull;
   if (info == null) return null;
   return '${info.version}+${info.buildNumber}';

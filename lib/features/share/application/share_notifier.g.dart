@@ -6,7 +6,7 @@ part of 'share_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$shareNotifierHash() => r'543922b537a0b629dfa21469d0a459d2ec9fd412';
+String _$shareNotifierHash() => r'155b6dbd9a2d3c5fd583a27cb39e06f95502e808';
 
 /// 歌单分享功能的状态管理 Notifier
 ///

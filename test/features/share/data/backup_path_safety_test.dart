@@ -403,7 +403,7 @@ void main() {
               PlaylistSongsCompanion.insert(
                 playlistId: plId,
                 songId: songId,
-                sortOrder: Value(0),
+                sortOrder: const Value(0),
               ),
             );
       }
