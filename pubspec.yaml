@@ -71,6 +71,24 @@ dev_dependencies:
   json_serializable: ^6.8.0
   drift_dev: ^2.18.0
 
+  # App Icon Generation
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  windows:
+    generate: true
+    icon_size: 48
+  macos:
+    generate: true
+  linux:
+    generate: true
+  image_path: 'assets/images/app_icon.png'
+  adaptive_icon_foreground: 'assets/images/app_icon.png'
+  adaptive_icon_background: '#FFFFFF'
+  remove_alpha_ios: true
+
 flutter:
   generate: true
   uses-material-design: true
