@@ -5,6 +5,7 @@ import 'l10n/generated/app_localizations.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/app_update/application/update_notifier.dart';
 import 'features/settings/application/settings_notifier.dart';
 
 /// Root application widget.
@@ -13,11 +14,32 @@ import 'features/settings/application/settings_notifier.dart';
 /// - go_router navigation
 /// - Light/Dark theme support
 /// - i18n localization delegates (en, zh)
-class App extends ConsumerWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  bool _updateCheckDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Schedule silent update check after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_updateCheckDone) {
+        _updateCheckDone = true;
+        ref
+            .read(updateNotifierProvider.notifier)
+            .checkForUpdate(silent: true);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final settings = ref.watch(settingsNotifierProvider);
     final seedColor = Color(settings.themeSeedColor);

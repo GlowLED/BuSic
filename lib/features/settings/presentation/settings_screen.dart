@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/utils/app_info.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../app_update/application/update_notifier.dart';
+import '../../app_update/domain/models/update_state.dart';
+import '../../app_update/presentation/widgets/update_dialog.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../share/application/sync_notifier.dart';
 import '../../share/presentation/widgets/backup_overview_dialog.dart';
@@ -277,6 +281,57 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
 
+          // ── Follow Us ──
+          ListTile(
+            leading: const Icon(Icons.people_outline),
+            title: Text(l10n.followUs),
+            subtitle: Text(l10n.followUsDesc),
+            onTap: () => _showFollowUsDialog(context),
+          ),
+
+          // ── Check for Update ──
+          Consumer(
+            builder: (context, ref, _) {
+              final updateState = ref.watch(updateNotifierProvider);
+              final isChecking = updateState is UpdateStateChecking;
+
+              // Listen for state changes to show the update dialog
+              ref.listen<UpdateState>(updateNotifierProvider, (prev, next) {
+                if (next is UpdateStateAvailable ||
+                    next is UpdateStateDownloading ||
+                    next is UpdateStateReadyToInstall) {
+                  UpdateDialog.show(context);
+                } else if (next is UpdateStateIdle &&
+                    prev is UpdateStateChecking) {
+                  // Explicit check found no update
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.upToDate)),
+                  );
+                } else if (next is UpdateStateError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(next.message)),
+                  );
+                }
+              });
+
+              return ListTile(
+                leading: isChecking
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.system_update),
+                title: Text(l10n.checkForUpdate),
+                onTap: isChecking
+                    ? null
+                    : () => ref
+                        .read(updateNotifierProvider.notifier)
+                        .checkForUpdate(),
+              );
+            },
+          ),
+
           // ── Reset ──
           Padding(
             padding: const EdgeInsets.all(16),
@@ -287,6 +342,39 @@ class SettingsScreen extends ConsumerWidget {
                 ref.read(settingsNotifierProvider.notifier).resetToDefaults();
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 关注我们对话框
+  void _showFollowUsDialog(BuildContext context) {
+    final l10n = context.l10n;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.followUs),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.code),
+              title: const Text('GitHub'),
+              subtitle: const Text('GlowLED/BuSic'),
+              onTap: () {
+                launchUrl(
+                  Uri.parse('https://github.com/GlowLED/BuSic'),
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(MaterialLocalizations.of(context).closeButtonLabel),
           ),
         ],
       ),
