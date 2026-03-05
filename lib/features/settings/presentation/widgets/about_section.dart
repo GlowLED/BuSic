@@ -3,13 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/utils/app_info.dart';
+import '../../../../core/utils/platform_utils.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../app_update/application/update_notifier.dart';
+import '../../../app_update/domain/models/download_channel.dart';
 import '../../../app_update/domain/models/update_state.dart';
+import '../../../app_update/presentation/widgets/channel_picker_sheet.dart';
+import '../../../app_update/presentation/widgets/download_tile.dart';
 import '../../../app_update/presentation/widgets/update_dialog.dart';
+import '../../../app_update/presentation/widgets/version_picker_dialog.dart';
 import '../../application/settings_notifier.dart';
 
-/// About section: version info, follow us, check for update, reset.
+/// About section: version info, follow us, check for update, download, rollback, reset.
 class AboutSection extends ConsumerWidget {
   const AboutSection({super.key});
 
@@ -58,9 +63,7 @@ class AboutSection extends ConsumerWidget {
             final isChecking = updateState is UpdateStateChecking;
 
             ref.listen<UpdateState>(updateNotifierProvider, (prev, next) {
-              if (next is UpdateStateAvailable ||
-                  next is UpdateStateDownloading ||
-                  next is UpdateStateReadyToInstall) {
+              if (next is UpdateStateAvailable && next.info.isForceUpdate) {
                 UpdateDialog.show(context);
               } else if (next is UpdateStateIdle &&
                   prev is UpdateStateChecking) {
@@ -92,6 +95,20 @@ class AboutSection extends ConsumerWidget {
           },
         ),
 
+        const Divider(),
+
+        // Download tile (inline progress)
+        const DownloadTile(),
+
+        // Rollback to previous version
+        ListTile(
+          leading: const Icon(Icons.history),
+          title: Text(l10n.rollbackVersion),
+          onTap: () => _handleRollback(context, ref),
+        ),
+
+        const Divider(),
+
         // Reset
         Padding(
           padding: const EdgeInsets.all(16),
@@ -105,6 +122,76 @@ class AboutSection extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _handleRollback(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+
+    try {
+      // Show loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.checkForUpdate)),
+      );
+
+      final versions = await ref
+          .read(updateNotifierProvider.notifier)
+          .fetchHistoryVersions();
+
+      if (!context.mounted) return;
+
+      // Get current version
+      final appInfo = ref.read(appInfoProvider).valueOrNull;
+      final currentVersion = appInfo?.version ?? '';
+
+      final selectedVersion = await VersionPickerDialog.show(
+        context,
+        versions: versions,
+        currentVersion: currentVersion,
+      );
+
+      if (selectedVersion == null || !context.mounted) return;
+
+      // Find the selected version entry to get available channels
+      final entry = versions.firstWhere((v) => v.version == selectedVersion);
+      final availableChannels = <DownloadChannel>{};
+      final platformKey = _currentPlatformKey();
+      final platformAssets = entry.assets[platformKey];
+      if (platformAssets != null) {
+        if (platformAssets.github != null) {
+          availableChannels.add(DownloadChannel.github);
+        }
+        if (platformAssets.lanzou != null) {
+          availableChannels.add(DownloadChannel.lanzou);
+        }
+      }
+      if (availableChannels.isEmpty) {
+        availableChannels.add(DownloadChannel.github);
+      }
+
+      final channel = await ChannelPickerSheet.show(
+        context,
+        availableChannels: availableChannels,
+      );
+
+      if (channel == null) return;
+
+      ref
+          .read(updateNotifierProvider.notifier)
+          .downloadHistoryVersion(selectedVersion, channel);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  String _currentPlatformKey() {
+    if (PlatformUtils.isAndroid) return 'android';
+    if (PlatformUtils.isWindows) return 'windows';
+    if (PlatformUtils.isLinux) return 'linux';
+    if (PlatformUtils.isMacOS) return 'macos';
+    return 'android';
   }
 
   void _showFollowUsDialog(BuildContext context) {

@@ -1049,6 +1049,120 @@ abstract class AppLocalizations {
   /// **'This version is no longer supported. Please update to continue using BuSic.'**
   String get forceUpdateMessage;
 
+  /// No description provided for @downloadLatestVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Download latest version'**
+  String get downloadLatestVersion;
+
+  /// No description provided for @selectDownloadChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select download channel'**
+  String get selectDownloadChannel;
+
+  /// No description provided for @channelGithub.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub'**
+  String get channelGithub;
+
+  /// No description provided for @channelGithubDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Official source, may require proxy'**
+  String get channelGithubDesc;
+
+  /// No description provided for @channelLanzou.
+  ///
+  /// In en, this message translates to:
+  /// **'Lanzou Cloud'**
+  String get channelLanzou;
+
+  /// No description provided for @channelLanzouDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Domestic high-speed download'**
+  String get channelLanzouDesc;
+
+  /// No description provided for @channelNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available for this version'**
+  String get channelNotAvailable;
+
+  /// No description provided for @downloadPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Download paused'**
+  String get downloadPaused;
+
+  /// No description provided for @tapToPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to pause'**
+  String get tapToPause;
+
+  /// No description provided for @tapToResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to resume'**
+  String get tapToResume;
+
+  /// No description provided for @longPressToCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press to cancel'**
+  String get longPressToCancel;
+
+  /// No description provided for @cancelDownloadConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel the current download?'**
+  String get cancelDownloadConfirm;
+
+  /// No description provided for @rollbackVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Rollback to previous version'**
+  String get rollbackVersion;
+
+  /// No description provided for @selectTargetVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Select target version'**
+  String get selectTargetVersion;
+
+  /// No description provided for @noHistoryVersions.
+  ///
+  /// In en, this message translates to:
+  /// **'No history versions available'**
+  String get noHistoryVersions;
+
+  /// No description provided for @installUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Install update'**
+  String get installUpdate;
+
+  /// No description provided for @downloadCompleteReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Download complete, ready to install'**
+  String get downloadCompleteReady;
+
+  /// No description provided for @retryDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry download'**
+  String get retryDownload;
+
+  /// No description provided for @goToSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings'**
+  String get goToSettings;
+
   /// No description provided for @myFavorites.
   ///
   /// In en, this message translates to:
@@ -1348,6 +1462,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cyan'**
   String get colorCyan;
+
+  /// No description provided for @lyricsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics'**
+  String get lyricsTitle;
+
+  /// No description provided for @noLyrics.
+  ///
+  /// In en, this message translates to:
+  /// **'No lyrics available'**
+  String get noLyrics;
+
+  /// No description provided for @lyricsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading lyrics...'**
+  String get lyricsLoading;
+
+  /// No description provided for @lyricsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load lyrics'**
+  String get lyricsError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

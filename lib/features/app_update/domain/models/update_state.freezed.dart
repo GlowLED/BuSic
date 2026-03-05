@@ -21,8 +21,17 @@ mixin _$UpdateState {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) =>
@@ -32,8 +41,12 @@ mixin _$UpdateState {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) =>
@@ -43,8 +56,12 @@ mixin _$UpdateState {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -56,6 +73,7 @@ mixin _$UpdateState {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) =>
@@ -66,6 +84,7 @@ mixin _$UpdateState {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) =>
@@ -76,6 +95,7 @@ mixin _$UpdateState {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -148,8 +168,17 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
@@ -162,8 +191,12 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
@@ -176,8 +209,12 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -195,6 +232,7 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -208,6 +246,7 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -221,6 +260,7 @@ class _$UpdateStateIdleImpl implements UpdateStateIdle {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -281,8 +321,17 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
@@ -295,8 +344,12 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
@@ -309,8 +362,12 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -328,6 +385,7 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -341,6 +399,7 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -354,6 +413,7 @@ class _$UpdateStateCheckingImpl implements UpdateStateChecking {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -454,8 +514,17 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
@@ -468,8 +537,12 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
@@ -482,8 +555,12 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -501,6 +578,7 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -514,6 +592,7 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -527,6 +606,7 @@ class _$UpdateStateAvailableImpl implements UpdateStateAvailable {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -558,7 +638,13 @@ abstract class _$$UpdateStateDownloadingImplCopyWith<$Res> {
           $Res Function(_$UpdateStateDownloadingImpl) then) =
       __$$UpdateStateDownloadingImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({UpdateInfo info, double progress, double speed});
+  $Res call(
+      {UpdateInfo info,
+      double progress,
+      double speed,
+      DownloadChannel channel,
+      int downloadedBytes,
+      int totalBytes});
 
   $UpdateInfoCopyWith<$Res> get info;
 }
@@ -580,6 +666,9 @@ class __$$UpdateStateDownloadingImplCopyWithImpl<$Res>
     Object? info = null,
     Object? progress = null,
     Object? speed = null,
+    Object? channel = null,
+    Object? downloadedBytes = null,
+    Object? totalBytes = null,
   }) {
     return _then(_$UpdateStateDownloadingImpl(
       info: null == info
@@ -594,6 +683,18 @@ class __$$UpdateStateDownloadingImplCopyWithImpl<$Res>
           ? _value.speed
           : speed // ignore: cast_nullable_to_non_nullable
               as double,
+      channel: null == channel
+          ? _value.channel
+          : channel // ignore: cast_nullable_to_non_nullable
+              as DownloadChannel,
+      downloadedBytes: null == downloadedBytes
+          ? _value.downloadedBytes
+          : downloadedBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBytes: null == totalBytes
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 
@@ -612,7 +713,12 @@ class __$$UpdateStateDownloadingImplCopyWithImpl<$Res>
 
 class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
   const _$UpdateStateDownloadingImpl(
-      {required this.info, required this.progress, required this.speed});
+      {required this.info,
+      required this.progress,
+      required this.speed,
+      required this.channel,
+      this.downloadedBytes = 0,
+      this.totalBytes = 0});
 
   @override
   final UpdateInfo info;
@@ -622,10 +728,18 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
   /// Download speed in bytes/second.
   @override
   final double speed;
+  @override
+  final DownloadChannel channel;
+  @override
+  @JsonKey()
+  final int downloadedBytes;
+  @override
+  @JsonKey()
+  final int totalBytes;
 
   @override
   String toString() {
-    return 'UpdateState.downloading(info: $info, progress: $progress, speed: $speed)';
+    return 'UpdateState.downloading(info: $info, progress: $progress, speed: $speed, channel: $channel, downloadedBytes: $downloadedBytes, totalBytes: $totalBytes)';
   }
 
   @override
@@ -636,11 +750,17 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
             (identical(other.info, info) || other.info == info) &&
             (identical(other.progress, progress) ||
                 other.progress == progress) &&
-            (identical(other.speed, speed) || other.speed == speed));
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.channel, channel) || other.channel == channel) &&
+            (identical(other.downloadedBytes, downloadedBytes) ||
+                other.downloadedBytes == downloadedBytes) &&
+            (identical(other.totalBytes, totalBytes) ||
+                other.totalBytes == totalBytes));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, info, progress, speed);
+  int get hashCode => Object.hash(
+      runtimeType, info, progress, speed, channel, downloadedBytes, totalBytes);
 
   /// Create a copy of UpdateState
   /// with the given fields replaced by the non-null parameter values.
@@ -657,12 +777,22 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
-    return downloading(info, progress, speed);
+    return downloading(
+        info, progress, speed, channel, downloadedBytes, totalBytes);
   }
 
   @override
@@ -671,12 +801,17 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
-    return downloading?.call(info, progress, speed);
+    return downloading?.call(
+        info, progress, speed, channel, downloadedBytes, totalBytes);
   }
 
   @override
@@ -685,14 +820,19 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
     if (downloading != null) {
-      return downloading(info, progress, speed);
+      return downloading(
+          info, progress, speed, channel, downloadedBytes, totalBytes);
     }
     return orElse();
   }
@@ -704,6 +844,7 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -717,6 +858,7 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -730,6 +872,7 @@ class _$UpdateStateDownloadingImpl implements UpdateStateDownloading {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -745,19 +888,296 @@ abstract class UpdateStateDownloading implements UpdateState {
   const factory UpdateStateDownloading(
       {required final UpdateInfo info,
       required final double progress,
-      required final double speed}) = _$UpdateStateDownloadingImpl;
+      required final double speed,
+      required final DownloadChannel channel,
+      final int downloadedBytes,
+      final int totalBytes}) = _$UpdateStateDownloadingImpl;
 
   UpdateInfo get info;
   double get progress;
 
   /// Download speed in bytes/second.
   double get speed;
+  DownloadChannel get channel;
+  int get downloadedBytes;
+  int get totalBytes;
 
   /// Create a copy of UpdateState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UpdateStateDownloadingImplCopyWith<_$UpdateStateDownloadingImpl>
       get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$UpdateStatePausedImplCopyWith<$Res> {
+  factory _$$UpdateStatePausedImplCopyWith(_$UpdateStatePausedImpl value,
+          $Res Function(_$UpdateStatePausedImpl) then) =
+      __$$UpdateStatePausedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {UpdateInfo info,
+      double progress,
+      DownloadChannel channel,
+      int downloadedBytes,
+      int totalBytes,
+      String localPath});
+
+  $UpdateInfoCopyWith<$Res> get info;
+}
+
+/// @nodoc
+class __$$UpdateStatePausedImplCopyWithImpl<$Res>
+    extends _$UpdateStateCopyWithImpl<$Res, _$UpdateStatePausedImpl>
+    implements _$$UpdateStatePausedImplCopyWith<$Res> {
+  __$$UpdateStatePausedImplCopyWithImpl(_$UpdateStatePausedImpl _value,
+      $Res Function(_$UpdateStatePausedImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of UpdateState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? info = null,
+    Object? progress = null,
+    Object? channel = null,
+    Object? downloadedBytes = null,
+    Object? totalBytes = null,
+    Object? localPath = null,
+  }) {
+    return _then(_$UpdateStatePausedImpl(
+      info: null == info
+          ? _value.info
+          : info // ignore: cast_nullable_to_non_nullable
+              as UpdateInfo,
+      progress: null == progress
+          ? _value.progress
+          : progress // ignore: cast_nullable_to_non_nullable
+              as double,
+      channel: null == channel
+          ? _value.channel
+          : channel // ignore: cast_nullable_to_non_nullable
+              as DownloadChannel,
+      downloadedBytes: null == downloadedBytes
+          ? _value.downloadedBytes
+          : downloadedBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBytes: null == totalBytes
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
+      localPath: null == localPath
+          ? _value.localPath
+          : localPath // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+
+  /// Create a copy of UpdateState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UpdateInfoCopyWith<$Res> get info {
+    return $UpdateInfoCopyWith<$Res>(_value.info, (value) {
+      return _then(_value.copyWith(info: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _$UpdateStatePausedImpl implements UpdateStatePaused {
+  const _$UpdateStatePausedImpl(
+      {required this.info,
+      required this.progress,
+      required this.channel,
+      required this.downloadedBytes,
+      required this.totalBytes,
+      required this.localPath});
+
+  @override
+  final UpdateInfo info;
+  @override
+  final double progress;
+  @override
+  final DownloadChannel channel;
+  @override
+  final int downloadedBytes;
+  @override
+  final int totalBytes;
+  @override
+  final String localPath;
+
+  @override
+  String toString() {
+    return 'UpdateState.paused(info: $info, progress: $progress, channel: $channel, downloadedBytes: $downloadedBytes, totalBytes: $totalBytes, localPath: $localPath)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UpdateStatePausedImpl &&
+            (identical(other.info, info) || other.info == info) &&
+            (identical(other.progress, progress) ||
+                other.progress == progress) &&
+            (identical(other.channel, channel) || other.channel == channel) &&
+            (identical(other.downloadedBytes, downloadedBytes) ||
+                other.downloadedBytes == downloadedBytes) &&
+            (identical(other.totalBytes, totalBytes) ||
+                other.totalBytes == totalBytes) &&
+            (identical(other.localPath, localPath) ||
+                other.localPath == localPath));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, info, progress, channel,
+      downloadedBytes, totalBytes, localPath);
+
+  /// Create a copy of UpdateState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UpdateStatePausedImplCopyWith<_$UpdateStatePausedImpl> get copyWith =>
+      __$$UpdateStatePausedImplCopyWithImpl<_$UpdateStatePausedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() idle,
+    required TResult Function() checking,
+    required TResult Function(UpdateInfo info) available,
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
+        downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
+    required TResult Function(UpdateInfo info, String localPath) readyToInstall,
+    required TResult Function(String message) error,
+  }) {
+    return paused(
+        info, progress, channel, downloadedBytes, totalBytes, localPath);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? idle,
+    TResult? Function()? checking,
+    TResult? Function(UpdateInfo info)? available,
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
+        downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
+    TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
+    TResult? Function(String message)? error,
+  }) {
+    return paused?.call(
+        info, progress, channel, downloadedBytes, totalBytes, localPath);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? idle,
+    TResult Function()? checking,
+    TResult Function(UpdateInfo info)? available,
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
+        downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
+    TResult Function(UpdateInfo info, String localPath)? readyToInstall,
+    TResult Function(String message)? error,
+    required TResult orElse(),
+  }) {
+    if (paused != null) {
+      return paused(
+          info, progress, channel, downloadedBytes, totalBytes, localPath);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UpdateStateIdle value) idle,
+    required TResult Function(UpdateStateChecking value) checking,
+    required TResult Function(UpdateStateAvailable value) available,
+    required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
+    required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
+    required TResult Function(UpdateStateError value) error,
+  }) {
+    return paused(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(UpdateStateIdle value)? idle,
+    TResult? Function(UpdateStateChecking value)? checking,
+    TResult? Function(UpdateStateAvailable value)? available,
+    TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
+    TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
+    TResult? Function(UpdateStateError value)? error,
+  }) {
+    return paused?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UpdateStateIdle value)? idle,
+    TResult Function(UpdateStateChecking value)? checking,
+    TResult Function(UpdateStateAvailable value)? available,
+    TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
+    TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
+    TResult Function(UpdateStateError value)? error,
+    required TResult orElse(),
+  }) {
+    if (paused != null) {
+      return paused(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UpdateStatePaused implements UpdateState {
+  const factory UpdateStatePaused(
+      {required final UpdateInfo info,
+      required final double progress,
+      required final DownloadChannel channel,
+      required final int downloadedBytes,
+      required final int totalBytes,
+      required final String localPath}) = _$UpdateStatePausedImpl;
+
+  UpdateInfo get info;
+  double get progress;
+  DownloadChannel get channel;
+  int get downloadedBytes;
+  int get totalBytes;
+  String get localPath;
+
+  /// Create a copy of UpdateState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UpdateStatePausedImplCopyWith<_$UpdateStatePausedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -856,8 +1276,17 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
@@ -870,8 +1299,12 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
@@ -884,8 +1317,12 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -903,6 +1340,7 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -916,6 +1354,7 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -929,6 +1368,7 @@ class _$UpdateStateReadyToInstallImpl implements UpdateStateReadyToInstall {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),
@@ -1027,8 +1467,17 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     required TResult Function() idle,
     required TResult Function() checking,
     required TResult Function(UpdateInfo info) available,
-    required TResult Function(UpdateInfo info, double progress, double speed)
+    required TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)
         downloading,
+    required TResult Function(
+            UpdateInfo info,
+            double progress,
+            DownloadChannel channel,
+            int downloadedBytes,
+            int totalBytes,
+            String localPath)
+        paused,
     required TResult Function(UpdateInfo info, String localPath) readyToInstall,
     required TResult Function(String message) error,
   }) {
@@ -1041,8 +1490,12 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     TResult? Function()? idle,
     TResult? Function()? checking,
     TResult? Function(UpdateInfo info)? available,
-    TResult? Function(UpdateInfo info, double progress, double speed)?
+    TResult? Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult? Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult? Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult? Function(String message)? error,
   }) {
@@ -1055,8 +1508,12 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     TResult Function()? idle,
     TResult Function()? checking,
     TResult Function(UpdateInfo info)? available,
-    TResult Function(UpdateInfo info, double progress, double speed)?
+    TResult Function(UpdateInfo info, double progress, double speed,
+            DownloadChannel channel, int downloadedBytes, int totalBytes)?
         downloading,
+    TResult Function(UpdateInfo info, double progress, DownloadChannel channel,
+            int downloadedBytes, int totalBytes, String localPath)?
+        paused,
     TResult Function(UpdateInfo info, String localPath)? readyToInstall,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -1074,6 +1531,7 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     required TResult Function(UpdateStateChecking value) checking,
     required TResult Function(UpdateStateAvailable value) available,
     required TResult Function(UpdateStateDownloading value) downloading,
+    required TResult Function(UpdateStatePaused value) paused,
     required TResult Function(UpdateStateReadyToInstall value) readyToInstall,
     required TResult Function(UpdateStateError value) error,
   }) {
@@ -1087,6 +1545,7 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     TResult? Function(UpdateStateChecking value)? checking,
     TResult? Function(UpdateStateAvailable value)? available,
     TResult? Function(UpdateStateDownloading value)? downloading,
+    TResult? Function(UpdateStatePaused value)? paused,
     TResult? Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult? Function(UpdateStateError value)? error,
   }) {
@@ -1100,6 +1559,7 @@ class _$UpdateStateErrorImpl implements UpdateStateError {
     TResult Function(UpdateStateChecking value)? checking,
     TResult Function(UpdateStateAvailable value)? available,
     TResult Function(UpdateStateDownloading value)? downloading,
+    TResult Function(UpdateStatePaused value)? paused,
     TResult Function(UpdateStateReadyToInstall value)? readyToInstall,
     TResult Function(UpdateStateError value)? error,
     required TResult orElse(),

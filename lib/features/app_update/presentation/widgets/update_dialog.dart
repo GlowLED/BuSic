@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/update_notifier.dart';
+import '../../domain/models/download_channel.dart';
 
-/// Dialog that shows update information and manages the update flow.
+/// Dialog that shows update information (passive notification).
+///
+/// V2: Simplified to pure notification — download happens in settings page.
+/// Force updates still provide in-dialog download.
 class UpdateDialog extends ConsumerWidget {
   const UpdateDialog({super.key});
 
@@ -81,15 +85,29 @@ class UpdateDialog extends ConsumerWidget {
               child: Text(l10n.updateLater),
             ),
           ],
-          FilledButton(
-            onPressed: () {
-              ref.read(updateNotifierProvider.notifier).startDownload();
-            },
-            child: Text(l10n.updateNow),
-          ),
+          if (info.isForceUpdate)
+            // Force update: download directly in dialog
+            FilledButton(
+              onPressed: () {
+                ref
+                    .read(updateNotifierProvider.notifier)
+                    .startDownloadWithChannel(DownloadChannel.github);
+              },
+              child: Text(l10n.updateNow),
+            )
+          else
+            // Normal update: navigate to settings
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to settings — caller handles this
+              },
+              child: Text(l10n.goToSettings),
+            ),
         ],
       ),
-      downloading: (info, progress, speed) => AlertDialog(
+      downloading: (info, progress, speed, channel, downloadedBytes, totalBytes) =>
+          AlertDialog(
         title: Text(l10n.downloading),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -116,6 +134,33 @@ class UpdateDialog extends ConsumerWidget {
             ),
         ],
       ),
+      paused: (info, progress, channel, downloadedBytes, totalBytes, localPath) =>
+          AlertDialog(
+        title: Text(l10n.downloadPaused),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Opacity(
+              opacity: 0.5,
+              child: LinearProgressIndicator(value: progress),
+            ),
+            const SizedBox(height: 8),
+            Text('${(progress * 100).toStringAsFixed(0)}%'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(updateNotifierProvider.notifier).resumeDownload();
+            },
+            child: Text(l10n.tapToResume),
+          ),
+        ],
+      ),
       readyToInstall: (info, localPath) => AlertDialog(
         title: Text(l10n.downloadComplete),
         content: Text(l10n.installing),
@@ -124,7 +169,7 @@ class UpdateDialog extends ConsumerWidget {
             onPressed: () {
               ref.read(updateNotifierProvider.notifier).applyUpdate();
             },
-            child: Text(l10n.updateNow),
+            child: Text(l10n.installUpdate),
           ),
         ],
       ),

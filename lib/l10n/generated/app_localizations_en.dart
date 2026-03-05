@@ -498,6 +498,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdateMessage => 'This version is no longer supported. Please update to continue using BuSic.';
 
   @override
+  String get downloadLatestVersion => 'Download latest version';
+
+  @override
+  String get selectDownloadChannel => 'Select download channel';
+
+  @override
+  String get channelGithub => 'GitHub';
+
+  @override
+  String get channelGithubDesc => 'Official source, may require proxy';
+
+  @override
+  String get channelLanzou => 'Lanzou Cloud';
+
+  @override
+  String get channelLanzouDesc => 'Domestic high-speed download';
+
+  @override
+  String get channelNotAvailable => 'Not available for this version';
+
+  @override
+  String get downloadPaused => 'Download paused';
+
+  @override
+  String get tapToPause => 'Tap to pause';
+
+  @override
+  String get tapToResume => 'Tap to resume';
+
+  @override
+  String get longPressToCancel => 'Long press to cancel';
+
+  @override
+  String get cancelDownloadConfirm => 'Cancel the current download?';
+
+  @override
+  String get rollbackVersion => 'Rollback to previous version';
+
+  @override
+  String get selectTargetVersion => 'Select target version';
+
+  @override
+  String get noHistoryVersions => 'No history versions available';
+
+  @override
+  String get installUpdate => 'Install update';
+
+  @override
+  String get downloadCompleteReady => 'Download complete, ready to install';
+
+  @override
+  String get retryDownload => 'Retry download';
+
+  @override
+  String get goToSettings => 'Go to Settings';
+
+  @override
   String get myFavorites => 'My Favorites';
 
   @override
@@ -666,4 +723,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorCyan => 'Cyan';
+
+  @override
+  String get lyricsTitle => 'Lyrics';
+
+  @override
+  String get noLyrics => 'No lyrics available';
+
+  @override
+  String get lyricsLoading => 'Loading lyrics...';
+
+  @override
+  String get lyricsError => 'Failed to load lyrics';
 }

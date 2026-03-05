@@ -17,6 +17,15 @@ const kMetadataUrls = [
   'https://raw.githubusercontent.com/GlowLED/BuSic/main/pubspec.yaml',
 ];
 
+/// Full URLs for fetching the versions manifest JSON (new V2 source of truth).
+const kManifestUrls = [
+  'https://cdn.jsdelivr.net/gh/GlowLED/BuSic@main/versions-manifest.json',
+  'https://gh-proxy.com/https://raw.githubusercontent.com/GlowLED/BuSic/main/versions-manifest.json',
+  'https://ghfast.top/https://raw.githubusercontent.com/GlowLED/BuSic/main/versions-manifest.json',
+  'https://ghproxy.net/https://raw.githubusercontent.com/GlowLED/BuSic/main/versions-manifest.json',
+  'https://raw.githubusercontent.com/GlowLED/BuSic/main/versions-manifest.json',
+];
+
 /// GitHub proxy endpoints for release asset downloads.
 ///
 /// Direct github.com first (fastest for international users).

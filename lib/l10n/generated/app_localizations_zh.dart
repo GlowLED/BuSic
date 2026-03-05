@@ -498,6 +498,63 @@ class AppLocalizationsZh extends AppLocalizations {
   String get forceUpdateMessage => '当前版本已不受支持，请更新后继续使用 BuSic。';
 
   @override
+  String get downloadLatestVersion => '下载最新版本';
+
+  @override
+  String get selectDownloadChannel => '选择下载渠道';
+
+  @override
+  String get channelGithub => 'GitHub';
+
+  @override
+  String get channelGithubDesc => '官方源，可能需要代理';
+
+  @override
+  String get channelLanzou => '蓝奏云';
+
+  @override
+  String get channelLanzouDesc => '国内高速下载';
+
+  @override
+  String get channelNotAvailable => '该版本暂无此渠道';
+
+  @override
+  String get downloadPaused => '下载已暂停';
+
+  @override
+  String get tapToPause => '点击暂停';
+
+  @override
+  String get tapToResume => '点击继续';
+
+  @override
+  String get longPressToCancel => '长按取消下载';
+
+  @override
+  String get cancelDownloadConfirm => '确定取消当前下载吗？';
+
+  @override
+  String get rollbackVersion => '回退到历史版本';
+
+  @override
+  String get selectTargetVersion => '选择目标版本';
+
+  @override
+  String get noHistoryVersions => '暂无可用的历史版本';
+
+  @override
+  String get installUpdate => '安装更新';
+
+  @override
+  String get downloadCompleteReady => '下载完成，可以安装';
+
+  @override
+  String get retryDownload => '重试下载';
+
+  @override
+  String get goToSettings => '前往设置';
+
+  @override
   String get myFavorites => '我喜欢';
 
   @override
@@ -666,4 +723,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get colorCyan => '蓝绿';
+
+  @override
+  String get lyricsTitle => '歌词';
+
+  @override
+  String get noLyrics => '暂无歌词';
+
+  @override
+  String get lyricsLoading => '歌词加载中...';
+
+  @override
+  String get lyricsError => '歌词加载失败';
 }

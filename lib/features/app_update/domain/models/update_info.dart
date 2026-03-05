@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'app_version.dart';
+import 'download_channel.dart';
 
 part 'update_info.freezed.dart';
 
@@ -20,13 +21,16 @@ class UpdateInfo with _$UpdateInfo {
     /// Whether this update is mandatory (current version below min_supported).
     required bool isForceUpdate,
 
-    /// Download URL for the platform-specific asset.
-    required String downloadUrl,
-
     /// File name of the asset (e.g. `busic-android.apk`).
     required String assetName,
 
     /// Optional link to external release notes.
     String? releaseNotesUrl,
+
+    /// 各渠道下载 URL
+    required Map<DownloadChannel, String> downloadUrls,
+
+    /// 蓝奏云密码（如有）
+    String? lanzouPassword,
   }) = _UpdateInfo;
 }

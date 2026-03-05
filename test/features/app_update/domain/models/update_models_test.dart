@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:busic/features/app_update/domain/models/app_version.dart';
+import 'package:busic/features/app_update/domain/models/download_channel.dart';
 import 'package:busic/features/app_update/domain/models/update_info.dart';
 import 'package:busic/features/app_update/domain/models/update_state.dart';
 
@@ -14,7 +15,7 @@ void main() {
         currentVersion: AppVersion.parse('0.9.0+1'),
         changelog: '修复若干 bug',
         isForceUpdate: false,
-        downloadUrl: 'https://example.com/busic.apk',
+        downloadUrls: {DownloadChannel.github: 'https://example.com/busic.apk'},
         assetName: 'busic-android.apk',
       );
 
@@ -31,7 +32,7 @@ void main() {
         currentVersion: AppVersion.parse('0.9.0'),
         changelog: 'old',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
       );
 
@@ -44,7 +45,7 @@ void main() {
       expect(updated.isForceUpdate, true);
       // 其他字段不变
       expect(updated.latestVersion, info.latestVersion);
-      expect(updated.downloadUrl, 'url');
+      expect(updated.downloadUrls[DownloadChannel.github], 'url');
     });
 
     test('releaseNotesUrl 可选', () {
@@ -53,7 +54,7 @@ void main() {
         currentVersion: AppVersion.parse('0.9.0'),
         changelog: '',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
         releaseNotesUrl: 'https://example.com/notes',
       );
@@ -81,7 +82,7 @@ void main() {
         currentVersion: AppVersion.parse('1.0.0'),
         changelog: 'New features',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
       );
 
@@ -96,7 +97,7 @@ void main() {
         currentVersion: AppVersion.parse('1.0.0'),
         changelog: '',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
       );
 
@@ -104,6 +105,7 @@ void main() {
         info: info,
         progress: 0.5,
         speed: 1024 * 1024,
+        channel: DownloadChannel.github,
       );
 
       expect(state, isA<UpdateStateDownloading>());
@@ -112,13 +114,38 @@ void main() {
       expect(dl.speed, 1024 * 1024);
     });
 
+    test('paused 状态', () {
+      final info = UpdateInfo(
+        latestVersion: AppVersion.parse('2.0.0'),
+        currentVersion: AppVersion.parse('1.0.0'),
+        changelog: '',
+        isForceUpdate: false,
+        downloadUrls: {DownloadChannel.github: 'url'},
+        assetName: 'asset',
+      );
+
+      final state = UpdateState.paused(
+        info: info,
+        progress: 0.5,
+        channel: DownloadChannel.github,
+        downloadedBytes: 500,
+        totalBytes: 1000,
+        localPath: '/tmp/busic.apk',
+      );
+
+      expect(state, isA<UpdateStatePaused>());
+      final p = state as UpdateStatePaused;
+      expect(p.progress, 0.5);
+      expect(p.downloadedBytes, 500);
+    });
+
     test('readyToInstall 状态携带本地路径', () {
       final info = UpdateInfo(
         latestVersion: AppVersion.parse('2.0.0'),
         currentVersion: AppVersion.parse('1.0.0'),
         changelog: '',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
       );
 
@@ -143,7 +170,7 @@ void main() {
         currentVersion: AppVersion.parse('1.0.0'),
         changelog: '',
         isForceUpdate: false,
-        downloadUrl: 'url',
+        downloadUrls: {DownloadChannel.github: 'url'},
         assetName: 'asset',
       );
 
@@ -151,7 +178,20 @@ void main() {
         const UpdateState.idle(),
         const UpdateState.checking(),
         UpdateState.available(info),
-        UpdateState.downloading(info: info, progress: 0.3, speed: 100),
+        UpdateState.downloading(
+          info: info,
+          progress: 0.3,
+          speed: 100,
+          channel: DownloadChannel.github,
+        ),
+        UpdateState.paused(
+          info: info,
+          progress: 0.3,
+          channel: DownloadChannel.github,
+          downloadedBytes: 300,
+          totalBytes: 1000,
+          localPath: '/tmp/f',
+        ),
         UpdateState.readyToInstall(info: info, localPath: '/tmp/f'),
         const UpdateState.error('err'),
       ];
@@ -160,7 +200,8 @@ void main() {
             idle: () => 'idle',
             checking: () => 'checking',
             available: (_) => 'available',
-            downloading: (_, __, ___) => 'downloading',
+            downloading: (_, __, ___, ____, _____, ______) => 'downloading',
+            paused: (_, __, ___, ____, _____, ______) => 'paused',
             readyToInstall: (_, __) => 'readyToInstall',
             error: (_) => 'error',
           ));
@@ -170,6 +211,7 @@ void main() {
         'checking',
         'available',
         'downloading',
+        'paused',
         'readyToInstall',
         'error',
       ]);

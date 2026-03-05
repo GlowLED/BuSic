@@ -28,14 +28,18 @@ mixin _$UpdateInfo {
   /// Whether this update is mandatory (current version below min_supported).
   bool get isForceUpdate => throw _privateConstructorUsedError;
 
-  /// Download URL for the platform-specific asset.
-  String get downloadUrl => throw _privateConstructorUsedError;
-
   /// File name of the asset (e.g. `busic-android.apk`).
   String get assetName => throw _privateConstructorUsedError;
 
   /// Optional link to external release notes.
   String? get releaseNotesUrl => throw _privateConstructorUsedError;
+
+  /// 各渠道下载 URL
+  Map<DownloadChannel, String> get downloadUrls =>
+      throw _privateConstructorUsedError;
+
+  /// 蓝奏云密码（如有）
+  String? get lanzouPassword => throw _privateConstructorUsedError;
 
   /// Create a copy of UpdateInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -55,9 +59,10 @@ abstract class $UpdateInfoCopyWith<$Res> {
       AppVersion currentVersion,
       String changelog,
       bool isForceUpdate,
-      String downloadUrl,
       String assetName,
-      String? releaseNotesUrl});
+      String? releaseNotesUrl,
+      Map<DownloadChannel, String> downloadUrls,
+      String? lanzouPassword});
 }
 
 /// @nodoc
@@ -79,9 +84,10 @@ class _$UpdateInfoCopyWithImpl<$Res, $Val extends UpdateInfo>
     Object? currentVersion = null,
     Object? changelog = null,
     Object? isForceUpdate = null,
-    Object? downloadUrl = null,
     Object? assetName = null,
     Object? releaseNotesUrl = freezed,
+    Object? downloadUrls = null,
+    Object? lanzouPassword = freezed,
   }) {
     return _then(_value.copyWith(
       latestVersion: null == latestVersion
@@ -100,10 +106,6 @@ class _$UpdateInfoCopyWithImpl<$Res, $Val extends UpdateInfo>
           ? _value.isForceUpdate
           : isForceUpdate // ignore: cast_nullable_to_non_nullable
               as bool,
-      downloadUrl: null == downloadUrl
-          ? _value.downloadUrl
-          : downloadUrl // ignore: cast_nullable_to_non_nullable
-              as String,
       assetName: null == assetName
           ? _value.assetName
           : assetName // ignore: cast_nullable_to_non_nullable
@@ -111,6 +113,14 @@ class _$UpdateInfoCopyWithImpl<$Res, $Val extends UpdateInfo>
       releaseNotesUrl: freezed == releaseNotesUrl
           ? _value.releaseNotesUrl
           : releaseNotesUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      downloadUrls: null == downloadUrls
+          ? _value.downloadUrls
+          : downloadUrls // ignore: cast_nullable_to_non_nullable
+              as Map<DownloadChannel, String>,
+      lanzouPassword: freezed == lanzouPassword
+          ? _value.lanzouPassword
+          : lanzouPassword // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -129,9 +139,10 @@ abstract class _$$UpdateInfoImplCopyWith<$Res>
       AppVersion currentVersion,
       String changelog,
       bool isForceUpdate,
-      String downloadUrl,
       String assetName,
-      String? releaseNotesUrl});
+      String? releaseNotesUrl,
+      Map<DownloadChannel, String> downloadUrls,
+      String? lanzouPassword});
 }
 
 /// @nodoc
@@ -151,9 +162,10 @@ class __$$UpdateInfoImplCopyWithImpl<$Res>
     Object? currentVersion = null,
     Object? changelog = null,
     Object? isForceUpdate = null,
-    Object? downloadUrl = null,
     Object? assetName = null,
     Object? releaseNotesUrl = freezed,
+    Object? downloadUrls = null,
+    Object? lanzouPassword = freezed,
   }) {
     return _then(_$UpdateInfoImpl(
       latestVersion: null == latestVersion
@@ -172,10 +184,6 @@ class __$$UpdateInfoImplCopyWithImpl<$Res>
           ? _value.isForceUpdate
           : isForceUpdate // ignore: cast_nullable_to_non_nullable
               as bool,
-      downloadUrl: null == downloadUrl
-          ? _value.downloadUrl
-          : downloadUrl // ignore: cast_nullable_to_non_nullable
-              as String,
       assetName: null == assetName
           ? _value.assetName
           : assetName // ignore: cast_nullable_to_non_nullable
@@ -183,6 +191,14 @@ class __$$UpdateInfoImplCopyWithImpl<$Res>
       releaseNotesUrl: freezed == releaseNotesUrl
           ? _value.releaseNotesUrl
           : releaseNotesUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      downloadUrls: null == downloadUrls
+          ? _value._downloadUrls
+          : downloadUrls // ignore: cast_nullable_to_non_nullable
+              as Map<DownloadChannel, String>,
+      lanzouPassword: freezed == lanzouPassword
+          ? _value.lanzouPassword
+          : lanzouPassword // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -196,9 +212,11 @@ class _$UpdateInfoImpl implements _UpdateInfo {
       required this.currentVersion,
       required this.changelog,
       required this.isForceUpdate,
-      required this.downloadUrl,
       required this.assetName,
-      this.releaseNotesUrl});
+      this.releaseNotesUrl,
+      required final Map<DownloadChannel, String> downloadUrls,
+      this.lanzouPassword})
+      : _downloadUrls = downloadUrls;
 
   /// The latest version available on GitHub.
   @override
@@ -216,10 +234,6 @@ class _$UpdateInfoImpl implements _UpdateInfo {
   @override
   final bool isForceUpdate;
 
-  /// Download URL for the platform-specific asset.
-  @override
-  final String downloadUrl;
-
   /// File name of the asset (e.g. `busic-android.apk`).
   @override
   final String assetName;
@@ -228,9 +242,24 @@ class _$UpdateInfoImpl implements _UpdateInfo {
   @override
   final String? releaseNotesUrl;
 
+  /// 各渠道下载 URL
+  final Map<DownloadChannel, String> _downloadUrls;
+
+  /// 各渠道下载 URL
+  @override
+  Map<DownloadChannel, String> get downloadUrls {
+    if (_downloadUrls is EqualUnmodifiableMapView) return _downloadUrls;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_downloadUrls);
+  }
+
+  /// 蓝奏云密码（如有）
+  @override
+  final String? lanzouPassword;
+
   @override
   String toString() {
-    return 'UpdateInfo(latestVersion: $latestVersion, currentVersion: $currentVersion, changelog: $changelog, isForceUpdate: $isForceUpdate, downloadUrl: $downloadUrl, assetName: $assetName, releaseNotesUrl: $releaseNotesUrl)';
+    return 'UpdateInfo(latestVersion: $latestVersion, currentVersion: $currentVersion, changelog: $changelog, isForceUpdate: $isForceUpdate, assetName: $assetName, releaseNotesUrl: $releaseNotesUrl, downloadUrls: $downloadUrls, lanzouPassword: $lanzouPassword)';
   }
 
   @override
@@ -246,17 +275,27 @@ class _$UpdateInfoImpl implements _UpdateInfo {
                 other.changelog == changelog) &&
             (identical(other.isForceUpdate, isForceUpdate) ||
                 other.isForceUpdate == isForceUpdate) &&
-            (identical(other.downloadUrl, downloadUrl) ||
-                other.downloadUrl == downloadUrl) &&
             (identical(other.assetName, assetName) ||
                 other.assetName == assetName) &&
             (identical(other.releaseNotesUrl, releaseNotesUrl) ||
-                other.releaseNotesUrl == releaseNotesUrl));
+                other.releaseNotesUrl == releaseNotesUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._downloadUrls, _downloadUrls) &&
+            (identical(other.lanzouPassword, lanzouPassword) ||
+                other.lanzouPassword == lanzouPassword));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, latestVersion, currentVersion,
-      changelog, isForceUpdate, downloadUrl, assetName, releaseNotesUrl);
+  int get hashCode => Object.hash(
+      runtimeType,
+      latestVersion,
+      currentVersion,
+      changelog,
+      isForceUpdate,
+      assetName,
+      releaseNotesUrl,
+      const DeepCollectionEquality().hash(_downloadUrls),
+      lanzouPassword);
 
   /// Create a copy of UpdateInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -273,9 +312,10 @@ abstract class _UpdateInfo implements UpdateInfo {
       required final AppVersion currentVersion,
       required final String changelog,
       required final bool isForceUpdate,
-      required final String downloadUrl,
       required final String assetName,
-      final String? releaseNotesUrl}) = _$UpdateInfoImpl;
+      final String? releaseNotesUrl,
+      required final Map<DownloadChannel, String> downloadUrls,
+      final String? lanzouPassword}) = _$UpdateInfoImpl;
 
   /// The latest version available on GitHub.
   @override
@@ -293,10 +333,6 @@ abstract class _UpdateInfo implements UpdateInfo {
   @override
   bool get isForceUpdate;
 
-  /// Download URL for the platform-specific asset.
-  @override
-  String get downloadUrl;
-
   /// File name of the asset (e.g. `busic-android.apk`).
   @override
   String get assetName;
@@ -304,6 +340,14 @@ abstract class _UpdateInfo implements UpdateInfo {
   /// Optional link to external release notes.
   @override
   String? get releaseNotesUrl;
+
+  /// 各渠道下载 URL
+  @override
+  Map<DownloadChannel, String> get downloadUrls;
+
+  /// 蓝奏云密码（如有）
+  @override
+  String? get lanzouPassword;
 
   /// Create a copy of UpdateInfo
   /// with the given fields replaced by the non-null parameter values.
