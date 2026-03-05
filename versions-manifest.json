@@ -1,7 +1,28 @@
 {
-  "latest": "0.3.3",
+  "latest": "0.3.4",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.3.4",
+      "build": 10,
+      "date": "2026-03-06",
+      "changelog": "修复蓝奏云下载有关 Bug",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.4/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.4/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.4/busic-linux-x64.tar.gz"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.4/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.3.3",
       "build": 9,

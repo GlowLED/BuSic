@@ -174,9 +174,14 @@ def step_analyze():
     """步骤 3：静态分析。"""
     header('步骤 3/7  静态分析')
 
-    result = run('flutter analyze --no-fatal-infos', check=False)
-    if result.returncode != 0:
-        error('静态分析未通过，请先修复问题')
+    result = run('flutter analyze', capture=True, check=False)
+
+    # 明确要求 0 issue：分析命令成功且输出包含 No issues found。
+    analyze_output = f'{result.stdout}\n{result.stderr}'
+    if result.returncode != 0 or 'No issues found' not in analyze_output:
+        error('静态分析未通过（要求 0 issue），请先修复问题')
+        if analyze_output.strip():
+            print(analyze_output)
         sys.exit(1)
     success('静态分析通过')
 

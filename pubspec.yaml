@@ -1,7 +1,7 @@
 name: busic
 description: A modern cross-platform music player powered by Bilibili.
 publish_to: 'none'
-version: 0.3.3+9
+version: 0.3.4+10
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
