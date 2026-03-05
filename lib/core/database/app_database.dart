@@ -9,6 +9,7 @@ import 'tables/playlists.dart';
 import 'tables/playlist_songs.dart';
 import 'tables/download_tasks.dart';
 import 'tables/user_sessions.dart';
+import 'tables/subtitles.dart';
 
 part 'app_database.g.dart';
 
@@ -22,6 +23,7 @@ part 'app_database.g.dart';
   PlaylistSongs,
   DownloadTasks,
   UserSessions,
+  Subtitles,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -30,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -44,6 +46,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 3) {
           await m.addColumn(playlists, playlists.isFavorite);
+        }
+        if (from < 4) {
+          await m.createTable(subtitles);
         }
       },
     );

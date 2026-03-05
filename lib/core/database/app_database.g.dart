@@ -2005,6 +2005,365 @@ class UserSessionsCompanion extends UpdateCompanion<UserSession> {
   }
 }
 
+class $SubtitlesTable extends Subtitles
+    with TableInfo<$SubtitlesTable, Subtitle> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SubtitlesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _bvidMeta = const VerificationMeta('bvid');
+  @override
+  late final GeneratedColumn<String> bvid = GeneratedColumn<String>(
+      'bvid', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _cidMeta = const VerificationMeta('cid');
+  @override
+  late final GeneratedColumn<int> cid = GeneratedColumn<int>(
+      'cid', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _subtitleJsonMeta =
+      const VerificationMeta('subtitleJson');
+  @override
+  late final GeneratedColumn<String> subtitleJson = GeneratedColumn<String>(
+      'subtitle_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceTypeMeta =
+      const VerificationMeta('sourceType');
+  @override
+  late final GeneratedColumn<String> sourceType = GeneratedColumn<String>(
+      'source_type', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('ai'));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, bvid, cid, subtitleJson, sourceType, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'subtitles';
+  @override
+  VerificationContext validateIntegrity(Insertable<Subtitle> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bvid')) {
+      context.handle(
+          _bvidMeta, bvid.isAcceptableOrUnknown(data['bvid']!, _bvidMeta));
+    } else if (isInserting) {
+      context.missing(_bvidMeta);
+    }
+    if (data.containsKey('cid')) {
+      context.handle(
+          _cidMeta, cid.isAcceptableOrUnknown(data['cid']!, _cidMeta));
+    } else if (isInserting) {
+      context.missing(_cidMeta);
+    }
+    if (data.containsKey('subtitle_json')) {
+      context.handle(
+          _subtitleJsonMeta,
+          subtitleJson.isAcceptableOrUnknown(
+              data['subtitle_json']!, _subtitleJsonMeta));
+    } else if (isInserting) {
+      context.missing(_subtitleJsonMeta);
+    }
+    if (data.containsKey('source_type')) {
+      context.handle(
+          _sourceTypeMeta,
+          sourceType.isAcceptableOrUnknown(
+              data['source_type']!, _sourceTypeMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {bvid, cid},
+      ];
+  @override
+  Subtitle map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Subtitle(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      bvid: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}bvid'])!,
+      cid: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}cid'])!,
+      subtitleJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}subtitle_json'])!,
+      sourceType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source_type'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $SubtitlesTable createAlias(String alias) {
+    return $SubtitlesTable(attachedDatabase, alias);
+  }
+}
+
+class Subtitle extends DataClass implements Insertable<Subtitle> {
+  /// Auto-incrementing primary key.
+  final int id;
+
+  /// Bilibili BV number.
+  final String bvid;
+
+  /// Bilibili CID (page identifier).
+  final int cid;
+
+  /// Serialized subtitle data (JSON string of [SubtitleData]).
+  final String subtitleJson;
+
+  /// Source type: 'ai' or 'cc'.
+  final String sourceType;
+
+  /// Creation timestamp (Unix milliseconds).
+  final int createdAt;
+  const Subtitle(
+      {required this.id,
+      required this.bvid,
+      required this.cid,
+      required this.subtitleJson,
+      required this.sourceType,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bvid'] = Variable<String>(bvid);
+    map['cid'] = Variable<int>(cid);
+    map['subtitle_json'] = Variable<String>(subtitleJson);
+    map['source_type'] = Variable<String>(sourceType);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  SubtitlesCompanion toCompanion(bool nullToAbsent) {
+    return SubtitlesCompanion(
+      id: Value(id),
+      bvid: Value(bvid),
+      cid: Value(cid),
+      subtitleJson: Value(subtitleJson),
+      sourceType: Value(sourceType),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Subtitle.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Subtitle(
+      id: serializer.fromJson<int>(json['id']),
+      bvid: serializer.fromJson<String>(json['bvid']),
+      cid: serializer.fromJson<int>(json['cid']),
+      subtitleJson: serializer.fromJson<String>(json['subtitleJson']),
+      sourceType: serializer.fromJson<String>(json['sourceType']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bvid': serializer.toJson<String>(bvid),
+      'cid': serializer.toJson<int>(cid),
+      'subtitleJson': serializer.toJson<String>(subtitleJson),
+      'sourceType': serializer.toJson<String>(sourceType),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  Subtitle copyWith(
+          {int? id,
+          String? bvid,
+          int? cid,
+          String? subtitleJson,
+          String? sourceType,
+          int? createdAt}) =>
+      Subtitle(
+        id: id ?? this.id,
+        bvid: bvid ?? this.bvid,
+        cid: cid ?? this.cid,
+        subtitleJson: subtitleJson ?? this.subtitleJson,
+        sourceType: sourceType ?? this.sourceType,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  Subtitle copyWithCompanion(SubtitlesCompanion data) {
+    return Subtitle(
+      id: data.id.present ? data.id.value : this.id,
+      bvid: data.bvid.present ? data.bvid.value : this.bvid,
+      cid: data.cid.present ? data.cid.value : this.cid,
+      subtitleJson: data.subtitleJson.present
+          ? data.subtitleJson.value
+          : this.subtitleJson,
+      sourceType:
+          data.sourceType.present ? data.sourceType.value : this.sourceType,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Subtitle(')
+          ..write('id: $id, ')
+          ..write('bvid: $bvid, ')
+          ..write('cid: $cid, ')
+          ..write('subtitleJson: $subtitleJson, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, bvid, cid, subtitleJson, sourceType, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Subtitle &&
+          other.id == this.id &&
+          other.bvid == this.bvid &&
+          other.cid == this.cid &&
+          other.subtitleJson == this.subtitleJson &&
+          other.sourceType == this.sourceType &&
+          other.createdAt == this.createdAt);
+}
+
+class SubtitlesCompanion extends UpdateCompanion<Subtitle> {
+  final Value<int> id;
+  final Value<String> bvid;
+  final Value<int> cid;
+  final Value<String> subtitleJson;
+  final Value<String> sourceType;
+  final Value<int> createdAt;
+  const SubtitlesCompanion({
+    this.id = const Value.absent(),
+    this.bvid = const Value.absent(),
+    this.cid = const Value.absent(),
+    this.subtitleJson = const Value.absent(),
+    this.sourceType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  SubtitlesCompanion.insert({
+    this.id = const Value.absent(),
+    required String bvid,
+    required int cid,
+    required String subtitleJson,
+    this.sourceType = const Value.absent(),
+    required int createdAt,
+  })  : bvid = Value(bvid),
+        cid = Value(cid),
+        subtitleJson = Value(subtitleJson),
+        createdAt = Value(createdAt);
+  static Insertable<Subtitle> custom({
+    Expression<int>? id,
+    Expression<String>? bvid,
+    Expression<int>? cid,
+    Expression<String>? subtitleJson,
+    Expression<String>? sourceType,
+    Expression<int>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bvid != null) 'bvid': bvid,
+      if (cid != null) 'cid': cid,
+      if (subtitleJson != null) 'subtitle_json': subtitleJson,
+      if (sourceType != null) 'source_type': sourceType,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  SubtitlesCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? bvid,
+      Value<int>? cid,
+      Value<String>? subtitleJson,
+      Value<String>? sourceType,
+      Value<int>? createdAt}) {
+    return SubtitlesCompanion(
+      id: id ?? this.id,
+      bvid: bvid ?? this.bvid,
+      cid: cid ?? this.cid,
+      subtitleJson: subtitleJson ?? this.subtitleJson,
+      sourceType: sourceType ?? this.sourceType,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bvid.present) {
+      map['bvid'] = Variable<String>(bvid.value);
+    }
+    if (cid.present) {
+      map['cid'] = Variable<int>(cid.value);
+    }
+    if (subtitleJson.present) {
+      map['subtitle_json'] = Variable<String>(subtitleJson.value);
+    }
+    if (sourceType.present) {
+      map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubtitlesCompanion(')
+          ..write('id: $id, ')
+          ..write('bvid: $bvid, ')
+          ..write('cid: $cid, ')
+          ..write('subtitleJson: $subtitleJson, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2013,12 +2372,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PlaylistSongsTable playlistSongs = $PlaylistSongsTable(this);
   late final $DownloadTasksTable downloadTasks = $DownloadTasksTable(this);
   late final $UserSessionsTable userSessions = $UserSessionsTable(this);
+  late final $SubtitlesTable subtitles = $SubtitlesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [songs, playlists, playlistSongs, downloadTasks, userSessions];
+      [songs, playlists, playlistSongs, downloadTasks, userSessions, subtitles];
 }
 
 typedef $$SongsTableCreateCompanionBuilder = SongsCompanion Function({
@@ -3526,6 +3886,181 @@ typedef $$UserSessionsTableProcessedTableManager = ProcessedTableManager<
     ),
     UserSession,
     PrefetchHooks Function()>;
+typedef $$SubtitlesTableCreateCompanionBuilder = SubtitlesCompanion Function({
+  Value<int> id,
+  required String bvid,
+  required int cid,
+  required String subtitleJson,
+  Value<String> sourceType,
+  required int createdAt,
+});
+typedef $$SubtitlesTableUpdateCompanionBuilder = SubtitlesCompanion Function({
+  Value<int> id,
+  Value<String> bvid,
+  Value<int> cid,
+  Value<String> subtitleJson,
+  Value<String> sourceType,
+  Value<int> createdAt,
+});
+
+class $$SubtitlesTableFilterComposer
+    extends Composer<_$AppDatabase, $SubtitlesTable> {
+  $$SubtitlesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get bvid => $composableBuilder(
+      column: $table.bvid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get cid => $composableBuilder(
+      column: $table.cid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get subtitleJson => $composableBuilder(
+      column: $table.subtitleJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get sourceType => $composableBuilder(
+      column: $table.sourceType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$SubtitlesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SubtitlesTable> {
+  $$SubtitlesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get bvid => $composableBuilder(
+      column: $table.bvid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get cid => $composableBuilder(
+      column: $table.cid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get subtitleJson => $composableBuilder(
+      column: $table.subtitleJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get sourceType => $composableBuilder(
+      column: $table.sourceType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$SubtitlesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SubtitlesTable> {
+  $$SubtitlesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get bvid =>
+      $composableBuilder(column: $table.bvid, builder: (column) => column);
+
+  GeneratedColumn<int> get cid =>
+      $composableBuilder(column: $table.cid, builder: (column) => column);
+
+  GeneratedColumn<String> get subtitleJson => $composableBuilder(
+      column: $table.subtitleJson, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceType => $composableBuilder(
+      column: $table.sourceType, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$SubtitlesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SubtitlesTable,
+    Subtitle,
+    $$SubtitlesTableFilterComposer,
+    $$SubtitlesTableOrderingComposer,
+    $$SubtitlesTableAnnotationComposer,
+    $$SubtitlesTableCreateCompanionBuilder,
+    $$SubtitlesTableUpdateCompanionBuilder,
+    (Subtitle, BaseReferences<_$AppDatabase, $SubtitlesTable, Subtitle>),
+    Subtitle,
+    PrefetchHooks Function()> {
+  $$SubtitlesTableTableManager(_$AppDatabase db, $SubtitlesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SubtitlesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SubtitlesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SubtitlesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> bvid = const Value.absent(),
+            Value<int> cid = const Value.absent(),
+            Value<String> subtitleJson = const Value.absent(),
+            Value<String> sourceType = const Value.absent(),
+            Value<int> createdAt = const Value.absent(),
+          }) =>
+              SubtitlesCompanion(
+            id: id,
+            bvid: bvid,
+            cid: cid,
+            subtitleJson: subtitleJson,
+            sourceType: sourceType,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String bvid,
+            required int cid,
+            required String subtitleJson,
+            Value<String> sourceType = const Value.absent(),
+            required int createdAt,
+          }) =>
+              SubtitlesCompanion.insert(
+            id: id,
+            bvid: bvid,
+            cid: cid,
+            subtitleJson: subtitleJson,
+            sourceType: sourceType,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SubtitlesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SubtitlesTable,
+    Subtitle,
+    $$SubtitlesTableFilterComposer,
+    $$SubtitlesTableOrderingComposer,
+    $$SubtitlesTableAnnotationComposer,
+    $$SubtitlesTableCreateCompanionBuilder,
+    $$SubtitlesTableUpdateCompanionBuilder,
+    (Subtitle, BaseReferences<_$AppDatabase, $SubtitlesTable, Subtitle>),
+    Subtitle,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3540,4 +4075,6 @@ class $AppDatabaseManager {
       $$DownloadTasksTableTableManager(_db, _db.downloadTasks);
   $$UserSessionsTableTableManager get userSessions =>
       $$UserSessionsTableTableManager(_db, _db.userSessions);
+  $$SubtitlesTableTableManager get subtitles =>
+      $$SubtitlesTableTableManager(_db, _db.subtitles);
 }
