@@ -364,4 +364,84 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importing => '导入中...';
+
+  @override
+  String get comments => '评论';
+
+  @override
+  String get noComments => '暂无评论';
+
+  @override
+  String get loadCommentsFailed => '加载评论失败';
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String get allCommentsLoaded => '已加载全部评论';
+
+  @override
+  String get popular => '热门';
+
+  @override
+  String get latest => '最新';
+
+  @override
+  String get loginToComment => '登录后发表评论';
+
+  @override
+  String get writeComment => '发表评论...';
+
+  @override
+  String replyTo(String username) {
+    return '回复 @$username';
+  }
+
+  @override
+  String get sendFailed => '发送失败';
+
+  @override
+  String commentCount(int count) {
+    return '评论 $count';
+  }
+
+  @override
+  String repliesCount(int count) {
+    return '$count条回复';
+  }
+
+  @override
+  String viewAllReplies(int count) {
+    return '查看全部$count条回复 >';
+  }
+
+  @override
+  String get commentSection => '评论区';
+
+  @override
+  String get justNow => '刚刚';
+
+  @override
+  String minutesAgo(int count) {
+    return '$count分钟前';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '$count小时前';
+  }
+
+  @override
+  String daysAgo(int count) {
+    return '$count天前';
+  }
+
+  @override
+  String get loginToLike => '登录后可点赞';
+
+  @override
+  String get loginToReply => '登录后可回复';
+
+  @override
+  String get pleaseLoginFirst => '请先登录';
 }

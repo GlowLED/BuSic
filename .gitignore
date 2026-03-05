@@ -119,9 +119,5 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 .idea
-<<<<<<< HEAD
-.vscode
-=======
 .vscode
 .github/copilot-instructions.md
->>>>>>> 457d9702ff5f5efefb758352e35e6c5feafbdf4b

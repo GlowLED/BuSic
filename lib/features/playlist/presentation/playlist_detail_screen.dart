@@ -7,6 +7,7 @@ import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
 import '../../../shared/widgets/song_tile.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../comment/presentation/comment_section.dart';
 import '../../download/application/download_notifier.dart';
 import '../../download/presentation/widgets/quality_select_dialog.dart';
 import '../../player/application/player_notifier.dart';
@@ -517,8 +518,31 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                       _showQualityDialog(context, ref, song);
                     },
             ),
+            ListTile(
+              leading: const Icon(Icons.comment_outlined),
+              title: Text(l10n.commentSection),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showCommentSheet(context, song.bvid);
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Show a bottom sheet with the comment section for a video.
+  void _showCommentSheet(BuildContext context, String bvid) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, _) => CommentSection(bvid: bvid),
       ),
     );
   }

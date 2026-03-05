@@ -796,6 +796,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing...'**
   String get importing;
+
+  /// No description provided for @comments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get comments;
+
+  /// No description provided for @noComments.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get noComments;
+
+  /// No description provided for @loadCommentsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load comments'**
+  String get loadCommentsFailed;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @allCommentsLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'All comments loaded'**
+  String get allCommentsLoaded;
+
+  /// No description provided for @popular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get popular;
+
+  /// No description provided for @latest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get latest;
+
+  /// No description provided for @loginToComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to comment'**
+  String get loginToComment;
+
+  /// No description provided for @writeComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a comment...'**
+  String get writeComment;
+
+  /// No description provided for @replyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to @{username}'**
+  String replyTo(String username);
+
+  /// No description provided for @sendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Send failed'**
+  String get sendFailed;
+
+  /// No description provided for @commentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments {count}'**
+  String commentCount(int count);
+
+  /// No description provided for @repliesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} replies'**
+  String repliesCount(int count);
+
+  /// No description provided for @viewAllReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'View all {count} replies >'**
+  String viewAllReplies(int count);
+
+  /// No description provided for @commentSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Section'**
+  String get commentSection;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m ago'**
+  String minutesAgo(int count);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h ago'**
+  String hoursAgo(int count);
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d ago'**
+  String daysAgo(int count);
+
+  /// No description provided for @loginToLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to like'**
+  String get loginToLike;
+
+  /// No description provided for @loginToReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to reply'**
+  String get loginToReply;
+
+  /// No description provided for @pleaseLoginFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login first'**
+  String get pleaseLoginFirst;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

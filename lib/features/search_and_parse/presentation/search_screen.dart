@@ -5,6 +5,7 @@ import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../comment/presentation/comment_section.dart';
 import '../../download/application/download_notifier.dart';
 import '../../download/presentation/widgets/quality_select_dialog.dart';
 import '../../player/application/player_notifier.dart';
@@ -37,6 +38,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   int _currentPage = 1;
   String _currentKeyword = '';
   bool _hasMorePages = true;
+  bool _showComments = false;
 
   @override
   void dispose() {
@@ -610,6 +612,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 ),
               ),
             ],
+          ),
+          // ── Comment Section ──
+          const SizedBox(height: 16),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.comment),
+                  title: const Text('评论区'),
+                  trailing: Icon(
+                    _showComments
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  onTap: () {
+                    setState(() => _showComments = !_showComments);
+                  },
+                ),
+                if (_showComments)
+                  SizedBox(
+                    height: 400,
+                    child: CommentSection(bvid: videoInfo.bvid),
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
         ],

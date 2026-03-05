@@ -7,11 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../comment/presentation/comment_section.dart';
 import '../application/player_notifier.dart';
 import '../domain/models/play_mode.dart';
 import 'widgets/play_queue_sheet.dart';
 
-/// Full-screen player view with large cover art, lyrics, and controls.
+/// Full-screen player view with large cover art, comments, and controls.
+///
+/// Swipe left/right to switch between cover art and the comment section.
 class FullPlayerScreen extends ConsumerStatefulWidget {
   const FullPlayerScreen({super.key});
 
@@ -22,6 +25,16 @@ class FullPlayerScreen extends ConsumerStatefulWidget {
 class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
   /// Non-null while the user is dragging the seek bar.
   double? _dragValue;
+
+  /// Page controller for cover ↔ comments switching.
+  final _pageController = PageController();
+  int _currentPageIndex = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,55 +84,43 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                   ),
                 ),
 
-                const Spacer(),
-
-                // Cover art
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: track?.coverUrl != null
-                          ? _buildMainCover(track!.coverUrl!)
-                          : Container(
-                              color: context.colorScheme.primaryContainer,
-                              child: const Icon(Icons.music_note,
-                                  size: 80, color: Colors.white70),
-                            ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Title & artist
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
+                // ── PageView: Cover Art ↔ Comments ──
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() => _currentPageIndex = index);
+                    },
                     children: [
-                      Text(
-                        track?.title ?? l10n.unknownTitle,
-                        style: context.textTheme.headlineSmall
-                            ?.copyWith(color: Colors.white),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        track?.artist ?? l10n.unknownArtist,
-                        style: context.textTheme.bodyLarge
-                            ?.copyWith(color: Colors.white70),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      // Page 0: Cover art + title
+                      _buildCoverPage(context, track, l10n),
+
+                      // Page 1: Comments
+                      if (track != null)
+                        _buildCommentPage(context, track.bvid)
+                      else
+                        Center(
+                          child: Text(
+                            l10n.noPlayingMusic,
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                        ),
                     ],
                   ),
                 ),
 
-                const Spacer(),
+                // Page indicator
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildDot(0),
+                      const SizedBox(width: 8),
+                      _buildDot(1),
+                    ],
+                  ),
+                ),
 
                 // Seek bar
                 Padding(
@@ -269,6 +270,86 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDot(int index) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: _currentPageIndex == index ? 16 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: _currentPageIndex == index
+            ? Colors.white
+            : Colors.white38,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
+  Widget _buildCoverPage(BuildContext context, dynamic track, dynamic l10n) {
+    return Column(
+      children: [
+        const Spacer(),
+        // Cover art
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: track?.coverUrl != null
+                  ? _buildMainCover(track!.coverUrl!)
+                  : Container(
+                      color: context.colorScheme.primaryContainer,
+                      child: const Icon(Icons.music_note,
+                          size: 80, color: Colors.white70),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        // Title & artist
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            children: [
+              Text(
+                track?.title ?? l10n.unknownTitle,
+                style: context.textTheme.headlineSmall
+                    ?.copyWith(color: Colors.white),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                track?.artist ?? l10n.unknownArtist,
+                style: context.textTheme.bodyLarge
+                    ?.copyWith(color: Colors.white70),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const Spacer(),
+      ],
+    );
+  }
+
+  Widget _buildCommentPage(BuildContext context, String bvid) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: context.colorScheme.surface.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: CommentSection(bvid: bvid),
       ),
     );
   }
