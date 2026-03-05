@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -270,25 +271,17 @@ class UpdateRepositoryImpl implements UpdateRepository {
   Future<void> _applyAndroid(String apkPath) async {
     AppLogger.info('Installing APK: $apkPath', tag: _kTag);
 
-    // Use `am start` to invoke the system installer via content:// URI.
-    // FileProvider must be configured in AndroidManifest.xml.
-    final result = await Process.run('am', [
-      'start',
-      '-a',
-      'android.intent.action.VIEW',
-      '-t',
-      'application/vnd.android.package-archive',
-      '-d',
-      'content://com.glowled.busic.fileprovider/cache_files/${p.basename(apkPath)}',
-      '--grant-uri-permission',
-    ]);
-
-    if (result.exitCode != 0) {
+    // Use platform channel to invoke Android's native package installer
+    // via Intent + FileProvider (Process.run('am', ...) fails in app sandbox).
+    const channel = MethodChannel('com.busic.busic/apk_installer');
+    try {
+      await channel.invokeMethod('installApk', {'filePath': apkPath});
+    } on PlatformException catch (e) {
       AppLogger.error(
-        'Failed to launch installer: ${result.stderr}',
+        'Failed to launch installer: ${e.message}',
         tag: _kTag,
       );
-      throw Exception('Failed to launch APK installer');
+      throw Exception('Failed to launch APK installer: ${e.message}');
     }
   }
 
