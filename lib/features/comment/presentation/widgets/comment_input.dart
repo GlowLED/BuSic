@@ -112,31 +112,43 @@ class _CommentInputState extends State<CommentInput> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Reply-to indicator
+            // Reply-to indicator (chip style, ✕ next to name, away from send btn)
             if (widget.replyTo != null)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l10n.replyTo(widget.replyTo!),
-                        style: context.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.primary,
+                padding: const EdgeInsets.only(bottom: 6),
+                child: GestureDetector(
+                  onTap: widget.onCancelReply,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.replyTo(widget.replyTo!),
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onPrimaryContainer,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.close,
+                          size: 14,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ],
                     ),
-                    GestureDetector(
-                      onTap: widget.onCancelReply,
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
