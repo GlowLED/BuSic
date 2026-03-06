@@ -407,33 +407,36 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           top: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Previous page button
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            iconSize: 20,
-            visualDensity: VisualDensity.compact,
-            onPressed: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
-            tooltip: '上一页',
-          ),
-          const SizedBox(width: 4),
-          // Dynamic page buttons with ellipsis
-          ..._buildPageNumbers(colorScheme),
-          const SizedBox(width: 4),
-          // Next page button
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            iconSize: 20,
-            visualDensity: VisualDensity.compact,
-            onPressed: _currentPage < _totalPages ? () => _goToPage(_currentPage + 1) : null,
-            tooltip: '下一页',
-          ),
-          const SizedBox(width: 8),
-          // Jump to page input
-          _buildJumpToPage(colorScheme),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Previous page button
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              iconSize: 20,
+              visualDensity: VisualDensity.compact,
+              onPressed: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
+              tooltip: '上一页',
+            ),
+            const SizedBox(width: 4),
+            // Dynamic page buttons with ellipsis
+            ..._buildPageNumbers(colorScheme),
+            const SizedBox(width: 4),
+            // Next page button
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              iconSize: 20,
+              visualDensity: VisualDensity.compact,
+              onPressed: _currentPage < _totalPages ? () => _goToPage(_currentPage + 1) : null,
+              tooltip: '下一页',
+            ),
+            const SizedBox(width: 8),
+            // Jump to page input
+            _buildJumpToPage(colorScheme),
+          ],
+        ),
       ),
     );
   }
