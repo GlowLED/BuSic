@@ -319,5 +319,15 @@
   "lyricsTitle": "Lyrics",
   "noLyrics": "No lyrics available",
   "lyricsLoading": "Loading lyrics...",
-  "lyricsError": "Failed to load lyrics"
+  "lyricsError": "Failed to load lyrics",
+  "searchAction": "Search",
+  "cancelAction": "Cancel",
+  "searchExternalLyrics": "Search external lyrics",
+  "restoreAutoLyrics": "Restore automatic lyrics",
+  "externalLyricsDialogTitle": "External Lyrics",
+  "externalLyricsKeywordHint": "Enter song title or artist",
+  "externalLyricsNoResults": "No matching songs found",
+  "externalLyricsSearchError": "Song search failed. Please try again later",
+  "externalLyricsLoadError": "Failed to load external lyrics",
+  "externalLyricsImported": "External lyrics loaded"
 }

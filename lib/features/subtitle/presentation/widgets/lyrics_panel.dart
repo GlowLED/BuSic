@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../player/application/player_notifier.dart';
 import '../../application/subtitle_notifier.dart';
+import '../../data/external_lyrics_repository.dart';
 import '../../domain/models/subtitle_data.dart';
+import 'external_lyrics_search_dialog.dart';
 
 /// Lyrics display panel with auto-scrolling and tap-to-seek.
 ///
@@ -17,10 +19,12 @@ import '../../domain/models/subtitle_data.dart';
 class LyricsPanel extends ConsumerStatefulWidget {
   final String bvid;
   final int cid;
+  final String initialSearchKeyword;
 
   const LyricsPanel({
     required this.bvid,
     required this.cid,
+    required this.initialSearchKeyword,
     super.key,
   });
 
@@ -36,6 +40,8 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
 
   /// Timer to resume auto-scroll after user stops scrolling.
   Timer? _resumeTimer;
+
+  bool _isImportingExternalLyrics = false;
 
   /// Estimated height per lyrics line for scroll offset calculation.
   static const double _itemHeight = 54.0;
@@ -66,14 +72,49 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           .updatePosition(position);
     });
 
-    return switch (subtitleState.status) {
-      SubtitleLoadStatus.loading => _buildLoading(context),
-      SubtitleLoadStatus.notFound => _buildNoLyrics(context),
-      SubtitleLoadStatus.error =>
-        _buildError(context, subtitleState.errorMessage),
-      SubtitleLoadStatus.loaded => _buildLyrics(context, subtitleState),
-      SubtitleLoadStatus.idle => const SizedBox.shrink(),
-    };
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: switch (subtitleState.status) {
+            SubtitleLoadStatus.loading => _buildLoading(context),
+            SubtitleLoadStatus.notFound => _buildNoLyrics(context),
+            SubtitleLoadStatus.error =>
+              _buildError(context, subtitleState.errorMessage),
+            SubtitleLoadStatus.loaded => _buildLyrics(context, subtitleState),
+            SubtitleLoadStatus.idle => const SizedBox.shrink(),
+          },
+        ),
+        Positioned(
+          top: 12,
+          right: 12,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (subtitleState.subtitleData?.sourceType == 'external')
+                IconButton.filledTonal(
+                  onPressed:
+                      _isImportingExternalLyrics ? null : _restorePrimaryLyrics,
+                  tooltip: context.l10n.restoreAutoLyrics,
+                  icon: const Icon(Icons.restart_alt),
+                ),
+              const SizedBox(width: 8),
+              IconButton.filledTonal(
+                onPressed:
+                    _isImportingExternalLyrics ? null : _searchExternalLyrics,
+                tooltip: context.l10n.searchExternalLyrics,
+                icon: _isImportingExternalLyrics
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.manage_search),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildLoading(BuildContext context) {
@@ -105,10 +146,9 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   }
 
   Widget _buildError(BuildContext context, String? message) {
-    final errorText =
-        message == SubtitleNotifier.loginRequiredErrorCode
-            ? context.l10n.pleaseLoginFirst
-            : context.l10n.lyricsError;
+    final errorText = message == SubtitleNotifier.loginRequiredErrorCode
+        ? context.l10n.pleaseLoginFirst
+        : context.l10n.lyricsError;
 
     return Center(
       child: Text(
@@ -172,8 +212,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
                 style: TextStyle(
                   color: isCurrent ? Colors.white : Colors.white38,
                   fontSize: isCurrent ? 20 : 16,
-                  fontWeight:
-                      isCurrent ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,
@@ -206,5 +245,77 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> _searchExternalLyrics() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final loadErrorText = context.l10n.externalLyricsLoadError;
+    final importedText = context.l10n.externalLyricsImported;
+
+    final selectedSong = await ExternalLyricsSearchDialog.show(
+      context,
+      initialQuery: widget.initialSearchKeyword,
+    );
+    if (!mounted || selectedSong == null) return;
+
+    setState(() => _isImportingExternalLyrics = true);
+    try {
+      final data = await ExternalLyricsRepository().fetchSubtitleData(
+        selectedSong.id,
+      );
+      if (!mounted) return;
+      if (data == null || data.lines.isEmpty) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(loadErrorText),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+        return;
+      }
+
+      ref
+          .read(
+            subtitleNotifierProvider(widget.bvid, widget.cid).notifier,
+          )
+          .applyManualSubtitle(data);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(importedText),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(loadErrorText),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isImportingExternalLyrics = false);
+      }
+    }
+  }
+
+  Future<void> _restorePrimaryLyrics() async {
+    setState(() => _isImportingExternalLyrics = true);
+    try {
+      await ref
+          .read(
+            subtitleNotifierProvider(widget.bvid, widget.cid).notifier,
+          )
+          .reloadPrimarySubtitle();
+    } finally {
+      if (mounted) {
+        setState(() => _isImportingExternalLyrics = false);
+      }
+    }
   }
 }

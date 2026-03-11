@@ -112,8 +112,7 @@ class SubtitleNotifier extends _$SubtitleNotifier {
     // Linear scan (lines are sorted, count is small, ~50–200)
     var index = -1;
     for (var i = 0; i < lines.length; i++) {
-      if (posSeconds >= lines[i].startTime &&
-          posSeconds < lines[i].endTime) {
+      if (posSeconds >= lines[i].startTime && posSeconds < lines[i].endTime) {
         index = i;
         break;
       }
@@ -127,5 +126,24 @@ class SubtitleNotifier extends _$SubtitleNotifier {
         errorMessage: state.errorMessage,
       );
     }
+  }
+
+  void applyManualSubtitle(SubtitleData data) {
+    state = (
+      subtitleData: data,
+      currentLineIndex: -1,
+      status: SubtitleLoadStatus.loaded,
+      errorMessage: null,
+    );
+  }
+
+  Future<void> reloadPrimarySubtitle() async {
+    state = (
+      subtitleData: null,
+      currentLineIndex: -1,
+      status: SubtitleLoadStatus.loading,
+      errorMessage: null,
+    );
+    await _loadSubtitle();
   }
 }

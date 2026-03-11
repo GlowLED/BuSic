@@ -735,4 +735,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lyricsError => '歌词加载失败';
+
+  @override
+  String get searchAction => '搜索';
+
+  @override
+  String get cancelAction => '取消';
+
+  @override
+  String get searchExternalLyrics => '搜索外部歌词';
+
+  @override
+  String get restoreAutoLyrics => '恢复自动歌词';
+
+  @override
+  String get externalLyricsDialogTitle => '外部歌词';
+
+  @override
+  String get externalLyricsKeywordHint => '输入歌曲名或歌手';
+
+  @override
+  String get externalLyricsNoResults => '没有找到匹配的歌曲';
+
+  @override
+  String get externalLyricsSearchError => '歌曲搜索失败，请稍后重试';
+
+  @override
+  String get externalLyricsLoadError => '外部歌词获取失败';
+
+  @override
+  String get externalLyricsImported => '已载入外部歌词';
 }

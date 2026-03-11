@@ -213,7 +213,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteDownload => 'Delete Download';
 
   @override
-  String get deleteDownloadConfirm => 'Are you sure you want to delete the downloaded file?';
+  String get deleteDownloadConfirm =>
+      'Are you sure you want to delete the downloaded file?';
 
   @override
   String get activeDownloads => 'Active Downloads';
@@ -335,7 +336,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overwriteConfirmTitle => 'Confirm Overwrite';
 
   @override
-  String get overwriteConfirmMessage => 'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
+  String get overwriteConfirmMessage =>
+      'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
 
   @override
   String get exportSuccess => 'Export successful';
@@ -495,7 +497,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdateTitle => 'Required update';
 
   @override
-  String get forceUpdateMessage => 'This version is no longer supported. Please update to continue using BuSic.';
+  String get forceUpdateMessage =>
+      'This version is no longer supported. Please update to continue using BuSic.';
 
   @override
   String get downloadLatestVersion => 'Download latest version';
@@ -579,13 +582,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createPlaylistManual => 'Create Manually';
 
   @override
-  String get createPlaylistManualDesc => 'Enter a name to create an empty playlist';
+  String get createPlaylistManualDesc =>
+      'Enter a name to create an empty playlist';
 
   @override
   String get importFromBiliFav => 'Import from Bilibili Favorites';
 
   @override
-  String get importFromBiliFavDesc => 'Sign in to import from your favorite folders';
+  String get importFromBiliFavDesc =>
+      'Sign in to import from your favorite folders';
 
   @override
   String get selectFavFolder => 'Select Favorite Folder';
@@ -735,4 +740,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lyricsError => 'Failed to load lyrics';
+
+  @override
+  String get searchAction => 'Search';
+
+  @override
+  String get cancelAction => 'Cancel';
+
+  @override
+  String get searchExternalLyrics => 'Search external lyrics';
+
+  @override
+  String get restoreAutoLyrics => 'Restore automatic lyrics';
+
+  @override
+  String get externalLyricsDialogTitle => 'External Lyrics';
+
+  @override
+  String get externalLyricsKeywordHint => 'Enter song title or artist';
+
+  @override
+  String get externalLyricsNoResults => 'No matching songs found';
+
+  @override
+  String get externalLyricsSearchError =>
+      'Song search failed. Please try again later';
+
+  @override
+  String get externalLyricsLoadError => 'Failed to load external lyrics';
+
+  @override
+  String get externalLyricsImported => 'External lyrics loaded';
 }

@@ -86,21 +86,19 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             controller: _verticalPageController,
             scrollDirection: Axis.vertical,
             physics: const ClampingScrollPhysics(),
-            onPageChanged: (i) =>
-                setState(() => _verticalPageIndex = i),
+            onPageChanged: (i) => setState(() => _verticalPageIndex = i),
             children: [
               // Page 0 (top): Horizontal PageView (Cover ↔ Comments)
               PageView(
                 controller: _pageController,
-                onPageChanged: (i) =>
-                    setState(() => _currentPageIndex = i),
+                onPageChanged: (i) => setState(() => _currentPageIndex = i),
                 children: [
                   _buildCoverPage(context, track),
                   _buildCommentPage(context, track?.bvid),
                 ],
               ),
               // Page 1 (bottom): Lyrics panel
-              _buildLyricsPage(track?.bvid, track?.cid),
+              _buildLyricsPage(track?.bvid, track?.cid, track?.title),
             ],
           ),
         ),
@@ -159,7 +157,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
                           // Page 0: Song info
                           _buildWideInfoPage(track, l10n),
                           // Page 1: Lyrics
-                          _buildLyricsPage(track?.bvid, track?.cid),
+                          _buildLyricsPage(
+                              track?.bvid, track?.cid, track?.title),
                           // Page 2: Comments
                           _buildCommentPage(context, track?.bvid),
                         ],
@@ -209,8 +208,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             const SizedBox(height: 8),
             Text(
               track?.artist ?? l10n.unknownArtist,
-              style: context.textTheme.bodyLarge
-                  ?.copyWith(color: Colors.white70),
+              style:
+                  context.textTheme.bodyLarge?.copyWith(color: Colors.white70),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -239,7 +238,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
   // ── Shared helpers ──────────────────────────────────────────────
 
-  Widget _buildLyricsPage(String? bvid, int? cid) {
+  Widget _buildLyricsPage(String? bvid, int? cid, String? title) {
     if (bvid == null || cid == null) {
       return Center(
         child: Text(
@@ -248,7 +247,11 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
         ),
       );
     }
-    return LyricsPanel(bvid: bvid, cid: cid);
+    return LyricsPanel(
+      bvid: bvid,
+      cid: cid,
+      initialSearchKeyword: title ?? '',
+    );
   }
 
   Widget _buildPageIndicators() {
@@ -286,8 +289,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
       width: activeIndex == index ? 16 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color:
-            activeIndex == index ? Colors.white : Colors.white38,
+        color: activeIndex == index ? Colors.white : Colors.white38,
         borderRadius: BorderRadius.circular(4),
       ),
     );

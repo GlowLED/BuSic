@@ -318,5 +318,15 @@
   "lyricsTitle": "歌词",
   "noLyrics": "暂无歌词",
   "lyricsLoading": "歌词加载中...",
-  "lyricsError": "歌词加载失败"
+  "lyricsError": "歌词加载失败",
+  "searchAction": "搜索",
+  "cancelAction": "取消",
+  "searchExternalLyrics": "搜索外部歌词",
+  "restoreAutoLyrics": "恢复自动歌词",
+  "externalLyricsDialogTitle": "外部歌词",
+  "externalLyricsKeywordHint": "输入歌曲名或歌手",
+  "externalLyricsNoResults": "没有找到匹配的歌曲",
+  "externalLyricsSearchError": "歌曲搜索失败，请稍后重试",
+  "externalLyricsLoadError": "外部歌词获取失败",
+  "externalLyricsImported": "已载入外部歌词"
 }
