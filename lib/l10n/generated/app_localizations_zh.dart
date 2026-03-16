@@ -735,4 +735,35 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lyricsError => '歌词加载失败';
+
+  @override
+  String get backToSearchResults => '返回搜索结果';
+
+  @override
+  String nParts(int count) {
+    return '$count 个分P';
+  }
+
+  @override
+  String selectedPageCount(int count, int total) {
+    return '已选 $count/$total';
+  }
+
+  @override
+  String playFailed(String error) {
+    return '播放失败: $error';
+  }
+
+  @override
+  String addedToPlaylistCount(int count) {
+    return '已添加 $count 首歌曲到歌单';
+  }
+
+  @override
+  String startedDownloadCount(int count) {
+    return '已开始下载 $count 首歌曲';
+  }
+
+  @override
+  String get noQualitiesAvailable => '未获取到可用音质';
 }

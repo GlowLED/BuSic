@@ -735,4 +735,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lyricsError => 'Failed to load lyrics';
+
+  @override
+  String get backToSearchResults => 'Back to results';
+
+  @override
+  String nParts(int count) {
+    return '$count parts';
+  }
+
+  @override
+  String selectedPageCount(int count, int total) {
+    return 'Selected $count/$total';
+  }
+
+  @override
+  String playFailed(String error) {
+    return 'Play failed: $error';
+  }
+
+  @override
+  String addedToPlaylistCount(int count) {
+    return 'Added $count songs to playlist';
+  }
+
+  @override
+  String startedDownloadCount(int count) {
+    return 'Started downloading $count songs';
+  }
+
+  @override
+  String get noQualitiesAvailable => 'No available qualities';
 }

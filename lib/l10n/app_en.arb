@@ -319,5 +319,38 @@
   "lyricsTitle": "Lyrics",
   "noLyrics": "No lyrics available",
   "lyricsLoading": "Loading lyrics...",
-  "lyricsError": "Failed to load lyrics"
+  "lyricsError": "Failed to load lyrics",
+  "backToSearchResults": "Back to results",
+  "nParts": "{count} parts",
+  "@nParts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "selectedPageCount": "Selected {count}/{total}",
+  "@selectedPageCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "playFailed": "Play failed: {error}",
+  "@playFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "addedToPlaylistCount": "Added {count} songs to playlist",
+  "@addedToPlaylistCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "startedDownloadCount": "Started downloading {count} songs",
+  "@startedDownloadCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noQualitiesAvailable": "No available qualities"
 }

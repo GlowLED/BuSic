@@ -318,5 +318,38 @@
   "lyricsTitle": "歌词",
   "noLyrics": "暂无歌词",
   "lyricsLoading": "歌词加载中...",
-  "lyricsError": "歌词加载失败"
+  "lyricsError": "歌词加载失败",
+  "backToSearchResults": "返回搜索结果",
+  "nParts": "{count} 个分P",
+  "@nParts": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "selectedPageCount": "已选 {count}/{total}",
+  "@selectedPageCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "playFailed": "播放失败: {error}",
+  "@playFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "addedToPlaylistCount": "已添加 {count} 首歌曲到歌单",
+  "@addedToPlaylistCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "startedDownloadCount": "已开始下载 {count} 首歌曲",
+  "@startedDownloadCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "noQualitiesAvailable": "未获取到可用音质"
 }

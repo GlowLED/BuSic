@@ -1486,6 +1486,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load lyrics'**
   String get lyricsError;
+
+  /// No description provided for @backToSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to results'**
+  String get backToSearchResults;
+
+  /// No description provided for @nParts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} parts'**
+  String nParts(int count);
+
+  /// No description provided for @selectedPageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected {count}/{total}'**
+  String selectedPageCount(int count, int total);
+
+  /// No description provided for @playFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Play failed: {error}'**
+  String playFailed(String error);
+
+  /// No description provided for @addedToPlaylistCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} songs to playlist'**
+  String addedToPlaylistCount(int count);
+
+  /// No description provided for @startedDownloadCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Started downloading {count} songs'**
+  String startedDownloadCount(int count);
+
+  /// No description provided for @noQualitiesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No available qualities'**
+  String get noQualitiesAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

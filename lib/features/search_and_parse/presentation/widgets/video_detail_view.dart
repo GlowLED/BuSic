@@ -70,7 +70,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               child: TextButton.icon(
                 onPressed: widget.onBack,
                 icon: const Icon(Icons.arrow_back, size: 18),
-                label: const Text('返回搜索结果'),
+                label: Text(l10n.backToSearchResults),
               ),
             ),
 
@@ -107,7 +107,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                       : () =>
                           _playParsedVideo(context, videoInfo, selectedPages),
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('播放'),
+                  label: Text(l10n.play),
                 ),
               ),
               const SizedBox(width: 12),
@@ -131,7 +131,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.comment),
-                  title: const Text('评论区'),
+                  title: Text(l10n.commentSection),
                   trailing: Icon(
                     _showComments
                         ? Icons.keyboard_arrow_up
@@ -212,7 +212,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                         Icon(Icons.list,
                             size: 14, color: colorScheme.primary),
                         const SizedBox(width: 4),
-                        Text('${videoInfo.pages.length} 个分P',
+                        Text(AppLocalizations.of(context)!.nParts(videoInfo.pages.length),
                             style: textTheme.bodySmall
                                 ?.copyWith(color: colorScheme.primary)),
                       ],
@@ -253,9 +253,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       child: Column(
         children: [
           CheckboxListTile(
-            title: const Text('选择分P'),
+            title: Text(AppLocalizations.of(context)!.selectPages),
             subtitle:
-                Text('已选 ${selectedPages.length}/${videoInfo.pages.length}'),
+                Text(AppLocalizations.of(context)!.selectedPageCount(selectedPages.length, videoInfo.pages.length)),
             value: allSelected
                 ? true
                 : selectedPages.isEmpty
@@ -330,9 +330,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           .playTrackList(tracks, 0, playlistName: videoInfo.title);
     } catch (e) {
       if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('播放失败: $e'),
+            content: Text(l10n.playFailed(e.toString())),
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
           ),
@@ -350,6 +351,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (pagesToDownload.isEmpty) return;
 
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     try {
       final songIds = await ref
           .read(parseNotifierProvider.notifier)
@@ -366,10 +368,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
 
       if (qualities.isEmpty) {
         scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('未获取到可用音质'),
+          SnackBar(
+            content: Text(l10n.noQualitiesAvailable),
             behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
           ),
         );
         return;
@@ -404,7 +406,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
             }
             scaffoldMessenger.showSnackBar(
               SnackBar(
-                content: Text('已开始下载 $startedCount 首歌曲'),
+                content: Text(l10n.startedDownloadCount(startedCount)),
                 behavior: SnackBarBehavior.floating,
                 margin: const EdgeInsets.only(
                     bottom: 80, left: 16, right: 16),
@@ -416,7 +418,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     } catch (e) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('下载失败: $e'),
+          content: Text(AppLocalizations.of(context)!.downloadFailed),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
         ),
@@ -438,7 +440,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (context.mounted && songIds.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('已添加 ${songIds.length} 首歌曲到歌单'),
+          content: Text(AppLocalizations.of(context)!.addedToPlaylistCount(songIds.length)),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
         ),
