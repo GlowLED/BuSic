@@ -1,0 +1,31 @@
+#!/bin/bash
+# BuSic AppRun script for AppImage
+# This script is the entry point for the AppImage
+
+set -e
+
+# Get the directory where this script is located
+APPIMAGE="$(readlink -f "${BASH_SOURCE[0]}")"
+APPDIR="${APPIMAGE%/*}"
+
+# Set environment variables for AppImage
+export APPIMAGE_NAME="BuSic"
+export ARCH="$(uname -m)"
+
+# If there is a desktop file with the same name as the appimage, use it
+if [ -n "$DESKTOPINTEGRATION" ]; then
+    export DESKTOPINTEGRATION=1
+fi
+
+# Find the actual executable in the AppDir
+if [ -x "${APPDIR}/usr/bin/busic" ]; then
+    EXEC="${APPDIR}/usr/bin/busic"
+elif [ -x "${APPDIR}/busic" ]; then
+    EXEC="${APPDIR}/busic"
+else
+    echo "Error: Executable not found in AppImage"
+    exit 1
+fi
+
+# Execute the application with any passed arguments
+exec "${EXEC}" "$@"

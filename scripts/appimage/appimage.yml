@@ -1,0 +1,29 @@
+# BuSic AppImage build configuration
+# This file is used by appimagetool to create the AppImage
+
+app: busic
+version: "1.0"
+
+script:
+  # Copy icon to the appropriate location
+  - cp assets/images/app_icon.png AppDir/usr/share/icons/hicolor/256x256/apps/busic.png
+
+runtime:
+  version: "stable"
+
+appimage_tools:
+  version: "continuous"
+
+# Files and directories to include
+files:
+  - build/linux/x64/release/bundle/:/usr/
+
+# Desktop integration
+desktop:
+  desktop-file: AppDir/busic.desktop
+  icon: AppDir/usr/share/icons/hicolor/256x256/apps/busic.png
+  category: Audio
+
+# Binaries that should be available in PATH
+bin:
+  - busic

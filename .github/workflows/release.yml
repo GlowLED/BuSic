@@ -119,15 +119,96 @@ jobs:
       - name: Build Linux
         run: flutter build linux --release
 
-      - name: Package Linux
-        run: |
-          cd build/linux/x64/release/bundle
-          tar czf ${{ github.workspace }}/busic-linux-x64.tar.gz .
+      - name: Install Ruby and fpm
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
 
-      - uses: actions/upload-artifact@v4
+      - name: Install fpm
+        run: sudo gem install fpm
+
+      - name: Prepare package directory
+        run: |
+          mkdir -p package/opt/busic
+          cp -r build/linux/x64/release/bundle/* package/opt/busic/
+          cp scripts/linux/postinst.sh package/
+          cp scripts/linux/prerm.sh package/
+          mkdir -p package/usr/share/icons/hicolor/256x256/apps
+          cp assets/images/app_icon.png package/usr/share/icons/hicolor/256x256/apps/busic.png
+
+      - name: Create .deb package
+        run: |
+          cd package
+          fpm -t deb -s dir \
+            -n busic \
+            -v ${{ needs.check.outputs.tag }} \
+            -p ${{ github.workspace }}/busic-linux-x64.deb \
+            --after-install postinst.sh \
+            --before-remove prerm.sh \
+            --depends libgtk-3-0 \
+            --depends libayatana-appindicator3-1 \
+            --description "A high-quality cross-platform music player" \
+            --category Audio \
+            --url "https://github.com/GlowLED/BuSic" \
+            --maintainer "BuSic Team" \
+            .
+
+      - name: Create .rpm package
+        run: |
+          cd package
+          fpm -t rpm -s dir \
+            -n busic \
+            -v ${{ needs.check.outputs.tag }} \
+            -p ${{ github.workspace }}/busic-linux-x64.rpm \
+            --after-install postinst.sh \
+            --before-remove prerm.sh \
+            --depends gtk3 \
+            --depends libappindicator-gtk3 \
+            --description "A high-quality cross-platform music player" \
+            --category Application:Audio \
+            --url "https://github.com/GlowLED/BuSic" \
+            .
+
+      - name: Download appimagetool
+        run: |
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+
+      - name: Create AppImage
+        run: |
+          # Prepare AppDir
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          
+          # Copy application files
+          cp -r build/linux/x64/release/bundle/* AppDir/usr/
+          
+          # Create symlink for main executable
+          ln -sf ../lib/busic AppDir/usr/bin/busic
+          
+          # Copy icon
+          cp assets/images/app_icon.png AppDir/usr/share/icons/hicolor/256x256/apps/busic.png
+          
+          # Copy .desktop file
+          cp scripts/appimage/AppDir/busic.desktop AppDir/usr/share/applications/
+          
+          # Download AppRun from AppImage community
+          wget -q -O AppRun https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64
+          chmod +x AppRun
+          
+          # Build AppImage
+          ARCH=x86_64 ./appimagetool-x86_64.AppImage --appimage-extract 2>/dev/null
+          ARCH=x86_64 ./squashfs-root/AppRun AppDir ${{ github.workspace }}/busic-linux-x64.AppImage
+
+      - name: Upload Linux packages
+        uses: actions/upload-artifact@v4
         with:
           name: linux-release
-          path: busic-linux-x64.tar.gz
+          path: |
+            busic-linux-x64.deb
+            busic-linux-x64.rpm
+            busic-linux-x64.AppImage
 
   # ─────────────────────────────── Windows ─────────────────────────────
   build-windows:
@@ -328,7 +409,9 @@ jobs:
           tag_name: ${{ needs.check.outputs.tag }}
           generate_release_notes: true
           files: |
-            busic-linux-x64.tar.gz
+            busic-linux-x64.deb
+            busic-linux-x64.rpm
+            busic-linux-x64.AppImage
             busic-windows-x64.zip
             busic-macos.zip
             busic-android.apk

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=BuSic
+GenericName=Music Player
+Comment=A high-quality cross-platform music player
+Exec=busic %U
+Icon=busic
+Terminal=false
+Categories=Audio;Music;Player;AudioVideo;
+Keywords=music;audio;player;bilibili;busic;
+MimeType=audio/mpeg;audio/flac;audio/ogg;audio/wav;
+StartupNotify=true
+StartupWMClass=busic

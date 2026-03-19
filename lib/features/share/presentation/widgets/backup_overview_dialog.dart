@@ -70,23 +70,25 @@ class _BackupOverviewDialogState extends State<BackupOverviewDialog> {
             const SizedBox(height: 8),
             Column(
               children: [
-                _RadioOption<bool>(
-                  title: l10n.mergeStrategy,
-                  subtitle: l10n.mergeStrategyDesc,
-                  value: true,
+                RadioGroup<bool>(
                   groupValue: _isMerge,
                   onChanged: (value) {
                     if (value != null) setState(() => _isMerge = value);
                   },
-                ),
-                _RadioOption<bool>(
-                  title: l10n.overwriteStrategy,
-                  subtitle: l10n.overwriteStrategyDesc,
-                  value: false,
-                  groupValue: _isMerge,
-                  onChanged: (value) {
-                    if (value != null) setState(() => _isMerge = value);
-                  },
+                  child: Column(
+                    children: [
+                      _RadioOption<bool>(
+                        title: l10n.mergeStrategy,
+                        subtitle: l10n.mergeStrategyDesc,
+                        value: true,
+                      ),
+                      _RadioOption<bool>(
+                        title: l10n.overwriteStrategy,
+                        subtitle: l10n.overwriteStrategyDesc,
+                        value: false,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -169,19 +171,15 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _RadioOption<T> extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final T value;
+
   const _RadioOption({
     required this.title,
     required this.subtitle,
     required this.value,
-    required this.groupValue,
-    required this.onChanged,
   });
-
-  final String title;
-  final String subtitle;
-  final T value;
-  final T groupValue;
-  final ValueChanged<T?> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -190,10 +188,10 @@ class _RadioOption<T> extends StatelessWidget {
       subtitle: Text(subtitle),
       leading: Radio<T>(
         value: value,
-        groupValue: groupValue,
-        onChanged: onChanged,
       ),
-      onTap: () => onChanged(value),
+      onTap: () {
+        // RadioGroup handles the onChanged
+      },
       contentPadding: EdgeInsets.zero,
     );
   }

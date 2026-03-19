@@ -145,7 +145,7 @@ git push origin v0.4.0
         └─► Release 构建
               ├─► Windows (.exe)
               ├─► macOS (.app/.dmg)
-              ├─► Linux (.AppImage/.deb)
+              ├─► Linux (.deb/.rpm/.AppImage)
               ├─► Android (.apk/.aab)
               └─► iOS (.ipa)
 ```
@@ -236,6 +236,47 @@ git push origin v0.4.1
 - [ ] CI 构建成功
 - [ ] 创建 GitHub Release
 - [ ] 切换回 develop 分支
+
+## Linux 打包说明
+
+### 打包格式
+
+| 格式 | 说明 | 适用系统 |
+|------|------|----------|
+| `.deb` | Debian/Ubuntu 包 | Debian, Ubuntu, Linux Mint |
+| `.rpm` | Red Hat/Fedora 包 | Fedora, RHEL, CentOS, openSUSE |
+| `.AppImage` | 便携式包 | 任意 Linux 发行版 |
+
+### 打包脚本位置
+
+| 文件 | 说明 |
+|------|------|
+| `scripts/linux/postinst.sh` | 安装后脚本（创建桌面快捷方式、安装图标） |
+| `scripts/linux/prerm.sh` | 卸载前脚本（清理桌面快捷方式、图标） |
+| `scripts/appimage/AppDir/` | AppImage 打包目录 |
+| `scripts/appimage/AppDir/busic.desktop` | AppImage 桌面入口文件 |
+
+### 安装脚本功能
+
+#### postinst.sh（安装后执行）
+
+- 安装多尺寸图标到系统图标目录
+- 创建 `.desktop` 桌面快捷方式
+- 创建 `/usr/bin/busic` 符号链接
+- 更新桌面数据库
+
+#### prerm.sh（卸载前执行）
+
+- 删除 `.desktop` 桌面快捷方式
+- 删除系统图标
+- 删除符号链接
+
+### AppImage 特点
+
+- **无需安装**：直接赋予执行权限即可运行
+- **便携性强**：可在任意 Linux 发行版使用
+- **自包含**：包含所有运行时依赖
+- **无需 root 权限**
 
 ## 相关Skill
 
