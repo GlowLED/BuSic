@@ -39,7 +39,9 @@ class TrayService with TrayListener {
 
     // Resolve icon path
     final iconPath = await _resolveIconPath();
-    await trayManager.setIcon(iconPath);
+    if (iconPath != null) {
+      await trayManager.setIcon(iconPath);
+    }
 
     await _rebuildMenu();
   }
@@ -61,7 +63,7 @@ class TrayService with TrayListener {
   ///
   /// On Windows we use the .ico bundled in runner/resources.
   /// On Linux/macOS we use the PNG from flutter assets.
-  Future<String> _resolveIconPath() async {
+  Future<String?> _resolveIconPath() async {
     if (Platform.isWindows) {
       // In a packaged Windows app the .exe sits next to data/
       final exeDir = p.dirname(Platform.resolvedExecutable);
@@ -79,7 +81,11 @@ class TrayService with TrayListener {
     if (await File(bundled).exists()) return bundled;
 
     // Development fallback
-    return p.join(Directory.current.path, 'assets', 'images', 'app_icon.png');
+    final fallbackBundled =  p.join(Directory.current.path, 'assets', 'images', 'app_icon.png');
+    if (await File(fallbackBundled).exists()) {
+      return fallbackBundled; 
+    }
+    return null;
   }
 
   // ─── TrayListener callbacks ───
