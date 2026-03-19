@@ -23,10 +23,3 @@ All notable changes to this project will be documented in this file.
 ### Documentation
 - docs: add .opencode to .gitignore (69544f5)
 
-## [0.3.4] - 2024-XX-XX
-
-### Features
-- Initial release features
-
-### Bug Fixes
-- Various bug fixes
