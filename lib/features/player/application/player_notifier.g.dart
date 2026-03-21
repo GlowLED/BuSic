@@ -6,7 +6,7 @@ part of 'player_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playerNotifierHash() => r'3394b142a7a3ec0e5b80486c096c935ace4cc635';
+String _$playerNotifierHash() => r'f3f8b67e6509d1f30769ab3a3908570f54693cf4';
 
 /// State notifier managing the audio player lifecycle.
 ///
