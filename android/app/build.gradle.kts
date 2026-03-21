@@ -39,7 +39,7 @@ android {
                 keyPassword = keystoreProperties.getProperty("keyPassword")
                     ?: System.getenv("KEY_PASSWORD") ?: ""
                 storeFile = file(keystoreProperties.getProperty("storeFile")
-                    ?: "upload-keystore.jks")
+                    ?: "../upload-keystore.jks")
                 storePassword = keystoreProperties.getProperty("storePassword")
                     ?: System.getenv("STORE_PASSWORD") ?: ""
             }
