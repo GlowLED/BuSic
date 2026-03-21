@@ -6,6 +6,7 @@ import 'widgets/account_section.dart';
 import 'widgets/appearance_section.dart';
 import 'widgets/data_management_section.dart';
 import 'widgets/language_section.dart';
+import 'widgets/minimal_mode_section.dart';
 import 'widgets/playback_section.dart';
 import 'widgets/storage_section.dart';
 
@@ -26,6 +27,8 @@ class SettingsScreen extends ConsumerWidget {
           LanguageSection(),
           Divider(),
           PlaybackSection(),
+          Divider(),
+          MinimalModeSection(),
           Divider(),
           StorageSection(),
           Divider(),

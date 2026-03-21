@@ -17,6 +17,8 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyCachePath = 'cache_path';
   static const _keyPreferredQuality = 'preferred_quality';
   static const _keyThemeSeedColor = 'theme_seed_color';
+  static const _keyMinimalMode = 'is_minimal_mode';
+  static const _keyMinimalPlaylistId = 'minimal_playlist_id';
 
   @override
   UserPreferences build() {
@@ -96,5 +98,37 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyCachePath);
     await prefs.remove(_keyPreferredQuality);
     await prefs.remove(_keyThemeSeedColor);
+    await prefs.remove(_keyMinimalMode);
+    await prefs.remove(_keyMinimalPlaylistId);
+  }
+
+  // ── 极简模式设置（不修改 UserPreferences 模型，直接读写 SharedPreferences） ──
+
+  /// 读取极简模式开关状态（默认 false）。
+  Future<bool> getMinimalMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyMinimalMode) ?? false;
+  }
+
+  /// 设置极简模式开关。
+  Future<void> setMinimalMode(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyMinimalMode, enabled);
+  }
+
+  /// 读取极简模式指定的本地歌单 ID。
+  Future<int?> getMinimalPlaylistId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyMinimalPlaylistId);
+  }
+
+  /// 设置极简模式指定的本地歌单 ID。
+  Future<void> setMinimalPlaylistId(int? id) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (id != null) {
+      await prefs.setInt(_keyMinimalPlaylistId, id);
+    } else {
+      await prefs.remove(_keyMinimalPlaylistId);
+    }
   }
 }

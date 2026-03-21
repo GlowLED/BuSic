@@ -4,10 +4,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'core/api/bili_dio.dart';
 import 'core/database/app_database.dart';
+import 'core/router/app_router.dart';
 import 'core/services/audio_handler.dart';
 import 'core/utils/logger.dart';
 import 'core/utils/platform_utils.dart';
@@ -63,11 +65,16 @@ Future<void> main() async {
       );
     }
 
+    // 读取极简模式标志
+    final prefs = await SharedPreferences.getInstance();
+    final isMinimalMode = prefs.getBool('is_minimal_mode') ?? false;
+
     runApp(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(database),
           audioHandlerProvider.overrideWithValue(audioHandler),
+          initialMinimalModeProvider.overrideWithValue(isMinimalMode),
         ],
         child: const App(),
       ),
