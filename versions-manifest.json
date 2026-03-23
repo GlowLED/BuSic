@@ -1,7 +1,28 @@
 {
-  "latest": "0.3.6",
+  "latest": "0.3.7",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.3.7",
+      "build": 13,
+      "date": "2026-03-23",
+      "changelog": "## Bug Fixes\n- refactor(comment): 添加评论区滚动穿透机制 (#12)",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.7/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.7/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.7/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.7/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.3.6",
       "build": 12,

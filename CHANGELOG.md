@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.7] - 2026-03-23
+
+### Bug Fixes
+- refactor(comment): 添加评论区滚动穿透机制 (#12)
+
+## [0.3.6] - 2026-03-19
+
+### Features
+- feat: disable macos window btn
+
+### Bug Fixes
+- fix: cannot start because of icon missing
+- fix(linux): copy icon to AppDir root for appimagetool
+- fix(linux): copy desktop file to AppDir root for appimagetool
+
 ## [0.3.5] - 2026-03-19
 
 ### Features
