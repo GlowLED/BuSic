@@ -34,6 +34,37 @@ class VideoDetailView extends ConsumerStatefulWidget {
 
 class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   bool _showComments = false;
+  final _scrollController = ScrollController();
+  bool _isScrollingOuter = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onCommentScrollToEdge(ScrollEdge edge) {
+    if (_isScrollingOuter) return;
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (!mounted) return;
+      final position = _scrollController.position;
+      if (edge == ScrollEdge.top && position.pixels > position.minScrollExtent) {
+        _isScrollingOuter = true;
+        _scrollController.animateTo(
+          position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        ).then((_) => _isScrollingOuter = false);
+      } else if (edge == ScrollEdge.bottom && position.pixels < position.maxScrollExtent) {
+        _isScrollingOuter = true;
+        _scrollController.animateTo(
+          position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        ).then((_) => _isScrollingOuter = false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +90,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final isMultiPage = videoInfo.pages.length > 1;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +176,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                 if (_showComments)
                   SizedBox(
                     height: 400,
-                    child: CommentSection(bvid: videoInfo.bvid),
+                    child: CommentSection(
+                      bvid: videoInfo.bvid,
+                      onScrollToEdge: _onCommentScrollToEdge,
+                    ),
                   ),
               ],
             ),

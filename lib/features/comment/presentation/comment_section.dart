@@ -11,6 +11,10 @@ import 'reply_sheet.dart';
 import 'widgets/comment_input.dart';
 import 'widgets/comment_tile.dart';
 
+enum ScrollEdge { top, bottom }
+
+typedef ScrollToEdgeCallback = void Function(ScrollEdge edge);
+
 /// A reusable comment section widget that displays comments for a given video.
 ///
 /// Pass in a [bvid] and the widget handles loading, pagination, sorting,
@@ -19,7 +23,10 @@ class CommentSection extends ConsumerStatefulWidget {
   const CommentSection({
     super.key,
     required this.bvid,
+    this.onScrollToEdge,
   });
+
+  final ScrollToEdgeCallback? onScrollToEdge;
 
   /// The BV number of the video whose comments to show.
   final String bvid;
@@ -50,6 +57,19 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
   void _onScroll() {
     if (_scrollController.position.extentAfter < 200) {
       ref.read(commentNotifierProvider(widget.bvid).notifier).loadMore();
+    }
+    _notifyScrollEdge();
+  }
+
+  void _notifyScrollEdge() {
+    final callback = widget.onScrollToEdge;
+    if (callback == null) return;
+
+    final position = _scrollController.position;
+    if (position.pixels <= position.minScrollExtent) {
+      callback(ScrollEdge.top);
+    } else if (position.pixels >= position.maxScrollExtent) {
+      callback(ScrollEdge.bottom);
     }
   }
 
