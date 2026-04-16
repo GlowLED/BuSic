@@ -1,7 +1,28 @@
 {
-  "latest": "0.3.7",
+  "latest": "0.3.8",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.3.8",
+      "build": 14,
+      "date": "2026-04-16",
+      "changelog": "## Bug Fixes\n- fix(release): 修复 Android CI 构建时 keystore 路径不匹配导致 APK 签名失败",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.8/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.8/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.8/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.3.8/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.3.7",
       "build": 13,

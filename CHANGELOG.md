@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2026-04-16
+
+### Bug Fixes
+- fix(release): 修复 Android CI 构建时 keystore 路径不匹配导致 APK 签名失败
+
 ## [0.3.7] - 2026-03-23
 
 ### Bug Fixes

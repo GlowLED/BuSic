@@ -125,3 +125,6 @@ app.*.symbols
 
 # Local dev / experiment scripts
 temp/
+
+# Claude Code
+.claude/
