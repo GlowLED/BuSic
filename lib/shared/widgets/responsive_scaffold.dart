@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/platform_utils.dart';
-import '../../features/player/presentation/player_bar.dart';
 import '../../features/auth/presentation/widgets/user_avatar_widget.dart';
+import '../../features/player/presentation/player_bar.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// A responsive scaffold that adapts navigation between desktop and mobile.
 ///
@@ -114,43 +114,51 @@ class ResponsiveScaffold extends StatelessWidget {
       );
     }
 
-    // Mobile layout
-    return Scaffold(
-      body: SafeArea(
-        bottom: false, // NavigationBar handles bottom padding
-        child: Column(
-          children: [
-            Expanded(child: navigationShell),
-            const PlayerBar(),
+    // Mobile layout — use PopScope to catch back gesture and unfocus,
+    // ensuring keyboard is dismissed when dialogs close.
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        // Unfocus before pop to dismiss keyboard
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false, // NavigationBar handles bottom padding
+          child: Column(
+            children: [
+              Expanded(child: navigationShell),
+              const PlayerBar(),
+            ],
+          ),
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: currentIdx,
+          onDestinationSelected: (idx) =>
+              _onDestinationSelected(idx),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.library_music_outlined),
+              selectedIcon: const Icon(Icons.library_music),
+              label: l10n.playlists,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.search_outlined),
+              selectedIcon: const Icon(Icons.search),
+              label: l10n.search,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.download_outlined),
+              selectedIcon: const Icon(Icons.download),
+              label: l10n.downloads,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.settings,
+            ),
           ],
         ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIdx,
-        onDestinationSelected: (idx) =>
-            _onDestinationSelected(idx),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.library_music_outlined),
-            selectedIcon: const Icon(Icons.library_music),
-            label: l10n.playlists,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.search_outlined),
-            selectedIcon: const Icon(Icons.search),
-            label: l10n.search,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.download_outlined),
-            selectedIcon: const Icon(Icons.download),
-            label: l10n.downloads,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: l10n.settings,
-          ),
-        ],
       ),
     );
   }
