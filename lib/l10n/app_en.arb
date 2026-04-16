@@ -213,6 +213,8 @@
   "installUpdate": "Install update",
   "downloadCompleteReady": "Download complete, ready to install",
   "retryDownload": "Retry download",
+  "linuxReadOnlyInstallDir": "Linux system-installed apps cannot auto-update. Please download the new version manually.",
+  "openDownloadPage": "Open download page",
   "goToSettings": "Go to Settings",
   "myFavorites": "My Favorites",
   "addToFavorites": "Add to Favorites",

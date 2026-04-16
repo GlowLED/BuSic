@@ -415,11 +415,20 @@ class UpdateNotifier extends _$UpdateNotifier {
       final currentState = state;
       if (currentState is! UpdateStateReadyToInstall) return;
 
-      await _repo.applyUpdate(currentState.localPath);
+      await _repo.applyUpdate(
+        currentState.localPath,
+        version: currentState.info.latestVersion.semver,
+        assetName: currentState.info.assetName,
+      );
     } catch (e, st) {
       AppLogger.error('Apply update failed', tag: _kTag, error: e,
           stackTrace: st);
-      state = UpdateState.error(e.toString());
+      final message = e.toString();
+      if (message.startsWith('INSTALL_READ_ONLY:')) {
+        state = UpdateState.error(message);
+      } else {
+        state = UpdateState.error(e.toString());
+      }
     } finally {
       keepAlive.close();
     }

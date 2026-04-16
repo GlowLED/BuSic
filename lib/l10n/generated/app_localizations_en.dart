@@ -552,6 +552,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryDownload => 'Retry download';
 
   @override
+  String get linuxReadOnlyInstallDir => 'Linux system-installed apps cannot auto-update. Please download the new version manually.';
+
+  @override
+  String get openDownloadPage => 'Open download page';
+
+  @override
   String get goToSettings => 'Go to Settings';
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/update_notifier.dart';
@@ -41,16 +42,30 @@ class DownloadTile extends ConsumerWidget {
           child: Text(l10n.installUpdate),
         ),
       ),
-      error: (message) => ListTile(
-        leading: Icon(Icons.error_outline, color: theme.colorScheme.error),
-        title: Text(l10n.updateError),
-        subtitle: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
-        trailing: TextButton(
-          onPressed: () =>
-              ref.read(updateNotifierProvider.notifier).checkForUpdate(),
-          child: Text(l10n.retryDownload),
-        ),
-      ),
+      error: (message) {
+        if (message.startsWith('INSTALL_READ_ONLY:')) {
+          final url = message.substring('INSTALL_READ_ONLY:'.length);
+          return ListTile(
+            leading: Icon(Icons.error_outline, color: theme.colorScheme.error),
+            title: Text(l10n.updateError),
+            subtitle: Text(l10n.linuxReadOnlyInstallDir, maxLines: 2),
+            trailing: FilledButton(
+              onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+              child: Text(l10n.openDownloadPage),
+            ),
+          );
+        }
+        return ListTile(
+          leading: Icon(Icons.error_outline, color: theme.colorScheme.error),
+          title: Text(l10n.updateError),
+          subtitle: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
+          trailing: TextButton(
+            onPressed: () =>
+                ref.read(updateNotifierProvider.notifier).checkForUpdate(),
+            child: Text(l10n.retryDownload),
+          ),
+        );
+      },
     );
   }
 

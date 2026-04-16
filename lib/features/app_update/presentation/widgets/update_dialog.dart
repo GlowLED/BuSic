@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/update_notifier.dart';
@@ -173,16 +174,35 @@ class UpdateDialog extends ConsumerWidget {
           ),
         ],
       ),
-      error: (message) => AlertDialog(
-        title: Text(l10n.updateError),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.confirm),
-          ),
-        ],
-      ),
+      error: (message) {
+        if (message.startsWith('INSTALL_READ_ONLY:')) {
+          final url = message.substring('INSTALL_READ_ONLY:'.length);
+          return AlertDialog(
+            title: Text(l10n.updateError),
+            content: Text(l10n.linuxReadOnlyInstallDir),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+                child: Text(l10n.openDownloadPage),
+              ),
+            ],
+          );
+        }
+        return AlertDialog(
+          title: Text(l10n.updateError),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.confirm),
+            ),
+          ],
+        );
+      },
     );
   }
 

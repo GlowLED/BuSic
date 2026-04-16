@@ -212,6 +212,8 @@
   "installUpdate": "安装更新",
   "downloadCompleteReady": "下载完成，可以安装",
   "retryDownload": "重试下载",
+  "linuxReadOnlyInstallDir": "Linux 系统安装的应用不支持自动更新，请手动下载新版本安装。",
+  "openDownloadPage": "前往下载页面",
   "goToSettings": "前往设置",
   "myFavorites": "我喜欢",
   "addToFavorites": "收藏",

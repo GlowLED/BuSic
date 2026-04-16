@@ -536,13 +536,13 @@ class UpdateRepositoryImpl implements UpdateRepository {
   }
 
   @override
-  Future<void> applyUpdate(String localPath) async {
+  Future<void> applyUpdate(String localPath, {String? version, String? assetName}) async {
     if (PlatformUtils.isAndroid) {
       await _applyAndroid(localPath);
     } else if (PlatformUtils.isWindows) {
       await _applyWindows(localPath);
     } else if (PlatformUtils.isLinux) {
-      await _applyLinux(localPath);
+      await _applyLinux(localPath, version: version, assetName: assetName);
     } else if (PlatformUtils.isMacOS) {
       await _applyMacOS(localPath);
     } else {
@@ -613,7 +613,7 @@ class UpdateRepositoryImpl implements UpdateRepository {
     exit(0);
   }
 
-  Future<void> _applyLinux(String tarPath) async {
+  Future<void> _applyLinux(String tarPath, {String? version, String? assetName}) async {
     AppLogger.info('Applying Linux update from: $tarPath', tag: _kTag);
 
     final tempDir = await getTemporaryDirectory();
@@ -634,13 +634,20 @@ class UpdateRepositoryImpl implements UpdateRepository {
       await testFile.writeAsString('test');
       await testFile.delete();
     } catch (_) {
+      // Build GitHub download URL for manual update
+      String githubUrl = '';
+      if (version != null && assetName != null) {
+        final releaseProxy = await _prober.probe(
+          kReleaseProxies,
+          testPath: '/$_kOwner/$_kRepo/releases',
+        );
+        githubUrl = '$releaseProxy/$_kOwner/$_kRepo/releases/download/v$version/$assetName';
+      }
       AppLogger.warning(
         'Install directory is read-only, cannot auto-update',
         tag: _kTag,
       );
-      throw Exception(
-        'Install directory is read-only. Please update manually.',
-      );
+      throw Exception('INSTALL_READ_ONLY:$githubUrl');
     }
 
     // Generate update shell script

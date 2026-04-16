@@ -552,6 +552,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retryDownload => '重试下载';
 
   @override
+  String get linuxReadOnlyInstallDir => 'Linux 系统安装的应用不支持自动更新，请手动下载新版本安装。';
+
+  @override
+  String get openDownloadPage => '前往下载页面';
+
+  @override
   String get goToSettings => '前往设置';
 
   @override

@@ -29,7 +29,10 @@ abstract class UpdateRepository {
   Future<String> resolveLanzouUrl(String shareUrl, {String? password});
 
   /// Apply the downloaded update (platform-specific).
-  Future<void> applyUpdate(String localPath);
+  ///
+  /// [version] and [assetName] are used to construct a GitHub download URL
+  /// in case the install directory is read-only (Linux/macOS).
+  Future<void> applyUpdate(String localPath, {String? version, String? assetName});
 
   /// Warm-up: probe proxies and cache the fastest one.
   Future<void> probeProxies();

@@ -1157,6 +1157,18 @@ abstract class AppLocalizations {
   /// **'Retry download'**
   String get retryDownload;
 
+  /// No description provided for @linuxReadOnlyInstallDir.
+  ///
+  /// In en, this message translates to:
+  /// **'Linux system-installed apps cannot auto-update. Please download the new version manually.'**
+  String get linuxReadOnlyInstallDir;
+
+  /// No description provided for @openDownloadPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open download page'**
+  String get openDownloadPage;
+
   /// No description provided for @goToSettings.
   ///
   /// In en, this message translates to:
@@ -1504,6 +1516,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
