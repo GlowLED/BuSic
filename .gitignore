@@ -122,7 +122,6 @@ app.*.symbols
 .vscode
 .github/copilot-instructions.md
 .opencode
-.cursor
 
 # Local dev / experiment scripts
 temp/
