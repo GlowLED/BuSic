@@ -6,7 +6,7 @@ part of 'player_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playerNotifierHash() => r'f3f8b67e6509d1f30769ab3a3908570f54693cf4';
+String _$playerNotifierHash() => r'52565f979e69e8bdee2fdda3c521fc25ddf2f08d';
 
 /// State notifier managing the audio player lifecycle.
 ///
@@ -17,7 +17,7 @@ String _$playerNotifierHash() => r'f3f8b67e6509d1f30769ab3a3908570f54693cf4';
 /// Copied from [PlayerNotifier].
 @ProviderFor(PlayerNotifier)
 final playerNotifierProvider =
-    AutoDisposeNotifierProvider<PlayerNotifier, PlayerState>.internal(
+    NotifierProvider<PlayerNotifier, PlayerState>.internal(
   PlayerNotifier.new,
   name: r'playerNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -27,6 +27,6 @@ final playerNotifierProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$PlayerNotifier = AutoDisposeNotifier<PlayerState>;
+typedef _$PlayerNotifier = Notifier<PlayerState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

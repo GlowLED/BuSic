@@ -29,7 +29,7 @@ part 'player_notifier.g.dart';
 /// Controls playback, queue management, and mode switching.
 /// Listens to the [PlayerRepository] streams and updates [PlayerState] accordingly.
 /// Persists playback state (track, queue, position) for restore on next launch.
-@riverpod
+@Riverpod(keepAlive: true)
 class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
