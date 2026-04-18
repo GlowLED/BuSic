@@ -68,25 +68,27 @@ class _BackupOverviewDialogState extends State<BackupOverviewDialog> {
               ),
             ),
             const SizedBox(height: 8),
-            RadioGroupWidget<bool>(
-              groupValue: _isMerge,
-              onChanged: (value) {
-                if (value != null) setState(() => _isMerge = value);
-              },
-              child: Column(
-                children: [
-                  _RadioOption<bool>(
-                    title: l10n.mergeStrategy,
-                    subtitle: l10n.mergeStrategyDesc,
-                    value: true,
-                  ),
-                  _RadioOption<bool>(
-                    title: l10n.overwriteStrategy,
-                    subtitle: l10n.overwriteStrategyDesc,
-                    value: false,
-                  ),
-                ],
-              ),
+            Column(
+              children: [
+                _RadioOption<bool>(
+                  title: l10n.mergeStrategy,
+                  subtitle: l10n.mergeStrategyDesc,
+                  value: true,
+                  groupValue: _isMerge,
+                  onChanged: (value) {
+                    if (value != null) setState(() => _isMerge = value);
+                  },
+                ),
+                _RadioOption<bool>(
+                  title: l10n.overwriteStrategy,
+                  subtitle: l10n.overwriteStrategyDesc,
+                  value: false,
+                  groupValue: _isMerge,
+                  onChanged: (value) {
+                    if (value != null) setState(() => _isMerge = value);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -166,47 +168,35 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-// 自定义 RadioGroupWidget，兼容 Flutter 3.29.1 并避免 deprecated API 警告
-class RadioGroupWidget<T> extends InheritedWidget {
-  const RadioGroupWidget({
-    super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required super.child,
-  });
-
-  final T groupValue;
-  final ValueChanged<T?> onChanged;
-
-  @override
-  bool updateShouldNotify(RadioGroupWidget<T> oldWidget) {
-    return groupValue != oldWidget.groupValue;
-  }
-}
-
-RadioGroupWidget<T>? _radioGroupOf<T>(BuildContext context) {
-  return context.dependOnInheritedWidgetOfExactType<RadioGroupWidget<T>>();
-}
-
 class _RadioOption<T> extends StatelessWidget {
   const _RadioOption({
     required this.title,
     required this.subtitle,
     required this.value,
+    required this.groupValue,
+    required this.onChanged,
   });
 
   final String title;
   final String subtitle;
   final T value;
+  final T groupValue;
+  final ValueChanged<T?> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final group = _radioGroupOf<T>(context);
     return ListTile(
       title: Text(title),
       subtitle: Text(subtitle),
-      leading: Radio<T>(value: value),
-      onTap: group != null ? () => group.onChanged(value) : null,
+      leading: Radio<T>(
+        // ignore: deprecated_member_use
+        value: value,
+        // ignore: deprecated_member_use
+        groupValue: groupValue,
+        // ignore: deprecated_member_use
+        onChanged: onChanged,
+      ),
+      onTap: () => onChanged(value),
       contentPadding: EdgeInsets.zero,
     );
   }
