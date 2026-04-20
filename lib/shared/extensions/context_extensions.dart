@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_theme_tokens.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Convenience extensions on [BuildContext] for quick access to
@@ -13,6 +16,20 @@ extension ContextExtensions on BuildContext {
   /// Current [TextTheme].
   TextTheme get textTheme => Theme.of(this).textTheme;
 
+  /// App-level palette tokens for surfaces, text, states, and overlays.
+  AppThemePalette get appPalette =>
+      Theme.of(this).extension<AppThemePalette>()!;
+
+  /// App-level spacing tokens.
+  AppThemeSpacing get appSpacing =>
+      Theme.of(this).extension<AppThemeSpacing>()!;
+
+  /// App-level corner radius tokens.
+  AppThemeRadii get appRadii => Theme.of(this).extension<AppThemeRadii>()!;
+
+  /// App-level shadow, border, and glow tokens.
+  AppThemeDepth get appDepth => Theme.of(this).extension<AppThemeDepth>()!;
+
   /// Localized strings via [AppLocalizations].
   AppLocalizations get l10n => AppLocalizations.of(this)!;
 
@@ -23,7 +40,7 @@ extension ContextExtensions on BuildContext {
   double get screenHeight => MediaQuery.of(this).size.height;
 
   /// Whether the current layout is considered desktop width (>= 840).
-  bool get isDesktop => screenWidth >= 840;
+  bool get isDesktop => screenWidth >= AppTheme.desktopBreakpoint;
 
   /// Show a [SnackBar] with the given [message], floating above the player bar.
   void showSnackBar(String message) {

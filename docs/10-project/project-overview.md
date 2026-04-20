@@ -45,8 +45,7 @@ lib/
 4. 初始化 `BiliDio` Cookie 持久化
 5. 初始化 `audio_service`
 6. 桌面端初始化窗口服务和托盘服务
-7. 读取极简模式标志
-8. 通过 `ProviderScope.overrides` 注入数据库、音频服务和极简模式初始值
+7. 通过 `ProviderScope.overrides` 注入数据库和音频服务
 
 ### 应用层
 

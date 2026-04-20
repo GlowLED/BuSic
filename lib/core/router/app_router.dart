@@ -24,15 +24,10 @@ abstract class AppRoutes {
   static const String minimal = '/minimal';
 }
 
-/// 启动时读取的极简模式标志，由 main() 通过 ProviderScope override 注入。
-final initialMinimalModeProvider = Provider<bool>((ref) => false);
-
 /// Global router provider for the application.
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final isMinimalMode = ref.read(initialMinimalModeProvider);
-
   return GoRouter(
-    initialLocation: isMinimalMode ? AppRoutes.minimal : AppRoutes.home,
+    initialLocation: AppRoutes.home,
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -87,7 +82,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      // Standalone routes (outside shell)
+      // Standalone routes outside the main shell.
       GoRoute(
         path: AppRoutes.login,
         name: 'login',
@@ -98,7 +93,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'player',
         builder: (context, state) => const FullPlayerScreen(),
       ),
-      // 极简模式独立路由（不包含底部导航栏）
       GoRoute(
         path: AppRoutes.minimal,
         name: 'minimal',

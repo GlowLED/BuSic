@@ -98,31 +98,68 @@ static const double compactBreakpoint = 600;
 
 ## 主题系统
 
-### Material 3 + Seed Color
+### AppTheme 设计系统入口
 
-主题定义在 `lib/core/theme/app_theme.dart`，使用 `ColorScheme.fromSeed`：
+主题定义在 `lib/core/theme/app_theme.dart`，不再只是简单的 `ColorScheme.fromSeed` 包装，而是统一的设计系统入口。当前主题层包含：
+
+- `AppThemePalette`：背景、表面、强调色、边框、文本、状态色、overlay、glow
+- `AppThemeSpacing`：统一间距刻度
+- `AppThemeRadii`：统一圆角刻度
+- `AppThemeDepth`：统一边框宽度、阴影和发光参数
+
+这些 token 通过 `ThemeData.extensions` 暴露，后续页面和共享组件都应复用这套命名，而不是各自发明新的样式语义。
+
+### Seed 色预设
 
 ```dart
-// 4 种预设种子色
-static const Map<String, Color> seedColors = {
-  'green': Colors.green,
-  'pink': Colors.pink,
-  'purple': Colors.purple,
-  'yellow': Colors.yellow,
+static const Map<String, Color> seedPresets = {
+  'green': AppTheme.greenSeed,
+  'blue': AppTheme.blueSeed,
+  'teal': AppTheme.tealSeed,
+  'pink': AppTheme.pinkSeed,
+  'purple': AppTheme.purpleSeed,
+  'indigo': AppTheme.indigoSeed,
+  'yellow': AppTheme.yellowSeed,
+  'orange': AppTheme.orangeSeed,
+  'red': AppTheme.redSeed,
+  'cyan': AppTheme.cyanSeed,
 };
 ```
 
 ### 在 Widget 中访问主题
 
 ```dart
-// ✅ 使用 context 扩展（推荐）
+// ✅ 基础 Flutter 主题访问
 final theme = context.theme;
-final colors = context.colorScheme;
+final colorScheme = context.colorScheme;
 final textTheme = context.textTheme;
 
-// ❌ 不推荐直接调用
-Theme.of(context).colorScheme;
+// ✅ BuSic 设计 token 访问
+final palette = context.appPalette;
+final spacing = context.appSpacing;
+final radii = context.appRadii;
+final depth = context.appDepth;
 ```
+
+推荐规则：
+
+- 优先用 `context.appPalette` 读取 BuSic 特有的视觉语义
+- 仍可继续用 `context.colorScheme` / `context.textTheme` 对接 Material 组件
+- 不推荐在业务页面里直接写魔法数字圆角、间距、阴影和自定义色值
+
+### 主题覆盖范围
+
+`AppTheme` 现在会统一配置这些组件的基础视觉语言：
+
+- `AppBar`
+- `Card`
+- `Dialog` / `BottomSheet`
+- `NavigationRail` / `NavigationBar`
+- `TextField`
+- `FilledButton` / `OutlinedButton` / `TextButton`
+- `SegmentedButton` / `Chip`
+- `ListTile`
+- `SnackBar`
 
 ### 主题模式
 
