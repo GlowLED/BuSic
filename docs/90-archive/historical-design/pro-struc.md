@@ -1,7 +1,7 @@
 # 项目目录结构与模块说明 (Project Structure)
 
 > ⚠️ 本文档保留了部分历史结构描述，不再作为当前架构的首要入口。
-> 当前仓库请优先阅读 [维护者上手](maintainer-onboarding.md) 和 [LLM/architecture.md](LLM/architecture.md)。
+> 归档提示：当前仓库请优先阅读 [docs/README](../../README.md)、[新开发者路径](../../00-start-here/newcomer-path.md) 和 [架构速查](../../30-reference/architecture.md)。
 > 尤其需要注意：数据库方案已经是 **Drift**，播放器后台能力也已经接入 `audio_service`。
 
 本项目基于 Flutter 框架，遵循 **Feature-first (按功能划分)** 与 **Lite DDD (轻量级领域驱动设计)** 原则，结合 Riverpod 进行状态管理。同时内置了完整的 i18n 多语言支持与跨端（Desktop + Mobile）兼容处理。

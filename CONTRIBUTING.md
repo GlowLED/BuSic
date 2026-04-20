@@ -57,8 +57,9 @@ dart run build_runner build --delete-conflicting-outputs && flutter analyze --no
 
 详细的编码规范请参阅：
 
-- [编码规范](docs/LLM/coding-conventions.md) — 命名约定、代码风格、错误处理
-- [架构与项目结构](docs/LLM/architecture.md) — 分层架构、目录组织
+- [docs 主入口](docs/README.md) — 默认阅读路径与项目特化知识导航
+- [编码规范](docs/30-reference/coding-conventions.md) — 命名约定、代码风格、错误处理
+- [架构与项目结构](docs/30-reference/architecture.md) — 分层架构、目录组织
 
 ### 核心要点
 
