@@ -1,5 +1,9 @@
 # 项目目录结构与模块说明 (Project Structure)
 
+> ⚠️ 本文档保留了部分历史结构描述，不再作为当前架构的首要入口。
+> 当前仓库请优先阅读 [维护者上手](maintainer-onboarding.md) 和 [LLM/architecture.md](LLM/architecture.md)。
+> 尤其需要注意：数据库方案已经是 **Drift**，播放器后台能力也已经接入 `audio_service`。
+
 本项目基于 Flutter 框架，遵循 **Feature-first (按功能划分)** 与 **Lite DDD (轻量级领域驱动设计)** 原则，结合 Riverpod 进行状态管理。同时内置了完整的 i18n 多语言支持与跨端（Desktop + Mobile）兼容处理。
 
 ## 根目录概览
@@ -27,7 +31,7 @@ Plaintext
 
 ```
 lib/
-├── main.dart              # App 入口：初始化 Isar 数据库、media_kit、跨端 Window 逻辑
+├── main.dart              # App 入口：初始化 Drift 数据库、media_kit、audio_service、跨端 Window 逻辑
 ├── app.dart               # MaterialApp 配置：注入 go_router、主题、多语言代理
 │
 ├── l10n/                  # 🌐 国际化与多语言支持
@@ -36,7 +40,7 @@ lib/
 │
 ├── core/                  # ⚙️ 核心基础基建 (与具体业务无关，全局通用)
 │   ├── api/               # B站 API 底层封装 (Dio 实例、拦截器、Wbi 签名算法)
-│   ├── database/          # Isar 数据库初始化配置及全局 Schema 注册
+│   ├── database/          # Drift 数据库初始化配置及全局表注册
 │   ├── router/            # go_router 全局路由表配置 (支持深层链接)
 │   ├── theme/             # 全局主题配置 (明暗色调、Typography、跨端响应式断点)
 │   ├── utils/             # 工具类 (日志 Logger、时间格式化、Hash 计算等)
@@ -63,7 +67,7 @@ lib/
     ├── playlist/          # 🗂️ 歌单管理模块 (B站收藏夹同步、本地自建歌单)
     │   ├── application/   # 增删改查歌单状态
     │   ├── domain/        # 歌单及关系模型 (Playlist, SongItem)
-    │   ├── data/          # Isar 数据库读写 Repository
+    │   ├── data/          # Drift 数据库读写 Repository
     │   └── presentation/  # 歌单列表页、歌曲拖拽排序 UI
     │
     ├── search_and_parse/  # 🔍 解析与搜索模块 (核心解耦部分)
@@ -91,7 +95,7 @@ lib/
    - **Desktop (宽屏)**：左侧显示固定侧边栏 (Sidebar)，顶部使用自定义拖拽标题栏 (`window_manager`)。
    - **Android (窄屏)**：隐藏左侧侧边栏，启用底部导航栏 (BottomNavigationBar) 或抽屉 (Drawer)，并忽略桌面端窗口管理逻辑。
 2. **后台播放与下载**：
-   - 桌面端后台播放和下载相对简单。但在 Android 上，为了防止 App 退到后台被系统杀掉导致音乐停止，我们需要在 `features/player` 中集成类似 `audio_service` 的库，来接管 Android 系统的媒体通知栏和锁屏控制。
+   - 桌面端后台播放和下载相对简单。Android 端当前已经通过 `audio_service` 接管媒体通知栏、锁屏控制和后台播放会话。
 3. **文件系统权限**：
    - 桌面端的缓存路径可以默认在用户的 Music 或 AppData 目录下。
    - Android 10+ 引入了分区存储 (Scoped Storage)，我们需要在 `core/utils/path_provider` 中根据平台动态获取合法的缓存目录，并向用户动态申请存储权限。

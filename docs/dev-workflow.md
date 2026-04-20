@@ -11,7 +11,7 @@
 
 - 确定功能的用户场景、输入输出和边界条件。
 - 判断功能属于**现有 Feature 的扩展**还是**全新 Feature 模块**。
-- 参考 [项目结构文档](pro-struc.md) 和 [架构文档](LLM/architecture.md) 确认功能归属的模块位置。
+- 参考 [维护者上手](maintainer-onboarding.md) 和 [架构文档](LLM/architecture.md) 确认功能归属的模块位置。
 
 ### 1.2 编写功能规划文档（可选）
 
@@ -293,7 +293,8 @@ lib/features/new_feature/
 
 | 文档 | 描述 |
 |------|------|
-| [pro-struc.md](pro-struc.md) | 项目目录结构与模块职责 |
+| [maintainer-onboarding.md](maintainer-onboarding.md) | 维护者开发与发布入口总览 |
+| [pro-struc.md](pro-struc.md) | 历史结构说明（存在过时内容） |
 | [build-guide.md](build-guide.md) | 从零搭建构建环境 |
 | [debug-guide.md](debug-guide.md) | 本地调试指南 |
 | [design.md](design.md) | 早期技术设计文档 |
