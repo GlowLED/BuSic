@@ -1,6 +1,10 @@
 # 真机 / 模拟器交互测试指南（面向 LLM Agent）
 
-本文档描述 AI 编码 Agent 在修复 Bug 或实现功能后，如何通过 ADB + `flutter run` 进行真机（或模拟器）交互测试验证。
+本文档只描述 AI 编码 Agent 在修复 Bug 或实现功能后，如何通过 ADB + `flutter run` 进行真机（或模拟器）交互测试验证。
+
+自动化测试的命令、目录、覆盖矩阵和维护规则已经收口到：
+
+- [../20-workflows/testing-guide.md](../20-workflows/testing-guide.md)
 
 ## 前置条件
 
