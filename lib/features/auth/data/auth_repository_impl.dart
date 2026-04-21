@@ -12,27 +12,34 @@ import 'auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final BiliDio _biliDio;
   final AppDatabase _db;
+  final Dio _authDio;
 
   /// Raw Dio instance for auth requests that bypasses cookie management.
   /// Bilibili's passport endpoints return Set-Cookie headers with commas,
   /// which Dart's Cookie parser rejects. Since we extract session info from
   /// the redirect URL rather than cookies, we don't need cookie handling.
-  static final Dio _authDio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://www.bilibili.com',
-      },
-    ),
-  );
+  static Dio _createAuthDio() {
+    return Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                  '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Referer': 'https://www.bilibili.com',
+        },
+      ),
+    );
+  }
 
-  AuthRepositoryImpl({required BiliDio biliDio, required AppDatabase db})
-      : _biliDio = biliDio,
-        _db = db;
+  AuthRepositoryImpl({
+    required BiliDio biliDio,
+    required AppDatabase db,
+    Dio? authDio,
+  })  : _biliDio = biliDio,
+        _db = db,
+        _authDio = authDio ?? _createAuthDio();
 
   @override
   Future<({String qrUrl, String qrKey})> generateQrCode() async {

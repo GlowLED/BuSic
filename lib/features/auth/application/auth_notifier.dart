@@ -10,6 +10,17 @@ import '../domain/models/user.dart';
 
 part 'auth_notifier.g.dart';
 
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl(
+    biliDio: BiliDio(),
+    db: ref.read(databaseProvider),
+  );
+});
+
+final authQrPollIntervalProvider = Provider<Duration>((ref) {
+  return const Duration(seconds: 2);
+});
+
 /// State notifier managing the authentication lifecycle.
 ///
 /// Provides the current [User] session state and exposes methods
@@ -22,10 +33,7 @@ class AuthNotifier extends _$AuthNotifier {
 
   @override
   Future<User?> build() async {
-    _repository = AuthRepositoryImpl(
-      biliDio: BiliDio(),
-      db: ref.read(databaseProvider),
-    );
+    _repository = ref.read(authRepositoryProvider);
     ref.onDispose(() {
       _pollTimer?.cancel();
     });
@@ -52,7 +60,8 @@ class AuthNotifier extends _$AuthNotifier {
 
     // Start polling every 2 seconds
     _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+    final pollInterval = ref.read(authQrPollIntervalProvider);
+    _pollTimer = Timer.periodic(pollInterval, (timer) async {
       if (_currentQrKey == null) {
         timer.cancel();
         return;

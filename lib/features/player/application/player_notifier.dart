@@ -24,6 +24,18 @@ import 'player_state_persistence.dart';
 
 part 'player_notifier.g.dart';
 
+final playerRepositoryProvider = Provider<PlayerRepository>((ref) {
+  return PlayerRepositoryImpl();
+});
+
+final playerParseRepositoryProvider = Provider<ParseRepository>((ref) {
+  return ParseRepositoryImpl(biliDio: BiliDio());
+});
+
+final playerResumeSeekDelayProvider = Provider<Duration>((ref) {
+  return const Duration(milliseconds: 300);
+});
+
 /// State notifier managing the audio player lifecycle.
 ///
 /// Controls playback, queue management, and mode switching.
@@ -50,8 +62,8 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
   @override
   PlayerState build() {
-    _repository = PlayerRepositoryImpl();
-    _parseRepository = ParseRepositoryImpl(biliDio: BiliDio());
+    _repository = ref.read(playerRepositoryProvider);
+    _parseRepository = ref.read(playerParseRepositoryProvider);
     _audioHandler = ref.read(audioHandlerProvider);
     _db = ref.read(databaseProvider);
 
@@ -169,7 +181,8 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
           ? updatedQueue[state.currentIndex]
           : state.currentTrack;
       state = state.copyWith(queue: updatedQueue, currentTrack: currentTrack);
-      AppLogger.info('Refreshed queue local paths after download', tag: 'Player');
+      AppLogger.info('Refreshed queue local paths after download',
+          tag: 'Player');
     }
   }
 
@@ -212,6 +225,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       position: Duration.zero,
     );
   }
+
   /// Play a specific track, optionally replacing the queue.
   Future<void> playTrack(AudioTrack track, {List<AudioTrack>? queue}) async {
     final newQueue = queue ?? [track];
@@ -280,7 +294,8 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         streamUrl = streamInfo.url;
         quality = streamInfo.quality;
       } catch (e) {
-        AppLogger.error('Failed to resolve stream for ${song.bvid}', tag: 'Player', error: e);
+        AppLogger.error('Failed to resolve stream for ${song.bvid}',
+            tag: 'Player', error: e);
         rethrow;
       }
     }
@@ -311,18 +326,20 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     final track = await _resolveAudioTrack(song);
 
     // Build queue with placeholder tracks (will resolve on play)
-    final queue = songs.map((s) => AudioTrack(
-      songId: s.id,
-      bvid: s.bvid,
-      cid: s.cid,
-      title: s.displayTitle,
-      artist: s.displayArtist,
-      coverUrl: s.coverUrl,
-      duration: Duration(seconds: s.duration),
-      streamUrl: s.id == song.id ? track.streamUrl : null,
-      localPath: s.localPath,
-      quality: s.audioQuality,
-    )).toList();
+    final queue = songs
+        .map((s) => AudioTrack(
+              songId: s.id,
+              bvid: s.bvid,
+              cid: s.cid,
+              title: s.displayTitle,
+              artist: s.displayArtist,
+              coverUrl: s.coverUrl,
+              duration: Duration(seconds: s.duration),
+              streamUrl: s.id == song.id ? track.streamUrl : null,
+              localPath: s.localPath,
+              quality: s.audioQuality,
+            ))
+        .toList();
 
     // Update the resolved track in queue
     if (index >= 0) {
@@ -384,7 +401,8 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       _hasActiveMedia = true;
       // Seek to saved position after a short delay for media to load
       if (savedPosition > Duration.zero) {
-        Future.delayed(const Duration(milliseconds: 300), () {
+        final seekDelay = ref.read(playerResumeSeekDelayProvider);
+        Future.delayed(seekDelay, () {
           _repository.seek(savedPosition);
         });
       }
@@ -416,7 +434,8 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         position: Duration.zero,
       );
       if (firstTrack != null) {
-        _audioHandler.setCurrentTrack(firstTrack, duration: firstTrack.duration);
+        _audioHandler.setCurrentTrack(firstTrack,
+            duration: firstTrack.duration);
       }
       persistState();
       return;

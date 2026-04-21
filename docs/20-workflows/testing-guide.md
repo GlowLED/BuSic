@@ -21,7 +21,7 @@
 
 - `flutter analyze --no-fatal-infos` 通过
 - `flutter test -r expanded` 通过
-- 当前总计 **124 个测试**
+- 当前总计 **151 个测试**
 
 CI 当前执行顺序与本地保持一致：
 
@@ -84,11 +84,14 @@ test/
 │   ├── router/
 │   └── theme/
 ├── features/
+│   ├── auth/
 │   ├── app_update/
 │   ├── download/
 │   ├── playlist/
+│   ├── player/
 │   ├── search_and_parse/
 │   ├── settings/
+│   ├── subtitle/
 │   └── share/
 ├── shared/
 │   └── widgets/
@@ -165,6 +168,7 @@ void main() {
 
 - 使用 `ProviderContainer`
 - 用 `addTearDown(container.dispose)` 回收资源
+- 对 `autoDispose` 且带异步初始化的 provider，测试中用 `container.listen(...)` 保持 provider 存活到断言结束
 - 优先断言最终 state 或持久化结果，不要只断言内部调用顺序
 
 ### 4.3 SharedPreferences 测试
@@ -230,38 +234,27 @@ group('备份导出不含下载路径', () {
 | `features/search_and_parse` | `presentation/widgets/search_result_list_test.dart` | 覆盖偏浅 | 优先补解析与数据层 |
 | `features/settings` | `application/settings_notifier_test.dart` | 局部覆盖 | 改设置持久化时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
-| `features/auth` | 无 | 未覆盖 | 需要新增数据层和状态层测试 |
+| `features/auth` | `data/auth_repository_impl_test.dart` + `application/auth_notifier_test.dart` | 关键登录与会话链路已覆盖 | 后续补 `presentation/login_screen.dart` 交互回归 |
 | `features/comment` | 无 | 未覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
-| `features/player` | 无 | 未覆盖 | 需要新增主链路状态与缓存联动测试 |
-| `features/subtitle` | 无 | 未覆盖 | 需要新增缓存、前缀校验、重试测试 |
+| `features/player` | `application/player_notifier_test.dart` | 主链路状态与缓存联动已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
+| `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` | 缓存、重试与状态映射已覆盖 | 后续补 `presentation/widgets/lyrics_panel.dart` 联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 
 ## 7. 补测优先级
 
 ### P0
 
-- `player`
-- `subtitle`
-- `auth`
-
-原因：
-
-- 都在主链路或强耦合链路上
-- 任何回归都容易影响播放、登录、歌词或真实请求
-- 当前 `test/features/` 中完全缺失
-
-### P1
-
 - `comment`
 - `minimal`
 
 原因：
 
-- 目前完全没有自动化测试
-- 逻辑不如 P0 核心，但失败后仍较难靠静态分析发现
+- 当前仍然完全没有自动化测试
+- 一个影响评论请求与交互，一个影响极简模式生命周期与独立页面
+- 都不容易靠静态分析发现行为回归
 
-### P2
+### P1
 
 - 为已部分覆盖 feature 补齐层级缺口
 - 优先顺序：`playlist` -> `search_and_parse` -> `settings` -> `app_update`
@@ -270,6 +263,15 @@ group('备份导出不含下载路径', () {
 
 - 已经有局部测试，继续补齐成本更低
 - 有利于把目录结构逐步拉回推荐形态
+
+### P2
+
+- 继续加深 `auth` / `player` / `subtitle` / `download` / `share` 的 `presentation` 或更细粒度状态回归
+
+原因：
+
+- 这些 feature 已覆盖关键主链路，但仍有 UI 与边界行为可以继续加固
+- 应优先在新增需求或真实 bug 出现时做 targeted test 回填
 
 ## 8. 什么时候必须更新本文档
 

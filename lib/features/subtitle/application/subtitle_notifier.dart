@@ -3,10 +3,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/api/bili_dio.dart';
 import '../../../core/utils/logger.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../data/subtitle_repository.dart';
 import '../data/subtitle_repository_impl.dart';
 import '../domain/models/subtitle_data.dart';
 
 part 'subtitle_notifier.g.dart';
+
+final subtitleRepositoryProvider = Provider<SubtitleRepository>((ref) {
+  return SubtitleRepositoryImpl(
+    biliDio: BiliDio(),
+    db: ref.read(databaseProvider),
+  );
+});
 
 /// Loading status for subtitle data.
 enum SubtitleLoadStatus {
@@ -54,10 +62,7 @@ class SubtitleNotifier extends _$SubtitleNotifier {
   Future<void> _loadSubtitle() async {
     final link = ref.keepAlive();
     try {
-      final repo = SubtitleRepositoryImpl(
-        biliDio: BiliDio(),
-        db: ref.read(databaseProvider),
-      );
+      final repo = ref.read(subtitleRepositoryProvider);
 
       final data = await repo.getSubtitle(bvid: bvid, cid: cid);
       if (data != null) {
@@ -112,8 +117,7 @@ class SubtitleNotifier extends _$SubtitleNotifier {
     // Linear scan (lines are sorted, count is small, ~50–200)
     var index = -1;
     for (var i = 0; i < lines.length; i++) {
-      if (posSeconds >= lines[i].startTime &&
-          posSeconds < lines[i].endTime) {
+      if (posSeconds >= lines[i].startTime && posSeconds < lines[i].endTime) {
         index = i;
         break;
       }
