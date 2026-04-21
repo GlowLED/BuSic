@@ -171,6 +171,27 @@
   "fetchingMetadata": "Fetching song info...",
   "selectAll": "Select All",
   "deselectAll": "Deselect All",
+  "batchActions": "Batch Actions",
+  "sort": "Sort",
+  "sortingMode": "Sorting Mode",
+  "doneSorting": "Done Sorting",
+  "moreActions": "More Actions",
+  "previousPage": "Previous Page",
+  "nextPage": "Next Page",
+  "jumpToPage": "Jump to Page",
+  "pageNumberLabel": "Page",
+  "enterPageRange": "Enter 1-{max}",
+  "@enterPageRange": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "songsTotal": "{count} songs",
+  "@songsTotal": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "selectedSongCount": "Selected {count}/{total}",
   "@selectedSongCount": {
     "placeholders": {

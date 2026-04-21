@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../../shared/widgets/media_cover.dart';
+import '../../../shared/widgets/media_row.dart';
 import '../../../shared/widgets/song_tile.dart';
 import '../../player/application/player_notifier.dart';
 import '../../player/domain/models/play_mode.dart';
@@ -21,8 +23,10 @@ import 'widgets/song_context_menu.dart';
 enum _EditMode {
   /// Normal browsing mode.
   none,
+
   /// Reorder mode — drag handle visible, drag to reorder.
   reorder,
+
   /// Batch selection mode — checkboxes visible, batch actions available.
   batchSelect,
 }
@@ -130,6 +134,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (songs) {
+          final playerState = ref.watch(playerNotifierProvider);
+
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -147,10 +153,13 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
                     _editMode == _EditMode.batchSelect
-                        ? '已选 ${_selectedSongIds.length} 首'
+                        ? l10n.selectedSongCount(
+                            _selectedSongIds.length,
+                            songs.length,
+                          )
                         : _editMode == _EditMode.reorder
-                            ? '排序模式'
-                            : playlistName ?? 'Playlist',
+                            ? l10n.sortingMode
+                            : playlistName ?? l10n.playlists,
                     style: context.textTheme.titleMedium,
                   ),
                   background: Container(
@@ -169,7 +178,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                 actions: _buildActions(context, songs, playlistName, l10n),
               ),
               // Batch action bar
-              if (_editMode == _EditMode.batchSelect && _selectedSongIds.isNotEmpty)
+              if (_editMode == _EditMode.batchSelect &&
+                  _selectedSongIds.isNotEmpty)
                 SliverToBoxAdapter(
                   child: BatchActionBar(
                     playlistId: playlistId,
@@ -195,27 +205,29 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                   onReorder: (oldIndex, newIndex) {
                     if (newIndex > oldIndex) newIndex--;
                     ref
-                        .read(playlistDetailNotifierProvider(playlistId)
-                            .notifier)
+                        .read(
+                            playlistDetailNotifierProvider(playlistId).notifier)
                         .reorderSongs(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {
                     final song = songs[index];
-                    return ReorderableDragStartListener(
+                    final isCurrentSong =
+                        playerState.currentTrack?.songId == song.id &&
+                            playerState.isPlaying;
+
+                    return Padding(
                       key: ValueKey(song.id),
-                      index: index,
-                      child: ListTile(
-                        leading: const Icon(Icons.drag_handle),
-                        title: Text(
-                          song.displayTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          song.displayArtist,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      padding: EdgeInsets.fromLTRB(
+                        context.appSpacing.md,
+                        index == 0 ? context.appSpacing.md : 0,
+                        context.appSpacing.md,
+                        context.appSpacing.sm,
+                      ),
+                      child: _buildReorderSongRow(
+                        context: context,
+                        song: song,
+                        index: index,
+                        isCurrentSong: isCurrentSong,
                       ),
                     );
                   },
@@ -225,93 +237,79 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final song = songs[index];
-                      final playerState = ref.watch(playerNotifierProvider);
                       final isCurrentSong =
                           playerState.currentTrack?.songId == song.id;
                       final isSelected = _selectedSongIds.contains(song.id);
                       return _editMode == _EditMode.batchSelect
-                          ? CheckboxListTile(
-                              value: isSelected,
-                              onChanged: (_) => _toggleSongSelection(song.id),
-                              title: Text(
-                                song.displayTitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                          ? Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                context.appSpacing.md,
+                                index == 0 ? context.appSpacing.md : 0,
+                                context.appSpacing.md,
+                                context.appSpacing.sm,
                               ),
-                              subtitle: Text(
-                                song.displayArtist,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              secondary: ClipRRect(
-                                borderRadius: BorderRadius.circular(6),
-                                child: SizedBox(
-                                  width: 48,
-                                  height: 48,
-                                  child: song.coverUrl != null
-                                      ? Image.network(
-                                          song.coverUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
-                                              Container(
-                                            color: context.colorScheme
-                                                .surfaceContainerHighest,
-                                            child: const Icon(
-                                                Icons.music_note, size: 24),
-                                          ),
-                                        )
-                                      : Container(
-                                          color: context.colorScheme
-                                              .surfaceContainerHighest,
-                                          child: const Icon(
-                                              Icons.music_note, size: 24),
-                                        ),
-                                ),
+                              child: _buildBatchSelectSongRow(
+                                context: context,
+                                song: song,
+                                isCurrentSong:
+                                    isCurrentSong && playerState.isPlaying,
+                                isSelected: isSelected,
                               ),
                             )
-                          : GestureDetector(
-                              onLongPress: () {
-                                // Enter batch select mode on long press
-                                setState(() {
-                                  _editMode = _EditMode.batchSelect;
-                                  _selectedSongIds.add(song.id);
-                                });
-                              },
+                          : Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                context.appSpacing.md,
+                                index == 0 ? context.appSpacing.md : 0,
+                                context.appSpacing.md,
+                                context.appSpacing.sm,
+                              ),
                               child: SongTile(
                                 title: song.displayTitle,
                                 artist: song.displayArtist,
                                 coverUrl: song.coverUrl,
                                 duration: Formatters.formatDuration(
-                                    Duration(seconds: song.duration)),
+                                  Duration(seconds: song.duration),
+                                ),
                                 isPlaying:
                                     isCurrentSong && playerState.isPlaying,
                                 isCached: song.isCached,
                                 qualityLabel:
                                     song.isCached ? song.qualityLabel : null,
-                                isFavorited: favState.value
-                                        ?.contains(song.id) ??
-                                    false,
+                                isFavorited:
+                                    favState.value?.contains(song.id) ?? false,
+                                onLongPress: () {
+                                  setState(() {
+                                    _editMode = _EditMode.batchSelect;
+                                    _selectedSongIds.add(song.id);
+                                  });
+                                },
                                 onFavoritePressed: () {
                                   ref
-                                      .read(favoriteNotifierProvider
-                                          .notifier)
+                                      .read(
+                                        favoriteNotifierProvider.notifier,
+                                      )
                                       .toggleFavorite(song.id);
                                 },
                                 onTap: () {
-                                  if (isCurrentSong &&
-                                      playerState.isPlaying) {
+                                  if (isCurrentSong && playerState.isPlaying) {
                                     ref
                                         .read(
-                                            playerNotifierProvider.notifier)
+                                          playerNotifierProvider.notifier,
+                                        )
                                         .pause();
                                   } else if (isCurrentSong) {
                                     ref
                                         .read(
-                                            playerNotifierProvider.notifier)
+                                          playerNotifierProvider.notifier,
+                                        )
                                         .resume();
                                   } else {
                                     _playSong(
-                                        ref, song, songs, playlistName);
+                                      ref,
+                                      song,
+                                      songs,
+                                      playlistName,
+                                    );
                                   }
                                 },
                                 onMorePressed: () {
@@ -335,6 +333,141 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     );
   }
 
+  Widget _buildReorderSongRow({
+    required BuildContext context,
+    required SongItem song,
+    required int index,
+    required bool isCurrentSong,
+  }) {
+    return MediaRow(
+      cover: MediaCover(
+        coverUrl: song.coverUrl,
+        width: 58,
+        height: 58,
+      ),
+      title: Text(
+        song.displayTitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: context.textTheme.titleSmall,
+      ),
+      subtitle: Text(
+        song.displayArtist,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: context.appPalette.textSecondary,
+        ),
+      ),
+      badges: _buildSongStatusBadges(context, song),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            Formatters.formatDuration(Duration(seconds: song.duration)),
+            style: context.textTheme.labelMedium?.copyWith(
+              color: context.appPalette.textMuted,
+            ),
+          ),
+          SizedBox(width: context.appSpacing.sm),
+          ReorderableDragStartListener(
+            index: index,
+            child: _AccessoryPill(
+              icon: Icons.drag_indicator_rounded,
+              tooltip: context.l10n.sort,
+            ),
+          ),
+        ],
+      ),
+      isActive: isCurrentSong,
+    );
+  }
+
+  Widget _buildBatchSelectSongRow({
+    required BuildContext context,
+    required SongItem song,
+    required bool isCurrentSong,
+    required bool isSelected,
+  }) {
+    return MediaRow(
+      cover: MediaCover(
+        coverUrl: song.coverUrl,
+        width: 58,
+        height: 58,
+      ),
+      title: Text(
+        song.displayTitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: context.textTheme.titleSmall,
+      ),
+      subtitle: Text(
+        song.displayArtist,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: context.appPalette.textSecondary,
+        ),
+      ),
+      badges: _buildSongStatusBadges(context, song),
+      leadingAccessory: Checkbox(
+        value: isSelected,
+        onChanged: (_) => _toggleSongSelection(song.id),
+      ),
+      trailing: Text(
+        Formatters.formatDuration(Duration(seconds: song.duration)),
+        style: context.textTheme.labelMedium?.copyWith(
+          color: context.appPalette.textMuted,
+        ),
+      ),
+      onTap: () => _toggleSongSelection(song.id),
+      isActive: isCurrentSong,
+      isSelected: isSelected,
+    );
+  }
+
+  List<Widget> _buildSongStatusBadges(BuildContext context, SongItem song) {
+    if (!song.isCached) return const [];
+
+    final palette = context.appPalette;
+
+    return [
+      Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.appSpacing.xs,
+          vertical: context.appSpacing.xxs,
+        ),
+        decoration: BoxDecoration(
+          color: palette.successSoft,
+          borderRadius: context.appRadii.pillRadius,
+          border: Border.all(
+            color: palette.success.withValues(alpha: 0.26),
+            width: context.appDepth.outline,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.download_done_rounded,
+              size: 12,
+              color: palette.success,
+            ),
+            SizedBox(width: context.appSpacing.xxs),
+            Text(
+              song.qualityLabel.isNotEmpty
+                  ? song.qualityLabel
+                  : context.l10n.cached,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: palette.success,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
   List<Widget> _buildActions(BuildContext context, List<SongItem> songs,
       String? playlistName, dynamic l10n) {
     if (_editMode == _EditMode.batchSelect) {
@@ -342,7 +475,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       return [
         IconButton(
           icon: Icon(allSelected ? Icons.deselect : Icons.select_all),
-          tooltip: allSelected ? '取消全选' : '全选',
+          tooltip: allSelected ? l10n.deselectAll : l10n.selectAll,
           onPressed: () {
             if (allSelected) {
               _deselectAll();
@@ -357,7 +490,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       return [
         IconButton(
           icon: const Icon(Icons.done),
-          tooltip: '完成排序',
+          tooltip: l10n.doneSorting,
           onPressed: _exitEditMode,
         ),
       ];
@@ -392,7 +525,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
-          tooltip: '更多',
+          tooltip: l10n.moreActions,
           onSelected: (value) {
             switch (value) {
               case 'reorder':
@@ -413,36 +546,36 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
             }
           },
           itemBuilder: (_) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'reorder',
-              child: ListTile(
-                leading: Icon(Icons.swap_vert),
-                title: Text('排序'),
-                contentPadding: EdgeInsets.zero,
+              child: _buildMenuItemContent(
+                context,
+                icon: Icons.swap_vert,
+                label: l10n.sort,
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'batchSelect',
-              child: ListTile(
-                leading: Icon(Icons.checklist),
-                title: Text('批量操作'),
-                contentPadding: EdgeInsets.zero,
+              child: _buildMenuItemContent(
+                context,
+                icon: Icons.checklist,
+                label: l10n.batchActions,
               ),
             ),
             PopupMenuItem(
               value: 'changeCover',
-              child: ListTile(
-                leading: const Icon(Icons.image_outlined),
-                title: Text(l10n.changeCover),
-                contentPadding: EdgeInsets.zero,
+              child: _buildMenuItemContent(
+                context,
+                icon: Icons.image_outlined,
+                label: l10n.changeCover,
               ),
             ),
             PopupMenuItem(
               value: 'downloadAll',
-              child: ListTile(
-                leading: const Icon(Icons.download),
-                title: Text(l10n.downloadAll),
-                contentPadding: EdgeInsets.zero,
+              child: _buildMenuItemContent(
+                context,
+                icon: Icons.download,
+                label: l10n.downloadAll,
               ),
             ),
           ],
@@ -451,16 +584,39 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     ];
   }
 
+  Widget _buildMenuItemContent(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 18,
+          color: context.appPalette.textSecondary,
+        ),
+        SizedBox(width: context.appSpacing.sm),
+        Expanded(
+          child: Text(
+            label,
+            style: context.textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+
   /// Play all songs sequentially from the first track.
   void _playAll(WidgetRef ref, List<SongItem> songs, String? playlistName) {
     if (songs.isEmpty) return;
     ref.read(playerNotifierProvider.notifier).setMode(PlayMode.sequential);
     ref.read(playerNotifierProvider.notifier).playSongFromPlaylist(
-      song: songs.first,
-      songs: songs,
-      playlistId: playlistId,
-      playlistName: playlistName,
-    );
+          song: songs.first,
+          songs: songs,
+          playlistId: playlistId,
+          playlistName: playlistName,
+        );
   }
 
   IconData _playModeIcon(PlayMode mode) {
@@ -491,13 +647,14 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }
 
   /// Play a specific song within the playlist context.
-  void _playSong(WidgetRef ref, SongItem song, List<SongItem> songs, String? playlistName) {
+  void _playSong(WidgetRef ref, SongItem song, List<SongItem> songs,
+      String? playlistName) {
     ref.read(playerNotifierProvider.notifier).playSongFromPlaylist(
-      song: song,
-      songs: songs,
-      playlistId: playlistId,
-      playlistName: playlistName,
-    );
+          song: song,
+          songs: songs,
+          playlistId: playlistId,
+          playlistName: playlistName,
+        );
   }
 
   /// 显示分享方式选择弹窗
@@ -516,7 +673,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
 
   /// 导出歌单到剪贴板
   void _exportToClipboard(BuildContext context, WidgetRef ref) async {
-    await ref.read(shareNotifierProvider.notifier).exportToClipboard(playlistId);
+    await ref
+        .read(shareNotifierProvider.notifier)
+        .exportToClipboard(playlistId);
     final state = ref.read(shareNotifierProvider);
     if (context.mounted) {
       state.when(
@@ -532,3 +691,38 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }
 }
 
+class _AccessoryPill extends StatelessWidget {
+  const _AccessoryPill({
+    required this.icon,
+    required this.tooltip,
+  });
+
+  final IconData icon;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: palette.surfaceSecondary.withValues(alpha: 0.9),
+          borderRadius: context.appRadii.mediumRadius,
+          border: Border.all(
+            color: palette.borderSubtle.withValues(alpha: 0.88),
+            width: context.appDepth.outline,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: palette.textSecondary,
+        ),
+      ),
+    );
+  }
+}

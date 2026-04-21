@@ -442,6 +442,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deselectAll => '取消全选';
 
   @override
+  String get batchActions => '批量操作';
+
+  @override
+  String get sort => '排序';
+
+  @override
+  String get sortingMode => '排序模式';
+
+  @override
+  String get doneSorting => '完成排序';
+
+  @override
+  String get moreActions => '更多操作';
+
+  @override
+  String get previousPage => '上一页';
+
+  @override
+  String get nextPage => '下一页';
+
+  @override
+  String get jumpToPage => '跳转页面';
+
+  @override
+  String get pageNumberLabel => '页码';
+
+  @override
+  String enterPageRange(int max) {
+    return '输入 1-$max';
+  }
+
+  @override
+  String songsTotal(int count) {
+    return '$count 首';
+  }
+
+  @override
   String selectedSongCount(int count, int total) {
     return '已选 $count/$total';
   }

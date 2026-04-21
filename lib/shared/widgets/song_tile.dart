@@ -1,13 +1,29 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
-/// A reusable song list tile widget.
-///
-/// Displays cover art, title, artist, and duration in a consistent format.
-/// Used across playlist detail, search results, and queue views.
+import '../extensions/context_extensions.dart';
+import 'media_cover.dart';
+import 'media_row.dart';
+
+/// A reusable song media row shared by playlist and search-related screens.
 class SongTile extends StatelessWidget {
+  const SongTile({
+    super.key,
+    this.coverUrl,
+    required this.title,
+    required this.artist,
+    this.duration,
+    this.isPlaying = false,
+    this.isCached = false,
+    this.qualityLabel,
+    this.isSelected = false,
+    this.enabled = true,
+    this.onTap,
+    this.onLongPress,
+    this.onMorePressed,
+    this.isFavorited,
+    this.onFavoritePressed,
+  });
+
   /// Song cover image URL.
   final String? coverUrl;
 
@@ -29,8 +45,17 @@ class SongTile extends StatelessWidget {
   /// Quality label for the cached version (e.g., "192kbps").
   final String? qualityLabel;
 
+  /// Whether the row is visually selected.
+  final bool isSelected;
+
+  /// Whether the row is enabled.
+  final bool enabled;
+
   /// Callback when the tile is tapped.
   final VoidCallback? onTap;
+
+  /// Callback when the tile is long-pressed.
+  final VoidCallback? onLongPress;
 
   /// Callback when the more/options button is tapped.
   final VoidCallback? onMorePressed;
@@ -41,155 +66,235 @@ class SongTile extends StatelessWidget {
   /// Callback when the favorite/heart button is tapped.
   final VoidCallback? onFavoritePressed;
 
-  const SongTile({
-    super.key,
-    this.coverUrl,
-    required this.title,
-    required this.artist,
-    this.duration,
-    this.isPlaying = false,
-    this.isCached = false,
-    this.qualityLabel,
-    this.onTap,
-    this.onMorePressed,
-    this.isFavorited,
-    this.onFavoritePressed,
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final spacing = context.appSpacing;
+    final textTheme = context.textTheme;
+    final l10n = context.l10n;
+
+    return MediaRow(
+      cover: MediaCover(
+        coverUrl: coverUrl,
+        width: 58,
+        height: 58,
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.titleSmall?.copyWith(
+                color: isPlaying ? palette.accentStrong : palette.textPrimary,
+                fontWeight: isPlaying ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ),
+          if (isPlaying) ...[
+            SizedBox(width: spacing.xs),
+            Icon(
+              Icons.graphic_eq_rounded,
+              size: 16,
+              color: palette.accentStrong,
+            ),
+          ],
+        ],
+      ),
+      subtitle: Text(
+        artist,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: textTheme.bodyMedium?.copyWith(
+          color: palette.textSecondary,
+        ),
+      ),
+      badges: [
+        if (isCached)
+          _SongMetaBadge(
+            icon: Icons.download_done_rounded,
+            label: (qualityLabel != null && qualityLabel!.isNotEmpty)
+                ? qualityLabel!
+                : l10n.cached,
+          ),
+      ],
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (duration != null) ...[
+            Text(
+              duration!,
+              style: textTheme.labelMedium?.copyWith(
+                color: palette.textMuted,
+              ),
+            ),
+            SizedBox(height: spacing.xs),
+          ],
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isFavorited != null) ...[
+                _SongActionButton(
+                  icon: isFavorited!
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
+                  tooltip: isFavorited!
+                      ? l10n.removeFromFavorites
+                      : l10n.addToFavorites,
+                  onPressed: enabled ? onFavoritePressed : null,
+                  backgroundColor: isFavorited!
+                      ? palette.dangerSoft
+                      : palette.surfaceSecondary.withValues(alpha: 0.88),
+                  borderColor: isFavorited!
+                      ? palette.danger.withValues(alpha: 0.36)
+                      : palette.borderSubtle.withValues(alpha: 0.88),
+                  iconColor:
+                      isFavorited! ? palette.danger : palette.textSecondary,
+                ),
+                SizedBox(width: spacing.xs),
+              ],
+              _SongActionButton(
+                icon:
+                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                tooltip: isPlaying ? l10n.pause : l10n.play,
+                onPressed: enabled ? onTap : null,
+                backgroundColor: palette.accentStrong,
+                borderColor: palette.accentStrong.withValues(alpha: 0.7),
+                iconColor: context.colorScheme.onPrimary,
+                isPrimary: true,
+              ),
+              if (onMorePressed != null) ...[
+                SizedBox(width: spacing.xs),
+                _SongActionButton(
+                  icon: Icons.more_horiz_rounded,
+                  tooltip: l10n.moreActions,
+                  onPressed: enabled ? onMorePressed : null,
+                  backgroundColor:
+                      palette.surfaceSecondary.withValues(alpha: 0.88),
+                  borderColor: palette.borderSubtle.withValues(alpha: 0.88),
+                  iconColor: palette.textSecondary,
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+      onTap: enabled ? onTap : null,
+      onLongPress: enabled ? onLongPress : null,
+      isActive: isPlaying,
+      isSelected: isSelected,
+      enabled: enabled,
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.sm,
+        vertical: spacing.sm,
+      ),
+    );
+  }
+}
+
+class _SongMetaBadge extends StatelessWidget {
+  const _SongMetaBadge({
+    required this.icon,
+    required this.label,
   });
+
+  final IconData icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final palette = context.appPalette;
+    final spacing = context.appSpacing;
 
-    return ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
-        child: SizedBox(
-          width: 48,
-          height: 48,
-          child: _buildCover(colorScheme),
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.xs,
+        vertical: spacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: palette.successSoft,
+        borderRadius: context.appRadii.pillRadius,
+        border: Border.all(
+          color: palette.success.withValues(alpha: 0.26),
+          width: context.appDepth.outline,
         ),
       ),
-      title: Text(
-        title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: textTheme.bodyLarge?.copyWith(
-          color: isPlaying ? colorScheme.primary : null,
-          fontWeight: isPlaying ? FontWeight.bold : null,
-        ),
-      ),
-      subtitle: Row(
-        children: [
-          if (isCached) ...[
-            Icon(Icons.download_done, size: 14,
-                color: isPlaying ? colorScheme.primary : colorScheme.tertiary),
-            const SizedBox(width: 2),
-            if (qualityLabel != null && qualityLabel!.isNotEmpty)
-              Text(
-                qualityLabel!,
-                style: textTheme.labelSmall?.copyWith(
-                  color: isPlaying ? colorScheme.primary : colorScheme.tertiary,
-                ),
-              ),
-            const SizedBox(width: 6),
-          ],
-          Expanded(
-            child: Text(
-              artist,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.bodySmall?.copyWith(
-                color: isPlaying ? colorScheme.primary : colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ],
-      ),
-      trailing: Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (duration != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Text(
-                duration!,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+          Icon(
+            icon,
+            size: 12,
+            color: palette.success,
+          ),
+          SizedBox(width: spacing.xxs),
+          Text(
+            label,
+            style: context.textTheme.labelSmall?.copyWith(
+              color: palette.success,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SongActionButton extends StatelessWidget {
+  const _SongActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.iconColor,
+    this.isPrimary = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color iconColor;
+  final bool isPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final enabled = onPressed != null;
+
+    return Tooltip(
+      message: tooltip,
+      child: SizedBox(
+        width: isPrimary ? 38 : 34,
+        height: isPrimary ? 38 : 34,
+        child: Material(
+          color: enabled ? backgroundColor : palette.accentMuted,
+          borderRadius: context.appRadii.mediumRadius,
+          child: InkWell(
+            borderRadius: context.appRadii.mediumRadius,
+            onTap: onPressed,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: context.appRadii.mediumRadius,
+                border: Border.all(
+                  color: enabled ? borderColor : palette.borderSubtle,
+                  width: context.appDepth.outline,
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  icon,
+                  size: isPrimary ? 22 : 18,
+                  color: enabled ? iconColor : palette.textMuted,
                 ),
               ),
             ),
-          // Favorite button (always visible when isFavorited is non-null)
-          if (isFavorited != null)
-            IconButton(
-              icon: Icon(
-                isFavorited! ? Icons.favorite : Icons.favorite_border,
-                color: isFavorited!
-                    ? Colors.redAccent
-                    : colorScheme.onSurfaceVariant,
-                size: 22,
-              ),
-              visualDensity: VisualDensity.compact,
-              onPressed: onFavoritePressed,
-              tooltip: isFavorited! ? '取消收藏' : '收藏',
-            ),
-          // Play button
-          IconButton(
-            icon: Icon(
-              isPlaying ? Icons.pause_circle_filled : Icons.play_circle_outline,
-              color: isPlaying ? colorScheme.primary : colorScheme.onSurfaceVariant,
-              size: 28,
-            ),
-            onPressed: onTap,
-            tooltip: isPlaying ? '暂停' : '播放',
           ),
-          if (onMorePressed != null)
-            IconButton(
-              icon: const Icon(Icons.more_vert, size: 20),
-              onPressed: onMorePressed,
-            ),
-        ],
-      ),
-      onTap: onTap,
-      selected: isPlaying,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    );
-  }
-
-  Widget _buildCover(ColorScheme colorScheme) {
-    if (coverUrl == null || coverUrl!.isEmpty) {
-      return Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
-      );
-    }
-
-    final cover = coverUrl!;
-    final isLocal = cover.startsWith('/') || cover.startsWith('file://');
-    if (isLocal) {
-      final path = cover.startsWith('file://')
-          ? Uri.parse(cover).toFilePath()
-          : cover;
-      return Image.file(
-        File(path),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          color: colorScheme.surfaceContainerHighest,
-          child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
         ),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: cover,
-      fit: BoxFit.cover,
-      placeholder: (_, __) => Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
-      ),
-      errorWidget: (_, __, ___) => Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: Icon(Icons.music_note, color: colorScheme.onSurfaceVariant),
       ),
     );
   }

@@ -944,6 +944,72 @@ abstract class AppLocalizations {
   /// **'Deselect All'**
   String get deselectAll;
 
+  /// No description provided for @batchActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch Actions'**
+  String get batchActions;
+
+  /// No description provided for @sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sort;
+
+  /// No description provided for @sortingMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorting Mode'**
+  String get sortingMode;
+
+  /// No description provided for @doneSorting.
+  ///
+  /// In en, this message translates to:
+  /// **'Done Sorting'**
+  String get doneSorting;
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Actions'**
+  String get moreActions;
+
+  /// No description provided for @previousPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous Page'**
+  String get previousPage;
+
+  /// No description provided for @nextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Page'**
+  String get nextPage;
+
+  /// No description provided for @jumpToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to Page'**
+  String get jumpToPage;
+
+  /// No description provided for @pageNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get pageNumberLabel;
+
+  /// No description provided for @enterPageRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 1-{max}'**
+  String enterPageRange(int max);
+
+  /// No description provided for @songsTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} songs'**
+  String songsTotal(int count);
+
   /// No description provided for @selectedSongCount.
   ///
   /// In en, this message translates to:

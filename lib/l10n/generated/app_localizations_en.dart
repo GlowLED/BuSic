@@ -444,6 +444,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deselectAll => 'Deselect All';
 
   @override
+  String get batchActions => 'Batch Actions';
+
+  @override
+  String get sort => 'Sort';
+
+  @override
+  String get sortingMode => 'Sorting Mode';
+
+  @override
+  String get doneSorting => 'Done Sorting';
+
+  @override
+  String get moreActions => 'More Actions';
+
+  @override
+  String get previousPage => 'Previous Page';
+
+  @override
+  String get nextPage => 'Next Page';
+
+  @override
+  String get jumpToPage => 'Jump to Page';
+
+  @override
+  String get pageNumberLabel => 'Page';
+
+  @override
+  String enterPageRange(int max) {
+    return 'Enter 1-$max';
+  }
+
+  @override
+  String songsTotal(int count) {
+    return '$count songs';
+  }
+
+  @override
   String selectedSongCount(int count, int total) {
     return 'Selected $count/$total';
   }

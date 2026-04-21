@@ -70,8 +70,8 @@ features/player/presentation/
 
 `shared/widgets/responsive_scaffold.dart` 是全局布局骨架，自动适配桌面和移动端：
 
-- **桌面端**（宽度 ≥ 840px）：左侧 `NavigationRail` + 自定义拖拽标题栏 + 窗口控制按钮
-- **移动端**（宽度 < 840px）：底部 `NavigationBar`，无窗口管理
+- **桌面端**（宽度 ≥ 840px）：自定义标题栏 + 音乐控制台式侧栏 + 内容面板
+- **移动端**（宽度 < 840px）：浮动底部导航 dock
 - **底部**：始终显示 `PlayerBar`（播放控制条）
 
 ### 平台判断
@@ -209,7 +209,7 @@ AppLocalizations.of(context)!.searchTitle
 - **所有用户可见文本**必须使用 i18n，禁止硬编码
 - 英文 ARB 是模板文件（包含 `@` 描述注释）
 - 翻译键使用 camelCase
-- 当前约有 73 个翻译键
+- 翻译键按功能演进持续补充，不维护固定数量描述
 
 ## 通用弹窗
 
@@ -264,6 +264,33 @@ if (localCoverPath != null) {
   GradientPlaceholder();
 }
 ```
+
+## 共享媒体组件
+
+Task 03 起，媒体内容相关展示统一复用 `shared/widgets/` 下的共享媒体积木，不再在业务页面中直接用默认 `ListTile` / `Card` 拼装歌曲项和媒体卡片。
+
+### 组件入口
+
+- `AppPanel`：共享玻璃感面板底座，用于媒体卡片、分页条和其他需要统一 panel 语言的展示层。
+- `MediaCover`：统一封面组件，负责本地路径、网络图、空封面和加载失败兜底。
+- `MediaRow`：统一横向媒体行骨架，负责封面、标题、副标题、badge、操作区和状态样式。
+- `SongTile`：基于 `MediaRow` 的歌曲展示组件。
+- `PlaylistTile`：基于 `AppPanel + MediaCover` 的歌单卡片组件。
+
+### 使用约束
+
+- 歌曲列表、搜索结果、歌单卡片优先复用上述组件，而不是重新定义独立的列表项结构。
+- 页面内如果需要排序 handle、复选框、箭头等附加控制，优先作为 `MediaRow` 的 accessory / trailing 内容接入。
+- 封面兜底必须继续遵守“本地 → 网络 → 占位”的加载优先级。
+- `AppPanel` 或任何同类 `ClipRRect + BackdropFilter + BoxDecoration(border)` 结构，内层 `BoxDecoration` 必须显式使用与裁剪一致的 `borderRadius`；否则选中态/高亮态边框会在圆角处出现裁切缺口。
+- 壳层面板、内容框和媒体卡片优先复用 `AppPanel`，不要复制一份相似实现后再单独维护圆角与边框逻辑。
+
+### 状态语义
+
+- `hover`：轻微提升 overlay 和边框对比度。
+- `playing / active`：使用更强的强调边框、封面 glow 或强调色文本。
+- `selected`：使用强调底色和更明确的选中边框。
+- `disabled`：降低整体对比度，并禁用点击 / 操作按钮。
 
 ## 导航
 

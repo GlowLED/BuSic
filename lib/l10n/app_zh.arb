@@ -170,6 +170,27 @@
   "fetchingMetadata": "正在获取歌曲信息...",
   "selectAll": "全选",
   "deselectAll": "取消全选",
+  "batchActions": "批量操作",
+  "sort": "排序",
+  "sortingMode": "排序模式",
+  "doneSorting": "完成排序",
+  "moreActions": "更多操作",
+  "previousPage": "上一页",
+  "nextPage": "下一页",
+  "jumpToPage": "跳转页面",
+  "pageNumberLabel": "页码",
+  "enterPageRange": "输入 1-{max}",
+  "@enterPageRange": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "songsTotal": "{count} 首",
+  "@songsTotal": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "selectedSongCount": "已选 {count}/{total}",
   "@selectedSongCount": {
     "placeholders": {

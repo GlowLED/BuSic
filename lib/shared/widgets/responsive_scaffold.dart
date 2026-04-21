@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +9,7 @@ import '../../features/player/application/player_notifier.dart';
 import '../../features/player/presentation/player_bar.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../extensions/context_extensions.dart';
+import 'app_panel.dart';
 
 const _navigationAnimationDuration = Duration(milliseconds: 220);
 const _navigationAnimationCurve = Curves.easeOutCubic;
@@ -732,34 +731,16 @@ class _ShellContentFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.appPalette;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: context.appRadii.xLargeRadius,
-        boxShadow: context.appDepth.panelShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: context.appRadii.xLargeRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  palette.surfacePrimary.withValues(alpha: 0.98),
-                  palette.backgroundPrimary.withValues(alpha: 0.94),
-                ],
-              ),
-              border: Border.all(
-                color: palette.borderSubtle.withValues(alpha: 0.95),
-                width: context.appDepth.outline,
-              ),
-            ),
-            child: child,
-          ),
-        ),
-      ),
+    return AppPanel(
+      borderRadius: context.appRadii.xLargeRadius,
+      blurSigma: 12,
+      backgroundColors: [
+        palette.surfacePrimary.withValues(alpha: 0.98),
+        palette.backgroundPrimary.withValues(alpha: 0.94),
+      ],
+      gradientBegin: Alignment.topCenter,
+      gradientEnd: Alignment.bottomCenter,
+      child: child,
     );
   }
 }
@@ -777,37 +758,15 @@ class _ShellPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.appPalette;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: context.appRadii.xLargeRadius,
-        boxShadow: context.appDepth.panelShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: context.appRadii.xLargeRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  palette.surfaceElevated.withValues(alpha: 0.96),
-                  palette.surfaceSecondary.withValues(alpha: 0.92),
-                ],
-              ),
-              border: Border.all(
-                color: palette.borderSubtle.withValues(alpha: 0.95),
-                width: context.appDepth.outline,
-              ),
-            ),
-            child: Padding(
-              padding: padding ?? EdgeInsets.zero,
-              child: child,
-            ),
-          ),
-        ),
-      ),
+    return AppPanel(
+      borderRadius: context.appRadii.xLargeRadius,
+      blurSigma: 18,
+      padding: padding,
+      backgroundColors: [
+        palette.surfaceElevated.withValues(alpha: 0.96),
+        palette.surfaceSecondary.withValues(alpha: 0.92),
+      ],
+      child: child,
     );
   }
 }
