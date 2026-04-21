@@ -1,139 +1,53 @@
 ---
 name: busic-database
-description: BuSic数据库操作规范。用于Drift数据库表定义、迁移、Repository实现时参考
+description: BuSic数据层规范。用于Drift表定义、迁移、Repository实现和Domain模型映射时快速确认主真源与联动检查项
 license: MIT
 compatibility: opencode
 ---
 
-## 数据库配置
+## 何时使用
 
-数据库定义在 `lib/core/database/app_database.dart`：
+- 新增或修改 Drift 表
+- 调整 `schemaVersion`、迁移逻辑或 Repository 映射
+- 想确认 Domain 模型、DB 表和 Repository 的职责边界
 
-```dart
-@DriftDatabase(tables: [Songs, Playlists, PlaylistSongs, DownloadTasks, UserSessions])
-class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+## 先看这些真源
 
-  @override
-  int get schemaVersion => 1;
-}
+- [`docs/30-reference/data-layer.md`](../../../docs/30-reference/data-layer.md)
+- [`lib/core/database/app_database.dart`](../../../lib/core/database/app_database.dart)
+- [`lib/core/database/tables/`](../../../lib/core/database/tables/)
+
+## 表与迁移 checklist
+
+改表时至少同步检查：
+
+1. 表定义文件
+2. `@DriftDatabase(tables: [...])` 注册
+3. `schemaVersion`
+4. `onUpgrade`
+5. `build_runner`
+
+命令：
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
 ```
 
-- 数据库文件：`documents/busic/busic.db`
-- 使用 `LazyDatabase` + `NativeDatabase.createInBackground`
-- `schemaVersion` 起始为 1
+## Repository 规则
 
-## 新增表规范
+- Repository 接口和实现都放在 `data/` 层
+- Domain 模型与 DB 表分离，由 Repository 负责映射
+- Repository 不是业务状态容器；业务编排仍在 Notifier
+- 需要长期存活的 Repository，再交给手动 Provider 管理
 
-```dart
-// lib/core/database/tables/new_table.dart
-import 'package:drift/drift.dart';
+## 常见联动
 
-class NewItems extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text()();
-  TextColumn get description => text().nullable()();
-  IntColumn get playlistId => integer().references(Playlists, #id)();
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  IntColumn get status => integer().withDefault(const Constant(0))();
-}
-```
+- 下载链路不要只改任务表，记得回写 `songs.localPath` 与 `songs.audioQuality`
+- 分享 / 备份不要把本地路径写进跨设备数据
+- 数据库变更后，测试要优先验证真实表状态，而不是只断言中间变量
 
-### 新增表后操作
+## 相关 Skill
 
-1. 在 `AppDatabase` 的 `@DriftDatabase(tables: [...])` 中注册
-2. 递增 `schemaVersion`
-3. 编写迁移代码
-4. 运行 `dart run build_runner build --delete-conflicting-outputs`
-
-## 迁移规范
-
-- **永远不要删除或重命名旧字段**
-- 仅通过 `addColumn` 添加新列并设置默认值
-
-```dart
-onUpgrade((Migrator m) async {
-  if (from < 2) {
-    await m.addColumn(songs, songs.newField);
-  }
-});
-```
-
-## Freezed 模型
-
-### 数据类 + JSON 序列化
-```dart
-@freezed
-class AudioTrack with _$AudioTrack {
-  const factory AudioTrack({
-    required int songId,
-    required String bvid,
-    String? coverUrl,
-    @Default(0) int quality,
-  }) = _AudioTrack;
-
-  factory AudioTrack.fromJson(Map<String, dynamic> json) =>
-      _$AudioTrackFromJson(json);
-}
-```
-
-### 联合类型（状态枚举）
-```dart
-@freezed
-class ParseState with _$ParseState {
-  const factory ParseState.idle() = _Idle;
-  const factory ParseState.parsing() = _Parsing;
-  const factory ParseState.success(BvidInfo info) = _Success;
-  const factory ParseState.error(String message) = _Error;
-}
-```
-
-### 带计算属性的模型
-```dart
-@freezed
-class SongItem with _$SongItem {
-  const SongItem._();
-  const factory SongItem({ ... }) = _SongItem;
-
-  String get displayTitle => customTitle ?? originTitle;
-  bool get isCached => localPath != null;
-}
-```
-
-## Repository 模式
-
-### 接口定义
-```dart
-abstract class XxxRepository {
-  Future<List<Item>> getAll();
-  Future<Item?> getById(int id);
-  Future<void> create(Item item);
-  Future<void> update(Item item);
-  Future<void> delete(int id);
-}
-```
-
-### 实现类
-```dart
-class XxxRepositoryImpl implements XxxRepository {
-  final AppDatabase _db;
-  XxxRepositoryImpl(this._db);
-
-  @override
-  Future<List<Item>> getAll() async {
-    final rows = await _db.select(_db.items).get();
-    return rows.map(_mapToModel).toList();
-  }
-
-  Item _mapToModel(ItemRow row) {
-    return Item(id: row.id, name: row.name);
-  }
-}
-```
-
-### 关键原则
-
-1. Repository 接口定义在 `data/` 目录
-2. Domain 模型和 DB 表是分离的
-3. Repository 由 Notifier 在 `build()` 中手动创建
-4. 需要 keep-alive 的 Repository 用手动 Provider 管理
+- [`busic-architecture`](../busic-architecture/SKILL.md)
+- [`busic-state-management`](../busic-state-management/SKILL.md)
+- [`busic-testing`](../busic-testing/SKILL.md)

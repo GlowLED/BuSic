@@ -1,168 +1,54 @@
 ---
 name: busic-ui-development
-description: BuSic UI层开发规范。用于Screen和Widget开发，包含Widget模式、响应式布局、主题系统、国际化
+description: BuSic UI开发规范。用于Screen和Widget开发时确认基类选择、响应式壳层、主题token、i18n和桌面平台差异
 license: MIT
 compatibility: opencode
 ---
 
-## Widget 编写模式
+## 何时使用
 
-### 基类选择
+- 新增 Screen、Widget 或路由接入
+- 调整主题、响应式布局、国际化或桌面端壳层
+- 需要判断某段 UI 逻辑应写在 Widget、Notifier 还是共享组件里
 
-| 场景 | 基类 |
-|---|---|
-| 纯展示 + 读取 Provider | `ConsumerWidget` |
-| 需要 State 生命周期 | `ConsumerStatefulWidget` |
-| 不需要 Provider | `StatelessWidget` |
+## 先看这些真源
 
-### 页面模板
+- [`docs/30-reference/ui.md`](../../../docs/30-reference/ui.md)
+- [`docs/10-project/ui-and-platform-quirks.md`](../../../docs/10-project/ui-and-platform-quirks.md)
+- [`lib/shared/widgets/responsive_scaffold.dart`](../../../lib/shared/widgets/responsive_scaffold.dart)
+- [`lib/core/router/app_router.dart`](../../../lib/core/router/app_router.dart)
 
-```dart
-class XxxScreen extends ConsumerWidget {
-  const XxxScreen({super.key});
+## Widget 结构
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(xxxNotifierProvider);
+- 纯展示且读 Provider：优先 `ConsumerWidget`
+- 需要生命周期：用 `ConsumerStatefulWidget`
+- 纯静态展示：`StatelessWidget`
+- 复杂页面里的私有 UI 片段优先抽成同文件私有 Widget
+- feature 专属可复用组件放到 `presentation/widgets/`
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.xxxTitle),
-      ),
-      body: state.when(
-        data: (data) => _buildContent(context, ref, data),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('$e')),
-      ),
-    );
-  }
+## 主题与响应式
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, XxxData data) {
-    // ...
-  }
-}
-```
+- 统一通过 `AppTheme` 与 theme extensions 取值
+- 业务页面优先使用 `context.appPalette`、`context.appSpacing`、`context.appRadii`、`context.appDepth`
+- 不要在页面里堆魔法数字颜色、圆角和阴影
+- 主壳层布局优先复用 `ResponsiveScaffold`
 
-### 私有内部 Widget
+## i18n 与交互
 
-```dart
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-  final String title;
+- 所有用户可见文本必须进 ARB
+- 改了 `lib/l10n/*.arb` 后记得 `flutter gen-l10n`
+- 常见弹窗优先复用 `CommonDialogs`
+- 路由接入以 `app_router.dart` 为准
 
-  @override
-  Widget build(BuildContext context) { ... }
-}
-```
+## 平台差异提醒
 
-## 响应式布局
+- 桌面端关闭窗口默认是托盘隐藏，不一定等于退出
+- `minimal` 模式是独立生命周期策略，不是普通页面皮肤
+- 改标题栏、托盘、极简模式时要同时检查桌面壳层逻辑
 
-### ResponsiveScaffold
+## 相关 Skill
 
-- **桌面端**（宽度 ≥ 840px）：左侧 `NavigationRail`
-- **移动端**（宽度 < 840px）：底部 `NavigationBar`
-
-### 平台判断
-
-```dart
-// Context 扩展
-if (context.isDesktop) { ... }
-
-// PlatformUtils
-if (PlatformUtils.isDesktop) { ... }
-```
-
-## 主题系统
-
-### 使用主题
-
-```dart
-// 使用 context 扩展
-final theme = context.theme;
-final colors = context.colorScheme;
-final textTheme = context.textTheme;
-```
-
-### 主题模式
-
-支持三种 `ThemeMode`：system / light / dark
-
-## 国际化 (i18n)
-
-### 添加翻译
-
-1. 在 `lib/l10n/app_en.arb` 添加英文键值
-2. 在 `lib/l10n/app_zh.arb` 添加中文翻译
-3. 运行 `flutter gen-l10n`
-
-```json
-// app_en.arb
-{
-  "newFeatureTitle": "New Feature",
-  "@newFeatureTitle": { "description": "Title for new feature" }
-}
-
-// app_zh.arb
-{
-  "newFeatureTitle": "新功能"
-}
-```
-
-### 使用翻译
-
-```dart
-Text(context.l10n.searchTitle)
-```
-
-### 规范
-
-- 所有用户可见文本必须使用 i18n
-- 英文 ARB 是模板文件
-- 翻译键使用 camelCase
-
-## 通用弹窗
-
-```dart
-// 确认弹窗
-final confirmed = await CommonDialogs.showConfirmDialog(context, ...);
-
-// 输入弹窗
-final input = await CommonDialogs.showInputDialog(context, ...);
-
-// 错误弹窗
-CommonDialogs.showErrorDialog(context, ...);
-```
-
-## SnackBar 提示
-
-```dart
-context.showSnackBar('操作成功');
-```
-
-## 导航
-
-```dart
-context.go('/search');
-context.push('/playlists/$id');
-context.go(AppRoutes.search);
-```
-
-## 图片处理
-
-```dart
-// 优先级：本地 → 网络 → 占位
-if (localCoverPath != null) {
-  Image.file(File(localCoverPath));
-} else if (coverUrl != null) {
-  CachedNetworkImage(imageUrl: coverUrl);
-} else {
-  GradientPlaceholder();
-}
-```
-
-## 路由注册
-
-在 `lib/core/router/app_router.dart` 中添加：
-- Shell 内嵌路由：加到 `StatefulShellBranch` 的 `routes`
-- 独立路由：加到 `StatefulShellRoute` 同级
-- 路由常量定义在 `AppRoutes` 抽象类
+- [`busic-architecture`](../busic-architecture/SKILL.md)
+- [`busic-coding-conventions`](../busic-coding-conventions/SKILL.md)
+- [`busic-state-management`](../busic-state-management/SKILL.md)
+- [`busic-testing`](../busic-testing/SKILL.md)

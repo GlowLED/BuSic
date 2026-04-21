@@ -1,158 +1,90 @@
 ---
 name: busic-skills-maintenance
-description: BuSic Skills维护规范。用于维护和更新skills时参考，包含skill创建、更新、删除规范与OpenCode skill格式
+description: BuSic Skills维护规范。用于维护和重构.agents/skills时统一目录结构、模板、更新时机、自检方式和与docs的职责边界
 license: MIT
 compatibility: opencode
 ---
 
-## Skill 存放位置
+## 何时使用
 
-OpenCode 按以下顺序搜索 skill：
+- 维护 `.agents/skills/` 本身
+- 新建、删除或重写某个 skill
+- 想确认 skill 和 `docs/` 应该各自承载什么内容
 
-| 位置 | 说明 |
-|---|---|
-| `.opencode/skills/<name>/SKILL.md` | 项目级 |
-| `.claude/skills/<name>/SKILL.md` | Claude兼容 |
-| `.agents/skills/<name>/SKILL.md` | Agent兼容（推荐） |
-| `~/.config/opencode/skills/` | 全局级 |
-| `~/.claude/skills/` | 全局Claude级 |
-| `~/.agents/skills/` | 全局Agent级 |
+## 先看这些真源
 
-**本项目使用：`.agents/skills/`**
+- [`README.md`](../README.md)
+- [`docs/README.md`](../../../docs/README.md)
+- [`docs/00-start-here/docs-maintenance.md`](../../../docs/00-start-here/docs-maintenance.md)
 
-## Skill 目录结构
+## 目录与命名
 
-```
-.agents/skills/
-└── <skill_name>/
-    └── SKILL.md
+目录结构保持：
+
+```text
+.agents/skills/<skill-name>/SKILL.md
 ```
 
-- 目录名与 skill 名必须一致
-- 文件名必须为 `SKILL.md`（全大写）
+约束：
 
-## Skill 命名规范
+- 目录名必须与 frontmatter 中的 `name` 一致
+- 文件名固定为 `SKILL.md`
+- skill 名使用小写字母 / 数字 / 单个连字符
 
-- 1-64 个字符
-- 小写字母 + 数字，单个连字符分隔
-- 不能以 `-` 开头或结尾
-- 不能有连续 `--`
+## 当前统一模板
 
-```regex
-^[a-z0-9]+(-[a-z0-9]+)*$
-```
+每个 skill 默认保留这四部分：
 
-**正确示例：**
-- `busic-main-workflow`
-- `busic-database`
-- `busic-ui-development`
+1. `何时使用`
+2. `先看这些真源`
+3. `关键规则` 或 `执行 checklist`
+4. `相关 Skill`
 
-## Frontmatter 规范
+额外规则：
 
-每个 SKILL.md 必须以 YAML frontmatter 开头：
+- skill 负责“入口、约束、跳转”，不负责复制整篇主线文档
+- 精确数字、日期、覆盖率、脚本参数优先回链到 `docs/` 或真源文件
+- 兄弟 skill 相互引用时使用 `../<skill-name>/SKILL.md`
+- 指向仓库 `docs/` 时使用从 skill 目录出发的相对路径
 
-```yaml
----
-name: <skill_name>
-description: <描述>。用于<使用场景>时参考，包含<包含内容>
-license: MIT
-compatibility: opencode
-metadata:
-  <key>: <value>
----
-```
+## 什么时候要更新 skill
 
-### 必填字段
+- 架构约束变了：更新 `busic-architecture`
+- 编码约定变了：更新 `busic-coding-conventions`
+- Drift / Repository / 迁移规则变了：更新 `busic-database`
+- Riverpod 使用方式变了：更新 `busic-state-management`
+- UI / 主题 / i18n / 响应式规则变了：更新 `busic-ui-development`
+- 测试目录、命令或测试模式变了：更新 `busic-testing`
+- 发布、版本或 Git 流程变了：更新 `busic-release` / `busic-version-management` / `busic-git-commit`
 
-| 字段 | 说明 |
-|---|---|
-| `name` | skill 名称 |
-| `description` | 1-1024 字符，格式：功能描述。用于xxx时参考，包含xxx |
+## 新建或删除 skill 的原则
 
-### 可选字段
+适合新建：
 
-| 字段 | 说明 |
-|---|---|
-| `license` | 开源许可证 |
-| `compatibility` | 兼容性标识 |
-| `metadata` | 键值对元数据 |
+- 某块规范有独立职责，且会被重复引用
+- 内容经常变化，单独维护更便宜
+- 放进现有 skill 会让职责边界明显变糊
 
-## Skill 拆分原则
+适合删除或合并：
 
-### 主流程 Skill
-- `busic-main-workflow`：描述整体开发步骤
+- 只是旧工具遗留兼容层，且已无调用价值
+- 内容完全被 `docs/` 或其它 skill 覆盖
+- skill 名存在，但已无法表达当前仓库事实
 
-### 子 Skill
-按职责拆分：
-- `busic-architecture`：架构规范
-- `busic-coding-conventions`：编码规范
-- `busic-database`：数据库规范
-- `busic-state-management`：状态管理规范
-- `busic-ui-development`：UI开发规范
-- `busic-testing`：测试规范
-- `busic-skills-maintenance`：本规范
+## 建议自检
 
-### 拆分时机
-
-1. **内容过长**：单一 skill 超过 500 行时考虑拆分
-2. **职责独立**：某部分内容可独立复用时拆分为子 skill
-3. **频繁变更**：某部分内容经常更新时单独维护
-
-## Skill 更新时机
-
-**每次开发和重构都必须同步更新相关 skill：**
-
-1. 代码实现变更了架构 → 更新 `busic-architecture`
-2. 新增编码约定 → 更新 `busic-coding-conventions`
-3. 数据库表结构变化 → 更新 `busic-database`
-4. 状态管理方式变化 → 更新 `busic-state-management`
-5. UI 组件模式变化 → 更新 `busic-ui-development`
-6. 测试模式变化 → 更新 `busic-testing`
-
-## Skill 创建流程
-
-### 1. 确定用途
-- 明确 skill 解决的问题
-- 确定使用场景
-
-### 2. 命名
-- 遵循命名规范
-- 名称应简洁表达功能
-
-### 3. 编写内容
-- 参考现有 skill 格式
-- 包含使用场景说明
-
-### 4. 验证
 ```bash
-# 检查目录结构
-ls -la .agents/skills/<skill_name>/
-
-# 检查 frontmatter
-head -10 .agents/skills/<skill_name>/SKILL.md
-
-# 验证格式
-# 1. name 与目录名一致
-# 2. description 符合格式
-# 3. 文件名为 SKILL.md
+python scripts/validate-skills.py
 ```
 
-## Skill 删除流程
+建议至少确认：
 
-当 skill 过时时：
+- `name` 与目录名一致
+- `description` 非空
+- 相对 Markdown 链接全部可达
+- 没有继续引用已经过时的旧流程、旧工具名、旧分支模型
 
-1. **确认无引用**：检查其他 skill 是否引用该 skill
-2. **删除目录**：
-   ```bash
-   rm -rf .agents/skills/<obsolete_skill>/
-   ```
-3. **更新引用**：如有引用，通知相关维护者
+## 相关 Skill
 
-## Skill 维护检查清单
-
-- [ ] 新增功能后评估是否需要新 skill
-- [ ] 重构后同步更新相关 skill
-- [ ] 删除代码后检查并删除对应 skill
-- [ ] 定期审查 skill 内容准确性
-- [ ] 确保 skill 命名符合规范
-- [ ] 确保 description 格式正确
+- [`busic-main-workflow`](../busic-main-workflow/SKILL.md)
+- [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)

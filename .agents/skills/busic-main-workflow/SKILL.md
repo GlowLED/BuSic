@@ -1,94 +1,81 @@
 ---
 name: busic-main-workflow
-description: BuSic Flutter项目主开发流程。用于功能开发、bug修复、代码重构时使用，包含整体开发步骤与验证要求
+description: BuSic主开发入口。用于功能开发、bug修复、代码重构时快速定位阅读顺序、执行顺序、最低验证和联动文档
 license: MIT
 compatibility: opencode
 ---
 
-## 整体开发流程
+## 何时使用
 
-### 1. 任务分析
-1. 确定功能范围和边界条件
-2. 确认功能归属的模块位置
-3. 复杂功能在 `docs/feat/` 下新建规划文档
+- 进入一个新的开发任务，不确定先读什么、先改哪里
+- 需要快速确认 BuSic 当前推荐的开发顺序
+- 想在实现前先把最低验证和文档联动范围看清楚
 
-### 2. 代码实现
-按顺序参考子skill：
+## 先看这些真源
 
+1. [`docs/20-workflows/dev-workflow.md`](../../../docs/20-workflows/dev-workflow.md)
+2. [`docs/00-start-here/agent-quickstart.md`](../../../docs/00-start-here/agent-quickstart.md)
+3. [`docs/10-project/project-overview.md`](../../../docs/10-project/project-overview.md)
+4. [`docs/10-project/project-specific-rules.md`](../../../docs/10-project/project-specific-rules.md)
+5. [`docs/30-reference/source-of-truth.md`](../../../docs/30-reference/source-of-truth.md)
+
+如果改的是特化系统，再补读：
+
+- 更新系统： [`docs/10-project/update-system.md`](../../../docs/10-project/update-system.md)
+- 字幕 / 歌词： [`docs/10-project/subtitle-and-lyrics.md`](../../../docs/10-project/subtitle-and-lyrics.md)
+- 分享 / 备份： [`docs/10-project/share-and-backup.md`](../../../docs/10-project/share-and-backup.md)
+- 桌面壳层 / 极简模式： [`docs/10-project/ui-and-platform-quirks.md`](../../../docs/10-project/ui-and-platform-quirks.md)
+- B 站接入： [`docs/10-project/bilibili-integration.md`](../../../docs/10-project/bilibili-integration.md)
+
+## 推荐执行顺序
+
+1. 先判断任务是否需要在 [`docs/40-feature-plans/`](../../../docs/40-feature-plans/) 建规划文档
+2. 先定位真源文件，再决定改动范围，不要从旧文档反推实现
+3. 涉及数据结构或协议时，优先改数据层和联动约束，再改业务编排，最后改 UI / 路由
+4. 改了 `@riverpod`、`@freezed`、Drift 或 ARB 后，补 `build_runner` / `gen-l10n`
+5. 改完先跑最低验证，再补受影响的 `docs/` 与 `.agents/skills/`
+
+## 最低验证
+
+```bash
+flutter analyze --no-fatal-infos
+flutter test
 ```
-busic-architecture    → 架构规范
-    ↓
-busic-database        → 数据层实现
-    ↓
-busic-state-management → 状态管理
-    ↓
-busic-ui-development   → UI层开发
-    ↓
-国际化 (app_en.arb / app_zh.arb)
-```
 
-### 3. 代码生成
-修改 `@riverpod` / `@freezed` / `@DriftDatabase` 后必须运行：
+如果改了 codegen 或 i18n：
+
 ```bash
 dart run build_runner build --delete-conflicting-outputs
+flutter gen-l10n
 ```
 
-### 4. 测试实现
-参考 `busic-testing` skill，**每个功能必须实现对应测试**
-
-### 5. 文档维护
-**每次开发和重构都必须进行文档维护。**
-
-#### 5.1 文档更新
-- 更新 `docs/` 下的相关文档
-- 新增功能需在 `docs/feat/` 下添加规划文档
-- 重构后需同步更新架构文档
-
-#### 5.2 Skills 维护
-- 参考 `busic-skills-maintenance` skill
-- 更新现有 skill 内容以反映代码变更
-- 必要时创建新 skill
-- 删除过时的 skill
-
-### 6. 验证要求
+如果改动有平台或高风险联动，再补最小手测：
 
 ```bash
-# 1. 静态分析（0 issues）
-flutter analyze --no-fatal-infos
-
-# 2. 所有测试通过
-flutter test
-
-# 3. 本地运行验证
-# 查看可用设备
-flutter devices
-# 根据设备ID运行
-flutter run -d <device_id> --debug
-# 常用平台：windows / linux / macos / android / ios
+flutter run -d windows
+flutter run -d <device_id>
 ```
 
-### 7. Git 提交与版本管理
-参考 `busic-git-commit` skill，提交前确保：
-- 运行 `flutter analyze --no-fatal-infos` 无 error
-- 运行 `flutter test` 全部通过
-- 使用约定式提交格式
+## 高频联动提醒
 
-### 相关子Skill
+- 改数据库：同步看 `app_database.dart`、表定义、迁移和 Repository 映射
+- 改下载 / 播放：确认 `songs.localPath` 与 `songs.audioQuality` 的反向回写没有断
+- 改分享 / 备份：继续以 `bvid + cid` 作为跨设备身份，不要带本地路径
+- 改更新系统：同步检查 `versions-manifest.json`、`app_update` feature、Release 资产名
+- 改桌面壳层：确认托盘和极简模式生命周期没有被普通页面逻辑误伤
 
-| Skill | 用途 |
-|---|---|
-| [busic-architecture](./busic-architecture/SKILL.md) | 架构与项目结构 |
-| [busic-coding-conventions](./busic-coding-conventions/SKILL.md) | 代码编码规范 |
-| [busic-database](./busic-database/SKILL.md) | 数据库操作规范 |
-| [busic-state-management](./busic-state-management/SKILL.md) | 状态管理规范 |
-| [busic-ui-development](./busic-ui-development/SKILL.md) | UI层开发规范 |
-| [busic-testing](./busic-testing/SKILL.md) | 测试规范 |
-| [busic-skills-maintenance](./busic-skills-maintenance/SKILL.md) | Skills维护规范 |
-| [busic-git-commit](./busic-git-commit/SKILL.md) | Git提交与版本管理 |
+## 改完别忘了
 
-### 代码编写时参考
+- 更新受影响的主线文档，优先改 `docs/`，不要把新知识继续埋到归档文档
+- 如果规范本身发生变化，再更新对应 skill
+- 参考 [`busic-git-commit`](../busic-git-commit/SKILL.md) 整理提交
 
-- **命名约定** → `busic-coding-conventions`
-- **数据层** → `busic-database`
-- **状态层** → `busic-state-management`
-- **UI层** → `busic-ui-development`
+## 相关 Skill
+
+- [`busic-architecture`](../busic-architecture/SKILL.md)
+- [`busic-coding-conventions`](../busic-coding-conventions/SKILL.md)
+- [`busic-database`](../busic-database/SKILL.md)
+- [`busic-state-management`](../busic-state-management/SKILL.md)
+- [`busic-ui-development`](../busic-ui-development/SKILL.md)
+- [`busic-testing`](../busic-testing/SKILL.md)
+- [`busic-skills-maintenance`](../busic-skills-maintenance/SKILL.md)

@@ -1,78 +1,48 @@
 ---
 name: busic-architecture
-description: BuSic项目架构规范。用于数据层、状态层、UI层开发时参考，包含整体架构、Feature模块结构、层间依赖规则
+description: BuSic项目架构速查。用于定位当前分层结构、主链路真源、层间依赖方向和跨系统高耦合约束
 license: MIT
 compatibility: opencode
 ---
 
-## 整体架构
+## 何时使用
 
-```
-lib/
-├── main.dart              # 入口：初始化数据库、media_kit、窗口服务
-├── app.dart               # MaterialApp.router 配置
-├── core/                  # 全局基础设施（与业务无关）
-├── features/              # 业务功能模块（核心代码）
-├── shared/                # 跨模块共享组件
-└── l10n/                  # 国际化资源
-```
+- 需要先判断一个改动应该落在哪一层或哪个 feature
+- 需要确认启动链路、路由壳层、跨系统联动的真实入口
+- 发现文档和代码描述不一致，想先回到当前架构真源
 
-## Core 层（核心基建）
+## 先看这些真源
 
-| 目录 | 职责 | 关键类 |
-|---|---|---|
-| `api/` | Bilibili API 底层封装 | `BiliDio`, `WbiSign` |
-| `database/` | Drift 数据库初始化 + 表定义 | `AppDatabase` |
-| `router/` | GoRouter 全局路由表 | `appRouterProvider`, `AppRoutes` |
-| `theme/` | Material 3 主题 + 响应式断点 | `AppTheme` |
-| `utils/` | 工具集 | `AppLogger`, `Formatters`, `PlatformUtils` |
-| `window/` | 桌面窗口管理 | `WindowService` |
+- [`docs/30-reference/architecture.md`](../../../docs/30-reference/architecture.md)
+- [`docs/30-reference/source-of-truth.md`](../../../docs/30-reference/source-of-truth.md)
+- [`docs/10-project/project-overview.md`](../../../docs/10-project/project-overview.md)
 
-## Feature 层（四层架构）
+## 当前结构
 
-```
-features/<feature_name>/
-├── domain/models/     # Freezed 数据模型
-├── data/              # Repository 接口 + 实现
-├── application/       # Riverpod Notifier
-└── presentation/     # UI (Screen + Widgets)
-```
+- `lib/main.dart`：启动初始化、依赖注入、窗口 / 托盘 / 极简模式入口
+- `lib/app.dart`：`MaterialApp.router`、主题、语言、静默更新检查
+- `lib/core/`：数据库、API、路由、主题、窗口等全局基建
+- `lib/features/`：按业务能力拆分，尽量保持 `domain / data / application / presentation`
+- `lib/shared/`：跨 feature 复用组件与扩展
+- `lib/l10n/`：ARB 与生成的本地化代码
 
-### 现有 Feature
+## 不可破坏的规则
 
-| 模块 | 功能 |
-|---|---|
-| `auth/` | 扫码登录、Cookie管理 |
-| `player/` | 播放控制、队列管理 |
-| `playlist/` | 歌单 CRUD |
-| `search_and_parse/` | BV号解析、搜索 |
-| `download/` | 下载任务队列 |
-| `settings/` | 用户偏好 |
+- 推荐依赖方向：`presentation -> application -> data -> core`
+- UI 通过 Provider / Notifier 访问业务层，不直接写数据库或网络
+- `domain` 保持纯模型与少量派生属性，不承载复杂 IO
+- `comment`、`subtitle`、`share`、`app_update`、`minimal` 更像系统能力，不要机械按主页面思维处理
 
-## 层间依赖规则
+## 高耦合系统提醒
 
-```
-Presentation → Application → Data → Core
-```
+- 下载完成后会反向刷新 `songs.localPath` 与 `songs.audioQuality`，播放器依赖它们恢复离线播放
+- 分享 / 备份以 `bvid + cid` 作为跨设备身份，不以 `Songs.id` 或本地路径为准
+- 更新系统同时依赖 `versions-manifest.json`、`app_update` feature 和 Release 资产命名
+- 字幕链路依赖 B 站接口、登录态和 AI 字幕前缀校验，不是单次 API 调用
 
-### 严格规则
+## 相关 Skill
 
-1. **Presentation 层**只通过 Riverpod provider 与 Application 层交互，禁止直接调用 Repository
-2. **Application 层** 持有 Repository 实例，负责编排业务逻辑
-3. **Data 层** 实现 Repository 抽象接口
-4. **Domain 层** 是纯数据模型，不包含业务逻辑
-5. **Feature 之间**通过 Riverpod provider 互相引用，不直接导入对方 Data/Domain 层
-6. **Core 层**可以被任何层使用
-
-## 新增 Feature 模板
-
-```
-lib/features/<new_feature>/
-├── domain/models/<model_name>.dart     # @freezed
-├── data/<feature>_repository.dart      # 抽象接口
-├── data/<feature>_repository_impl.dart # 实现
-├── application/<feature>_notifier.dart # @riverpod
-└── presentation/
-    ├── <feature>_screen.dart
-    └── widgets/<widget_name>.dart
-```
+- [`busic-main-workflow`](../busic-main-workflow/SKILL.md)
+- [`busic-database`](../busic-database/SKILL.md)
+- [`busic-state-management`](../busic-state-management/SKILL.md)
+- [`busic-ui-development`](../busic-ui-development/SKILL.md)
