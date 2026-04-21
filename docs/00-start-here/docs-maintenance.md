@@ -69,6 +69,13 @@ docs/
 - 目标是指导执行流程，而不是解释系统原理
 - 与“构建、调试、开发、发布”直接相关
 
+示例：
+
+- `build-guide.md`
+- `debug-guide.md`
+- `testing-guide.md`
+- `release-workflow.md`
+
 ### 放到 `30-reference/` 的内容
 
 满足以下特征：
@@ -182,10 +189,22 @@ BuSic 的 docs 统一遵守以下原则：
 
 至少检查：
 
+- `00-start-here/agent-quickstart.md`
 - `20-workflows/build-guide.md`
 - `20-workflows/debug-guide.md`
+- `20-workflows/testing-guide.md`
 - `20-workflows/dev-workflow.md`
 - `20-workflows/release-workflow.md`
+
+### 改测试目录、测试策略、CI 验证要求
+
+至少检查：
+
+- `20-workflows/testing-guide.md`
+- `30-reference/device-testing.md`
+- `CONTRIBUTING.md`
+
+如果新增或修改了 agent 高频命令，还要同步更新 `00-start-here/agent-quickstart.md` 里的“Agent 沙箱与提权”分类。其它文档只保留短提示并回链，不要复制整张表。分类至少写清：通常可先在沙箱内尝试、常需提权到沙箱外、尚未验证。
 
 ### 改 docs 目录结构本身
 
@@ -223,3 +242,5 @@ BuSic 的 docs 统一遵守以下原则：
 - `30-reference/source-of-truth.md`
 
 这些文档不应被写成教学型长文，否则会降低冷启动效率。
+
+尤其是 `00-start-here/agent-quickstart.md` 里的高频命令说明，要明确标注沙箱行为和提权预期；不要只列命令，不写 agent 在当前环境里怎么执行它们。

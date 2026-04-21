@@ -93,6 +93,26 @@ dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
 
+## Agent 沙箱与提权
+
+2026-04-21 在当前 Windows PowerShell agent 环境的实测结论：
+
+- 可先在沙箱内尝试：`git status`、`git log`、`git diff`
+- 通常需要提权到沙箱外：所有 `flutter ...` 命令，包括 `flutter pub get`、`flutter analyze --no-fatal-infos`、`flutter test`、`flutter run -d windows`、`flutter devices`、`flutter gen-l10n`
+- 通常需要提权到沙箱外：文档里常见的 `dart ...` 包装入口，尤其 `dart run build_runner build --delete-conflicting-outputs`
+- 预期需要提权：远程 Git 和写入型 Git，例如 `git ls-remote`、`git fetch`、`git pull`、`git push`、`git add`、`git commit`、切分支、改 tag、改 ref
+- 不要把这条规则写成跨平台绝对结论；这里只描述当前仓库在当前 agent 环境里的经验值
+
+原因只记关键事实：
+
+- `flutter` / `dart` 包装入口在沙箱内会超时或卡在工具引导阶段；绕过包装层直跑 Flutter tool 时，沙箱内复现过 `CreateFile failed 5` 和 `where aapt` 访问失败
+- 同一批命令提权后可正常执行：`git ls-remote origin HEAD` 成功，`flutter analyze --no-fatal-infos` 于 2026-04-21 复测约 26.2s 通过，`flutter test` 同日复测通过
+- 如果只是想确认 Dart VM 是否可用，直连 `D:\flutter\bin\cache\dart-sdk\bin\dart.exe` 的只读帮助/版本命令在沙箱内可运行；但主线文档默认仍使用 `dart ...`，因此对 agent 的默认建议仍是先预期提权
+
+完整的测试目录、维护规则和当前覆盖现状见：
+
+- [../20-workflows/testing-guide.md](../20-workflows/testing-guide.md)
+
 ## 哪些旧文档不要直接当真
 
 - `90-archive/historical-design/design.md`
@@ -108,3 +128,4 @@ flutter gen-l10n
 1. [../10-project/project-overview.md](../10-project/project-overview.md)
 2. [../10-project/project-specific-rules.md](../10-project/project-specific-rules.md)
 3. [../30-reference/source-of-truth.md](../30-reference/source-of-truth.md)
+4. [../20-workflows/testing-guide.md](../20-workflows/testing-guide.md)

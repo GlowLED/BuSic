@@ -48,6 +48,8 @@ dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
 
+如果执行者是运行在沙箱中的 agent，请预期 `flutter ...`、`dart run ...` 和远程/写入型 Git 往往需要提权到沙箱外；本地只读 Git（如 `git status`、`git log`、`git diff`）通常可先在沙箱内尝试。统一分类见 [../00-start-here/agent-quickstart.md](../00-start-here/agent-quickstart.md)。
+
 说明：
 
 - `build_runner` 负责 Riverpod / Freezed / Drift 生成代码

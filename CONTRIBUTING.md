@@ -8,9 +8,15 @@
 2. 运行 `flutter pub get` 安装依赖
 3. 运行代码生成（见下方）
 
+如果执行者是运行在沙箱中的 agent，请预期 `flutter ...`、`dart run ...` 和远程/写入型 Git 往往需要提权到沙箱外；本地只读 Git（如 `git status`、`git log`、`git diff`）通常可先在沙箱内尝试。统一分类见 [docs/00-start-here/agent-quickstart.md](docs/00-start-here/agent-quickstart.md)。
+
 ## Push / PR 前必须执行的检查
 
 CI 流水线会依次执行以下步骤，请在本地**全部通过**后再推送：
+
+自动化测试的目录、维护规则、当前覆盖现状和补测优先级见：
+
+- [测试维护指南](docs/20-workflows/testing-guide.md)
 
 ### 1. 代码生成
 
@@ -46,6 +52,8 @@ flutter test
 ```
 
 所有测试必须通过。
+
+如果只想先做 targeted regression，可先跑单个测试文件；但提交前仍应回到全量 `flutter test`。
 
 ### 快速检查（一键执行）
 

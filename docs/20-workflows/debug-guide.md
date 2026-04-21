@@ -10,6 +10,8 @@ dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
 
+如果执行者是运行在沙箱中的 agent，请预期 `flutter ...`、`dart run ...` 和远程/写入型 Git 往往需要提权到沙箱外；本地只读 Git（如 `git status`、`git log`、`git diff`）通常可先在沙箱内尝试。统一分类见 [../00-start-here/agent-quickstart.md](../00-start-here/agent-quickstart.md)。
+
 如果你改的是普通 UI 且没有碰 codegen，`build_runner` 可以跳过；但一旦怀疑生成代码过期，先重跑，不要带着脏产物继续查问题。
 
 ## 2. 推荐的调试入口
@@ -142,7 +144,17 @@ flutter analyze --no-fatal-infos
 flutter test
 ```
 
+如果这两条命令在 agent 沙箱内异常超时或卡在工具引导阶段，先按上面的规则提权重跑，不要先假设是项目本身坏了。
+
 很多“运行时异常”其实是早就能被分析或测试发现的结构问题。
+
+自动化测试的目录、维护规则和当前覆盖现状见：
+
+- [testing-guide.md](./testing-guide.md)
+
+如果需要真机 / 模拟器交互验证，再看：
+
+- [../30-reference/device-testing.md](../30-reference/device-testing.md)
 
 ## 6. 热重载边界
 
@@ -191,6 +203,7 @@ flutter gen-l10n
 
 - 构建： [build-guide.md](./build-guide.md)
 - 开发流程： [dev-workflow.md](./dev-workflow.md)
+- 测试维护： [testing-guide.md](./testing-guide.md)
 - B 站集成： [../10-project/bilibili-integration.md](../10-project/bilibili-integration.md)
 - 字幕与歌词： [../10-project/subtitle-and-lyrics.md](../10-project/subtitle-and-lyrics.md)
 - 平台差异： [../10-project/ui-and-platform-quirks.md](../10-project/ui-and-platform-quirks.md)

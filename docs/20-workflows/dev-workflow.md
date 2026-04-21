@@ -193,12 +193,18 @@ dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
 
+如果执行者是运行在沙箱中的 agent，请预期 `flutter ...`、`dart run ...` 和远程/写入型 Git 往往需要提权到沙箱外；本地只读 Git（如 `git status`、`git log`、`git diff`）通常可先在沙箱内尝试。统一分类见 [../00-start-here/agent-quickstart.md](../00-start-here/agent-quickstart.md)。
+
 ### 6.2 最低验证
 
 ```bash
 flutter analyze --no-fatal-infos
 flutter test
 ```
+
+完整的测试目录、模式、覆盖现状和补测优先级见：
+
+- [testing-guide.md](./testing-guide.md)
 
 如改动涉及具体平台，再补最小手动运行：
 
@@ -225,6 +231,7 @@ flutter run -d <device_id>
 - 字幕 / 歌词：更新 `10-project/subtitle-and-lyrics.md`
 - 分享 / 备份：更新 `10-project/share-and-backup.md`
 - 更新系统：更新 `10-project/update-system.md` 和 `20-workflows/release-workflow.md`
+- 测试目录、测试策略、CI 验证要求：更新 `20-workflows/testing-guide.md`
 - 文档结构自身：更新 `../README.md` 和 `../00-start-here/docs-maintenance.md`
 
 ## 8. 相关文档
@@ -232,5 +239,6 @@ flutter run -d <device_id>
 - 新开发者入口： [../00-start-here/newcomer-path.md](../00-start-here/newcomer-path.md)
 - 构建： [build-guide.md](./build-guide.md)
 - 调试： [debug-guide.md](./debug-guide.md)
+- 测试维护： [testing-guide.md](./testing-guide.md)
 - 发布： [release-workflow.md](./release-workflow.md)
 - 架构速查： [../30-reference/architecture.md](../30-reference/architecture.md)

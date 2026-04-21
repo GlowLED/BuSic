@@ -19,6 +19,8 @@ flutter test
 flutter run -d windows
 ```
 
+如果执行者是运行在沙箱中的 agent，请预期这组 `flutter ...` 命令和后面的 `dart run ...` 常常需要提权到沙箱外；只有本地只读 Git（如 `git status`、`git log`、`git diff`）通常可先在沙箱内尝试。完整分类见 [agent-quickstart.md](./agent-quickstart.md)。
+
 如需 Android 调试：
 
 ```bash
@@ -37,6 +39,10 @@ flutter run -d <device_id>
 dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
+
+完整的测试维护要求、目录和覆盖现状见：
+
+- [../20-workflows/testing-guide.md](../20-workflows/testing-guide.md)
 
 ## 2. 先建立正确心智模型
 
@@ -114,6 +120,7 @@ Presentation -> Application -> Data -> Core
 
 - 构建环境： [../20-workflows/build-guide.md](../20-workflows/build-guide.md)
 - 调试方式： [../20-workflows/debug-guide.md](../20-workflows/debug-guide.md)
+- 测试维护： [../20-workflows/testing-guide.md](../20-workflows/testing-guide.md)
 - 发布流程： [../20-workflows/release-workflow.md](../20-workflows/release-workflow.md)
 
 ## 6. 历史文档怎么处理
