@@ -21,6 +21,7 @@
   "sequential": "顺序播放",
   "volume": "音量",
   "queue": "播放队列",
+  "playerInfoTab": "信息",
   "createPlaylist": "创建歌单",
   "deletePlaylist": "删除歌单",
   "renamePlaylist": "重命名歌单",

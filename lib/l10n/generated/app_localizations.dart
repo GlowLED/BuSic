@@ -224,6 +224,12 @@ abstract class AppLocalizations {
   /// **'Queue'**
   String get queue;
 
+  /// Label for the full-player information tab
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get playerInfoTab;
+
   /// No description provided for @createPlaylist.
   ///
   /// In en, this message translates to:

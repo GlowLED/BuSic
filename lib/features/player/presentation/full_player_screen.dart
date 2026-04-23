@@ -10,6 +10,7 @@ import '../application/player_notifier.dart';
 import 'widgets/cover_image.dart';
 import 'widgets/player_app_bar.dart';
 import 'widgets/player_controls.dart';
+import 'widgets/player_section_switcher.dart';
 import 'widgets/player_seek_bar.dart';
 
 /// Full-screen player view with large cover art, comments, and controls.
@@ -86,14 +87,12 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             controller: _verticalPageController,
             scrollDirection: Axis.vertical,
             physics: const ClampingScrollPhysics(),
-            onPageChanged: (i) =>
-                setState(() => _verticalPageIndex = i),
+            onPageChanged: (i) => setState(() => _verticalPageIndex = i),
             children: [
               // Page 0 (top): Horizontal PageView (Cover ↔ Comments)
               PageView(
                 controller: _pageController,
-                onPageChanged: (i) =>
-                    setState(() => _currentPageIndex = i),
+                onPageChanged: (i) => setState(() => _currentPageIndex = i),
                 children: [
                   _buildCoverPage(context, track),
                   _buildCommentPage(context, track?.bvid),
@@ -150,6 +149,10 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
               Expanded(
                 child: Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                      child: _buildWideSectionSwitcher(l10n),
+                    ),
                     Expanded(
                       child: PageView(
                         controller: _wideRightPageController,
@@ -209,8 +212,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             const SizedBox(height: 8),
             Text(
               track?.artist ?? l10n.unknownArtist,
-              style: context.textTheme.bodyLarge
-                  ?.copyWith(color: Colors.white70),
+              style:
+                  context.textTheme.bodyLarge?.copyWith(color: Colors.white70),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -218,6 +221,35 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildWideSectionSwitcher(dynamic l10n) {
+    return PlayerSectionSwitcher(
+      selectedIndex: _wideRightPageIndex,
+      onSelected: (index) {
+        setState(() => _wideRightPageIndex = index);
+        if (!_wideRightPageController.hasClients) return;
+        _wideRightPageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+        );
+      },
+      items: [
+        PlayerSectionSwitcherItem(
+          label: l10n.playerInfoTab,
+          icon: Icons.info_outline_rounded,
+        ),
+        PlayerSectionSwitcherItem(
+          label: l10n.lyricsTitle,
+          icon: Icons.format_align_center_rounded,
+        ),
+        PlayerSectionSwitcherItem(
+          label: l10n.commentSection,
+          icon: Icons.comment_outlined,
+        ),
+      ],
     );
   }
 
@@ -286,8 +318,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
       width: activeIndex == index ? 16 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color:
-            activeIndex == index ? Colors.white : Colors.white38,
+        color: activeIndex == index ? Colors.white : Colors.white38,
         borderRadius: BorderRadius.circular(4),
       ),
     );

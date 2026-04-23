@@ -22,6 +22,8 @@
   "sequential": "Sequential",
   "volume": "Volume",
   "queue": "Queue",
+  "playerInfoTab": "Info",
+  "@playerInfoTab": { "description": "Label for the full-player information tab" },
   "createPlaylist": "Create Playlist",
   "deletePlaylist": "Delete Playlist",
   "renamePlaylist": "Rename Playlist",

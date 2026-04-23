@@ -61,7 +61,7 @@
 1. Task 01: 设计系统与主题层重构（已完成）
 2. Task 02: 主导航壳层重构（已完成）
 3. Task 03: 通用媒体组件重构（已完成）
-4. Task 04: 播放器与极简模式视觉主线重构
+4. Task 04: 全屏播放器切换交互收口
 5. Task 05: 首页与搜索页重构
 6. Task 06: 设置页与全局收口
 
@@ -77,6 +77,7 @@
 - Task 01: 已完成
 - Task 02: 已完成
 - Task 03: 已完成（2026-04-21）
+- Task 04: 已完成（2026-04-23）
 
 ### 3.2 最近完成记录
 
@@ -88,6 +89,11 @@
 - 2026-04-21：Task 03 后续维护收口。
   - 修复 `AppPanel` 与壳层面板在圆角高亮边框下的裁切缺口问题
   - 在 `docs/30-reference/ui.md` 中补充共享面板的圆角边框实现约束
+- 2026-04-23：Task 04 按新需求完成收口。
+  - 保留全屏播放器现有沉浸式外观风格
+  - PC 宽屏右侧内容区新增 `信息 / 歌词 / 评论` 分段切换入口
+  - 原 PageView 滑动切换、移动端竖屏交互、播放控制和极简模式生命周期策略保持不变
+  - 文档已同步到 `docs/10-project/ui-and-platform-quirks.md`
 
 ## 4. 子任务清单
 
@@ -294,11 +300,13 @@
 
 ---
 
-## Task 04: 播放器与极简模式视觉主线重构
+## Task 04: 全屏播放器切换交互收口
 
 ### 目标
 
-把播放器页做成整套视觉系统的锚点页面，并让极简模式与之共用同一主线语言。
+在尽量保持当前全屏播放页外观风格的前提下，补强 PC 宽屏下歌词 / 评论区的显式切换入口。
+
+本任务不再要求重做全屏播放器视觉主线，也不再主动统一极简模式与播放器的视觉语义。现有全屏播放器的大封面、背景模糊、白色信息文字与控制区氛围应基本保留。
 
 ### 依赖
 
@@ -316,15 +324,15 @@
 
 - `lib/features/player/presentation/full_player_screen.dart`
 - `lib/features/player/presentation/widgets/`
-- `lib/features/minimal/presentation/minimal_screen.dart`
-- `lib/features/minimal/presentation/widgets/`
+- `lib/features/minimal/presentation/minimal_screen.dart`（仅回归关注）
+- `lib/features/minimal/presentation/widgets/`（仅回归关注）
 
 ### 允许修改范围
 
 - `lib/features/player/presentation/`
-- `lib/features/minimal/presentation/`
-- 与播放器视觉直接相关的共享展示组件
-- 必要的 theme token 扩展
+- 必要的播放器 presentation widgets
+- 必要的 i18n 文案
+- 与本任务直接相关的 docs 回写
 
 ### 禁止修改范围
 
@@ -334,26 +342,28 @@
 
 ### 必做产出
 
-- 强化封面、背景模糊、信息面板、控制区层次
-- 统一播放器页和极简模式的视觉语义
-- 歌词 / 评论 / 封面切换区域更有主次关系
-- 控制区更像播放器，不像普通按钮排布
+- PC 宽屏全屏播放器右侧内容区提供显式 `信息 / 歌词 / 评论` 分段切换入口
+- 分段入口点击后切换现有右侧 PageView 页面，并保留原滑动切换能力
+- 移动端 / 竖屏全屏播放器交互保持现状
+- 切换入口视觉应贴近当前全屏播放器风格，避免引入一套新的播放器视觉语言
 
 ### 完成标准
 
-- 全屏播放器成为 BuSic 的品牌锚点页面
-- 极简模式与播放器不是两套风格
+- PC 宽屏全屏播放器能明显、稳定地切换信息、歌词和评论页面
+- 全屏播放器当前外观风格基本不变
 - 不破坏播放控制、歌词、评论功能入口
+- 极简模式进入退出和生命周期策略不回归
 
 ### 回归检查
 
 - `flutter analyze --no-fatal-infos`
+- 手测 PC 宽屏全屏播放器的信息 / 歌词 / 评论分段切换与原 PageView 滑动切换
 - 手测播放、暂停、切歌、歌词页、评论页、极简模式进入退出
 - 验证极简模式 `paused/resumed/detached` 相关逻辑不回归
 
 ### 文档回写
 
-- 如播放器视觉结构或极简模式 UI 规则明显变化，更新 `docs/10-project/ui-and-platform-quirks.md`
+- 如播放器切换交互或平台 UI 规则明显变化，更新 `docs/10-project/ui-and-platform-quirks.md`
 
 ---
 

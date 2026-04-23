@@ -72,6 +72,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get queue => '播放队列';
 
   @override
+  String get playerInfoTab => '信息';
+
+  @override
   String get createPlaylist => '创建歌单';
 
   @override
