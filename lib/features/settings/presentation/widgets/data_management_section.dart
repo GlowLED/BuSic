@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../share/application/sync_notifier.dart';
 import '../../../share/presentation/widgets/backup_overview_dialog.dart';
-import 'section_header.dart';
+import 'settings_panel.dart';
 
 /// Data management section: export/import backup.
 class DataManagementSection extends ConsumerWidget {
@@ -14,20 +14,20 @@ class DataManagementSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSectionPanel(
+      title: l10n.dataManagement,
+      icon: Icons.storage_rounded,
       children: [
-        SectionHeader(title: l10n.dataManagement),
-        ListTile(
-          leading: const Icon(Icons.upload_file),
-          title: Text(l10n.exportBackup),
-          subtitle: Text(l10n.exportBackupDesc),
+        SettingsTile(
+          icon: Icons.upload_file_rounded,
+          title: l10n.exportBackup,
+          subtitle: l10n.exportBackupDesc,
           onTap: () => _exportBackup(context, ref),
         ),
-        ListTile(
-          leading: const Icon(Icons.download),
-          title: Text(l10n.importBackup),
-          subtitle: Text(l10n.importBackupDesc),
+        SettingsTile(
+          icon: Icons.download_rounded,
+          title: l10n.importBackup,
+          subtitle: l10n.importBackupDesc,
           onTap: () => _importBackup(context, ref),
         ),
       ],

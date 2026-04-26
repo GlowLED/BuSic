@@ -458,6 +458,30 @@ abstract class AppLocalizations {
   /// **'No playlists yet'**
   String get noPlaylists;
 
+  /// No description provided for @playlistHomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shape your Bilibili finds into a focused listening library.'**
+  String get playlistHomeSubtitle;
+
+  /// No description provided for @playlistLibraryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} playlists'**
+  String playlistLibraryCount(int count);
+
+  /// No description provided for @playlistSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist List'**
+  String get playlistSectionTitle;
+
+  /// No description provided for @noPlaylistsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a playlist or import one to start building your library.'**
+  String get noPlaylistsHint;
+
   /// No description provided for @unknownArtist.
   ///
   /// In en, this message translates to:
@@ -631,6 +655,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import from Clipboard'**
   String get importFromClipboard;
+
+  /// No description provided for @importFromClipboardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a BuSic share link'**
+  String get importFromClipboardDesc;
 
   /// No description provided for @copiedToClipboard.
   ///
@@ -1052,6 +1082,84 @@ abstract class AppLocalizations {
   /// **'Importing playlist...'**
   String get importingPlaylist;
 
+  /// No description provided for @searchPageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Bilibili or paste a BV link without leaving your music flow.'**
+  String get searchPageSubtitle;
+
+  /// No description provided for @searchCommandTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search or parse'**
+  String get searchCommandTitle;
+
+  /// No description provided for @searching.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching...'**
+  String get searching;
+
+  /// No description provided for @pasteFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from clipboard'**
+  String get pasteFromClipboard;
+
+  /// No description provided for @searchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with a keyword or BV link'**
+  String get searchEmptyTitle;
+
+  /// No description provided for @searchEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Results, parsed video details, page selection and comments will appear here.'**
+  String get searchEmptySubtitle;
+
+  /// No description provided for @backToSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to search results'**
+  String get backToSearchResults;
+
+  /// No description provided for @pagesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pages'**
+  String pagesCount(int count);
+
+  /// No description provided for @selectedPagesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected {count}/{total} pages'**
+  String selectedPagesCount(int count, int total);
+
+  /// No description provided for @playFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback failed: {error}'**
+  String playFailedWithError(String error);
+
+  /// No description provided for @downloadStartedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Started downloading {count} songs'**
+  String downloadStartedCount(int count);
+
+  /// No description provided for @downloadFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String downloadFailedWithError(String error);
+
+  /// No description provided for @addedSongsToPlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} songs to playlist'**
+  String addedSongsToPlaylist(int count);
+
   /// No description provided for @checkForUpdate.
   ///
   /// In en, this message translates to:
@@ -1295,7 +1403,7 @@ abstract class AppLocalizations {
   /// No description provided for @createPlaylistManual.
   ///
   /// In en, this message translates to:
-  /// **'Create Manually'**
+  /// **'Create Custom Playlist'**
   String get createPlaylistManual;
 
   /// No description provided for @createPlaylistManualDesc.
@@ -1489,6 +1597,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Color Scheme'**
   String get colorScheme;
+
+  /// No description provided for @settingsPageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune playback, account, storage and maintenance controls.'**
+  String get settingsPageSubtitle;
+
+  /// No description provided for @appearanceSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceSettings;
+
+  /// No description provided for @languageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageSettings;
+
+  /// No description provided for @playbackSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback'**
+  String get playbackSettings;
+
+  /// No description provided for @storageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get storageSettings;
+
+  /// No description provided for @accountSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountSettings;
+
+  /// No description provided for @loadingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading account...'**
+  String get loadingAccount;
+
+  /// No description provided for @aboutSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'About BuSic'**
+  String get aboutSettings;
+
+  /// No description provided for @selectDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select directory'**
+  String get selectDirectory;
+
+  /// No description provided for @selectCacheDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select cache directory'**
+  String get selectCacheDirectory;
+
+  /// No description provided for @inputCachePath.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter cache path'**
+  String get inputCachePath;
+
+  /// No description provided for @createDirectoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create directory: {error}'**
+  String createDirectoryFailed(String error);
 
   /// No description provided for @colorGreen.
   ///

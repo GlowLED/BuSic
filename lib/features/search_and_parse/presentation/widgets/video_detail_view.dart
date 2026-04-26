@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/utils/formatters.dart';
-import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/extensions/context_extensions.dart';
+import '../../../../shared/widgets/app_panel.dart';
+import '../../../../shared/widgets/media_cover.dart';
 import '../../../../shared/widgets/playlist_picker_dialog.dart';
 import '../../../auth/application/auth_notifier.dart';
 import '../../../comment/presentation/comment_section.dart';
@@ -14,19 +17,18 @@ import '../../application/parse_notifier.dart';
 import '../../domain/models/bvid_info.dart';
 import '../../domain/models/page_info.dart';
 
-/// Displays parsed video detail: info card, page selection, action buttons,
-/// and collapsible comment section.
+/// Displays parsed video detail, page selection, actions, and comments.
 class VideoDetailView extends ConsumerStatefulWidget {
-  final ParseState parseState;
-  final bool showBackButton;
-  final VoidCallback? onBack;
-
   const VideoDetailView({
     super.key,
     required this.parseState,
     this.showBackButton = false,
     this.onBack,
   });
+
+  final ParseState parseState;
+  final bool showBackButton;
+  final VoidCallback? onBack;
 
   @override
   ConsumerState<VideoDetailView> createState() => _VideoDetailViewState();
@@ -48,20 +50,26 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     Future.delayed(const Duration(milliseconds: 50), () {
       if (!mounted) return;
       final position = _scrollController.position;
-      if (edge == ScrollEdge.top && position.pixels > position.minScrollExtent) {
+      if (edge == ScrollEdge.top &&
+          position.pixels > position.minScrollExtent) {
         _isScrollingOuter = true;
-        _scrollController.animateTo(
-          position.minScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        ).then((_) => _isScrollingOuter = false);
-      } else if (edge == ScrollEdge.bottom && position.pixels < position.maxScrollExtent) {
+        _scrollController
+            .animateTo(
+              position.minScrollExtent,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            )
+            .then((_) => _isScrollingOuter = false);
+      } else if (edge == ScrollEdge.bottom &&
+          position.pixels < position.maxScrollExtent) {
         _isScrollingOuter = true;
-        _scrollController.animateTo(
-          position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        ).then((_) => _isScrollingOuter = false);
+        _scrollController
+            .animateTo(
+              position.maxScrollExtent,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            )
+            .then((_) => _isScrollingOuter = false);
       }
     });
   }
@@ -84,52 +92,42 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (info == null) return const SizedBox.shrink();
 
     final videoInfo = info!;
-    final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
+    final spacing = context.appSpacing;
     final isMultiPage = videoInfo.pages.length > 1;
 
     return SingleChildScrollView(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.fromLTRB(spacing.lg, 0, spacing.lg, spacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Back button
           if (widget.showBackButton)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(bottom: spacing.sm),
               child: TextButton.icon(
                 onPressed: widget.onBack,
-                icon: const Icon(Icons.arrow_back, size: 18),
-                label: const Text('返回搜索结果'),
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: Text(l10n.backToSearchResults),
               ),
             ),
-
-          // ── Video info card ──
-          _buildInfoCard(videoInfo, colorScheme, textTheme, isMultiPage),
-
-          // ── Page selection for multi-page videos ──
+          _buildInfoCard(videoInfo, isMultiPage),
           if (isMultiPage) ...[
-            const SizedBox(height: 12),
-            _buildPageSelection(videoInfo, selectedPages, colorScheme),
+            SizedBox(height: spacing.md),
+            _buildPageSelection(videoInfo, selectedPages),
           ],
-
-          // ── Add to Playlist button ──
-          const SizedBox(height: 16),
+          SizedBox(height: spacing.md),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: (isMultiPage && selectedPages.isEmpty)
                   ? null
                   : () => _addToPlaylist(context),
-              icon: const Icon(Icons.playlist_add),
+              icon: const Icon(Icons.playlist_add_rounded),
               label: Text(l10n.addToPlaylist),
             ),
           ),
-
-          // ── Play / Download buttons ──
-          const SizedBox(height: 8),
+          SizedBox(height: spacing.sm),
           Row(
             children: [
               Expanded(
@@ -138,40 +136,66 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                       ? null
                       : () =>
                           _playParsedVideo(context, videoInfo, selectedPages),
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('播放'),
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: Text(l10n.play),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: spacing.sm),
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: (isMultiPage && selectedPages.isEmpty)
                       ? null
                       : () => _downloadParsedVideo(
-                          context, videoInfo, selectedPages),
-                  icon: const Icon(Icons.download),
+                            context,
+                            videoInfo,
+                            selectedPages,
+                          ),
+                  icon: const Icon(Icons.download_rounded),
                   label: Text(l10n.downloads),
                 ),
               ),
             ],
           ),
-
-          // ── Comment Section ──
-          const SizedBox(height: 16),
-          Card(
+          SizedBox(height: spacing.md),
+          AppPanel(
+            padding: EdgeInsets.zero,
+            borderRadius: context.appRadii.xLargeRadius,
             child: Column(
               children: [
-                ListTile(
-                  leading: const Icon(Icons.comment),
-                  title: const Text('评论区'),
-                  trailing: Icon(
-                    _showComments
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: context.appRadii.xLargeRadius,
+                    onTap: () {
+                      setState(() => _showComments = !_showComments);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(spacing.md),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.comment_rounded,
+                            color: context.appPalette.accentStrong,
+                          ),
+                          SizedBox(width: spacing.sm),
+                          Expanded(
+                            child: Text(
+                              l10n.commentSection,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                color: context.appPalette.textPrimary,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            _showComments
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
+                            color: context.appPalette.textSecondary,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  onTap: () {
-                    setState(() => _showComments = !_showComments);
-                  },
                 ),
                 if (_showComments)
                   SizedBox(
@@ -184,148 +208,172 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: spacing.md),
         ],
       ),
     );
   }
 
-  // ── Video info card ─────────────────────────────────────────────────
+  Widget _buildInfoCard(BvidInfo videoInfo, bool isMultiPage) {
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
 
-  Widget _buildInfoCard(
-    BvidInfo videoInfo,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    bool isMultiPage,
-  ) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: videoInfo.coverUrl != null
-                  ? Image.network(
-                      videoInfo.coverUrl!,
-                      width: 160,
-                      height: 100,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _coverPlaceholder(colorScheme),
-                    )
-                  : _coverPlaceholder(colorScheme),
+    return AppPanel(
+      padding: EdgeInsets.all(spacing.md),
+      borderRadius: context.appRadii.xLargeRadius,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 560;
+          final cover = DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: context.appRadii.largeRadius,
+              boxShadow: context.appDepth.coverGlowShadow,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            child: MediaCover(
+              coverUrl: videoInfo.coverUrl,
+              width: compact ? double.infinity : 168,
+              height: compact ? null : 104,
+              aspectRatio: compact ? 16 / 9 : null,
+              borderRadius: context.appRadii.largeRadius,
+              placeholderIcon: Icons.video_library_rounded,
+            ),
+          );
+
+          final meta = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                videoInfo.title,
+                style: context.textTheme.titleLarge?.copyWith(
+                  color: palette.textPrimary,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: spacing.sm),
+              Text(
+                videoInfo.owner,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: palette.textSecondary,
+                ),
+              ),
+              SizedBox(height: spacing.sm),
+              Wrap(
+                spacing: spacing.sm,
+                runSpacing: spacing.xs,
                 children: [
-                  Text(videoInfo.title,
-                      style: textTheme.titleMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 8),
-                  Text(videoInfo.owner,
-                      style: textTheme.bodyMedium
-                          ?.copyWith(color: colorScheme.onSurfaceVariant)),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.schedule,
-                          size: 14, color: colorScheme.onSurfaceVariant),
-                      const SizedBox(width: 4),
-                      Text(
-                        Formatters.formatDuration(
-                            Duration(seconds: videoInfo.duration)),
-                        style: textTheme.bodySmall
-                            ?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                      if (isMultiPage) ...[
-                        const SizedBox(width: 12),
-                        Icon(Icons.list,
-                            size: 14, color: colorScheme.primary),
-                        const SizedBox(width: 4),
-                        Text('${videoInfo.pages.length} 个分P',
-                            style: textTheme.bodySmall
-                                ?.copyWith(color: colorScheme.primary)),
-                      ],
-                    ],
+                  _VideoBadge(
+                    icon: Icons.schedule_rounded,
+                    label: Formatters.formatDuration(
+                      Duration(seconds: videoInfo.duration),
+                    ),
                   ),
+                  if (isMultiPage)
+                    _VideoBadge(
+                      icon: Icons.queue_music_rounded,
+                      label: context.l10n.pagesCount(videoInfo.pages.length),
+                      emphasized: true,
+                    ),
                 ],
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                cover,
+                SizedBox(height: spacing.md),
+                meta,
+              ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              cover,
+              SizedBox(width: spacing.md),
+              Expanded(child: meta),
+            ],
+          );
+        },
       ),
     );
   }
-
-  Widget _coverPlaceholder(ColorScheme colorScheme) {
-    return Container(
-      width: 160,
-      height: 100,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Icon(Icons.video_library, size: 40),
-    );
-  }
-
-  // ── Page selection ──────────────────────────────────────────────────
 
   Widget _buildPageSelection(
     BvidInfo videoInfo,
     List<PageInfo> selectedPages,
-    ColorScheme colorScheme,
   ) {
     final notifier = ref.read(parseNotifierProvider.notifier);
     final allSelected = selectedPages.length == videoInfo.pages.length;
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
 
-    return Card(
+    return AppPanel(
+      padding: EdgeInsets.all(spacing.md),
+      borderRadius: context.appRadii.xLargeRadius,
       child: Column(
         children: [
-          CheckboxListTile(
-            title: const Text('选择分P'),
-            subtitle:
-                Text('已选 ${selectedPages.length}/${videoInfo.pages.length}'),
-            value: allSelected
-                ? true
-                : selectedPages.isEmpty
-                    ? false
-                    : null,
-            tristate: true,
-            onChanged: (value) {
-              if (value == true) {
-                notifier.selectAllPages();
-              } else {
-                notifier.deselectAllPages();
-              }
-            },
+          Row(
+            children: [
+              Checkbox(
+                value: allSelected
+                    ? true
+                    : selectedPages.isEmpty
+                        ? false
+                        : null,
+                tristate: true,
+                onChanged: (value) {
+                  if (value == true) {
+                    notifier.selectAllPages();
+                  } else {
+                    notifier.deselectAllPages();
+                  }
+                },
+              ),
+              SizedBox(width: spacing.xs),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.selectPages,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        color: palette.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: spacing.xxs),
+                    Text(
+                      context.l10n.selectedPagesCount(
+                        selectedPages.length,
+                        videoInfo.pages.length,
+                      ),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: palette.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const Divider(height: 1),
+          SizedBox(height: spacing.sm),
           ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 250),
-            child: ListView.builder(
+            constraints: const BoxConstraints(maxHeight: 280),
+            child: ListView.separated(
               shrinkWrap: true,
               itemCount: videoInfo.pages.length,
+              separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
               itemBuilder: (context, index) {
                 final page = videoInfo.pages[index];
-                final isSelected =
-                    selectedPages.any((p) => p.cid == page.cid);
-                return CheckboxListTile(
-                  value: isSelected,
-                  dense: true,
-                  title: Text(
-                    'P${page.page} ${page.partTitle}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(Formatters.formatDuration(
-                      Duration(seconds: page.duration))),
-                  onChanged: (_) => notifier.togglePageSelection(page),
+                final isSelected = selectedPages.any((p) => p.cid == page.cid);
+                return _PageSelectionRow(
+                  page: page,
+                  isSelected: isSelected,
+                  onTap: () => notifier.togglePageSelection(page),
                 );
               },
             ),
@@ -335,28 +383,27 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     );
   }
 
-  // ── Actions ─────────────────────────────────────────────────────────
-
   Future<void> _playParsedVideo(
     BuildContext context,
     BvidInfo videoInfo,
     List<PageInfo> pages,
   ) async {
+    final l10n = context.l10n;
     final pagesToPlay = pages.isNotEmpty ? pages : videoInfo.pages;
     if (pagesToPlay.isEmpty) return;
 
     final tracks = pagesToPlay
-        .map((page) => AudioTrack(
-              songId: 0,
-              bvid: videoInfo.bvid,
-              cid: page.cid,
-              title: pagesToPlay.length > 1
-                  ? page.partTitle
-                  : videoInfo.title,
-              artist: videoInfo.owner,
-              coverUrl: videoInfo.coverUrl,
-              duration: Duration(seconds: page.duration),
-            ))
+        .map(
+          (page) => AudioTrack(
+            songId: 0,
+            bvid: videoInfo.bvid,
+            cid: page.cid,
+            title: pagesToPlay.length > 1 ? page.partTitle : videoInfo.title,
+            artist: videoInfo.owner,
+            coverUrl: videoInfo.coverUrl,
+            duration: Duration(seconds: page.duration),
+          ),
+        )
         .toList();
 
     try {
@@ -364,15 +411,14 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           .read(playerNotifierProvider.notifier)
           .playTrackList(tracks, 0, playlistName: videoInfo.title);
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('播放失败: $e'),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
-          ),
-        );
-      }
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.playFailedWithError(e.toString())),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+        ),
+      );
     }
   }
 
@@ -381,14 +427,14 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     BvidInfo videoInfo,
     List<PageInfo> pages,
   ) async {
+    final l10n = context.l10n;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     final pagesToDownload = pages.isNotEmpty ? pages : videoInfo.pages;
     if (pagesToDownload.isEmpty) return;
 
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
-      final songIds = await ref
-          .read(parseNotifierProvider.notifier)
-          .confirmSelection();
+      final songIds =
+          await ref.read(parseNotifierProvider.notifier).confirmSelection();
 
       ref.read(parseNotifierProvider.notifier).parseInput(videoInfo.bvid);
 
@@ -401,10 +447,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
 
       if (qualities.isEmpty) {
         scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text('未获取到可用音质'),
+          SnackBar(
+            content: Text(l10n.noQualities),
             behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
           ),
         );
         return;
@@ -419,13 +465,12 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           qualities: qualities,
           isLoggedIn: isLoggedIn,
           onSelect: (selected) async {
-            int startedCount = 0;
-            for (int i = 0; i < pagesToDownload.length; i++) {
+            var startedCount = 0;
+            for (var i = 0; i < pagesToDownload.length; i++) {
               final page = pagesToDownload[i];
               final songId = i < songIds.length ? songIds[i] : songIds.last;
-              final title = pagesToDownload.length > 1
-                  ? page.partTitle
-                  : videoInfo.title;
+              final title =
+                  pagesToDownload.length > 1 ? page.partTitle : videoInfo.title;
               final started = await ref
                   .read(downloadNotifierProvider.notifier)
                   .downloadSongWithQuality(
@@ -439,10 +484,13 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
             }
             scaffoldMessenger.showSnackBar(
               SnackBar(
-                content: Text('已开始下载 $startedCount 首歌曲'),
+                content: Text(l10n.downloadStartedCount(startedCount)),
                 behavior: SnackBarBehavior.floating,
                 margin: const EdgeInsets.only(
-                    bottom: 80, left: 16, right: 16),
+                  bottom: 80,
+                  left: 16,
+                  right: 16,
+                ),
               ),
             );
           },
@@ -451,7 +499,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     } catch (e) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('下载失败: $e'),
+          content: Text(l10n.downloadFailedWithError(e.toString())),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
         ),
@@ -460,20 +508,22 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   }
 
   Future<void> _addToPlaylist(BuildContext context) async {
+    final l10n = context.l10n;
     final selectedPlaylistId = await showDialog<int>(
       context: context,
       builder: (_) => const PlaylistPickerDialog(),
     );
     if (selectedPlaylistId == null || !context.mounted) return;
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     final songIds = await ref
         .read(parseNotifierProvider.notifier)
         .confirmSelection(playlistId: selectedPlaylistId);
 
     if (context.mounted && songIds.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('已添加 ${songIds.length} 首歌曲到歌单'),
+          content: Text(l10n.addedSongsToPlaylist(songIds.length)),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
         ),
@@ -481,5 +531,130 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       ref.invalidate(playlistListNotifierProvider);
       ref.invalidate(playlistDetailNotifierProvider(selectedPlaylistId));
     }
+  }
+}
+
+class _VideoBadge extends StatelessWidget {
+  const _VideoBadge({
+    required this.icon,
+    required this.label,
+    this.emphasized = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final color = emphasized ? palette.accentStrong : palette.textSecondary;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.appSpacing.sm,
+        vertical: context.appSpacing.xxs,
+      ),
+      decoration: BoxDecoration(
+        color: emphasized
+            ? palette.accentSoft.withValues(alpha: 0.66)
+            : palette.surfaceSecondary.withValues(alpha: 0.72),
+        borderRadius: context.appRadii.pillRadius,
+        border: Border.all(
+          color: color.withValues(alpha: 0.22),
+          width: context.appDepth.outline,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          SizedBox(width: context.appSpacing.xxs),
+          Text(
+            label,
+            style: context.textTheme.labelSmall?.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PageSelectionRow extends StatelessWidget {
+  const _PageSelectionRow({
+    required this.page,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final PageInfo page;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
+
+    return Material(
+      color: isSelected
+          ? palette.accentSoft.withValues(alpha: 0.5)
+          : palette.surfacePrimary.withValues(alpha: 0.42),
+      borderRadius: context.appRadii.largeRadius,
+      child: InkWell(
+        borderRadius: context.appRadii.largeRadius,
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: context.appRadii.largeRadius,
+            border: Border.all(
+              color: isSelected
+                  ? palette.accentStrong.withValues(alpha: 0.42)
+                  : palette.borderSubtle.withValues(alpha: 0.72),
+              width: context.appDepth.outline,
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.sm,
+              vertical: spacing.xs,
+            ),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (_) => onTap(),
+                ),
+                SizedBox(width: spacing.xs),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'P${page.page} ${page.partTitle}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.titleSmall?.copyWith(
+                          color: palette.textPrimary,
+                        ),
+                      ),
+                      SizedBox(height: spacing.xxs),
+                      Text(
+                        Formatters.formatDuration(
+                          Duration(seconds: page.duration),
+                        ),
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: palette.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
-import 'section_header.dart';
+import 'settings_panel.dart';
 
 /// Pick a directory using zenity (Linux) or text input fallback.
 Future<String?> pickDirectory({
@@ -41,10 +41,10 @@ class StorageSection extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
     final l10n = context.l10n;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSectionPanel(
+      title: l10n.storageSettings,
+      icon: Icons.folder_rounded,
       children: [
-        SectionHeader(title: l10n.cachePath),
         _CachePathTile(settings: settings, ref: ref),
       ],
     );
@@ -80,26 +80,21 @@ class _CachePathTileState extends State<_CachePathTile> {
     }
   }
 
-  String get _displayPath =>
-      widget.settings.cachePath ?? _defaultPath ?? '...';
+  String get _displayPath => widget.settings.cachePath ?? _defaultPath ?? '...';
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return ListTile(
-      leading: const Icon(Icons.folder),
-      title: Text(l10n.cachePath),
-      subtitle: Text(
-        _displayPath,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+    return SettingsTile(
+      icon: Icons.folder_open_rounded,
+      title: l10n.cachePath,
+      subtitle: _displayPath,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             icon: const Icon(Icons.folder_open, size: 20),
-            tooltip: '选择目录',
+            tooltip: l10n.selectDirectory,
             onPressed: () => _selectDirectory(context),
           ),
           if (widget.settings.cachePath != null)
@@ -119,7 +114,7 @@ class _CachePathTileState extends State<_CachePathTile> {
 
   Future<void> _selectDirectory(BuildContext context) async {
     var result = await pickDirectory(
-      title: '选择缓存目录',
+      title: context.l10n.selectCacheDirectory,
       initialDirectory: _displayPath,
     );
 
@@ -137,7 +132,7 @@ class _CachePathTileState extends State<_CachePathTile> {
         result = await showDialog<String>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('输入缓存路径'),
+            title: Text(context.l10n.inputCachePath),
             content: TextField(
               controller: controller,
               autofocus: true,
@@ -170,13 +165,12 @@ class _CachePathTileState extends State<_CachePathTile> {
         await dir.create(recursive: true);
       } catch (e) {
         if (context.mounted) {
-          context.showSnackBar('无法创建目录: $e');
+          context
+              .showSnackBar(context.l10n.createDirectoryFailed(e.toString()));
         }
         return;
       }
     }
-    widget.ref
-        .read(settingsNotifierProvider.notifier)
-        .setCachePath(result);
+    widget.ref.read(settingsNotifierProvider.notifier).setCachePath(result);
   }
 }

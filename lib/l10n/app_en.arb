@@ -62,6 +62,15 @@
   "noSongs": "No songs yet",
   "noPlayingMusic": "No music playing",
   "noPlaylists": "No playlists yet",
+  "playlistHomeSubtitle": "Shape your Bilibili finds into a focused listening library.",
+  "playlistLibraryCount": "{count} playlists",
+  "@playlistLibraryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "playlistSectionTitle": "Playlist List",
+  "noPlaylistsHint": "Create a playlist or import one to start building your library.",
   "unknownArtist": "Unknown Artist",
   "unknownTitle": "Unknown Title",
   "downloadSong": "Download Song",
@@ -91,6 +100,7 @@
   "songList": "Song List",
   "confirmImport": "Confirm Import",
   "importFromClipboard": "Import from Clipboard",
+  "importFromClipboardDesc": "Paste a BuSic share link",
   "copiedToClipboard": "Copied to clipboard",
   "exportFailed": "Export failed",
   "importSuccess": "Import successful",
@@ -206,6 +216,50 @@
   "metadataFetchFailed": "Fetch failed",
   "fetchMetadataError": "Failed to fetch song info",
   "importingPlaylist": "Importing playlist...",
+  "searchPageSubtitle": "Search Bilibili or paste a BV link without leaving your music flow.",
+  "searchCommandTitle": "Search or parse",
+  "searching": "Searching...",
+  "pasteFromClipboard": "Paste from clipboard",
+  "searchEmptyTitle": "Start with a keyword or BV link",
+  "searchEmptySubtitle": "Results, parsed video details, page selection and comments will appear here.",
+  "backToSearchResults": "Back to search results",
+  "pagesCount": "{count} pages",
+  "@pagesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "selectedPagesCount": "Selected {count}/{total} pages",
+  "@selectedPagesCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "playFailedWithError": "Playback failed: {error}",
+  "@playFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "downloadStartedCount": "Started downloading {count} songs",
+  "@downloadStartedCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "downloadFailedWithError": "Download failed: {error}",
+  "@downloadFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "addedSongsToPlaylist": "Added {count} songs to playlist",
+  "@addedSongsToPlaylist": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "checkForUpdate": "Check for updates",
   "updateAvailable": "New version available",
   "updateChangelog": "What's new",
@@ -246,7 +300,7 @@
   "removedFromFavorites": "Removed from My Favorites",
   "favoritesCannotDelete": "My Favorites playlist cannot be deleted",
   "favoritesCannotRename": "My Favorites playlist cannot be renamed",
-  "createPlaylistManual": "Create Manually",
+  "createPlaylistManual": "Create Custom Playlist",
   "createPlaylistManualDesc": "Enter a name to create an empty playlist",
   "importFromBiliFav": "Import from Bilibili Favorites",
   "importFromBiliFavDesc": "Sign in to import from your favorite folders",
@@ -331,6 +385,23 @@
   "loginToLike": "Login to like",
   "loginToReply": "Login to reply",
   "colorScheme": "Color Scheme",
+  "settingsPageSubtitle": "Tune playback, account, storage and maintenance controls.",
+  "appearanceSettings": "Appearance",
+  "languageSettings": "Language",
+  "playbackSettings": "Playback",
+  "storageSettings": "Storage",
+  "accountSettings": "Account",
+  "loadingAccount": "Loading account...",
+  "aboutSettings": "About BuSic",
+  "selectDirectory": "Select directory",
+  "selectCacheDirectory": "Select cache directory",
+  "inputCachePath": "Enter cache path",
+  "createDirectoryFailed": "Failed to create directory: {error}",
+  "@createDirectoryFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
   "colorGreen": "Green",
   "colorBlue": "Blue",
   "colorTeal": "Teal",

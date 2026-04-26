@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
-import 'section_header.dart';
+import 'settings_panel.dart';
 
 /// Language settings section.
 class LanguageSection extends ConsumerWidget {
@@ -14,13 +14,13 @@ class LanguageSection extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
     final l10n = context.l10n;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSectionPanel(
+      title: l10n.languageSettings,
+      icon: Icons.language_rounded,
       children: [
-        SectionHeader(title: l10n.language),
-        ListTile(
-          leading: const Icon(Icons.language),
-          title: Text(l10n.language),
+        SettingsTile(
+          icon: Icons.translate_rounded,
+          title: l10n.language,
           trailing: DropdownButton<String?>(
             value: settings.locale,
             underline: const SizedBox.shrink(),

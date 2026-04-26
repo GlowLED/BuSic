@@ -189,6 +189,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noPlaylists => '暂无歌单';
 
   @override
+  String get playlistHomeSubtitle => '把 B 站收藏与解析内容整理成专注的听歌资料库。';
+
+  @override
+  String playlistLibraryCount(int count) {
+    return '$count 个歌单';
+  }
+
+  @override
+  String get playlistSectionTitle => '歌单列表';
+
+  @override
+  String get noPlaylistsHint => '创建歌单或导入分享内容后，就可以开始整理音乐。';
+
+  @override
   String get unknownArtist => '未知歌手';
 
   @override
@@ -274,6 +288,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importFromClipboard => '从剪贴板导入';
+
+  @override
+  String get importFromClipboardDesc => '粘贴 BuSic 分享链接';
 
   @override
   String get copiedToClipboard => '已复制到剪贴板';
@@ -502,6 +519,57 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importingPlaylist => '正在导入歌单...';
 
   @override
+  String get searchPageSubtitle => '搜索 B 站内容或粘贴 BV 链接，直接进入听歌流程。';
+
+  @override
+  String get searchCommandTitle => '搜索或解析';
+
+  @override
+  String get searching => '搜索中...';
+
+  @override
+  String get pasteFromClipboard => '从剪贴板粘贴';
+
+  @override
+  String get searchEmptyTitle => '输入关键词或 BV 链接开始';
+
+  @override
+  String get searchEmptySubtitle => '搜索结果、视频详情、分 P 选择和评论会显示在这里。';
+
+  @override
+  String get backToSearchResults => '返回搜索结果';
+
+  @override
+  String pagesCount(int count) {
+    return '$count 个分 P';
+  }
+
+  @override
+  String selectedPagesCount(int count, int total) {
+    return '已选 $count/$total 个分 P';
+  }
+
+  @override
+  String playFailedWithError(String error) {
+    return '播放失败: $error';
+  }
+
+  @override
+  String downloadStartedCount(int count) {
+    return '已开始下载 $count 首歌曲';
+  }
+
+  @override
+  String downloadFailedWithError(String error) {
+    return '下载失败: $error';
+  }
+
+  @override
+  String addedSongsToPlaylist(int count) {
+    return '已添加 $count 首歌曲到歌单';
+  }
+
+  @override
   String get checkForUpdate => '检查更新';
 
   @override
@@ -622,7 +690,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favoritesCannotRename => '「我喜欢」歌单不可重命名';
 
   @override
-  String get createPlaylistManual => '手动创建';
+  String get createPlaylistManual => '直接自定义歌单';
 
   @override
   String get createPlaylistManualDesc => '输入歌单名称创建空歌单';
@@ -739,6 +807,44 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get colorScheme => '配色方案';
+
+  @override
+  String get settingsPageSubtitle => '集中管理播放、账号、存储和维护选项。';
+
+  @override
+  String get appearanceSettings => '外观';
+
+  @override
+  String get languageSettings => '语言';
+
+  @override
+  String get playbackSettings => '播放';
+
+  @override
+  String get storageSettings => '存储';
+
+  @override
+  String get accountSettings => '账号';
+
+  @override
+  String get loadingAccount => '正在读取账号...';
+
+  @override
+  String get aboutSettings => '关于 BuSic';
+
+  @override
+  String get selectDirectory => '选择目录';
+
+  @override
+  String get selectCacheDirectory => '选择缓存目录';
+
+  @override
+  String get inputCachePath => '输入缓存路径';
+
+  @override
+  String createDirectoryFailed(String error) {
+    return '无法创建目录: $error';
+  }
 
   @override
   String get colorGreen => '绿色';

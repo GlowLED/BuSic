@@ -189,6 +189,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPlaylists => 'No playlists yet';
 
   @override
+  String get playlistHomeSubtitle =>
+      'Shape your Bilibili finds into a focused listening library.';
+
+  @override
+  String playlistLibraryCount(int count) {
+    return '$count playlists';
+  }
+
+  @override
+  String get playlistSectionTitle => 'Playlist List';
+
+  @override
+  String get noPlaylistsHint =>
+      'Create a playlist or import one to start building your library.';
+
+  @override
   String get unknownArtist => 'Unknown Artist';
 
   @override
@@ -275,6 +291,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importFromClipboard => 'Import from Clipboard';
+
+  @override
+  String get importFromClipboardDesc => 'Paste a BuSic share link';
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';
@@ -504,6 +523,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importingPlaylist => 'Importing playlist...';
 
   @override
+  String get searchPageSubtitle =>
+      'Search Bilibili or paste a BV link without leaving your music flow.';
+
+  @override
+  String get searchCommandTitle => 'Search or parse';
+
+  @override
+  String get searching => 'Searching...';
+
+  @override
+  String get pasteFromClipboard => 'Paste from clipboard';
+
+  @override
+  String get searchEmptyTitle => 'Start with a keyword or BV link';
+
+  @override
+  String get searchEmptySubtitle =>
+      'Results, parsed video details, page selection and comments will appear here.';
+
+  @override
+  String get backToSearchResults => 'Back to search results';
+
+  @override
+  String pagesCount(int count) {
+    return '$count pages';
+  }
+
+  @override
+  String selectedPagesCount(int count, int total) {
+    return 'Selected $count/$total pages';
+  }
+
+  @override
+  String playFailedWithError(String error) {
+    return 'Playback failed: $error';
+  }
+
+  @override
+  String downloadStartedCount(int count) {
+    return 'Started downloading $count songs';
+  }
+
+  @override
+  String downloadFailedWithError(String error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String addedSongsToPlaylist(int count) {
+    return 'Added $count songs to playlist';
+  }
+
+  @override
   String get checkForUpdate => 'Check for updates';
 
   @override
@@ -626,7 +698,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favoritesCannotRename => 'My Favorites playlist cannot be renamed';
 
   @override
-  String get createPlaylistManual => 'Create Manually';
+  String get createPlaylistManual => 'Create Custom Playlist';
 
   @override
   String get createPlaylistManualDesc =>
@@ -745,6 +817,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorScheme => 'Color Scheme';
+
+  @override
+  String get settingsPageSubtitle =>
+      'Tune playback, account, storage and maintenance controls.';
+
+  @override
+  String get appearanceSettings => 'Appearance';
+
+  @override
+  String get languageSettings => 'Language';
+
+  @override
+  String get playbackSettings => 'Playback';
+
+  @override
+  String get storageSettings => 'Storage';
+
+  @override
+  String get accountSettings => 'Account';
+
+  @override
+  String get loadingAccount => 'Loading account...';
+
+  @override
+  String get aboutSettings => 'About BuSic';
+
+  @override
+  String get selectDirectory => 'Select directory';
+
+  @override
+  String get selectCacheDirectory => 'Select cache directory';
+
+  @override
+  String get inputCachePath => 'Enter cache path';
+
+  @override
+  String createDirectoryFailed(String error) {
+    return 'Failed to create directory: $error';
+  }
 
   @override
   String get colorGreen => 'Green';

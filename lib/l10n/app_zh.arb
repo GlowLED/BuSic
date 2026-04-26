@@ -60,6 +60,15 @@
   "noSongs": "暂无歌曲",
   "noPlayingMusic": "当前未播放音乐",
   "noPlaylists": "暂无歌单",
+  "playlistHomeSubtitle": "把 B 站收藏与解析内容整理成专注的听歌资料库。",
+  "playlistLibraryCount": "{count} 个歌单",
+  "@playlistLibraryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "playlistSectionTitle": "歌单列表",
+  "noPlaylistsHint": "创建歌单或导入分享内容后，就可以开始整理音乐。",
   "unknownArtist": "未知歌手",
   "unknownTitle": "未知标题",
   "downloadSong": "下载歌曲",
@@ -89,6 +98,7 @@
   "songList": "歌曲列表",
   "confirmImport": "确认导入",
   "importFromClipboard": "从剪贴板导入",
+  "importFromClipboardDesc": "粘贴 BuSic 分享链接",
   "copiedToClipboard": "已复制到剪贴板",
   "exportFailed": "导出失败",
   "importSuccess": "导入成功",
@@ -204,6 +214,50 @@
   "metadataFetchFailed": "信息获取失败",
   "fetchMetadataError": "获取歌曲信息失败",
   "importingPlaylist": "正在导入歌单...",
+  "searchPageSubtitle": "搜索 B 站内容或粘贴 BV 链接，直接进入听歌流程。",
+  "searchCommandTitle": "搜索或解析",
+  "searching": "搜索中...",
+  "pasteFromClipboard": "从剪贴板粘贴",
+  "searchEmptyTitle": "输入关键词或 BV 链接开始",
+  "searchEmptySubtitle": "搜索结果、视频详情、分 P 选择和评论会显示在这里。",
+  "backToSearchResults": "返回搜索结果",
+  "pagesCount": "{count} 个分 P",
+  "@pagesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "selectedPagesCount": "已选 {count}/{total} 个分 P",
+  "@selectedPagesCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "playFailedWithError": "播放失败: {error}",
+  "@playFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "downloadStartedCount": "已开始下载 {count} 首歌曲",
+  "@downloadStartedCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "downloadFailedWithError": "下载失败: {error}",
+  "@downloadFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "addedSongsToPlaylist": "已添加 {count} 首歌曲到歌单",
+  "@addedSongsToPlaylist": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "checkForUpdate": "检查更新",
   "updateAvailable": "发现新版本",
   "updateChangelog": "更新内容",
@@ -244,7 +298,7 @@
   "removedFromFavorites": "已从「我喜欢」移除",
   "favoritesCannotDelete": "「我喜欢」歌单不可删除",
   "favoritesCannotRename": "「我喜欢」歌单不可重命名",
-  "createPlaylistManual": "手动创建",
+  "createPlaylistManual": "直接自定义歌单",
   "createPlaylistManualDesc": "输入歌单名称创建空歌单",
   "importFromBiliFav": "从 B 站收藏夹导入",
   "importFromBiliFavDesc": "登录后选择收藏夹一键导入",
@@ -329,6 +383,23 @@
   "loginToLike": "登录后可点赞",
   "loginToReply": "登录后可回复",
   "colorScheme": "配色方案",
+  "settingsPageSubtitle": "集中管理播放、账号、存储和维护选项。",
+  "appearanceSettings": "外观",
+  "languageSettings": "语言",
+  "playbackSettings": "播放",
+  "storageSettings": "存储",
+  "accountSettings": "账号",
+  "loadingAccount": "正在读取账号...",
+  "aboutSettings": "关于 BuSic",
+  "selectDirectory": "选择目录",
+  "selectCacheDirectory": "选择缓存目录",
+  "inputCachePath": "输入缓存路径",
+  "createDirectoryFailed": "无法创建目录: {error}",
+  "@createDirectoryFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
   "colorGreen": "绿色",
   "colorBlue": "蓝色",
   "colorTeal": "青色",

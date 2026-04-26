@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
-import 'section_header.dart';
+import 'settings_panel.dart';
 
 /// Playback quality settings section.
 class PlaybackSection extends ConsumerWidget {
@@ -14,13 +14,13 @@ class PlaybackSection extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
     final l10n = context.l10n;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSectionPanel(
+      title: l10n.playbackSettings,
+      icon: Icons.graphic_eq_rounded,
       children: [
-        SectionHeader(title: l10n.preferredQuality),
-        ListTile(
-          leading: const Icon(Icons.high_quality),
-          title: Text(l10n.preferredQuality),
+        SettingsTile(
+          icon: Icons.high_quality_rounded,
+          title: l10n.preferredQuality,
           trailing: DropdownButton<int>(
             value: settings.preferredQuality,
             underline: const SizedBox.shrink(),

@@ -9,32 +9,48 @@ import '../../../app_update/application/update_notifier.dart';
 import '../../../app_update/domain/models/download_channel.dart';
 import '../../../app_update/domain/models/update_state.dart';
 import '../../../app_update/presentation/widgets/channel_picker_sheet.dart';
-import '../../../app_update/presentation/widgets/download_tile.dart';
 import '../../../app_update/presentation/widgets/update_dialog.dart';
 import '../../../app_update/presentation/widgets/version_picker_dialog.dart';
 import '../../application/settings_notifier.dart';
+import 'settings_panel.dart';
 
-/// About section: version info, follow us, check for update, download, rollback, reset.
+/// About section: version info, follow us, update, rollback, and reset.
 class AboutSection extends ConsumerWidget {
   const AboutSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final updateState = ref.watch(updateNotifierProvider);
+    final isChecking = updateState is UpdateStateChecking;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    ref.listen<UpdateState>(updateNotifierProvider, (prev, next) {
+      if (next is UpdateStateAvailable && next.info.isForceUpdate) {
+        UpdateDialog.show(context);
+      } else if (next is UpdateStateIdle && prev is UpdateStateChecking) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.upToDate)),
+        );
+      } else if (next is UpdateStateError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.message)),
+        );
+      }
+    });
+
+    return SettingsSectionPanel(
+      title: l10n.aboutSettings,
+      icon: Icons.info_rounded,
       children: [
-        // Version info
         Consumer(
           builder: (context, ref, _) {
             final info = ref.watch(appInfoProvider).valueOrNull;
             final versionDisplay =
                 info != null ? 'v${info.version}+${info.buildNumber}' : '';
-            return ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: Text(l10n.about),
-              subtitle: Text('BuSic $versionDisplay'),
+            return SettingsTile(
+              icon: Icons.info_outline_rounded,
+              title: l10n.about,
+              subtitle: 'BuSic $versionDisplay',
               onTap: () {
                 showAboutDialog(
                   context: context,
@@ -47,78 +63,41 @@ class AboutSection extends ConsumerWidget {
             );
           },
         ),
-
-        // Follow us
-        ListTile(
-          leading: const Icon(Icons.people_outline),
-          title: Text(l10n.followUs),
-          subtitle: Text(l10n.followUsDesc),
+        SettingsTile(
+          icon: Icons.people_outline_rounded,
+          title: l10n.followUs,
+          subtitle: l10n.followUsDesc,
           onTap: () => _showFollowUsDialog(context),
         ),
-
-        // Check for update
-        Consumer(
-          builder: (context, ref, _) {
-            final updateState = ref.watch(updateNotifierProvider);
-            final isChecking = updateState is UpdateStateChecking;
-
-            ref.listen<UpdateState>(updateNotifierProvider, (prev, next) {
-              if (next is UpdateStateAvailable && next.info.isForceUpdate) {
-                UpdateDialog.show(context);
-              } else if (next is UpdateStateIdle &&
-                  prev is UpdateStateChecking) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.upToDate)),
-                );
-              } else if (next is UpdateStateError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(next.message)),
-                );
-              }
-            });
-
-            return ListTile(
-              leading: isChecking
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.system_update),
-              title: Text(l10n.checkForUpdate),
-              onTap: isChecking
-                  ? null
-                  : () => ref
-                      .read(updateNotifierProvider.notifier)
-                      .checkForUpdate(),
-            );
-          },
+        SettingsTile(
+          icon: isChecking ? Icons.sync_rounded : Icons.system_update_rounded,
+          title: l10n.checkForUpdate,
+          trailing: isChecking
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.chevron_right_rounded),
+          onTap: isChecking
+              ? null
+              : () =>
+                  ref.read(updateNotifierProvider.notifier).checkForUpdate(),
         ),
-
-        const Divider(),
-
-        // Download tile (inline progress)
-        const DownloadTile(),
-
-        // Rollback to previous version
-        ListTile(
-          leading: const Icon(Icons.history),
-          title: Text(l10n.rollbackVersion),
+        const _UpdateDownloadTile(),
+        SettingsTile(
+          icon: Icons.history_rounded,
+          title: l10n.rollbackVersion,
+          trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () => _handleRollback(context, ref),
         ),
-
-        const Divider(),
-
-        // Reset
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.restore),
-            label: Text(l10n.reset),
-            onPressed: () {
-              ref.read(settingsNotifierProvider.notifier).resetToDefaults();
-            },
-          ),
+        SettingsTile(
+          icon: Icons.restore_rounded,
+          title: l10n.reset,
+          destructive: true,
+          onTap: () {
+            ref.read(settingsNotifierProvider.notifier).resetToDefaults();
+          },
         ),
       ],
     );
@@ -128,7 +107,6 @@ class AboutSection extends ConsumerWidget {
     final l10n = context.l10n;
 
     try {
-      // Show loading
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.checkForUpdate)),
       );
@@ -139,7 +117,6 @@ class AboutSection extends ConsumerWidget {
 
       if (!context.mounted) return;
 
-      // Get current version
       final appInfo = ref.read(appInfoProvider).valueOrNull;
       final currentVersion = appInfo?.version ?? '';
 
@@ -151,7 +128,6 @@ class AboutSection extends ConsumerWidget {
 
       if (selectedVersion == null || !context.mounted) return;
 
-      // Find the selected version entry to get available channels
       final entry = versions.firstWhere((v) => v.version == selectedVersion);
       final availableChannels = <DownloadChannel>{};
       final platformKey = _currentPlatformKey();
@@ -219,11 +195,223 @@ class AboutSection extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                Text(MaterialLocalizations.of(context).closeButtonLabel),
+            child: Text(MaterialLocalizations.of(context).closeButtonLabel),
           ),
         ],
       ),
     );
+  }
+}
+
+class _UpdateDownloadTile extends ConsumerWidget {
+  const _UpdateDownloadTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(updateNotifierProvider);
+    final l10n = context.l10n;
+
+    return state.when(
+      idle: () => _buildIdleOrAvailable(context, ref, null),
+      checking: () => SettingsTile(
+        icon: Icons.sync_rounded,
+        title: l10n.checkForUpdate,
+        trailing: const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      available: (info) => _buildIdleOrAvailable(context, ref, info),
+      downloading: (info, progress, speed, channel, downloadedBytes,
+              totalBytes) =>
+          _buildDownloading(context, ref, progress, speed, info.isForceUpdate),
+      paused:
+          (info, progress, channel, downloadedBytes, totalBytes, localPath) =>
+              _buildPaused(context, ref, progress),
+      readyToInstall: (info, localPath) => SettingsTile(
+        icon: Icons.check_circle_rounded,
+        title: l10n.downloadCompleteReady,
+        subtitle: 'v${info.latestVersion.semver}',
+        trailing: FilledButton(
+          onPressed: () =>
+              ref.read(updateNotifierProvider.notifier).applyUpdate(),
+          child: Text(l10n.installUpdate),
+        ),
+      ),
+      error: (message) {
+        if (message.startsWith('INSTALL_READ_ONLY:')) {
+          final url = message.substring('INSTALL_READ_ONLY:'.length);
+          return SettingsTile(
+            icon: Icons.error_outline_rounded,
+            title: l10n.updateError,
+            subtitle: l10n.linuxReadOnlyInstallDir,
+            trailing: FilledButton(
+              onPressed: () => launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              ),
+              child: Text(l10n.openDownloadPage),
+            ),
+          );
+        }
+        return SettingsTile(
+          icon: Icons.error_outline_rounded,
+          title: l10n.updateError,
+          subtitle: message,
+          trailing: TextButton(
+            onPressed: () =>
+                ref.read(updateNotifierProvider.notifier).checkForUpdate(),
+            child: Text(l10n.retryDownload),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildIdleOrAvailable(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic info,
+  ) {
+    final l10n = context.l10n;
+    final title = info != null
+        ? '${l10n.updateAvailable} v${info.latestVersion.semver}'
+        : l10n.downloadLatestVersion;
+
+    return SettingsTile(
+      icon: Icons.download_rounded,
+      title: title,
+      subtitle: info != null ? l10n.selectDownloadChannel : null,
+      trailing: const Icon(Icons.chevron_right_rounded),
+      onTap: () async {
+        if (info == null) {
+          await ref.read(updateNotifierProvider.notifier).checkForUpdate();
+          return;
+        }
+
+        final availableChannels = <DownloadChannel>{};
+        final downloadUrls = info.downloadUrls as Map<DownloadChannel, String>;
+        availableChannels.addAll(downloadUrls.keys);
+
+        if (!context.mounted) return;
+
+        final channel = await ChannelPickerSheet.show(
+          context,
+          availableChannels: availableChannels,
+        );
+        if (channel != null) {
+          ref.read(updateNotifierProvider.notifier).startDownloadWithChannel(
+                channel,
+              );
+        }
+      },
+    );
+  }
+
+  Widget _buildDownloading(
+    BuildContext context,
+    WidgetRef ref,
+    double progress,
+    double speed,
+    bool isForceUpdate,
+  ) {
+    final l10n = context.l10n;
+
+    return SettingsTile(
+      icon: Icons.downloading_rounded,
+      title: l10n.downloading,
+      subtitle: '${l10n.tapToPause} · ${l10n.longPressToCancel}',
+      body: Column(
+        children: [
+          LinearProgressIndicator(value: progress),
+          SizedBox(height: context.appSpacing.xs),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${(progress * 100).toStringAsFixed(0)}%',
+                style: context.textTheme.bodySmall,
+              ),
+              Text(
+                _formatSpeed(speed),
+                style: context.textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ],
+      ),
+      onTap: () => ref.read(updateNotifierProvider.notifier).pauseDownload(),
+      onLongPress: () => _showCancelConfirm(context, ref, isForceUpdate),
+    );
+  }
+
+  Widget _buildPaused(
+    BuildContext context,
+    WidgetRef ref,
+    double progress,
+  ) {
+    final l10n = context.l10n;
+
+    return SettingsTile(
+      icon: Icons.pause_circle_outline_rounded,
+      title: l10n.downloadPaused,
+      subtitle: '${l10n.tapToResume} · ${l10n.longPressToCancel}',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Opacity(
+            opacity: 0.5,
+            child: LinearProgressIndicator(value: progress),
+          ),
+          SizedBox(height: context.appSpacing.xs),
+          Text(
+            '${(progress * 100).toStringAsFixed(0)}%',
+            style: context.textTheme.bodySmall,
+          ),
+        ],
+      ),
+      onTap: () => ref.read(updateNotifierProvider.notifier).resumeDownload(),
+      onLongPress: () => _showCancelConfirm(context, ref, false),
+    );
+  }
+
+  void _showCancelConfirm(
+    BuildContext context,
+    WidgetRef ref,
+    bool isForceUpdate,
+  ) {
+    if (isForceUpdate) return;
+
+    final l10n = context.l10n;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.cancelDownloadConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref.read(updateNotifierProvider.notifier).cancelDownload();
+              Navigator.pop(ctx);
+            },
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatSpeed(double bytesPerSec) {
+    if (bytesPerSec < 1024) {
+      return '${bytesPerSec.toStringAsFixed(0)} B/s';
+    } else if (bytesPerSec < 1024 * 1024) {
+      return '${(bytesPerSec / 1024).toStringAsFixed(1)} KB/s';
+    } else {
+      return '${(bytesPerSec / (1024 * 1024)).toStringAsFixed(1)} MB/s';
+    }
   }
 }

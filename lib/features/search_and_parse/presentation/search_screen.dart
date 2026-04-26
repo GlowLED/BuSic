@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../shared/extensions/context_extensions.dart';
+import '../../../shared/widgets/app_panel.dart';
 
 import '../application/parse_notifier.dart';
 import '../domain/models/bvid_info.dart';
@@ -61,6 +63,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final searchResult = await ref
         .read(parseNotifierProvider.notifier)
         .searchVideos(keyword, page: page);
+    if (!mounted) return;
     setState(() {
       _searchResults = searchResult.results;
       _totalPages = searchResult.numPages;
@@ -94,7 +97,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final parseState = ref.watch(parseNotifierProvider);
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
+    final spacing = context.appSpacing;
 
     final showVideoDetail = parseState.whenOrNull(
       success: (info) => info,
@@ -102,124 +105,293 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.search), centerTitle: false),
-      body: Column(
-        children: [
-          // ── Input bar ──
-          _buildInputBar(l10n, parseState),
-
-          // ── Error banner ──
-          parseState.whenOrNull(
-                error: (msg) => Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: colorScheme.errorContainer,
-                  child: Text(msg,
-                      style:
-                          TextStyle(color: colorScheme.onErrorContainer)),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                spacing.md,
+                spacing.lg,
+                spacing.xs,
+              ),
+              child: _buildInputBar(l10n, parseState),
+            ),
+            parseState.whenOrNull(
+                  error: (msg) => Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      spacing.lg,
+                      spacing.sm,
+                      spacing.lg,
+                      0,
+                    ),
+                    child: _SearchErrorBanner(message: msg),
+                  ),
+                ) ??
+                const SizedBox.shrink(),
+            SizedBox(height: spacing.sm),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: _buildContent(
+                  parseState: parseState,
+                  showVideoDetail: showVideoDetail,
+                  l10n: l10n,
                 ),
-              ) ??
-              const SizedBox.shrink(),
-
-          // ── Content area ──
-          if (parseState.whenOrNull(parsing: () => true) == true)
-            const Expanded(
-                child: Center(child: CircularProgressIndicator()))
-          else if (showVideoDetail != null)
-            Expanded(
-              child: VideoDetailView(
-                parseState: parseState,
-                showBackButton: _searchResults.isNotEmpty,
-                onBack: _backToResults,
               ),
-            )
-          else if (_isSearching)
-            const Expanded(
-                child: Center(child: CircularProgressIndicator()))
-          else if (_searchResults.isNotEmpty)
-            Expanded(
-              child: SearchResultList(
-                results: _searchResults,
-                currentPage: _currentPage,
-                totalPages: _totalPages,
-                onVideoTap: _onVideoTap,
-                onPageChanged: _goToPage,
-              ),
-            )
-          else
-            Expanded(child: _buildEmptyState(l10n, colorScheme)),
-        ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildContent({
+    required ParseState parseState,
+    required BvidInfo? showVideoDetail,
+    required AppLocalizations l10n,
+  }) {
+    if (parseState.whenOrNull(parsing: () => true) == true) {
+      return _SearchLoadingState(
+        key: const ValueKey('parsing'),
+        label: l10n.parsing,
+      );
+    }
+
+    if (showVideoDetail != null) {
+      return VideoDetailView(
+        key: const ValueKey('detail'),
+        parseState: parseState,
+        showBackButton: _searchResults.isNotEmpty,
+        onBack: _backToResults,
+      );
+    }
+
+    if (_isSearching) {
+      return _SearchLoadingState(
+        key: const ValueKey('searching'),
+        label: l10n.searching,
+      );
+    }
+
+    if (_searchResults.isNotEmpty) {
+      return SearchResultList(
+        key: ValueKey('results_$_currentKeyword-$_currentPage'),
+        results: _searchResults,
+        currentPage: _currentPage,
+        totalPages: _totalPages,
+        onVideoTap: _onVideoTap,
+        onPageChanged: _goToPage,
+      );
+    }
+
+    return _buildEmptyState(l10n);
   }
 
   // ── Input bar ───────────────────────────────────────────────────────
 
   Widget _buildInputBar(AppLocalizations l10n, ParseState parseState) {
-    final isParsing =
-        parseState.whenOrNull(parsing: () => true) == true;
+    final isParsing = parseState.whenOrNull(parsing: () => true) == true;
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
+    return AppPanel(
+      padding: EdgeInsets.all(spacing.sm),
+      borderRadius: context.appRadii.largeRadius,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 560;
+          final field = DecoratedBox(
+            decoration: BoxDecoration(
+              color: palette.surfacePrimary.withValues(alpha: 0.58),
+              borderRadius: context.appRadii.largeRadius,
+              border: Border.all(
+                color: palette.borderSubtle.withValues(alpha: 0.78),
+                width: context.appDepth.outline,
+              ),
+            ),
             child: TextField(
               controller: _controller,
               decoration: InputDecoration(
                 hintText: l10n.parseInput,
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Icon(
+                  Icons.manage_search_rounded,
+                  color: palette.textSecondary,
+                ),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.content_paste),
-                  tooltip: '粘贴',
-                  onPressed: _onPaste,
+                  icon: const Icon(Icons.content_paste_rounded),
+                  tooltip: l10n.pasteFromClipboard,
+                  onPressed: isParsing ? null : _onPaste,
                 ),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: spacing.sm,
+                  vertical: spacing.xs,
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
               ),
               onSubmitted: (_) => _handleSubmit(),
               enabled: !isParsing,
             ),
-          ),
-          const SizedBox(width: 12),
-          FilledButton.icon(
+          );
+
+          final submit = FilledButton.icon(
             onPressed: isParsing ? null : _handleSubmit,
             icon: isParsing
-                ? const SizedBox(
+                ? SizedBox(
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white),
+                      strokeWidth: 2,
+                      color: context.colorScheme.onPrimary,
+                    ),
                   )
-                : const Icon(Icons.search),
+                : const Icon(Icons.search_rounded),
             label: Text(isParsing ? l10n.parsing : l10n.search),
-          ),
-        ],
+          );
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                field,
+                SizedBox(height: spacing.sm),
+                SizedBox(width: double.infinity, child: submit),
+              ],
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: field),
+                  SizedBox(width: spacing.sm),
+                  submit,
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
   // ── Empty state ─────────────────────────────────────────────────────
 
-  Widget _buildEmptyState(AppLocalizations l10n, ColorScheme colorScheme) {
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
+
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      key: const ValueKey('empty'),
+      child: AppPanel(
+        padding: EdgeInsets.all(spacing.xl),
+        borderRadius: context.appRadii.xLargeRadius,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.travel_explore_rounded,
+              size: 56,
+              color: palette.accentStrong.withValues(alpha: 0.72),
+            ),
+            SizedBox(height: spacing.md),
+            Text(
+              l10n.searchEmptyTitle,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: palette.textPrimary,
+              ),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              l10n.searchEmptySubtitle,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchErrorBanner extends StatelessWidget {
+  const _SearchErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final spacing = context.appSpacing;
+
+    return AppPanel(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.sm,
+      ),
+      backgroundColor: palette.dangerSoft.withValues(alpha: 0.88),
+      borderColor: palette.danger.withValues(alpha: 0.38),
+      boxShadow: const [],
+      child: Row(
         children: [
-          Icon(Icons.search, size: 64, color: colorScheme.outlineVariant),
-          const SizedBox(height: 16),
-          Text(l10n.parseInput,
-              style: TextStyle(color: colorScheme.onSurfaceVariant)),
-          const SizedBox(height: 8),
-          Text('搜索关键词或输入BV号',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant)),
+          Icon(Icons.error_outline_rounded, color: palette.danger),
+          SizedBox(width: spacing.sm),
+          Expanded(
+            child: Text(
+              message,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: palette.textPrimary,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+class _SearchLoadingState extends StatelessWidget {
+  const _SearchLoadingState({
+    super.key,
+    required this.label,
+  });
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
+
+    return Center(
+      child: AppPanel(
+        padding: EdgeInsets.all(spacing.lg),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: spacing.sm),
+            Text(
+              label,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
-import 'section_header.dart';
+import 'settings_panel.dart';
 
 /// Appearance settings section: theme mode and colour scheme.
 class AppearanceSection extends ConsumerWidget {
@@ -14,14 +14,14 @@ class AppearanceSection extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
     final l10n = context.l10n;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSectionPanel(
+      title: l10n.appearanceSettings,
+      icon: Icons.palette_rounded,
       children: [
-        SectionHeader(title: l10n.themeMode),
-        ListTile(
-          leading: const Icon(Icons.brightness_6),
-          title: Text(l10n.themeMode),
-          subtitle: SegmentedButton<ThemeMode>(
+        SettingsTile(
+          icon: Icons.brightness_6_rounded,
+          title: l10n.themeMode,
+          body: SegmentedButton<ThemeMode>(
             segments: [
               ButtonSegment(value: ThemeMode.system, label: Text(l10n.system)),
               ButtonSegment(value: ThemeMode.light, label: Text(l10n.light)),
@@ -35,12 +35,12 @@ class AppearanceSection extends ConsumerWidget {
             },
           ),
         ),
-        ListTile(
-          leading: const Icon(Icons.palette_outlined),
-          title: Text(l10n.colorScheme),
-          subtitle: Wrap(
-            spacing: 8,
-            runSpacing: 4,
+        SettingsTile(
+          icon: Icons.color_lens_rounded,
+          title: l10n.colorScheme,
+          body: Wrap(
+            spacing: context.appSpacing.xs,
+            runSpacing: context.appSpacing.xs,
             children: [
               for (final entry in {
                 0xFF4CAF50: l10n.colorGreen,

@@ -70,6 +70,14 @@ lib/
   - `/player`
   - `/minimal`
 
+### 主页面 UI
+
+当前主页面已经落到同一套音乐播放器感视觉语言：
+
+- `/` 歌单列表：紧凑资料库标题行、单一加号入口和 `PlaylistTile` 卡片网格；加号弹窗提供自定义歌单、剪贴板导入和 B 站收藏夹导入
+- `/search`：紧凑 command surface 输入区，搜索结果复用媒体行，解析详情使用面板化封面 / 分 P / 评论结构
+- `/settings`：控制台式设置页头和分区面板，不再以默认 `ListTile + Divider` 作为页面骨架
+
 ## 4. 关键 feature
 
 ### `player`

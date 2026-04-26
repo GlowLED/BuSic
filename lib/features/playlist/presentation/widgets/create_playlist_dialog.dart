@@ -4,7 +4,8 @@ import '../../../../shared/extensions/context_extensions.dart';
 
 /// 创建歌单方式选择对话框。
 ///
-/// 返回 `'manual'`（手动创建）或 `'biliFav'`（B 站收藏夹导入）。
+/// 返回 `'manual'`（自定义歌单）、`'clipboard'`（剪贴板导入）
+/// 或 `'biliFav'`（B 站收藏夹导入）。
 class CreatePlaylistDialog extends StatelessWidget {
   const CreatePlaylistDialog({super.key});
 
@@ -23,6 +24,12 @@ class CreatePlaylistDialog extends StatelessWidget {
             title: Text(l10n.createPlaylistManual),
             subtitle: Text(l10n.createPlaylistManualDesc),
             onTap: () => Navigator.of(context).pop('manual'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.content_paste),
+            title: Text(l10n.importFromClipboard),
+            subtitle: Text(l10n.importFromClipboardDesc),
+            onTap: () => Navigator.of(context).pop('clipboard'),
           ),
           ListTile(
             leading: const Icon(Icons.star_outline),
