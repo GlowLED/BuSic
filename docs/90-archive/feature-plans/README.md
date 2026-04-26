@@ -8,6 +8,7 @@
 
 | 文件 | 主题 | 当前应优先阅读 |
 |---|---|---|
+| [ui-redesign-master-plan.md](./ui-redesign-master-plan.md) | UI 重构主计划执行记录 | [../../30-reference/ui.md](../../30-reference/ui.md), [../../10-project/project-overview.md](../../10-project/project-overview.md), [../../10-project/ui-and-platform-quirks.md](../../10-project/ui-and-platform-quirks.md) |
 | [app-update.md](./app-update.md) | 早期应用更新方案 | [../../10-project/update-system.md](../../10-project/update-system.md) |
 | [update-system-v2.md](./update-system-v2.md) | 更新系统后续方案演进 | [../../10-project/update-system.md](../../10-project/update-system.md), [../../20-workflows/release-workflow.md](../../20-workflows/release-workflow.md) |
 | [subtitle-system-plan.md](./subtitle-system-plan.md) | 字幕系统实施规划 | [../../10-project/subtitle-and-lyrics.md](../../10-project/subtitle-and-lyrics.md) |

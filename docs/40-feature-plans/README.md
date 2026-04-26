@@ -4,10 +4,12 @@
 
 ## 当前活跃主计划
 
-- [ui-redesign-master-plan.md](./ui-redesign-master-plan.md)
-  - 当前有效的 UI 重构总计划
-  - 面向冷启动 agent 的串行任务入口
-  - 已冻结视觉方向、任务顺序、验收标准和回写要求
+- [search-video-detail-bilibili-style.md](./search-video-detail-bilibili-style.md)
+  - 搜索结果视频详情页 B 站式重构计划
+  - 覆盖 `search_and_parse`、`comment`、`auth`、`playlist`、`download`、`player` 的协作边界
+  - 锁定原地详情页、B 站式简介 / 评论结构、真实 B 站互动动作和验证范围
+
+已完成的 UI 重构主计划已归档到 [../90-archive/feature-plans/ui-redesign-master-plan.md](../90-archive/feature-plans/ui-redesign-master-plan.md)。当前 UI 规则优先读 [../30-reference/ui.md](../30-reference/ui.md)、[../10-project/project-overview.md](../10-project/project-overview.md)、[../10-project/ui-and-platform-quirks.md](../10-project/ui-and-platform-quirks.md)。
 
 ## 什么时候把文档放这里？
 
