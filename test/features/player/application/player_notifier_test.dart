@@ -21,6 +21,7 @@ import 'package:busic/features/search_and_parse/domain/models/audio_stream_info.
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.dart';
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_item.dart';
 import 'package:busic/features/search_and_parse/domain/models/bvid_info.dart';
+import 'package:busic/features/search_and_parse/domain/models/video_tag.dart';
 import 'package:busic/main.dart';
 
 void main() {
@@ -358,6 +359,11 @@ class _FakeParseRepository implements ParseRepository {
   }) async {
     getAudioStreamCalls++;
     return streamInfo;
+  }
+
+  @override
+  Future<List<VideoTag>> getVideoTags(String bvid) {
+    throw UnimplementedError();
   }
 
   @override

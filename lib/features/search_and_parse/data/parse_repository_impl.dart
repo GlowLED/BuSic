@@ -6,6 +6,7 @@ import '../domain/models/bili_fav_folder.dart';
 import '../domain/models/bili_fav_item.dart';
 import '../domain/models/bvid_info.dart';
 import '../domain/models/page_info.dart';
+import '../domain/models/video_tag.dart';
 import 'parse_repository.dart';
 
 /// Concrete implementation of [ParseRepository] using Bilibili API + BiliDio.
@@ -321,6 +322,44 @@ class ParseRepositoryImpl implements ParseRepository {
     }).toList();
 
     return (results: videoList, numPages: numPages);
+  }
+
+  @override
+  Future<List<VideoTag>> getVideoTags(String bvid) async {
+    try {
+      final response = await _biliDio.get(
+        '/x/tag/archive/tags',
+        queryParameters: {'bvid': bvid},
+      );
+      final data = response.data['data'];
+      if (data is! List) {
+        return [];
+      }
+
+      final tags = <VideoTag>[];
+      for (final item in data) {
+        if (item is! Map<String, dynamic>) {
+          continue;
+        }
+        final rawId = item['tag_id'] ?? item['id'];
+        final id = rawId is int ? rawId : int.tryParse('$rawId') ?? 0;
+        final name =
+            item['tag_name'] as String? ?? item['name'] as String? ?? '';
+        if (name.isEmpty) {
+          continue;
+        }
+        tags.add(VideoTag(id: id, name: name));
+      }
+      return tags;
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Failed to fetch video tags',
+        tag: 'Parse',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return [];
+    }
   }
 
   int _parseDuration(String durationStr) {

@@ -2,6 +2,7 @@ import '../domain/models/audio_stream_info.dart';
 import '../domain/models/bili_fav_folder.dart';
 import '../domain/models/bili_fav_item.dart';
 import '../domain/models/bvid_info.dart';
+import '../domain/models/video_tag.dart';
 
 /// Abstract repository for Bilibili video parsing and audio stream resolution.
 ///
@@ -35,6 +36,13 @@ abstract class ParseRepository {
     int page = 1,
     int pageSize = 20,
   });
+
+  /// Fetch tags for a Bilibili video.
+  ///
+  /// Tag loading is optional detail-page enrichment. Implementations should
+  /// return an empty list when the request fails so the core detail view can
+  /// still render.
+  Future<List<VideoTag>> getVideoTags(String bvid);
 
   /// Get all available audio quality options for a specific video page.
   ///

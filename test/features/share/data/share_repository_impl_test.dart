@@ -13,6 +13,7 @@ import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.da
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_item.dart';
 import 'package:busic/features/search_and_parse/domain/models/bvid_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/page_info.dart';
+import 'package:busic/features/search_and_parse/domain/models/video_tag.dart';
 
 /// Mock ParseRepository，用于测试时模拟 B 站 API
 class MockParseRepository implements ParseRepository {
@@ -47,6 +48,11 @@ class MockParseRepository implements ParseRepository {
     int page = 1,
     int pageSize = 20,
   }) async {
+    throw UnimplementedError('测试中不需要');
+  }
+
+  @override
+  Future<List<VideoTag>> getVideoTags(String bvid) async {
     throw UnimplementedError('测试中不需要');
   }
 
