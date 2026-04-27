@@ -6,6 +6,8 @@ import '../domain/models/bili_fav_folder.dart';
 import '../domain/models/bili_fav_item.dart';
 import '../domain/models/bvid_info.dart';
 import '../domain/models/page_info.dart';
+import '../domain/models/video_rights.dart';
+import '../domain/models/video_stats.dart';
 import '../domain/models/video_tag.dart';
 import 'parse_repository.dart';
 
@@ -21,8 +23,10 @@ class ParseRepositoryImpl implements ParseRepository {
   ParseRepositoryImpl({required BiliDio biliDio}) : _biliDio = biliDio;
 
   Future<void> _ensureWbiKeys() async {
-    if (_imgKey == null || _subKey == null ||
-        _keysExpiry == null || DateTime.now().isAfter(_keysExpiry!)) {
+    if (_imgKey == null ||
+        _subKey == null ||
+        _keysExpiry == null ||
+        DateTime.now().isAfter(_keysExpiry!)) {
       final keys = await fetchWbiKeys();
       _imgKey = keys.imgKey;
       _subKey = keys.subKey;
@@ -36,23 +40,18 @@ class ParseRepositoryImpl implements ParseRepository {
       '/x/web-interface/view',
       queryParameters: {'bvid': bvid},
     );
-    final data = response.data['data'];
-    final pages = (data['pages'] as List).map((p) => PageInfo(
-      cid: p['cid'] as int,
-      page: p['page'] as int,
-      partTitle: p['part'] as String? ?? '',
-      duration: p['duration'] as int? ?? 0,
-    )).toList();
+    final code = _asInt(response.data['code']) ?? 0;
+    if (code != 0) {
+      final message = response.data['message'] as String? ?? '获取视频信息失败';
+      throw Exception(message);
+    }
 
-    return BvidInfo(
-      bvid: data['bvid'] as String,
-      title: data['title'] as String,
-      owner: data['owner']?['name'] as String? ?? '',
-      ownerUid: data['owner']?['mid'] as int?,
-      coverUrl: data['pic'] as String?,
-      pages: pages,
-      duration: data['duration'] as int? ?? 0,
-    );
+    final data = response.data['data'];
+    if (data is! Map<String, dynamic>) {
+      throw Exception('view returned null data');
+    }
+
+    return _mapVideoInfo(data, fallbackBvid: bvid);
   }
 
   @override
@@ -129,8 +128,9 @@ class ParseRepositoryImpl implements ParseRepository {
       selected = allStreams.first;
     }
 
-    final backupUrls = (selected['backupUrl'] as List?)
-        ?.map((e) => e.toString()).toList() ?? [];
+    final backupUrls =
+        (selected['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
+            [];
 
     return AudioStreamInfo(
       url: selected['baseUrl'] as String? ?? selected['base_url'] as String,
@@ -167,7 +167,8 @@ class ParseRepositoryImpl implements ParseRepository {
     final data = response.data['data'];
     if (data == null) {
       // Fallback: retry with fnval=16 if extended flags fail
-      AppLogger.info('Retrying getAvailableQualities with fnval=16', tag: 'Parse');
+      AppLogger.info('Retrying getAvailableQualities with fnval=16',
+          tag: 'Parse');
       return _getAvailableQualitiesFallback(bvid, cid);
     }
     final dash = data['dash'] as Map<String, dynamic>?;
@@ -187,8 +188,9 @@ class ParseRepositoryImpl implements ParseRepository {
 
     final results = <AudioStreamInfo>[];
     for (final stream in audioStreams) {
-      final backupUrls = (stream['backupUrl'] as List?)
-          ?.map((e) => e.toString()).toList() ?? [];
+      final backupUrls =
+          (stream['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
+              [];
       results.add(AudioStreamInfo(
         url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
         quality: stream['id'] as int,
@@ -205,7 +207,9 @@ class ParseRepositoryImpl implements ParseRepository {
       if (dolbyAudio is List) {
         for (final stream in dolbyAudio) {
           final backupUrls = (stream['backupUrl'] as List?)
-              ?.map((e) => e.toString()).toList() ?? [];
+                  ?.map((e) => e.toString())
+                  .toList() ??
+              [];
           results.add(AudioStreamInfo(
             url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
             quality: stream['id'] as int,
@@ -223,9 +227,12 @@ class ParseRepositoryImpl implements ParseRepository {
       final flacAudio = flac['audio'];
       if (flacAudio is Map<String, dynamic>) {
         final backupUrls = (flacAudio['backupUrl'] as List?)
-            ?.map((e) => e.toString()).toList() ?? [];
+                ?.map((e) => e.toString())
+                .toList() ??
+            [];
         results.add(AudioStreamInfo(
-          url: flacAudio['baseUrl'] as String? ?? flacAudio['base_url'] as String,
+          url: flacAudio['baseUrl'] as String? ??
+              flacAudio['base_url'] as String,
           quality: flacAudio['id'] as int,
           mimeType: flacAudio['mimeType'] as String? ?? 'audio/mp4',
           bandwidth: flacAudio['bandwidth'] as int?,
@@ -268,8 +275,9 @@ class ParseRepositoryImpl implements ParseRepository {
 
     final results = <AudioStreamInfo>[];
     for (final stream in audioStreams) {
-      final backupUrls = (stream['backupUrl'] as List?)
-          ?.map((e) => e.toString()).toList() ?? [];
+      final backupUrls =
+          (stream['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
+              [];
       results.add(AudioStreamInfo(
         url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
         quality: stream['id'] as int,
@@ -369,7 +377,9 @@ class ParseRepositoryImpl implements ParseRepository {
       if (parts.length == 2) {
         return int.parse(parts[0]) * 60 + int.parse(parts[1]);
       } else if (parts.length == 3) {
-        return int.parse(parts[0]) * 3600 + int.parse(parts[1]) * 60 + int.parse(parts[2]);
+        return int.parse(parts[0]) * 3600 +
+            int.parse(parts[1]) * 60 +
+            int.parse(parts[2]);
       }
       return int.tryParse(durationStr) ?? 0;
     } catch (_) {
@@ -449,9 +459,9 @@ class ParseRepositoryImpl implements ParseRepository {
         items.add(BiliFavItem(
           bvid: bvid,
           title: media['title'] as String? ?? '',
-          upper: (media['upper'] as Map<String, dynamic>?)?['name']
-                  as String? ??
-              '',
+          upper:
+              (media['upper'] as Map<String, dynamic>?)?['name'] as String? ??
+                  '',
           cover: media['cover'] as String?,
           duration: media['duration'] as int? ?? 0,
           firstCid:
@@ -466,5 +476,88 @@ class ParseRepositoryImpl implements ParseRepository {
     }
 
     return items;
+  }
+
+  BvidInfo _mapVideoInfo(
+    Map<String, dynamic> data, {
+    required String fallbackBvid,
+  }) {
+    final owner = _asStringMap(data['owner']);
+    final pagesRaw = data['pages'] as List? ?? [];
+    final pages = pagesRaw
+        .whereType<Map<String, dynamic>>()
+        .map((page) => PageInfo(
+              cid: _asInt(page['cid']) ?? 0,
+              page: _asInt(page['page']) ?? 0,
+              partTitle: page['part'] as String? ?? '',
+              duration: _asInt(page['duration']) ?? 0,
+            ))
+        .toList();
+
+    return BvidInfo(
+      bvid: data['bvid'] as String? ?? fallbackBvid,
+      aid: _asInt(data['aid']),
+      title: data['title'] as String? ?? '',
+      description:
+          data['desc'] as String? ?? data['description'] as String? ?? '',
+      pubdate: _asInt(data['pubdate']),
+      tname: data['tname'] as String?,
+      owner: owner?['name'] as String? ?? '',
+      ownerUid: _asInt(owner?['mid']),
+      ownerFace: owner?['face'] as String?,
+      coverUrl: data['pic'] as String?,
+      pages: pages,
+      duration: _asInt(data['duration']) ?? 0,
+      stats: _mapVideoStats(data['stat']),
+      rights: _mapVideoRights(data['rights']),
+    );
+  }
+
+  VideoStats _mapVideoStats(Object? raw) {
+    final stat = _asStringMap(raw);
+    if (stat == null) return const VideoStats();
+
+    return VideoStats(
+      view: _asInt(stat['view']) ?? 0,
+      danmaku: _asInt(stat['danmaku']) ?? 0,
+      reply: _asInt(stat['reply']) ?? 0,
+      favorite: _asInt(stat['favorite']) ?? 0,
+      coin: _asInt(stat['coin']) ?? 0,
+      share: _asInt(stat['share']) ?? 0,
+      like: _asInt(stat['like']) ?? 0,
+    );
+  }
+
+  VideoRights _mapVideoRights(Object? raw) {
+    final rights = _asStringMap(raw);
+    if (rights == null) return const VideoRights();
+
+    return VideoRights(
+      noReprint: _asBool(rights['no_reprint'] ?? rights['noReprint']),
+    );
+  }
+
+  Map<String, dynamic>? _asStringMap(Object? value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) {
+      return value.map((key, value) => MapEntry('$key', value));
+    }
+    return null;
+  }
+
+  int? _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  bool _asBool(Object? value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
+    return false;
   }
 }

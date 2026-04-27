@@ -31,6 +31,7 @@ Cookie: key1=value1; key2=value2; ...
 
 - 更高音质音频流
 - 评论相关接口
+- 视频点赞 / 投币 / 收藏 / 分享记录
 - 收藏夹导入
 - 字幕 / 歌词获取
 
@@ -85,16 +86,38 @@ WBI 相关真源：
 
 所以如果你手里只有 `bvid` / `cid`，很多评论操作前还需要先解析出 `aid`。
 
-## 7. 最常见失败模式
+## 7. 视频互动
+
+搜索详情页的视频互动数据层位于 `search_and_parse`：
+
+- 详情真源仍是 `/x/web-interface/view`，用于解析 `aid`、UP 信息、统计、权限和分 P。
+- 标签通过 `/x/tag/archive/tags` 单独补拉；失败时只记录日志并返回空列表，不阻塞详情主体。
+- 互动状态由点赞、投币、收藏三个接口合并，单项读取失败时按未激活默认值处理。
+- 点赞、投币、收藏夹添加和分享记录都需要登录 Cookie；写接口还需要 `bili_jct` 作为 `csrf`。
+- v1 只支持添加到指定 B 站收藏夹，不实现从收藏夹移除。
+
+当前使用的交互端点：
+
+| 能力 | Endpoint | 备注 |
+|---|---|---|
+| 点赞状态 | `/x/web-interface/archive/has/like` | 读取当前用户近期点赞状态 |
+| 投币状态 | `/x/web-interface/archive/coins` | 返回当前用户已投币数量 |
+| 收藏状态 | `/x/v2/fav/video/favoured` | 返回当前用户是否已收藏 |
+| 点赞 / 取消点赞 | `/x/web-interface/archive/like` | `like=1` 点赞，`like=2` 取消 |
+| 投币 | `/x/web-interface/coin/add` | `multiply` 只能是 1 或 2 |
+| 添加收藏夹 | `/x/v3/fav/resource/deal` | `rid=aid`，`type=2`，`add_media_ids=mediaId` |
+| 分享记录 | `/x/web-interface/share/add` | 记录 B 站分享行为；复制链接由 UI 层另做 |
+
+## 8. 最常见失败模式
 
 - Cookie 看起来存在，但实际上失效
 - 忘了 `Referer`
 - 把 `SESSDATA` 交给普通 Cookie 解析
 - 误判某个接口是否需要 WBI
 - 只拿 `bvid` 不拿 `cid` 就开始做歌曲级处理
-- 收藏夹 / 评论 / 字幕问题其实是登录问题
+- 收藏夹 / 评论 / 视频互动 / 字幕问题其实是登录问题
 
-## 8. 修改这部分时要一起看什么
+## 9. 修改这部分时要一起看什么
 
 - `lib/core/api/bili_dio.dart`
 - `lib/core/api/wbi_sign.dart`
