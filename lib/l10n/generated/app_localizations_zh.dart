@@ -782,6 +782,103 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commentSection => '评论区';
 
   @override
+  String get videoIntroTab => '简介';
+
+  @override
+  String videoCommentsTab(int count) {
+    return '评论 $count';
+  }
+
+  @override
+  String get videoUpOwner => 'UP';
+
+  @override
+  String videoOwnerUid(int uid) {
+    return 'UID $uid';
+  }
+
+  @override
+  String videoStatsViews(String count) {
+    return '$count 播放';
+  }
+
+  @override
+  String videoStatsDanmaku(String count) {
+    return '$count 弹幕';
+  }
+
+  @override
+  String videoStatsPublished(String date) {
+    return '$date 发布';
+  }
+
+  @override
+  String get videoNoReprint => '未经作者授权，禁止转载';
+
+  @override
+  String get videoDescriptionEmpty => '暂无简介';
+
+  @override
+  String get expand => '展开';
+
+  @override
+  String get collapse => '收起';
+
+  @override
+  String get videoLike => '点赞';
+
+  @override
+  String get videoLiked => '已赞';
+
+  @override
+  String get videoCoin => '投币';
+
+  @override
+  String videoCoined(int count) {
+    return '已投 $count';
+  }
+
+  @override
+  String get videoFavorite => '收藏';
+
+  @override
+  String get videoFavorited => '已收藏';
+
+  @override
+  String get videoShare => '分享';
+
+  @override
+  String get videoCoinsAlreadyMaxed => '已经投过最多硬币';
+
+  @override
+  String videoCoinAdded(int count) {
+    return '已投 $count 枚硬币';
+  }
+
+  @override
+  String get videoCoinDialogTitle => '给视频投币';
+
+  @override
+  String get videoCoinOne => '1 枚硬币';
+
+  @override
+  String get videoCoinTwo => '2 枚硬币';
+
+  @override
+  String get videoCoinAlsoLike => '同时点赞';
+
+  @override
+  String get videoFavoriteAdded => '已添加到 B 站收藏夹';
+
+  @override
+  String get videoFavoriteFolderLoadFailed => '加载收藏夹失败';
+
+  @override
+  String videoCopyFailedWithError(String error) {
+    return '复制失败：$error';
+  }
+
+  @override
   String get justNow => '刚刚';
 
   @override

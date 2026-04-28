@@ -1553,6 +1553,168 @@ abstract class AppLocalizations {
   /// **'Comment Section'**
   String get commentSection;
 
+  /// No description provided for @videoIntroTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Intro'**
+  String get videoIntroTab;
+
+  /// No description provided for @videoCommentsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments {count}'**
+  String videoCommentsTab(int count);
+
+  /// No description provided for @videoUpOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'UP'**
+  String get videoUpOwner;
+
+  /// No description provided for @videoOwnerUid.
+  ///
+  /// In en, this message translates to:
+  /// **'UID {uid}'**
+  String videoOwnerUid(int uid);
+
+  /// No description provided for @videoStatsViews.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} views'**
+  String videoStatsViews(String count);
+
+  /// No description provided for @videoStatsDanmaku.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} danmaku'**
+  String videoStatsDanmaku(String count);
+
+  /// No description provided for @videoStatsPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Published {date}'**
+  String videoStatsPublished(String date);
+
+  /// No description provided for @videoNoReprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reposting without the creator\'s permission is prohibited'**
+  String get videoNoReprint;
+
+  /// No description provided for @videoDescriptionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No description'**
+  String get videoDescriptionEmpty;
+
+  /// No description provided for @expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get expand;
+
+  /// No description provided for @collapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapse;
+
+  /// No description provided for @videoLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get videoLike;
+
+  /// No description provided for @videoLiked.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get videoLiked;
+
+  /// No description provided for @videoCoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Coin'**
+  String get videoCoin;
+
+  /// No description provided for @videoCoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} coined'**
+  String videoCoined(int count);
+
+  /// No description provided for @videoFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get videoFavorite;
+
+  /// No description provided for @videoFavorited.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorited'**
+  String get videoFavorited;
+
+  /// No description provided for @videoShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get videoShare;
+
+  /// No description provided for @videoCoinsAlreadyMaxed.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already given the maximum coins'**
+  String get videoCoinsAlreadyMaxed;
+
+  /// No description provided for @videoCoinAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} coin(s)'**
+  String videoCoinAdded(int count);
+
+  /// No description provided for @videoCoinDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Give coins'**
+  String get videoCoinDialogTitle;
+
+  /// No description provided for @videoCoinOne.
+  ///
+  /// In en, this message translates to:
+  /// **'1 coin'**
+  String get videoCoinOne;
+
+  /// No description provided for @videoCoinTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'2 coins'**
+  String get videoCoinTwo;
+
+  /// No description provided for @videoCoinAlsoLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Like this video too'**
+  String get videoCoinAlsoLike;
+
+  /// No description provided for @videoFavoriteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Bilibili favorites'**
+  String get videoFavoriteAdded;
+
+  /// No description provided for @videoFavoriteFolderLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load favorite folders'**
+  String get videoFavoriteFolderLoadFailed;
+
+  /// No description provided for @videoCopyFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy failed: {error}'**
+  String videoCopyFailedWithError(String error);
+
   /// No description provided for @justNow.
   ///
   /// In en, this message translates to:

@@ -109,28 +109,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                spacing.lg,
-                spacing.md,
-                spacing.lg,
-                spacing.xs,
+            if (showVideoDetail == null) ...[
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg,
+                  spacing.md,
+                  spacing.lg,
+                  spacing.xs,
+                ),
+                child: _buildInputBar(l10n, parseState),
               ),
-              child: _buildInputBar(l10n, parseState),
-            ),
-            parseState.whenOrNull(
-                  error: (msg) => Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      spacing.lg,
-                      spacing.sm,
-                      spacing.lg,
-                      0,
+              parseState.whenOrNull(
+                    error: (msg) => Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        spacing.lg,
+                        spacing.sm,
+                        spacing.lg,
+                        0,
+                      ),
+                      child: _SearchErrorBanner(message: msg),
                     ),
-                    child: _SearchErrorBanner(message: msg),
-                  ),
-                ) ??
-                const SizedBox.shrink(),
-            SizedBox(height: spacing.sm),
+                  ) ??
+                  const SizedBox.shrink(),
+              SizedBox(height: spacing.sm),
+            ],
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 180),
@@ -163,7 +165,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       return VideoDetailView(
         key: const ValueKey('detail'),
         parseState: parseState,
-        showBackButton: _searchResults.isNotEmpty,
+        showBackButton: true,
         onBack: _backToResults,
       );
     }

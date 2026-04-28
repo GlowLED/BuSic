@@ -361,6 +361,73 @@
     }
   },
   "commentSection": "评论区",
+  "videoIntroTab": "简介",
+  "videoCommentsTab": "评论 {count}",
+  "@videoCommentsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoUpOwner": "UP",
+  "videoOwnerUid": "UID {uid}",
+  "@videoOwnerUid": {
+    "placeholders": {
+      "uid": { "type": "int" }
+    }
+  },
+  "videoStatsViews": "{count} 播放",
+  "@videoStatsViews": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "videoStatsDanmaku": "{count} 弹幕",
+  "@videoStatsDanmaku": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "videoStatsPublished": "{date} 发布",
+  "@videoStatsPublished": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "videoNoReprint": "未经作者授权，禁止转载",
+  "videoDescriptionEmpty": "暂无简介",
+  "expand": "展开",
+  "collapse": "收起",
+  "videoLike": "点赞",
+  "videoLiked": "已赞",
+  "videoCoin": "投币",
+  "videoCoined": "已投 {count}",
+  "@videoCoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoFavorite": "收藏",
+  "videoFavorited": "已收藏",
+  "videoShare": "分享",
+  "videoCoinsAlreadyMaxed": "已经投过最多硬币",
+  "videoCoinAdded": "已投 {count} 枚硬币",
+  "@videoCoinAdded": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoCoinDialogTitle": "给视频投币",
+  "videoCoinOne": "1 枚硬币",
+  "videoCoinTwo": "2 枚硬币",
+  "videoCoinAlsoLike": "同时点赞",
+  "videoFavoriteAdded": "已添加到 B 站收藏夹",
+  "videoFavoriteFolderLoadFailed": "加载收藏夹失败",
+  "videoCopyFailedWithError": "复制失败：{error}",
+  "@videoCopyFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
   "justNow": "刚刚",
   "minutesAgo": "{count}分钟前",
   "@minutesAgo": {

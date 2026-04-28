@@ -782,6 +782,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commentSection => 'Comment Section';
 
   @override
+  String get videoIntroTab => 'Intro';
+
+  @override
+  String videoCommentsTab(int count) {
+    return 'Comments $count';
+  }
+
+  @override
+  String get videoUpOwner => 'UP';
+
+  @override
+  String videoOwnerUid(int uid) {
+    return 'UID $uid';
+  }
+
+  @override
+  String videoStatsViews(String count) {
+    return '$count views';
+  }
+
+  @override
+  String videoStatsDanmaku(String count) {
+    return '$count danmaku';
+  }
+
+  @override
+  String videoStatsPublished(String date) {
+    return 'Published $date';
+  }
+
+  @override
+  String get videoNoReprint => 'Reposting without the creator\'s permission is prohibited';
+
+  @override
+  String get videoDescriptionEmpty => 'No description';
+
+  @override
+  String get expand => 'Expand';
+
+  @override
+  String get collapse => 'Collapse';
+
+  @override
+  String get videoLike => 'Like';
+
+  @override
+  String get videoLiked => 'Liked';
+
+  @override
+  String get videoCoin => 'Coin';
+
+  @override
+  String videoCoined(int count) {
+    return '$count coined';
+  }
+
+  @override
+  String get videoFavorite => 'Favorite';
+
+  @override
+  String get videoFavorited => 'Favorited';
+
+  @override
+  String get videoShare => 'Share';
+
+  @override
+  String get videoCoinsAlreadyMaxed => 'You have already given the maximum coins';
+
+  @override
+  String videoCoinAdded(int count) {
+    return 'Added $count coin(s)';
+  }
+
+  @override
+  String get videoCoinDialogTitle => 'Give coins';
+
+  @override
+  String get videoCoinOne => '1 coin';
+
+  @override
+  String get videoCoinTwo => '2 coins';
+
+  @override
+  String get videoCoinAlsoLike => 'Like this video too';
+
+  @override
+  String get videoFavoriteAdded => 'Added to Bilibili favorites';
+
+  @override
+  String get videoFavoriteFolderLoadFailed => 'Failed to load favorite folders';
+
+  @override
+  String videoCopyFailedWithError(String error) {
+    return 'Copy failed: $error';
+  }
+
+  @override
   String get justNow => 'Just now';
 
   @override

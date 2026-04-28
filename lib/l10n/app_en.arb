@@ -363,6 +363,73 @@
     }
   },
   "commentSection": "Comment Section",
+  "videoIntroTab": "Intro",
+  "videoCommentsTab": "Comments {count}",
+  "@videoCommentsTab": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoUpOwner": "UP",
+  "videoOwnerUid": "UID {uid}",
+  "@videoOwnerUid": {
+    "placeholders": {
+      "uid": { "type": "int" }
+    }
+  },
+  "videoStatsViews": "{count} views",
+  "@videoStatsViews": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "videoStatsDanmaku": "{count} danmaku",
+  "@videoStatsDanmaku": {
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "videoStatsPublished": "Published {date}",
+  "@videoStatsPublished": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "videoNoReprint": "Reposting without the creator's permission is prohibited",
+  "videoDescriptionEmpty": "No description",
+  "expand": "Expand",
+  "collapse": "Collapse",
+  "videoLike": "Like",
+  "videoLiked": "Liked",
+  "videoCoin": "Coin",
+  "videoCoined": "{count} coined",
+  "@videoCoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoFavorite": "Favorite",
+  "videoFavorited": "Favorited",
+  "videoShare": "Share",
+  "videoCoinsAlreadyMaxed": "You have already given the maximum coins",
+  "videoCoinAdded": "Added {count} coin(s)",
+  "@videoCoinAdded": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "videoCoinDialogTitle": "Give coins",
+  "videoCoinOne": "1 coin",
+  "videoCoinTwo": "2 coins",
+  "videoCoinAlsoLike": "Like this video too",
+  "videoFavoriteAdded": "Added to Bilibili favorites",
+  "videoFavoriteFolderLoadFailed": "Failed to load favorite folders",
+  "videoCopyFailedWithError": "Copy failed: {error}",
+  "@videoCopyFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
   "justNow": "Just now",
   "minutesAgo": "{count}m ago",
   "@minutesAgo": {

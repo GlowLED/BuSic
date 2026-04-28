@@ -24,9 +24,11 @@ class CommentSection extends ConsumerStatefulWidget {
     super.key,
     required this.bvid,
     this.onScrollToEdge,
+    this.usePrimaryScrollController = false,
   });
 
   final ScrollToEdgeCallback? onScrollToEdge;
+  final bool usePrimaryScrollController;
 
   /// The BV number of the video whose comments to show.
   final String bvid;
@@ -42,33 +44,29 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
   int? _replyToParentRpid;
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.extentAfter < 200) {
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return false;
+
+    final metrics = notification.metrics;
+    if (metrics.extentAfter < 200) {
       ref.read(commentNotifierProvider(widget.bvid).notifier).loadMore();
     }
-    _notifyScrollEdge();
+    _notifyScrollEdge(metrics);
+    return false;
   }
 
-  void _notifyScrollEdge() {
+  void _notifyScrollEdge(ScrollMetrics metrics) {
     final callback = widget.onScrollToEdge;
     if (callback == null) return;
 
-    final position = _scrollController.position;
-    if (position.pixels <= position.minScrollExtent) {
+    if (metrics.pixels <= metrics.minScrollExtent) {
       callback(ScrollEdge.top);
-    } else if (position.pixels >= position.maxScrollExtent) {
+    } else if (metrics.pixels >= metrics.maxScrollExtent) {
       callback(ScrollEdge.bottom);
     }
   }
@@ -139,140 +137,155 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
       children: [
         // Comment list
         Expanded(
-          child: commentAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.error_outline,
-                      size: 48, color: colorScheme.error),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.loadCommentsFailed,
-                    style: TextStyle(color: colorScheme.error),
-                  ),
-                  const SizedBox(height: 8),
-                  FilledButton.tonal(
-                    onPressed: () => ref.invalidate(
-                        commentNotifierProvider(widget.bvid)),
-                    child: Text(l10n.retry),
-                  ),
-                ],
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _onScrollNotification,
+            child: commentAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline,
+                        size: 48, color: colorScheme.error),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.loadCommentsFailed,
+                      style: TextStyle(color: colorScheme.error),
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton.tonal(
+                      onPressed: () =>
+                          ref.invalidate(commentNotifierProvider(widget.bvid)),
+                      child: Text(l10n.retry),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            data: (state) {
-              if (state.comments.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.chat_bubble_outline,
-                          size: 48, color: colorScheme.outlineVariant),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.noComments,
-                        style: TextStyle(
-                            color: colorScheme.onSurfaceVariant),
-                      ),
-                    ],
-                  ),
-                );
-              }
+              data: (state) {
+                if (state.comments.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: 48,
+                          color: colorScheme.outlineVariant,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.noComments,
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-              return CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  // Header: count + sort
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                      child: Row(
-                        children: [
-                          Text(
-                            l10n.commentCount(state.totalCount),
-                            style: context.textTheme.titleSmall,
-                          ),
-                          const Spacer(),
-                          _SortChip(
-                            label: l10n.popular,
-                            isSelected: state.sortMode == 3,
-                            onTap: () => ref
-                                .read(commentNotifierProvider(widget.bvid)
-                                    .notifier)
-                                .changeSortMode(3),
-                          ),
-                          const SizedBox(width: 8),
-                          _SortChip(
-                            label: l10n.latest,
-                            isSelected: state.sortMode == 2,
-                            onTap: () => ref
-                                .read(commentNotifierProvider(widget.bvid)
-                                    .notifier)
-                                .changeSortMode(2),
-                          ),
-                        ],
+                return CustomScrollView(
+                  primary: widget.usePrimaryScrollController ? true : null,
+                  controller: widget.usePrimaryScrollController
+                      ? null
+                      : _scrollController,
+                  slivers: [
+                    // Header: count + sort
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        child: Row(
+                          children: [
+                            Text(
+                              l10n.commentCount(state.totalCount),
+                              style: context.textTheme.titleSmall,
+                            ),
+                            const Spacer(),
+                            _SortChip(
+                              label: l10n.popular,
+                              isSelected: state.sortMode == 3,
+                              onTap: () => ref
+                                  .read(
+                                    commentNotifierProvider(widget.bvid)
+                                        .notifier,
+                                  )
+                                  .changeSortMode(3),
+                            ),
+                            const SizedBox(width: 8),
+                            _SortChip(
+                              label: l10n.latest,
+                              isSelected: state.sortMode == 2,
+                              onTap: () => ref
+                                  .read(
+                                    commentNotifierProvider(widget.bvid)
+                                        .notifier,
+                                  )
+                                  .changeSortMode(2),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Comment list
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index >= state.comments.length) {
-                          if (state.isEnd) {
-                            return Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Center(
-                                child: Text(
-                                  '— ${l10n.allCommentsLoaded} —',
-                                  style: context.textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
+                    // Comment list
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index >= state.comments.length) {
+                            if (state.isEnd) {
+                              return Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Center(
+                                  child: Text(
+                                    '— ${l10n.allCommentsLoaded} —',
+                                    style:
+                                        context.textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                                 ),
+                              );
+                            }
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: CircularProgressIndicator(),
                               ),
                             );
                           }
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
 
-                        final comment = state.comments[index];
-                        return CommentTile(
-                          comment: comment,
-                          isLoggedIn: isLoggedIn,
-                          onLike: () {
-                            if (!isLoggedIn) {
-                              context.showSnackBar(l10n.loginToLike);
-                              return;
-                            }
-                            ref
-                                .read(commentNotifierProvider(widget.bvid)
-                                    .notifier)
-                                .toggleLike(comment.rpid);
-                          },
-                          onReply: () {
-                            if (!isLoggedIn) {
-                              context.showSnackBar(l10n.loginToReply);
-                              return;
-                            }
-                            _onReply(comment);
-                          },
-                          onViewReplies: () => _showReplySheet(comment),
-                        );
-                      },
-                      childCount: state.comments.length +
-                          (state.isLoadingMore || !state.isEnd ? 1 : 0),
+                          final comment = state.comments[index];
+                          return CommentTile(
+                            comment: comment,
+                            isLoggedIn: isLoggedIn,
+                            onLike: () {
+                              if (!isLoggedIn) {
+                                context.showSnackBar(l10n.loginToLike);
+                                return;
+                              }
+                              ref
+                                  .read(
+                                    commentNotifierProvider(widget.bvid)
+                                        .notifier,
+                                  )
+                                  .toggleLike(comment.rpid);
+                            },
+                            onReply: () {
+                              if (!isLoggedIn) {
+                                context.showSnackBar(l10n.loginToReply);
+                                return;
+                              }
+                              _onReply(comment);
+                            },
+                            onViewReplies: () => _showReplySheet(comment),
+                          );
+                        },
+                        childCount: state.comments.length +
+                            (state.isLoadingMore || !state.isEnd ? 1 : 0),
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
 
@@ -309,9 +322,7 @@ class _SortChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primaryContainer
-              : Colors.transparent,
+          color: isSelected ? colorScheme.primaryContainer : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
