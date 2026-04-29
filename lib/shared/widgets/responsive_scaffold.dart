@@ -95,8 +95,7 @@ class _DesktopShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final useExpandedSidebar = context.screenWidth >= 1180;
-    final sidebarWidth = useExpandedSidebar ? 296.0 : 112.0;
+    const sidebarWidth = 112.0;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -117,7 +116,6 @@ class _DesktopShell extends StatelessWidget {
                       child: _DesktopSidebar(
                         destinations: destinations,
                         currentIndex: currentIndex,
-                        showLabels: useExpandedSidebar,
                         onDestinationSelected: onDestinationSelected,
                       ),
                     ),
@@ -306,13 +304,11 @@ class _DesktopSidebar extends StatelessWidget {
   const _DesktopSidebar({
     required this.destinations,
     required this.currentIndex,
-    required this.showLabels,
     required this.onDestinationSelected,
   });
 
   final List<_ShellDestination> destinations;
   final int currentIndex;
-  final bool showLabels;
   final ValueChanged<int> onDestinationSelected;
 
   @override
@@ -333,14 +329,13 @@ class _DesktopSidebar extends StatelessWidget {
                 return _DesktopNavigationItem(
                   destination: destinations[index],
                   isSelected: currentIndex == index,
-                  showLabels: showLabels,
                   onTap: () => onDestinationSelected(index),
                 );
               },
             ),
           ),
           SizedBox(height: spacing.sm),
-          _DesktopSidebarStatusCard(showLabels: showLabels),
+          const _DesktopSidebarStatusCard(),
         ],
       ),
     );
@@ -351,13 +346,11 @@ class _DesktopNavigationItem extends StatelessWidget {
   const _DesktopNavigationItem({
     required this.destination,
     required this.isSelected,
-    required this.showLabels,
     required this.onTap,
   });
 
   final _ShellDestination destination;
   final bool isSelected;
-  final bool showLabels;
   final VoidCallback onTap;
 
   @override
@@ -374,19 +367,15 @@ class _DesktopNavigationItem extends StatelessWidget {
     final item = Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: showLabels
-            ? context.appRadii.largeRadius
-            : context.appRadii.xLargeRadius,
+        borderRadius: context.appRadii.xLargeRadius,
         onTap: onTap,
         child: AnimatedContainer(
           duration: _navigationAnimationDuration,
           curve: _navigationAnimationCurve,
-          constraints: BoxConstraints(
-            minHeight: showLabels ? 0 : 64,
-          ),
+          constraints: const BoxConstraints(minHeight: 64),
           padding: EdgeInsets.symmetric(
-            horizontal: showLabels ? spacing.md : spacing.xs,
-            vertical: showLabels ? spacing.md : spacing.sm,
+            horizontal: spacing.xs,
+            vertical: spacing.sm,
           ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -405,9 +394,7 @@ class _DesktopNavigationItem extends StatelessWidget {
                 )!,
               ],
             ),
-            borderRadius: showLabels
-                ? context.appRadii.largeRadius
-                : context.appRadii.xLargeRadius,
+            borderRadius: context.appRadii.xLargeRadius,
             border: Border.all(
               color: isSelected
                   ? palette.accentStrong.withValues(alpha: 0.72)
@@ -416,56 +403,14 @@ class _DesktopNavigationItem extends StatelessWidget {
             ),
             boxShadow: [glowShadow],
           ),
-          child: showLabels
-              ? Row(
-                  children: [
-                    _NavigationIconPill(
-                      icon: destination.icon,
-                      selectedIcon: destination.selectedIcon,
-                      isSelected: isSelected,
-                    ),
-                    SizedBox(width: spacing.md),
-                    Expanded(
-                      child: AnimatedDefaultTextStyle(
-                        duration: _navigationAnimationDuration,
-                        curve: _navigationAnimationCurve,
-                        style:
-                            (context.textTheme.titleSmall ?? const TextStyle())
-                                .copyWith(
-                          color: isSelected
-                              ? palette.textPrimary
-                              : palette.textSecondary,
-                        ),
-                        child: Text(
-                          destination.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                    AnimatedOpacity(
-                      opacity: isSelected ? 1 : 0,
-                      duration: _navigationAnimationDuration,
-                      curve: _navigationAnimationCurve,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: palette.accentStrong,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : Center(
-                  child: _NavigationIconPill(
-                    icon: destination.icon,
-                    selectedIcon: destination.selectedIcon,
-                    isSelected: isSelected,
-                    compact: true,
-                  ),
-                ),
+          child: Center(
+            child: _NavigationIconPill(
+              icon: destination.icon,
+              selectedIcon: destination.selectedIcon,
+              isSelected: isSelected,
+              compact: true,
+            ),
+          ),
         ),
       ),
     );
@@ -475,9 +420,7 @@ class _DesktopNavigationItem extends StatelessWidget {
 }
 
 class _DesktopSidebarStatusCard extends ConsumerWidget {
-  const _DesktopSidebarStatusCard({required this.showLabels});
-
-  final bool showLabels;
+  const _DesktopSidebarStatusCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -487,91 +430,25 @@ class _DesktopSidebarStatusCard extends ConsumerWidget {
       playerNotifierProvider.select((state) => state.currentTrack),
     );
 
-    if (!showLabels) {
-      return Container(
-        padding: EdgeInsets.symmetric(vertical: spacing.xs),
-        decoration: BoxDecoration(
-          color: palette.surfaceSecondary.withValues(alpha: 0.56),
-          borderRadius: context.appRadii.largeRadius,
-          border: Border.all(
-            color: palette.borderSubtle.withValues(alpha: 0.9),
-            width: context.appDepth.outline,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              currentTrack == null
-                  ? Icons.music_off_rounded
-                  : Icons.graphic_eq_rounded,
-              color: palette.textSecondary,
-            ),
-            SizedBox(height: spacing.sm),
-            const UserAvatarWidget(),
-          ],
-        ),
-      );
-    }
-
     return Container(
-      padding: EdgeInsets.all(spacing.sm),
+      padding: EdgeInsets.symmetric(vertical: spacing.xs),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            palette.surfaceElevated.withValues(alpha: 0.98),
-            palette.surfaceSecondary.withValues(alpha: 0.9),
-          ],
-        ),
+        color: palette.surfaceSecondary.withValues(alpha: 0.56),
         borderRadius: context.appRadii.largeRadius,
         border: Border.all(
           color: palette.borderSubtle.withValues(alpha: 0.9),
           width: context.appDepth.outline,
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: palette.accentSoft,
-              borderRadius: context.appRadii.mediumRadius,
-            ),
-            child: Icon(
-              currentTrack == null
-                  ? Icons.music_note_rounded
-                  : Icons.graphic_eq_rounded,
-              color: palette.accentStrong,
-            ),
+          Icon(
+            currentTrack == null
+                ? Icons.music_off_rounded
+                : Icons.graphic_eq_rounded,
+            color: palette.textSecondary,
           ),
-          SizedBox(width: spacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  currentTrack?.title ?? context.l10n.noPlayingMusic,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall,
-                ),
-                if (currentTrack != null) ...[
-                  SizedBox(height: spacing.xxs),
-                  Text(
-                    currentTrack.artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: palette.textSecondary,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          SizedBox(width: spacing.sm),
+          SizedBox(height: spacing.sm),
           const UserAvatarWidget(),
         ],
       ),
