@@ -39,7 +39,8 @@ class CommentTile extends StatelessWidget {
                 ? CachedNetworkImageProvider(comment.avatarUrl)
                 : null,
             child: comment.avatarUrl.isEmpty
-                ? Icon(Icons.person, size: 20, color: colorScheme.onSurfaceVariant)
+                ? Icon(Icons.person,
+                    size: 20, color: colorScheme.onSurfaceVariant)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -73,9 +74,11 @@ class CommentTile extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 // Comment content
-                Text(
-                  comment.content,
-                  style: textTheme.bodyMedium,
+                SelectionArea(
+                  child: Text(
+                    comment.content,
+                    style: textTheme.bodyMedium,
+                  ),
                 ),
                 const SizedBox(height: 8),
 
@@ -135,23 +138,25 @@ class CommentTile extends StatelessWidget {
                         for (final reply in comment.replies.take(3))
                           Padding(
                             padding: const EdgeInsets.only(bottom: 4),
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${reply.username}：',
-                                    style: textTheme.labelMedium?.copyWith(
-                                      color: colorScheme.primary,
+                            child: SelectionArea(
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '${reply.username}：',
+                                      style: textTheme.labelMedium?.copyWith(
+                                        color: colorScheme.primary,
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text: reply.content,
-                                    style: textTheme.bodySmall,
-                                  ),
-                                ],
+                                    TextSpan(
+                                      text: reply.content,
+                                      style: textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         if (comment.replyCount > 3)

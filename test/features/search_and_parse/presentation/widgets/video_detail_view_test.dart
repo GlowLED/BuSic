@@ -27,6 +27,32 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoDetailView', () {
+    testWidgets('makes video text and comment content selectable',
+        (tester) async {
+      _setDesktopViewport(tester);
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: const ParseState.success(_video),
+        commentState: _commentStateWithItems,
+      );
+
+      _expectTextInSelectionArea(_video.title);
+      _expectTextInSelectionArea(_video.description);
+      _expectTextInSelectionArea(_video.bvid);
+
+      final commentTab = find.descendant(
+        of: find.byType(TabBar),
+        matching: find.text('Comments 17'),
+      );
+
+      await tester.tap(commentTab);
+      await tester.pumpAndSettle();
+
+      _expectTextInSelectionArea('Comment 0');
+    });
+
     testWidgets('桌面布局下封面收窄且随简介滚动上移', (tester) async {
       _setDesktopViewport(tester);
 
@@ -217,6 +243,19 @@ void _setDesktopViewport(WidgetTester tester) {
   tester.view.physicalSize = const Size(1000, 800);
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
+}
+
+void _expectTextInSelectionArea(String text) {
+  final textFinder = find.text(text);
+
+  expect(textFinder, findsOneWidget);
+  expect(
+    find.ancestor(
+      of: textFinder,
+      matching: find.byType(SelectionArea),
+    ),
+    findsOneWidget,
+  );
 }
 
 const _aid = 123456;

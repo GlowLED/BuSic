@@ -423,13 +423,15 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          videoInfo.title,
-          maxLines: _isTitleExpanded ? null : 2,
-          overflow: _isTitleExpanded ? null : TextOverflow.ellipsis,
-          style: context.textTheme.titleLarge?.copyWith(
-            color: palette.textPrimary,
-            fontWeight: FontWeight.w700,
+        SelectionArea(
+          child: Text(
+            videoInfo.title,
+            maxLines: _isTitleExpanded ? null : 2,
+            overflow: _isTitleExpanded ? null : TextOverflow.ellipsis,
+            style: context.textTheme.titleLarge?.copyWith(
+              color: palette.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         if (showToggle)
@@ -466,6 +468,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       _VideoBadge(
         icon: Icons.fingerprint_rounded,
         label: videoInfo.bvid,
+        isSelectable: true,
       ),
     ];
 
@@ -535,16 +538,20 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            displayText,
-            maxLines: _isDescriptionExpanded || description.isEmpty ? null : 4,
-            overflow: _isDescriptionExpanded || description.isEmpty
-                ? null
-                : TextOverflow.ellipsis,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color:
-                  description.isEmpty ? palette.textMuted : palette.textPrimary,
-              height: 1.45,
+          SelectionArea(
+            child: Text(
+              displayText,
+              maxLines:
+                  _isDescriptionExpanded || description.isEmpty ? null : 4,
+              overflow: _isDescriptionExpanded || description.isEmpty
+                  ? null
+                  : TextOverflow.ellipsis,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: description.isEmpty
+                    ? palette.textMuted
+                    : palette.textPrimary,
+                height: 1.45,
+              ),
             ),
           ),
           if (showToggle) ...[
@@ -1527,10 +1534,12 @@ class _VideoBadge extends StatelessWidget {
   const _VideoBadge({
     required this.icon,
     required this.label,
+    this.isSelectable = false,
   });
 
   final IconData icon;
   final String label;
+  final bool isSelectable;
 
   @override
   Widget build(BuildContext context) {
@@ -1555,13 +1564,32 @@ class _VideoBadge extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: color),
           SizedBox(width: context.appSpacing.xxs),
-          Text(
+          _BadgeText(
             label,
             style: context.textTheme.labelSmall?.copyWith(color: color),
+            isSelectable: isSelectable,
           ),
         ],
       ),
     );
+  }
+}
+
+class _BadgeText extends StatelessWidget {
+  const _BadgeText(
+    this.label, {
+    required this.style,
+    required this.isSelectable,
+  });
+
+  final String label;
+  final TextStyle? style;
+  final bool isSelectable;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Text(label, style: style);
+    return isSelectable ? SelectionArea(child: text) : text;
   }
 }
 

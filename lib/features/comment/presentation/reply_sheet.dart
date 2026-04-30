@@ -168,9 +168,11 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          widget.rootComment.content,
-                          style: textTheme.bodyMedium,
+                        SelectionArea(
+                          child: Text(
+                            widget.rootComment.content,
+                            style: textTheme.bodyMedium,
+                          ),
                         ),
                       ],
                     ),
@@ -270,7 +272,9 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(reply.content, style: textTheme.bodySmall),
+                  SelectionArea(
+                    child: Text(reply.content, style: textTheme.bodySmall),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     _formatTime(reply.ctime),
@@ -290,9 +294,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                     context.showSnackBar('点赞功能仅支持主评论');
                   },
                   child: Icon(
-                    reply.isLiked
-                        ? Icons.thumb_up
-                        : Icons.thumb_up_outlined,
+                    reply.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
                     size: 14,
                     color: reply.isLiked
                         ? colorScheme.primary
