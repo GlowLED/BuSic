@@ -5,7 +5,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../../core/utils/platform_utils.dart';
 import '../../features/auth/presentation/widgets/user_avatar_widget.dart';
-import '../../features/player/application/player_notifier.dart';
+
 import '../../features/player/presentation/player_bar.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../extensions/context_extensions.dart';
@@ -323,7 +323,7 @@ class _DesktopSidebar extends StatelessWidget {
           Expanded(
             child: ListView.separated(
               padding: EdgeInsets.zero,
-              itemCount: destinations.length,
+              itemCount: destinations.length - 1, // 排除设置
               separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
               itemBuilder: (context, index) {
                 return _DesktopNavigationItem(
@@ -333,6 +333,12 @@ class _DesktopSidebar extends StatelessWidget {
                 );
               },
             ),
+          ),
+          SizedBox(height: spacing.sm),
+          _DesktopNavigationItem(
+            destination: destinations[3], // 设置目的地
+            isSelected: currentIndex == 3,
+            onTap: () => onDestinationSelected(3),
           ),
           SizedBox(height: spacing.sm),
           const _DesktopSidebarStatusCard(),
@@ -355,53 +361,18 @@ class _DesktopNavigationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.appPalette;
     final spacing = context.appSpacing;
-    final depth = context.appDepth;
-    final baseSurface = palette.surfaceSecondary.withValues(alpha: 0.48);
-    final glowShadow = BoxShadow(
-      color: palette.coverGlow.withValues(alpha: isSelected ? 1 : 0),
-      blurRadius: isSelected ? depth.glowBlur : 0,
-      spreadRadius: isSelected ? depth.glowSpread : 0,
-    );
-    final item = Material(
+
+    return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: context.appRadii.xLargeRadius,
         onTap: onTap,
-        child: AnimatedContainer(
-          duration: _navigationAnimationDuration,
-          curve: _navigationAnimationCurve,
+        child: Container(
           constraints: const BoxConstraints(minHeight: 64),
           padding: EdgeInsets.symmetric(
             horizontal: spacing.xs,
             vertical: spacing.sm,
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.lerp(
-                  baseSurface,
-                  palette.accentSoft.withValues(alpha: 0.98),
-                  isSelected ? 1 : 0,
-                )!,
-                Color.lerp(
-                  baseSurface,
-                  palette.surfaceElevated.withValues(alpha: 0.96),
-                  isSelected ? 1 : 0,
-                )!,
-              ],
-            ),
-            borderRadius: context.appRadii.xLargeRadius,
-            border: Border.all(
-              color: isSelected
-                  ? palette.accentStrong.withValues(alpha: 0.72)
-                  : palette.borderSubtle.withValues(alpha: 0.9),
-              width: isSelected ? depth.outlineStrong : depth.outline,
-            ),
-            boxShadow: [glowShadow],
           ),
           child: Center(
             child: _NavigationIconPill(
@@ -414,8 +385,6 @@ class _DesktopNavigationItem extends StatelessWidget {
         ),
       ),
     );
-
-    return item;
   }
 }
 
@@ -426,32 +395,13 @@ class _DesktopSidebarStatusCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.appPalette;
     final spacing = context.appSpacing;
-    final currentTrack = ref.watch(
-      playerNotifierProvider.select((state) => state.currentTrack),
-    );
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: spacing.xs),
+      padding: EdgeInsets.all(spacing.sm),
       decoration: BoxDecoration(
         color: palette.surfaceSecondary.withValues(alpha: 0.56),
-        borderRadius: context.appRadii.largeRadius,
-        border: Border.all(
-          color: palette.borderSubtle.withValues(alpha: 0.9),
-          width: context.appDepth.outline,
-        ),
       ),
-      child: Column(
-        children: [
-          Icon(
-            currentTrack == null
-                ? Icons.music_off_rounded
-                : Icons.graphic_eq_rounded,
-            color: palette.textSecondary,
-          ),
-          SizedBox(height: spacing.sm),
-          const UserAvatarWidget(),
-        ],
-      ),
+      child: const UserAvatarWidget(),
     );
   }
 }
