@@ -40,7 +40,7 @@ void main() {
 
       _expectTextInSelectionArea(_video.title);
       _expectTextInSelectionArea(_video.description);
-      _expectTextInSelectionArea(_video.bvid);
+      _expectTextInInkWell(_video.bvid);
 
       final commentTab = find.descendant(
         of: find.byType(TabBar),
@@ -253,6 +253,19 @@ void _expectTextInSelectionArea(String text) {
     find.ancestor(
       of: textFinder,
       matching: find.byType(SelectionArea),
+    ),
+    findsOneWidget,
+  );
+}
+
+void _expectTextInInkWell(String text) {
+  final textFinder = find.text(text);
+
+  expect(textFinder, findsOneWidget);
+  expect(
+    find.ancestor(
+      of: textFinder,
+      matching: find.byType(InkWell),
     ),
     findsOneWidget,
   );

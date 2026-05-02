@@ -468,7 +468,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       _VideoBadge(
         icon: Icons.fingerprint_rounded,
         label: videoInfo.bvid,
-        isSelectable: true,
+        onTap: () => _copyBvidToClipboard(context, videoInfo.bvid),
       ),
     ];
 
@@ -489,6 +489,19 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       runSpacing: context.appSpacing.xs,
       children: badges,
     );
+  }
+
+  Future<void> _copyBvidToClipboard(BuildContext context, String bvid) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: bvid));
+      if (context.mounted) {
+        context.showSnackBar(context.l10n.copiedToClipboard);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        context.showSnackBar(context.l10n.videoCopyFailedWithError('$e'));
+      }
+    }
   }
 
   Widget _buildNoReprintNotice() {
@@ -1534,12 +1547,12 @@ class _VideoBadge extends StatelessWidget {
   const _VideoBadge({
     required this.icon,
     required this.label,
-    this.isSelectable = false,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
-  final bool isSelectable;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1567,7 +1580,7 @@ class _VideoBadge extends StatelessWidget {
           _BadgeText(
             label,
             style: context.textTheme.labelSmall?.copyWith(color: color),
-            isSelectable: isSelectable,
+            onTap: onTap,
           ),
         ],
       ),
@@ -1579,17 +1592,24 @@ class _BadgeText extends StatelessWidget {
   const _BadgeText(
     this.label, {
     required this.style,
-    required this.isSelectable,
+    this.onTap,
   });
 
   final String label;
   final TextStyle? style;
-  final bool isSelectable;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final text = Text(label, style: style);
-    return isSelectable ? SelectionArea(child: text) : text;
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: text,
+      );
+    }
+    return text;
   }
 }
 
