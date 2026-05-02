@@ -39,6 +39,7 @@ compatibility: opencode
 - 分享 / 备份以 `bvid + cid` 作为跨设备身份，不以 `Songs.id` 或本地路径为准
 - 更新系统同时依赖 `versions-manifest.json`、`app_update` feature 和 Release 资产命名
 - 字幕链路依赖 B 站接口、登录态和 AI 字幕前缀校验，不是单次 API 调用
+- 视频互动依赖登录态 + 多接口合并（点赞/投币/收藏状态读取 + B站收藏夹添加），`VideoInteractionNotifier` 使用 `bvid + aid` 作 family 参数，单项读取失败按未激活默认值处理
 
 ## 相关 Skill
 

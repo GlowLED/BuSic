@@ -14,6 +14,7 @@ compatibility: opencode
 ## 先看这些真源
 
 - [`docs/20-workflows/testing-guide.md`](../../../docs/20-workflows/testing-guide.md)
+- [`docs/30-reference/device-testing.md`](../../../docs/30-reference/device-testing.md)
 - [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml)
 - [`test/test_helpers/test_app.dart`](../../../test/test_helpers/test_app.dart)
 

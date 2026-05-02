@@ -31,6 +31,7 @@ compatibility: opencode
 - Widget 参数里 `child` / `children` 放后面
 - 注释优先解释“为什么”，不要重复代码在做什么
 - 用户可见文本不要硬编码，交给 i18n；具体规则见 [`busic-ui-development`](../busic-ui-development/SKILL.md)
+- 主题 token 使用 `context.appPalette` / `context.appSpacing` / `context.appRadii` / `context.appDepth` 访问，不要硬编码魔法数字圆角、间距、阴影和自定义色值；具体 token 清单见 [`busic-ui-development`](../busic-ui-development/SKILL.md)
 
 ## 错误处理
 

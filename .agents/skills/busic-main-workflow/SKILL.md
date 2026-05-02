@@ -26,6 +26,7 @@ compatibility: opencode
 - 分享 / 备份： [`docs/10-project/share-and-backup.md`](../../../docs/10-project/share-and-backup.md)
 - 桌面壳层 / 极简模式： [`docs/10-project/ui-and-platform-quirks.md`](../../../docs/10-project/ui-and-platform-quirks.md)
 - B 站接入： [`docs/10-project/bilibili-integration.md`](../../../docs/10-project/bilibili-integration.md)
+- 视频互动 / 详情： [`docs/10-project/bilibili-integration.md`](../../../docs/10-project/bilibili-integration.md)（视频互动端点、登录态失败模式、收藏/投币/分享注意事项）
 
 ## 推荐执行顺序
 
@@ -63,6 +64,7 @@ flutter run -d <device_id>
 - 改分享 / 备份：继续以 `bvid + cid` 作为跨设备身份，不要带本地路径
 - 改更新系统：同步检查 `versions-manifest.json`、`app_update` feature、Release 资产名
 - 改桌面壳层：确认托盘和极简模式生命周期没有被普通页面逻辑误伤
+- 改视频互动：确认 `VideoInteractionNotifier` 的乐观更新回滚逻辑，点赞/投币/收藏状态读取失败时按未激活处理，写接口需要 `bili_jct` 作为 csrf
 
 ## 改完别忘了
 
