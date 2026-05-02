@@ -1,5 +1,9 @@
 # 搜索页视频详情 B 站式重构计划
 
+> **状态：已实现并归档**
+> 实现时间：2026-05
+> 当前真源：`docs/10-project/bilibili-integration.md`、`lib/features/search_and_parse/`
+
 ## 1. 背景
 
 当前搜索页点击搜索结果后，会在 `SearchScreen` 内调用 `parseNotifierProvider` 解析 BV，并把解析成功的视频交给 `VideoDetailView` 展示。现有详情页偏工具型，主要服务于封面、标题、分 P 选择、播放、下载、加入歌单和评论入口。

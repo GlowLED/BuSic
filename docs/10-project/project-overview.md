@@ -62,6 +62,7 @@ lib/
 - Shell：`StatefulShellRoute.indexedStack`
 - 主分支：
   - `/` -> 歌单列表
+    - `/playlists/:id` -> 歌单详情（子路由）
   - `/search`
   - `/downloads`
   - `/settings`

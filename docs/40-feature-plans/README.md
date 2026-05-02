@@ -4,12 +4,13 @@
 
 ## 当前活跃主计划
 
-- [search-video-detail-bilibili-style.md](./search-video-detail-bilibili-style.md)
-  - 搜索结果视频详情页 B 站式重构计划
-  - 覆盖 `search_and_parse`、`comment`、`auth`、`playlist`、`download`、`player` 的协作边界
-  - 锁定原地详情页、B 站式简介 / 评论结构、真实 B 站互动动作和验证范围
+当前无活跃规划。
 
-已完成的 UI 重构主计划已归档到 [../90-archive/feature-plans/ui-redesign-master-plan.md](../90-archive/feature-plans/ui-redesign-master-plan.md)。当前 UI 规则优先读 [../30-reference/ui.md](../30-reference/ui.md)、[../10-project/project-overview.md](../10-project/project-overview.md)、[../10-project/ui-and-platform-quirks.md](../10-project/ui-and-platform-quirks.md)。
+已完成的规划：
+- 搜索结果视频详情页 B 站式重构已归档到 [../90-archive/feature-plans/search-video-detail-bilibili-style.md](../90-archive/feature-plans/search-video-detail-bilibili-style.md)
+- UI 重构主计划已归档到 [../90-archive/feature-plans/ui-redesign-master-plan.md](../90-archive/feature-plans/ui-redesign-master-plan.md)
+
+当前 UI 规则优先读 [../30-reference/ui.md](../30-reference/ui.md)、[../10-project/project-overview.md](../10-project/project-overview.md)、[../10-project/ui-and-platform-quirks.md](../10-project/ui-and-platform-quirks.md)。
 
 ## 什么时候把文档放这里？
 
