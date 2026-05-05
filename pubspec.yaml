@@ -13,7 +13,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # State Management (Riverpod code generation)
+  # State Management (Riverpod code generation)示例：
+
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
 
