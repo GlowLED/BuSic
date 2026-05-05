@@ -25,6 +25,8 @@ flutter analyze --no-fatal-infos
 flutter test
 ```
 
+Agent 执行时，`flutter ...` 通常需要提权到沙箱外；完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。
+
 如果改了 `@riverpod`、`@freezed`、Drift 或 `lib/l10n/*.arb`：
 
 ```bash
@@ -33,6 +35,8 @@ flutter gen-l10n
 flutter analyze --no-fatal-infos
 flutter test
 ```
+
+`dart run ...` 与 `flutter gen-l10n` 在 agent 沙箱中也按通常需提权处理。
 
 ## 常用测试模式
 
@@ -54,3 +58,4 @@ flutter test
 - [`busic-database`](../busic-database/SKILL.md)
 - [`busic-state-management`](../busic-state-management/SKILL.md)
 - [`busic-ui-development`](../busic-ui-development/SKILL.md)
+- [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)

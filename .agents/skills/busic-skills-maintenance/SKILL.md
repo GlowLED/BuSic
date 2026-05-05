@@ -46,6 +46,7 @@ compatibility: opencode
 - 精确数字、日期、覆盖率、脚本参数优先回链到 `docs/` 或真源文件
 - 兄弟 skill 相互引用时使用 `../<skill-name>/SKILL.md`
 - 指向仓库 `docs/` 时使用从 skill 目录出发的相对路径
+- 新增或修改高频命令时，同步检查 [`docs/00-start-here/agent-quickstart.md`](../../../docs/00-start-here/agent-quickstart.md) 与相关 skill 的沙箱 / 提权提示
 
 ## 什么时候要更新 skill
 

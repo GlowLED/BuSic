@@ -43,12 +43,16 @@ flutter analyze --no-fatal-infos
 flutter test
 ```
 
+Agent 执行时，`flutter ...` 通常需要提权到沙箱外；完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。
+
 如果改了 codegen 或 i18n：
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ```
+
+`dart run ...` 与 `flutter gen-l10n` 在 agent 沙箱中也按通常需提权处理。
 
 如果改动有平台或高风险联动，再补最小手测：
 

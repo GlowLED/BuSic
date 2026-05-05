@@ -65,6 +65,8 @@ flutter test
 git commit -m "type(scope): subject"
 ```
 
+Agent 执行时，本地只读 Git 如 `git status`、`git log`、`git diff` 通常可先在沙箱内尝试；`git add`、`git commit`、`git push` 等写入型或远程 Git 通常需要提权到沙箱外。完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。
+
 ## 明确禁止
 
 - 不要用 `git add .` 把无关改动一锅端走
@@ -78,3 +80,4 @@ git commit -m "type(scope): subject"
 - [`busic-testing`](../busic-testing/SKILL.md)
 - [`busic-version-management`](../busic-version-management/SKILL.md)
 - [`busic-release`](../busic-release/SKILL.md)
+- [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)

@@ -36,6 +36,13 @@ compatibility: opencode
 - 验证至少覆盖 `flutter analyze --no-fatal-infos` 与 `flutter test`，必要时加平台手测
 - 汇报时明确区分：已完成、已验证、未验证、建议后续
 
+## 沙箱与提权
+
+- 当前 Windows PowerShell agent 环境里，`flutter ...`、常见 `dart run ...`、远程 Git 和写入型 Git 通常需要提权到沙箱外执行
+- 本地只读 Git 通常可先在沙箱内尝试，例如 `git status`、`git log`、`git diff`
+- 写入型 Git 包括 `git add`、`git commit`、切分支、改 tag、改 ref；远程 Git 包括 `git fetch`、`git pull`、`git push`、`git ls-remote`
+- 完整分类和已知失败现象以 [`docs/00-start-here/agent-quickstart.md`](../../../docs/00-start-here/agent-quickstart.md) 为准，skill 只保留入口提醒，不复制整张表
+
 ## 不再保留的旧约定
 
 - 不再假设存在旧工具专用的提问 / 计划模式指令

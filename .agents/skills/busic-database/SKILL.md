@@ -33,6 +33,8 @@ compatibility: opencode
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+Agent 执行时，`dart run ...` 通常需要提权到沙箱外；完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。
+
 ## Repository 规则
 
 - Repository 接口和实现都放在 `data/` 层
@@ -51,3 +53,4 @@ dart run build_runner build --delete-conflicting-outputs
 - [`busic-architecture`](../busic-architecture/SKILL.md)
 - [`busic-state-management`](../busic-state-management/SKILL.md)
 - [`busic-testing`](../busic-testing/SKILL.md)
+- [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)

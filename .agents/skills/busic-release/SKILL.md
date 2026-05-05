@@ -38,6 +38,8 @@ python3 scripts/release.py
 
 这个脚本会引导完成版本设置、构建、manifest 更新、提交、打 tag 和推送。
 
+Agent 执行发布脚本时，脚本内会触发构建、写入型 Git、tag 和 push，通常需要提权到沙箱外；完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。
+
 ## 发布前最低检查
 
 ```bash
@@ -45,11 +47,15 @@ flutter analyze --no-fatal-infos
 flutter test
 ```
 
+Agent 执行时，`flutter ...` 通常需要提权到沙箱外。
+
 如果改了 codegen：
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+`dart run ...` 在 agent 沙箱中也按通常需提权处理。
 
 ## 当前发布链路的关键事实
 
@@ -70,3 +76,4 @@ dart run build_runner build --delete-conflicting-outputs
 - [`busic-version-management`](../busic-version-management/SKILL.md)
 - [`busic-git-commit`](../busic-git-commit/SKILL.md)
 - [`busic-main-workflow`](../busic-main-workflow/SKILL.md)
+- [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)
