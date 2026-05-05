@@ -443,7 +443,10 @@ class AppTheme {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: bundle.palette.accentStrong,
-        selectionColor: bundle.palette.accentSoft,
+        selectionColor: _textSelectionColor(
+          accent: bundle.palette.accentStrong,
+          brightness: brightness,
+        ),
         selectionHandleColor: bundle.palette.accentStrong,
       ),
       tooltipTheme: TooltipThemeData(
@@ -769,6 +772,19 @@ class AppTheme {
 
   static Color _tintSurface(Color accent, Color base, double alpha) {
     return Color.alphaBlend(accent.withValues(alpha: alpha), base);
+  }
+
+  static Color _textSelectionColor({
+    required Color accent,
+    required Brightness brightness,
+  }) {
+    if (brightness == Brightness.dark) {
+      return accent.withValues(alpha: 0.50);
+    }
+
+    final hsl = HSLColor.fromColor(accent);
+    final selectionAccent = hsl.withLightness(0.36).toColor();
+    return selectionAccent.withValues(alpha: 0.42);
   }
 
   static Color _blend(Color a, Color b, double amount) {

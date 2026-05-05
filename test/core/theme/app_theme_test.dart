@@ -41,5 +41,58 @@ void main() {
       expect(theme.navigationRailTheme.indicatorColor, palette.accentSoft);
       expect(depth.coverGlowShadow, isNotEmpty);
     });
+
+    test('text selection uses a stronger global accent overlay', () {
+      for (final seedColor in AppTheme.seedPresets.values) {
+        for (final theme in [
+          AppTheme.lightTheme(seedColor: seedColor),
+          AppTheme.darkTheme(seedColor: seedColor),
+        ]) {
+          final palette = theme.extension<AppThemePalette>()!;
+          final selectionTheme = theme.textSelectionTheme;
+          final selectionColor = selectionTheme.selectionColor;
+
+          expect(selectionTheme.cursorColor, palette.accentStrong);
+          expect(selectionTheme.selectionHandleColor, palette.accentStrong);
+          expect(selectionColor, isNotNull);
+          expect(selectionColor, isNot(equals(palette.accentSoft)));
+          expect(
+            selectionColor!.a,
+            closeTo(
+              theme.colorScheme.brightness == Brightness.dark ? 0.50 : 0.42,
+              0.001,
+            ),
+          );
+
+          final selectedSurface = Color.alphaBlend(
+            selectionColor,
+            palette.surfacePrimary,
+          );
+          final previousSelectedSurface = Color.alphaBlend(
+            palette.accentSoft,
+            palette.surfacePrimary,
+          );
+
+          expect(
+            _contrastRatio(selectedSurface, palette.surfacePrimary),
+            greaterThan(
+              _contrastRatio(
+                previousSelectedSurface,
+                palette.surfacePrimary,
+              ),
+            ),
+          );
+        }
+      }
+    });
   });
+}
+
+double _contrastRatio(Color a, Color b) {
+  final first = a.computeLuminance();
+  final second = b.computeLuminance();
+  final lighter = first > second ? first : second;
+  final darker = first > second ? second : first;
+
+  return (lighter + 0.05) / (darker + 0.05);
 }
