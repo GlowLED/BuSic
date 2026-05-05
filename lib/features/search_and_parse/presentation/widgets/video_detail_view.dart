@@ -923,25 +923,25 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  RadioGroup<int>(
+                  RadioListTile<int>(
+                    value: 1,
                     groupValue: multiply,
                     onChanged: (value) {
                       if (value == null) return;
                       setDialogState(() => multiply = value);
                     },
-                    child: Column(
-                      children: [
-                        RadioListTile<int>(
-                          value: 1,
-                          title: Text(context.l10n.videoCoinOne),
-                        ),
-                        RadioListTile<int>(
-                          value: 2,
-                          enabled: remainingCoins >= 2,
-                          title: Text(context.l10n.videoCoinTwo),
-                        ),
-                      ],
-                    ),
+                    title: Text(context.l10n.videoCoinOne),
+                  ),
+                  RadioListTile<int>(
+                    value: 2,
+                    groupValue: multiply,
+                    onChanged: remainingCoins >= 2
+                        ? (value) {
+                            if (value == null) return;
+                            setDialogState(() => multiply = value);
+                          }
+                        : null,
+                    title: Text(context.l10n.videoCoinTwo),
                   ),
                   CheckboxListTile(
                     value: alsoLike,
