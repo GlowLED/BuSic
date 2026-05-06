@@ -6,11 +6,11 @@ import '../../../core/router/app_router.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../../comment/presentation/comment_section.dart';
-import '../../playlist/application/favorite_notifier.dart';
 import '../application/player_notifier.dart';
 import '../domain/models/play_mode.dart';
 import 'widgets/cover_image.dart';
 import 'widgets/draggable_progress_bar.dart';
+import 'widgets/player_favorite_button.dart';
 import 'widgets/volume_button.dart';
 
 /// 底部播放控制栏，在所有主屏幕中显示。
@@ -106,11 +106,6 @@ class PlayerBar extends ConsumerWidget {
         ? playerState.position.inMilliseconds /
             playerState.duration.inMilliseconds
         : 0.0;
-
-    // 收藏状态
-    final favState = ref.watch(favoriteNotifierProvider);
-    final isFavorited =
-        track.songId > 0 && (favState.value?.contains(track.songId) ?? false);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -222,32 +217,11 @@ class PlayerBar extends ConsumerWidget {
                           ),
                       ],
                       // ❤️ 收藏按钮
-                      IconButton(
-                        icon: Icon(
-                          isFavorited ? Icons.favorite : Icons.favorite_border,
-                          size: 20,
-                          color: isFavorited
-                              ? Colors.redAccent
-                              : context.colorScheme.onSurfaceVariant,
-                        ),
-                        tooltip: isFavorited
-                            ? context.l10n.removeFromFavorites
-                            : context.l10n.addToFavorites,
+                      PlayerFavoriteButton(
+                        track: track,
+                        iconSize: 20,
+                        inactiveColor: context.colorScheme.onSurfaceVariant,
                         visualDensity: VisualDensity.compact,
-                        onPressed: () async {
-                          if (track.songId > 0) {
-                            ref
-                                .read(favoriteNotifierProvider.notifier)
-                                .toggleFavorite(track.songId);
-                          } else {
-                            final newId = await ref
-                                .read(favoriteNotifierProvider.notifier)
-                                .favoriteFromTrack(track);
-                            ref
-                                .read(playerNotifierProvider.notifier)
-                                .updateCurrentTrackSongId(newId);
-                          }
-                        },
                       ),
                       // 💬 评论按钮
                       IconButton(
