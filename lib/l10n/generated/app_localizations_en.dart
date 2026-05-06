@@ -144,9 +144,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pending => 'Pending';
 
   @override
-  String get clearCompleted => 'Clear completed';
-
-  @override
   String get themeMode => 'Theme Mode';
 
   @override
@@ -236,7 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activeDownloads => 'Active Downloads';
 
   @override
-  String get completedDownloads => 'Completed';
+  String get localCache => 'Local cache';
 
   @override
   String get confirm => 'Confirm';

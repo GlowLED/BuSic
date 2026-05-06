@@ -144,9 +144,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pending => '等待中';
 
   @override
-  String get clearCompleted => '清除已完成';
-
-  @override
   String get themeMode => '主题模式';
 
   @override
@@ -236,7 +233,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activeDownloads => '正在下载';
 
   @override
-  String get completedDownloads => '已完成';
+  String get localCache => '本地缓存';
 
   @override
   String get confirm => '确定';

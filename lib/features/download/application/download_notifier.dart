@@ -65,8 +65,7 @@ class DownloadNotifier extends _$DownloadNotifier {
           .map((t) => t.id)
           .toSet();
       if (_listenerInitialized) {
-        final newlyCompleted =
-            completedIds.difference(_previousCompletedIds);
+        final newlyCompleted = completedIds.difference(_previousCompletedIds);
         if (newlyCompleted.isNotEmpty) {
           _notifyDownloadChanged();
         }
@@ -126,8 +125,8 @@ class DownloadNotifier extends _$DownloadNotifier {
     }
 
     // Check existing completed download quality via repository
-    final existingQuality =
-        await (_repository as DownloadRepositoryImpl).getSongAudioQuality(songId);
+    final existingQuality = await (_repository as DownloadRepositoryImpl)
+        .getSongAudioQuality(songId);
     if (existingQuality >= quality && existingQuality > 0) {
       AppLogger.info(
           'Song $songId already has quality $existingQuality >= $quality, skipping',
@@ -263,17 +262,12 @@ class DownloadNotifier extends _$DownloadNotifier {
         );
       }
 
-      await _repository.restartDownload(taskId, streamInfo.url, savePath, quality);
+      await _repository.restartDownload(
+          taskId, streamInfo.url, savePath, quality);
       ref.invalidateSelf();
     } catch (e) {
       AppLogger.error('Retry download failed: $e', tag: 'Download');
     }
-  }
-
-  /// Remove completed tasks from the list.
-  Future<void> clearCompleted() async {
-    await _repository.clearCompletedTasks();
-    ref.invalidateSelf();
   }
 
   /// Delete a task (and optionally its downloaded file).

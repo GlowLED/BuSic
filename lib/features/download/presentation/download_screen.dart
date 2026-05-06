@@ -8,7 +8,7 @@ import '../application/download_notifier.dart';
 import '../domain/models/download_task.dart';
 import 'widgets/download_task_tile.dart';
 
-/// Download management screen showing all download tasks.
+/// Cache management screen with download tasks as transient work items.
 class DownloadScreen extends ConsumerWidget {
   const DownloadScreen({super.key});
 
@@ -48,17 +48,14 @@ class DownloadScreen extends ConsumerWidget {
           final downloadingTasks = tasks
               .where((t) => t.status == DownloadStatus.downloading)
               .toList();
-          final pendingTasks = tasks
-              .where((t) => t.status == DownloadStatus.pending)
-              .toList();
-          final completedTasks = tasks
-              .where((t) => t.status == DownloadStatus.completed)
-              .toList();
-          final failedTasks = tasks
-              .where((t) => t.status == DownloadStatus.failed)
-              .toList();
-          final totalCacheSize = completedTasks.fold<int>(
-              0, (sum, t) => sum + t.fileSize);
+          final pendingTasks =
+              tasks.where((t) => t.status == DownloadStatus.pending).toList();
+          final cachedTasks =
+              tasks.where((t) => t.status == DownloadStatus.completed).toList();
+          final failedTasks =
+              tasks.where((t) => t.status == DownloadStatus.failed).toList();
+          final totalCacheSize =
+              cachedTasks.fold<int>(0, (sum, t) => sum + t.fileSize);
 
           return CustomScrollView(
             slivers: [
@@ -143,26 +140,17 @@ class DownloadScreen extends ConsumerWidget {
                 ),
               ],
 
-              // Completed downloads section
-              if (completedTasks.isNotEmpty) ...[
+              // Local cache section
+              if (cachedTasks.isNotEmpty) ...[
                 _SectionHeader(
                   title: totalCacheSize > 0
-                      ? '${l10n.completedDownloads} (${formatBytes(totalCacheSize)})'
-                      : l10n.completedDownloads,
-                  trailing: TextButton.icon(
-                    icon: const Icon(Icons.clear_all, size: 18),
-                    label: Text(l10n.clearCompleted),
-                    onPressed: () {
-                      ref
-                          .read(downloadNotifierProvider.notifier)
-                          .clearCompleted();
-                    },
-                  ),
+                      ? '${l10n.localCache} (${formatBytes(totalCacheSize)})'
+                      : l10n.localCache,
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final task = completedTasks[index];
+                      final task = cachedTasks[index];
                       return DownloadTaskTile(
                         task: task,
                         onDelete: () => ref
@@ -172,7 +160,7 @@ class DownloadScreen extends ConsumerWidget {
                             _showPlaylistPicker(context, ref, task),
                       );
                     },
-                    childCount: completedTasks.length,
+                    childCount: cachedTasks.length,
                   ),
                 ),
               ],
@@ -243,8 +231,7 @@ class _PlaylistPickerDialog extends ConsumerWidget {
                 Expanded(
                   child: Center(
                     child: Text(l10n.noPlaylists,
-                        style:
-                            TextStyle(color: colorScheme.onSurfaceVariant)),
+                        style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   ),
                 )
               else
@@ -261,8 +248,7 @@ class _PlaylistPickerDialog extends ConsumerWidget {
                             ? l10n.myFavorites
                             : playlist.name),
                         subtitle: Text('${playlist.songCount} 首歌曲'),
-                        onTap: () =>
-                            Navigator.of(context).pop(playlist.id),
+                        onTap: () => Navigator.of(context).pop(playlist.id),
                       );
                     },
                   ),

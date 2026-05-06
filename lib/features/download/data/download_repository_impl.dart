@@ -114,8 +114,7 @@ class DownloadRepositoryImpl implements DownloadRepository {
               (startOffset > 0 ? (startOffset * 100 ~/ totalBytes) : 0);
           if (progress - lastDb >= 5) {
             _lastDbProgress[taskId] = progress;
-            (_db.update(_db.downloadTasks)
-                  ..where((t) => t.id.equals(taskId)))
+            (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
                 .write(DownloadTasksCompanion(progress: Value(progress)));
           }
 
@@ -141,8 +140,7 @@ class DownloadRepositoryImpl implements DownloadRepository {
       if (cancelToken.isCancelled) return;
 
       // Mark completed
-      await (_db.update(_db.downloadTasks)
-            ..where((t) => t.id.equals(taskId)))
+      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
           .write(const DownloadTasksCompanion(
         status: Value(2),
         progress: Value(100),
@@ -384,13 +382,6 @@ class DownloadRepositoryImpl implements DownloadRepository {
   }
 
   @override
-  Future<void> clearCompletedTasks() async {
-    await (_db.delete(_db.downloadTasks)..where((t) => t.status.equals(2)))
-        .go();
-    _taskUpdateController.add(null);
-  }
-
-  @override
   Future<void> deleteTask(int taskId, {bool deleteFile = false}) async {
     final row = await (_db.select(_db.downloadTasks)
           ..where((t) => t.id.equals(taskId)))
@@ -417,9 +408,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
       if (row != null) {
         await (_db.update(_db.songs)..where((t) => t.id.equals(row.songId)))
             .write(const SongsCompanion(
-              localPath: Value(null),
-              audioQuality: Value(0),
-            ));
+          localPath: Value(null),
+          audioQuality: Value(0),
+        ));
       }
     }
 

@@ -54,9 +54,6 @@ abstract class DownloadRepository {
   /// Get only active (pending + downloading) tasks.
   Future<List<DownloadTask>> getActiveTasks();
 
-  /// Remove completed tasks from the database.
-  Future<void> clearCompletedTasks();
-
   /// Remove a single task from the database.
   ///
   /// Optionally [deleteFile] to also remove the downloaded file from disk.

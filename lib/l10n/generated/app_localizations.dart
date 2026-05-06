@@ -365,12 +365,6 @@ abstract class AppLocalizations {
   /// **'Pending'**
   String get pending;
 
-  /// No description provided for @clearCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear completed'**
-  String get clearCompleted;
-
   /// No description provided for @themeMode.
   ///
   /// In en, this message translates to:
@@ -545,11 +539,11 @@ abstract class AppLocalizations {
   /// **'Active Downloads'**
   String get activeDownloads;
 
-  /// No description provided for @completedDownloads.
+  /// No description provided for @localCache.
   ///
   /// In en, this message translates to:
-  /// **'Completed'**
-  String get completedDownloads;
+  /// **'Local cache'**
+  String get localCache;
 
   /// No description provided for @confirm.
   ///
