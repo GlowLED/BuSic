@@ -153,12 +153,17 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         .getSingleOrNull();
     final path = song?.localPath;
     if (path == null) return null;
+    if (await _localFileExists(path)) return path;
+    return null;
+  }
+
+  Future<bool> _localFileExists(String path) async {
     try {
-      if (await File(path).exists()) return path;
+      return await File(path).exists();
     } catch (_) {
       // Ignore file-system errors
     }
-    return null;
+    return false;
   }
 
   /// Refresh localPath for all tracks in the current queue from the database.
@@ -194,14 +199,17 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   Future<AudioTrack> _ensurePlayable(AudioTrack track) async {
     // Refresh localPath from DB — the song may have been downloaded
     // after the queue was built or after state was persisted.
-    if (track.localPath == null) {
-      final freshPath = await _getFreshLocalPath(track.songId);
-      if (freshPath != null) {
-        track = track.copyWith(localPath: freshPath);
-      }
+    final freshPath = await _getFreshLocalPath(track.songId);
+    if (freshPath != null) {
+      track = track.copyWith(localPath: freshPath, streamUrl: null);
+    } else if (track.localPath != null &&
+        !await _localFileExists(track.localPath!)) {
+      track = track.copyWith(localPath: null);
     }
 
-    // Resolve stream URL if no local file available
+    // Resolve stream URL if no local file is available. Restored player state
+    // deliberately does not trust persisted Bilibili stream URLs because they
+    // can expire across app launches.
     if (track.streamUrl == null && track.localPath == null) {
       final streamInfo = await _parseRepository.getAudioStream(
         track.bvid,
@@ -501,7 +509,24 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
   /// Seek to a specific position in the current track.
   Future<void> seekTo(Duration position) async {
-    await _repository.seek(position);
+    if (state.currentTrack == null) return;
+
+    final durationMs = state.duration.inMilliseconds;
+    final targetMs = (durationMs > 0
+            ? position.inMilliseconds.clamp(0, durationMs)
+            : max(0, position.inMilliseconds))
+        .toInt();
+    final target = Duration(milliseconds: targetMs);
+
+    state = state.copyWith(position: target);
+    _audioHandler.updatePlaybackState(
+      playing: state.isPlaying,
+      position: target,
+    );
+    await persistState();
+
+    if (!_hasActiveMedia) return;
+    await _repository.seek(target);
   }
 
   /// Set the playback mode (sequential, repeat, shuffle).

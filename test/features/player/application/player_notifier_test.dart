@@ -138,6 +138,163 @@ void main() {
       await tempDir.delete(recursive: true);
     });
 
+    test('resume 会忽略恢复状态中的旧 streamUrl 并重新解析', () async {
+      final track = _track(
+        songId: 11,
+        bvid: 'BVstale01',
+        cid: 1101,
+        title: '过期流地址歌曲',
+        streamUrl: 'https://example.com/stale.m4s',
+      );
+      fakeParseRepository.streamInfo = const AudioStreamInfo(
+        url: 'https://example.com/fresh.m4s',
+        quality: 30280,
+      );
+      await _seedPlayerPreferences(
+        track: track,
+        queue: [track],
+        currentIndex: 0,
+        position: const Duration(seconds: 8),
+        playMode: PlayMode.sequential,
+        volume: 1,
+      );
+
+      container.read(playerNotifierProvider);
+      await _settle();
+
+      final restored = container.read(playerNotifierProvider);
+      expect(restored.currentTrack?.streamUrl, isNull);
+      expect(restored.queue.single.streamUrl, isNull);
+
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.resume();
+      await _settle();
+
+      expect(fakeParseRepository.getAudioStreamCalls, 1);
+      expect(fakePlayerRepository.playedTracks, hasLength(1));
+      expect(
+        fakePlayerRepository.playedTracks.single.streamUrl,
+        'https://example.com/fresh.m4s',
+      );
+      expect(
+        fakePlayerRepository.playedTracks.single.streamUrl,
+        isNot('https://example.com/stale.m4s'),
+      );
+      expect(fakePlayerRepository.seekCalls, [const Duration(seconds: 8)]);
+    });
+
+    test('冷启动未加载媒体时 seekTo 会更新恢复进度并延后到底层 seek', () async {
+      final track = _track(
+        songId: 13,
+        bvid: 'BVcoldseek01',
+        cid: 1301,
+        title: '冷启动拖动进度歌曲',
+      );
+      fakeParseRepository.streamInfo = const AudioStreamInfo(
+        url: 'https://example.com/cold-seek-fresh.m4s',
+        quality: 30280,
+      );
+      await _seedPlayerPreferences(
+        track: track,
+        queue: [track],
+        currentIndex: 0,
+        position: const Duration(seconds: 12),
+        playMode: PlayMode.sequential,
+        volume: 1,
+      );
+
+      container.read(playerNotifierProvider);
+      await _settle();
+
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.seekTo(const Duration(seconds: 65));
+      await _settle();
+
+      var state = container.read(playerNotifierProvider);
+      expect(state.position, const Duration(seconds: 65));
+      expect(fakePlayerRepository.seekCalls, isEmpty);
+      expect(fakeAudioHandler.lastPosition, const Duration(seconds: 65));
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt('player_position_ms'), 65000);
+
+      await notifier.resume();
+      await _settle();
+
+      state = container.read(playerNotifierProvider);
+      expect(fakeParseRepository.getAudioStreamCalls, 1);
+      expect(fakePlayerRepository.playedTracks, hasLength(1));
+      expect(fakePlayerRepository.seekCalls, [const Duration(seconds: 65)]);
+      expect(state.position, const Duration(seconds: 65));
+    });
+
+    test('已加载媒体时 seekTo 会更新状态并调用播放器 seek', () async {
+      final track = _track(
+        songId: 14,
+        title: '已加载歌曲',
+        streamUrl: 'https://example.com/loaded.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+
+      await notifier.playTrack(track, queue: [track]);
+      await _settle();
+
+      await notifier.seekTo(const Duration(seconds: 30));
+      await _settle();
+
+      final state = container.read(playerNotifierProvider);
+      expect(state.position, const Duration(seconds: 30));
+      expect(fakePlayerRepository.seekCalls, [const Duration(seconds: 30)]);
+      expect(fakeAudioHandler.lastPosition, const Duration(seconds: 30));
+    });
+
+    test('resume 会忽略不存在的本地路径并重新解析远端流', () async {
+      final tempDir =
+          await Directory.systemTemp.createTemp('player_missing_local_');
+      final missingPath = '${tempDir.path}/missing_track.m4s';
+      await tempDir.delete(recursive: true);
+
+      final track = _track(
+        songId: 12,
+        bvid: 'BVmissing01',
+        cid: 1201,
+        title: '失效本地路径歌曲',
+        localPath: missingPath,
+        streamUrl: 'https://example.com/stale-local-fallback.m4s',
+      );
+      fakeParseRepository.streamInfo = const AudioStreamInfo(
+        url: 'https://example.com/fresh-after-missing-local.m4s',
+        quality: 30232,
+      );
+      await _seedPlayerPreferences(
+        track: track,
+        queue: [track],
+        currentIndex: 0,
+        position: const Duration(milliseconds: 3500),
+        playMode: PlayMode.sequential,
+        volume: 1,
+      );
+
+      container.read(playerNotifierProvider);
+      await _settle();
+
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.resume();
+      await _settle();
+
+      expect(fakeParseRepository.getAudioStreamCalls, 1);
+      expect(fakePlayerRepository.playedTracks, hasLength(1));
+      expect(fakePlayerRepository.playedTracks.single.localPath, isNull);
+      expect(
+        fakePlayerRepository.playedTracks.single.streamUrl,
+        'https://example.com/fresh-after-missing-local.m4s',
+      );
+      expect(
+        fakePlayerRepository.seekCalls,
+        [const Duration(milliseconds: 3500)],
+      );
+    });
+
     test('下载完成信号会刷新队列中的最新 localPath', () async {
       final tempDir = await Directory.systemTemp.createTemp('player_refresh_');
       final localFile = File('${tempDir.path}/fresh_track.m4s');

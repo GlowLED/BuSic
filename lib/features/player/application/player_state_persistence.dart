@@ -30,10 +30,17 @@ mixin PlayerStatePersistence {
       final prefs = await SharedPreferences.getInstance();
       final track = state.currentTrack;
       if (track != null) {
-        await prefs.setString(_keyCurrentTrack, jsonEncode(track.toJson()));
+        await prefs.setString(
+          _keyCurrentTrack,
+          jsonEncode(_stripTransientPlaybackSource(track).toJson()),
+        );
         await prefs.setString(
           _keyQueue,
-          jsonEncode(state.queue.map((t) => t.toJson()).toList()),
+          jsonEncode(
+            state.queue
+                .map((t) => _stripTransientPlaybackSource(t).toJson())
+                .toList(),
+          ),
         );
         await prefs.setInt(_keyCurrentIndex, state.currentIndex);
         await prefs.setInt(_keyPosition, state.position.inMilliseconds);
@@ -61,16 +68,18 @@ mixin PlayerStatePersistence {
       final trackJson = prefs.getString(_keyCurrentTrack);
       if (trackJson == null) return null;
 
-      final track = AudioTrack.fromJson(
+      final track = _stripTransientPlaybackSource(AudioTrack.fromJson(
         jsonDecode(trackJson) as Map<String, dynamic>,
-      );
+      ));
 
       final queueJson = prefs.getString(_keyQueue);
       List<AudioTrack> queue = [track];
       if (queueJson != null) {
         final queueList = jsonDecode(queueJson) as List;
         queue = queueList
-            .map((e) => AudioTrack.fromJson(e as Map<String, dynamic>))
+            .map((e) => _stripTransientPlaybackSource(
+                  AudioTrack.fromJson(e as Map<String, dynamic>),
+                ))
             .toList();
       }
 
@@ -88,8 +97,8 @@ mixin PlayerStatePersistence {
         position: Duration(milliseconds: positionMs),
         duration: track.duration,
         isPlaying: false,
-        playMode: PlayMode
-            .values[playModeIndex.clamp(0, PlayMode.values.length - 1)],
+        playMode:
+            PlayMode.values[playModeIndex.clamp(0, PlayMode.values.length - 1)],
         volume: volume,
         playlistName: playlistName,
         playlistId: playlistId,
@@ -99,5 +108,9 @@ mixin PlayerStatePersistence {
           tag: 'Player', error: e);
       return null;
     }
+  }
+
+  AudioTrack _stripTransientPlaybackSource(AudioTrack track) {
+    return track.copyWith(streamUrl: null);
   }
 }
