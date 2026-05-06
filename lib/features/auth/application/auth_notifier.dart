@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show StateProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -21,6 +22,14 @@ final authQrPollIntervalProvider = Provider<Duration>((ref) {
   return const Duration(seconds: 2);
 });
 
+enum AuthSessionNotice {
+  sessionInvalid,
+}
+
+final authSessionNoticeProvider = StateProvider<AuthSessionNotice?>((ref) {
+  return null;
+});
+
 /// State notifier managing the authentication lifecycle.
 ///
 /// Provides the current [User] session state and exposes methods
@@ -39,11 +48,16 @@ class AuthNotifier extends _$AuthNotifier {
     });
     // Attempt to load existing session
     final user = await _repository.loadSession();
-    if (user != null) {
-      // Validate session
-      final refreshed = await _repository.refreshSession();
-      return refreshed ?? user;
-    }
+    if (user == null) return null;
+
+    // Validate session. A stored cookie that cannot be confirmed remotely must
+    // not continue to drive the app's logged-in state.
+    final refreshed = await _repository.refreshSession();
+    if (refreshed != null) return refreshed;
+
+    await _repository.clearSession();
+    ref.read(authSessionNoticeProvider.notifier).state =
+        AuthSessionNotice.sessionInvalid;
     return null;
   }
 
@@ -86,7 +100,15 @@ class AuthNotifier extends _$AuthNotifier {
               await _repository.saveSession(user);
               // Refresh to get full user info
               final refreshed = await _repository.refreshSession();
-              state = AsyncData(refreshed ?? user);
+              if (refreshed != null) {
+                state = AsyncData(refreshed);
+              } else {
+                await _repository.clearSession();
+                state = AsyncError(
+                  Exception('登录态验证失败，请重新登录'),
+                  StackTrace.current,
+                );
+              }
             }
             break;
           case 86038: // QR expired
@@ -120,6 +142,14 @@ class AuthNotifier extends _$AuthNotifier {
     state = const AsyncData(null);
   }
 
+  /// Clear a remotely rejected session and expose the app as logged out.
+  Future<void> invalidateSession() async {
+    _pollTimer?.cancel();
+    _currentQrKey = null;
+    await _repository.clearSession();
+    state = const AsyncData(null);
+  }
+
   /// Log in by manually providing cookie values obtained from a browser.
   ///
   /// Saves the session and attempts to refresh user profile info.
@@ -142,6 +172,7 @@ class AuthNotifier extends _$AuthNotifier {
     } else {
       // Cookie might be invalid — clear and throw
       await _repository.clearSession();
+      state = const AsyncData(null);
       throw Exception('Cookie无效或已过期');
     }
   }
@@ -154,6 +185,7 @@ class AuthNotifier extends _$AuthNotifier {
     if (refreshed != null) {
       state = AsyncData(refreshed);
     } else {
+      await _repository.clearSession();
       state = const AsyncData(null);
     }
   }

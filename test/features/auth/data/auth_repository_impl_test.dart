@@ -51,6 +51,7 @@ void main() {
         body: {
           'code': 0,
           'data': {
+            'isLogin': true,
             'uname': '刷新后的昵称',
             'face': 'https://example.com/avatar.png',
           },
@@ -140,9 +141,33 @@ void main() {
       expect(biliAdapter.lastRequest?.headers['Cookie'], isNull);
     });
 
-    test('refreshSession 失败时返回 null，不向外抛异常', () async {
+    test('refreshSession 在 nav 未确认登录时返回 null', () async {
       await repository.saveSession(const User(
         userId: '4',
+        nickname: '失效用户',
+        sessdata: 'bad-sess',
+        biliJct: 'bad-csrf',
+        isLoggedIn: true,
+      ));
+      biliAdapter.register(
+        '/x/web-interface/nav',
+        body: {
+          'code': 0,
+          'data': {
+            'isLogin': false,
+            'uname': '',
+          },
+        },
+      );
+
+      final result = await repository.refreshSession();
+
+      expect(result, isNull);
+    });
+
+    test('refreshSession 失败时返回 null，不向外抛异常', () async {
+      await repository.saveSession(const User(
+        userId: '5',
         nickname: '失效用户',
         sessdata: 'bad-sess',
         biliJct: 'bad-csrf',

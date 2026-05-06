@@ -727,6 +727,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseLoginFirst => 'Please sign in to Bilibili first';
 
   @override
+  String get biliSessionInvalid => 'Bilibili login has expired. Please sign in again.';
+
+  @override
   String biliFavSongCount(int count) {
     return '$count songs';
   }

@@ -321,6 +321,7 @@
   },
   "retry": "重试",
   "pleaseLoginFirst": "请先登录 B 站账号",
+  "biliSessionInvalid": "B 站登录已失效，请重新登录",
   "biliFavSongCount": "{count} 首",
   "@biliFavSongCount": {
     "placeholders": {

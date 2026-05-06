@@ -129,17 +129,21 @@ class AuthRepositoryImpl implements AuthRepository {
         '/x/web-interface/nav',
       );
       final data = response.data;
-      if (data['code'] == 0) {
-        final userData = data['data'];
-        final existing = await loadSession();
-        if (existing != null) {
-          final updated = existing.copyWith(
-            nickname: userData['uname'] as String? ?? existing.nickname,
-            avatarUrl: userData['face'] as String?,
-            isLoggedIn: true,
-          );
-          return updated;
-        }
+      if (data is! Map || data['code'] != 0) return null;
+
+      final userData = data['data'];
+      if (userData is! Map || userData['isLogin'] != true) {
+        return null;
+      }
+
+      final existing = await loadSession();
+      if (existing != null) {
+        final updated = existing.copyWith(
+          nickname: userData['uname'] as String? ?? existing.nickname,
+          avatarUrl: userData['face'] as String?,
+          isLoggedIn: true,
+        );
+        return updated;
       }
       return null;
     } catch (e) {

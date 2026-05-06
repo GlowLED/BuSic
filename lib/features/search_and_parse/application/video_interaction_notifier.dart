@@ -19,6 +19,10 @@ final videoInteractionRepositoryProvider =
 /// Manages Bilibili interaction state for a parsed video detail page.
 @riverpod
 class VideoInteractionNotifier extends _$VideoInteractionNotifier {
+  static const _loginRequiredErrorCode = 'pleaseLoginFirst';
+  static const _sessionInvalidErrorCode = 'biliSessionInvalid';
+  static const Set<int> _sessionInvalidCodes = {-101, -111, -403};
+
   late VideoInteractionRepository _repository;
 
   @override
@@ -44,7 +48,9 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(current.copyWith(lastError: 'pleaseLoginFirst'));
+        state = AsyncData(
+          current.copyWith(lastError: _loginRequiredErrorCode),
+        );
         return false;
       }
 
@@ -72,12 +78,14 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
       );
       return true;
     } catch (error, stackTrace) {
+      final message = _messageFor(error);
       final fallback = rollbackState?.copyWith(
             isBusy: false,
-            lastError: _messageFor(error),
+            lastError: message,
           ) ??
-          VideoInteractionState(lastError: _messageFor(error));
+          VideoInteractionState(lastError: message);
       state = AsyncData(fallback);
+      await _invalidateSessionIfNeeded(error);
       AppLogger.error(
         'Failed to toggle video like',
         tag: 'VideoInteraction',
@@ -102,7 +110,9 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(current.copyWith(lastError: 'pleaseLoginFirst'));
+        state = AsyncData(
+          current.copyWith(lastError: _loginRequiredErrorCode),
+        );
         return false;
       }
 
@@ -124,7 +134,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
       );
       return true;
     } catch (error, stackTrace) {
-      _setOperationError(error, stackTrace, 'Failed to add video coin');
+      await _setOperationError(error, stackTrace, 'Failed to add video coin');
       return false;
     } finally {
       link.close();
@@ -140,7 +150,9 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(current.copyWith(lastError: 'pleaseLoginFirst'));
+        state = AsyncData(
+          current.copyWith(lastError: _loginRequiredErrorCode),
+        );
         return false;
       }
 
@@ -160,7 +172,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
       );
       return true;
     } catch (error, stackTrace) {
-      _setOperationError(
+      await _setOperationError(
         error,
         stackTrace,
         'Failed to add video to favorite folder',
@@ -180,7 +192,9 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(current.copyWith(lastError: 'pleaseLoginFirst'));
+        state = AsyncData(
+          current.copyWith(lastError: _loginRequiredErrorCode),
+        );
         return false;
       }
 
@@ -194,7 +208,11 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
       state = AsyncData(current.copyWith(isBusy: false, lastError: null));
       return true;
     } catch (error, stackTrace) {
-      _setOperationError(error, stackTrace, 'Failed to record video share');
+      await _setOperationError(
+        error,
+        stackTrace,
+        'Failed to record video share',
+      );
       return false;
     } finally {
       link.close();
@@ -212,11 +230,11 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
     return user != null && user.isLoggedIn && user.biliJct.isNotEmpty;
   }
 
-  void _setOperationError(
+  Future<void> _setOperationError(
     Object error,
     StackTrace stackTrace,
     String logMessage,
-  ) {
+  ) async {
     final current = state.valueOrNull;
     state = AsyncData(
       (current ?? const VideoInteractionState()).copyWith(
@@ -224,6 +242,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
         lastError: _messageFor(error),
       ),
     );
+    await _invalidateSessionIfNeeded(error);
     AppLogger.error(
       logMessage,
       tag: 'VideoInteraction',
@@ -233,9 +252,22 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
   }
 
   String _messageFor(Object error) {
+    if (_isSessionInvalid(error)) {
+      return _sessionInvalidErrorCode;
+    }
     if (error is VideoInteractionException) {
       return error.message;
     }
     return error.toString();
+  }
+
+  bool _isSessionInvalid(Object error) {
+    return error is VideoInteractionException &&
+        _sessionInvalidCodes.contains(error.code);
+  }
+
+  Future<void> _invalidateSessionIfNeeded(Object error) async {
+    if (!_isSessionInvalid(error)) return;
+    await ref.read(authNotifierProvider.notifier).invalidateSession();
   }
 }

@@ -105,6 +105,35 @@ void main() {
       expect(state?.lastError, '取消赞失败');
     });
 
+    test('账号异常会清理登录态并暴露会话失效错误', () async {
+      final repository = _FakeVideoInteractionRepository(
+        setLikeError: const VideoInteractionException(-403, '账号异常,操作失败'),
+      );
+      final authRepository = _FakeAuthRepository.loggedIn();
+      final container = _createContainer(
+        authRepository: authRepository,
+        interactionRepository: repository,
+      );
+      addTearDown(container.dispose);
+      final provider = videoInteractionNotifierProvider(_bvid, _aid);
+      final errors = <String>[];
+      final subscription = container.listen<AsyncValue<VideoInteractionState>>(
+        provider,
+        (_, next) {
+          final error = next.valueOrNull?.lastError;
+          if (error != null) errors.add(error);
+        },
+      );
+      addTearDown(subscription.close);
+      await container.read(provider.future);
+
+      final result = await container.read(provider.notifier).toggleLike();
+
+      expect(result, isFalse);
+      expect(errors, contains('biliSessionInvalid'));
+      expect(authRepository.clearSessionCallCount, 1);
+    });
+
     test('投币成功会更新投币数并同步点赞态', () async {
       final repository = _FakeVideoInteractionRepository();
       final container = _createContainer(
@@ -161,8 +190,9 @@ void main() {
       final repository = _FakeVideoInteractionRepository(
         recordShareError: const VideoInteractionException(-101, '账号未登录'),
       );
+      final authRepository = _FakeAuthRepository.loggedIn();
       final container = _createContainer(
-        authRepository: _FakeAuthRepository.loggedIn(),
+        authRepository: authRepository,
         interactionRepository: repository,
       );
       addTearDown(container.dispose);
@@ -176,7 +206,8 @@ void main() {
       final state = container.read(provider).valueOrNull;
       expect(result, isFalse);
       expect(state?.isBusy, isFalse);
-      expect(state?.lastError, '账号未登录');
+      expect(state?.lastError, 'biliSessionInvalid');
+      expect(authRepository.clearSessionCallCount, 1);
       expect(
         repository.recordShareCalls.single,
         (aid: _aid, bvid: _bvid, csrf: _csrf),
@@ -222,9 +253,12 @@ class _FakeAuthRepository implements AuthRepository {
 
   final User? loadSessionResult;
   final List<User?> refreshResults;
+  int clearSessionCallCount = 0;
 
   @override
-  Future<void> clearSession() async {}
+  Future<void> clearSession() async {
+    clearSessionCallCount++;
+  }
 
   @override
   Future<({String qrUrl, String qrKey})> generateQrCode() async {

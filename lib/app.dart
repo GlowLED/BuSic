@@ -6,7 +6,9 @@ import 'l10n/generated/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/app_update/application/update_notifier.dart';
+import 'features/auth/application/auth_notifier.dart';
 import 'features/settings/application/settings_notifier.dart';
+import 'shared/extensions/context_extensions.dart';
 
 /// Root application widget.
 ///
@@ -31,9 +33,7 @@ class _AppState extends ConsumerState<App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_updateCheckDone) {
         _updateCheckDone = true;
-        ref
-            .read(updateNotifierProvider.notifier)
-            .checkForUpdate(silent: true);
+        ref.read(updateNotifierProvider.notifier).checkForUpdate(silent: true);
       }
     });
   }
@@ -65,6 +65,44 @@ class _AppState extends ConsumerState<App> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) {
+        return _StartupAuthProbe(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
+  }
+}
+
+class _StartupAuthProbe extends ConsumerStatefulWidget {
+  const _StartupAuthProbe({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  ConsumerState<_StartupAuthProbe> createState() => _StartupAuthProbeState();
+}
+
+class _StartupAuthProbeState extends ConsumerState<_StartupAuthProbe> {
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(authNotifierProvider);
+    ref.listen<AuthSessionNotice?>(authSessionNoticeProvider, (_, next) {
+      if (next == null) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
+        switch (next) {
+          case AuthSessionNotice.sessionInvalid:
+            context.showSnackBar(context.l10n.biliSessionInvalid);
+        }
+        ref.read(authSessionNoticeProvider.notifier).state = null;
+      });
+    });
+
+    return widget.child;
   }
 }

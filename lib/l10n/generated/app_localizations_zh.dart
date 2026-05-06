@@ -727,6 +727,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseLoginFirst => '请先登录 B 站账号';
 
   @override
+  String get biliSessionInvalid => 'B 站登录已失效，请重新登录';
+
+  @override
   String biliFavSongCount(int count) {
     return '$count 首';
   }

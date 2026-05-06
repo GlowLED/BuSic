@@ -41,6 +41,33 @@ void main() {
       expect(repository.refreshSessionCallCount, 1);
     });
 
+    test('build clears stale local session when refresh fails', () async {
+      final repository = _FakeAuthRepository(
+        loadSessionResult: const User(
+          userId: '1',
+          nickname: 'stale session',
+          sessdata: 'sess',
+          biliJct: 'csrf',
+          isLoggedIn: true,
+        ),
+        refreshResults: [null],
+      );
+      final container = _createContainer(repository);
+      addTearDown(container.dispose);
+      final subscription = _listenAuth(container);
+      addTearDown(subscription.close);
+
+      final user = await container.read(authNotifierProvider.future);
+
+      expect(user, isNull);
+      expect(repository.refreshSessionCallCount, 1);
+      expect(repository.clearSessionCallCount, 1);
+      expect(
+        container.read(authSessionNoticeProvider),
+        AuthSessionNotice.sessionInvalid,
+      );
+    });
+
     test('build 在没有本地会话时返回 null', () async {
       final repository = _FakeAuthRepository(loadSessionResult: null);
       final container = _createContainer(repository);
@@ -52,6 +79,7 @@ void main() {
 
       expect(user, isNull);
       expect(repository.refreshSessionCallCount, 0);
+      expect(container.read(authSessionNoticeProvider), isNull);
     });
 
     test('loginWithCookie 成功时会保存并暴露刷新后的用户', () async {
@@ -278,6 +306,7 @@ void main() {
       await container.read(authNotifierProvider.notifier).checkSession();
 
       expect(container.read(authNotifierProvider).valueOrNull, isNull);
+      expect(repository.clearSessionCallCount, 1);
     });
   });
 }

@@ -1153,6 +1153,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (message.contains('pleaseLoginFirst')) {
       return context.l10n.pleaseLoginFirst;
     }
+    if (message.contains('biliSessionInvalid')) {
+      return context.l10n.biliSessionInvalid;
+    }
     return message;
   }
 

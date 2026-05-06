@@ -323,6 +323,7 @@
   },
   "retry": "Retry",
   "pleaseLoginFirst": "Please sign in to Bilibili first",
+  "biliSessionInvalid": "Bilibili login has expired. Please sign in again.",
   "biliFavSongCount": "{count} songs",
   "@biliFavSongCount": {
     "placeholders": {

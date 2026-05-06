@@ -1463,6 +1463,12 @@ abstract class AppLocalizations {
   /// **'Please sign in to Bilibili first'**
   String get pleaseLoginFirst;
 
+  /// No description provided for @biliSessionInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Bilibili login has expired. Please sign in again.'**
+  String get biliSessionInvalid;
+
   /// No description provided for @biliFavSongCount.
   ///
   /// In en, this message translates to:
