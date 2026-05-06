@@ -9,6 +9,7 @@ import 'features/app_update/application/update_notifier.dart';
 import 'features/auth/application/auth_notifier.dart';
 import 'features/settings/application/settings_notifier.dart';
 import 'shared/extensions/context_extensions.dart';
+import 'shared/widgets/desktop_window_resize_frame.dart';
 
 /// Root application widget.
 ///
@@ -66,8 +67,10 @@ class _AppState extends ConsumerState<App> {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
-        return _StartupAuthProbe(
-          child: child ?? const SizedBox.shrink(),
+        return DesktopWindowResizeFrame(
+          child: _StartupAuthProbe(
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

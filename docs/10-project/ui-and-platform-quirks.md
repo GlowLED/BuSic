@@ -31,6 +31,7 @@
 - 左侧拖拽区显示应用品牌和当前分支标题
 - 右侧窗口控制按钮负责最小化、最大化 / 还原
 - 关闭按钮默认仍是 **hide to tray**
+- Linux 使用 `DesktopWindowResizeFrame` 在应用根部补透明 resize 边缘；隐藏系统标题栏后不能依赖 GNOME / Cinnamon 自动提供窗口边缘调整区域
 
 这意味着“点关闭 = 退出程序”在桌面端并不成立。
 
@@ -84,6 +85,7 @@
 ## 8. 修改这部分时要一起看什么？
 
 - `lib/shared/widgets/responsive_scaffold.dart`
+- `lib/shared/widgets/desktop_window_resize_frame.dart`
 - `lib/core/window/window_service.dart`
 - `lib/core/window/tray_service.dart`
 - `lib/features/minimal/presentation/minimal_screen.dart`
