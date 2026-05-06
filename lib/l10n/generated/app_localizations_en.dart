@@ -189,7 +189,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPlaylists => 'No playlists yet';
 
   @override
-  String get playlistHomeSubtitle => 'Shape your Bilibili finds into a focused listening library.';
+  String get playlistHomeSubtitle =>
+      'Shape your Bilibili finds into a focused listening library.';
 
   @override
   String playlistLibraryCount(int count) {
@@ -200,7 +201,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistSectionTitle => 'Playlist List';
 
   @override
-  String get noPlaylistsHint => 'Create a playlist or import one to start building your library.';
+  String get noPlaylistsHint =>
+      'Create a playlist or import one to start building your library.';
 
   @override
   String get unknownArtist => 'Unknown Artist';
@@ -230,7 +232,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteDownload => 'Delete Download';
 
   @override
-  String get deleteDownloadConfirm => 'Are you sure you want to delete the downloaded file?';
+  String get deleteDownloadConfirm =>
+      'Are you sure you want to delete the downloaded file?';
 
   @override
   String get activeDownloads => 'Active Downloads';
@@ -355,7 +358,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overwriteConfirmTitle => 'Confirm Overwrite';
 
   @override
-  String get overwriteConfirmMessage => 'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
+  String get overwriteConfirmMessage =>
+      'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
 
   @override
   String get exportSuccess => 'Export successful';
@@ -519,7 +523,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importingPlaylist => 'Importing playlist...';
 
   @override
-  String get searchPageSubtitle => 'Search Bilibili or paste a BV link without leaving your music flow.';
+  String get searchPageSubtitle =>
+      'Search Bilibili or paste a BV link without leaving your music flow.';
 
   @override
   String get searchCommandTitle => 'Search or parse';
@@ -534,7 +539,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchEmptyTitle => 'Start with a keyword or BV link';
 
   @override
-  String get searchEmptySubtitle => 'Results, parsed video details, page selection and comments will appear here.';
+  String get searchEmptySubtitle =>
+      'Results, parsed video details, page selection and comments will appear here.';
 
   @override
   String get backToSearchResults => 'Back to search results';
@@ -603,7 +609,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdateTitle => 'Required update';
 
   @override
-  String get forceUpdateMessage => 'This version is no longer supported. Please update to continue using BuSic.';
+  String get forceUpdateMessage =>
+      'This version is no longer supported. Please update to continue using BuSic.';
 
   @override
   String get downloadLatestVersion => 'Download latest version';
@@ -660,7 +667,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryDownload => 'Retry download';
 
   @override
-  String get linuxReadOnlyInstallDir => 'Linux system-installed apps cannot auto-update. Please download the new version manually.';
+  String get linuxReadOnlyInstallDir =>
+      'Linux system-installed apps cannot auto-update. Please download the new version manually.';
 
   @override
   String get openDownloadPage => 'Open download page';
@@ -693,13 +701,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createPlaylistManual => 'Create Custom Playlist';
 
   @override
-  String get createPlaylistManualDesc => 'Enter a name to create an empty playlist';
+  String get createPlaylistManualDesc =>
+      'Enter a name to create an empty playlist';
 
   @override
   String get importFromBiliFav => 'Import from Bilibili Favorites';
 
   @override
-  String get importFromBiliFavDesc => 'Sign in to import from your favorite folders';
+  String get importFromBiliFavDesc =>
+      'Sign in to import from your favorite folders';
 
   @override
   String get selectFavFolder => 'Select Favorite Folder';
@@ -813,7 +823,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get videoNoReprint => 'Reposting without the creator\'s permission is prohibited';
+  String get videoNoReprint =>
+      'Reposting without the creator\'s permission is prohibited';
 
   @override
   String get videoDescriptionEmpty => 'No description';
@@ -848,7 +859,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get videoShare => 'Share';
 
   @override
-  String get videoCoinsAlreadyMaxed => 'You have already given the maximum coins';
+  String get videoCoinsAlreadyMaxed =>
+      'You have already given the maximum coins';
 
   @override
   String videoCoinAdded(int count) {
@@ -906,7 +918,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorScheme => 'Color Scheme';
 
   @override
-  String get settingsPageSubtitle => 'Tune playback, account, storage and maintenance controls.';
+  String get settingsPageSubtitle =>
+      'Tune playback, account, storage and maintenance controls.';
 
   @override
   String get appearanceSettings => 'Appearance';
