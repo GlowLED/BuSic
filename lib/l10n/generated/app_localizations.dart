@@ -161,6 +161,132 @@ abstract class AppLocalizations {
   /// **'Login failed'**
   String get loginFailed;
 
+  /// No description provided for @qrLoginTab.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Login'**
+  String get qrLoginTab;
+
+  /// No description provided for @webLoginTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Web Login'**
+  String get webLoginTab;
+
+  /// No description provided for @cookieLoginTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie Login'**
+  String get cookieLoginTab;
+
+  /// No description provided for @qrScannedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned. Confirm on your phone'**
+  String get qrScannedConfirm;
+
+  /// No description provided for @qrExpiredRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code expired. Refresh to try again'**
+  String get qrExpiredRefresh;
+
+  /// No description provided for @webLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bilibili Web Login'**
+  String get webLoginTitle;
+
+  /// No description provided for @webLoginDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.'**
+  String get webLoginDesc;
+
+  /// No description provided for @webLoginChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking login...'**
+  String get webLoginChecking;
+
+  /// No description provided for @webLoginCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'I have logged in'**
+  String get webLoginCompleted;
+
+  /// No description provided for @webLoginCookieMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Login cookies were not found yet'**
+  String get webLoginCookieMissing;
+
+  /// No description provided for @webLoginUnsupportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Web login is unavailable on this platform'**
+  String get webLoginUnsupportedTitle;
+
+  /// No description provided for @webLoginUnsupportedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use QR login or manual Cookie login on this device.'**
+  String get webLoginUnsupportedDesc;
+
+  /// No description provided for @webLoginFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Web login failed: {error}'**
+  String webLoginFailedWithError(String error);
+
+  /// No description provided for @cookieLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie Login'**
+  String get cookieLoginTitle;
+
+  /// No description provided for @cookieLoginDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the Bilibili cookies from your browser. Find them on bilibili.com in DevTools > Application > Cookies.'**
+  String get cookieLoginDesc;
+
+  /// No description provided for @cookieRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in all Cookie fields'**
+  String get cookieRequired;
+
+  /// No description provided for @cookieSessdataHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste SESSDATA value'**
+  String get cookieSessdataHint;
+
+  /// No description provided for @cookieBiliJctHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste bili_jct value'**
+  String get cookieBiliJctHint;
+
+  /// No description provided for @cookieDedeUserIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste DedeUserID value'**
+  String get cookieDedeUserIdHint;
+
+  /// No description provided for @cookieLoginFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookie login failed: {error}'**
+  String cookieLoginFailedWithError(String error);
+
+  /// No description provided for @loggingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging in...'**
+  String get loggingIn;
+
   /// No description provided for @play.
   ///
   /// In en, this message translates to:

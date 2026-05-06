@@ -21,6 +21,13 @@ abstract class AuthRepository {
   /// Save the authenticated user session to local database.
   Future<void> saveSession(User user);
 
+  /// Validate raw Bilibili cookies, save the session, and return profile data.
+  Future<User?> loginWithCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  });
+
   /// Load a previously saved session from local database.
   ///
   /// Returns `null` if no session exists or it has expired.

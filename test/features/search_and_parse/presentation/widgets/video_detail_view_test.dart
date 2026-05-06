@@ -391,6 +391,16 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<User?> loginWithCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  }) async {
+    if (refreshResults.isEmpty) return null;
+    return refreshResults.removeAt(0);
+  }
+
+  @override
   Future<void> saveSession(User user) async {}
 }
 

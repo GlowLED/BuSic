@@ -86,22 +86,16 @@ class AuthNotifier extends _$AuthNotifier {
           case 0: // Success
             timer.cancel();
             _currentQrKey = null;
-            // Parse cookies from the redirect URL
             if (result.url != null) {
               final uri = Uri.parse(result.url!);
               final params = uri.queryParameters;
-              final user = User(
-                userId: params['DedeUserID'] ?? '',
-                nickname: '用户',
+              final user = await _repository.loginWithCookies(
                 sessdata: params['SESSDATA'] ?? '',
                 biliJct: params['bili_jct'] ?? '',
-                isLoggedIn: true,
+                dedeUserId: params['DedeUserID'],
               );
-              await _repository.saveSession(user);
-              // Refresh to get full user info
-              final refreshed = await _repository.refreshSession();
-              if (refreshed != null) {
-                state = AsyncData(refreshed);
+              if (user != null) {
+                state = AsyncData(user);
               } else {
                 await _repository.clearSession();
                 state = AsyncError(
@@ -158,22 +152,38 @@ class AuthNotifier extends _$AuthNotifier {
     required String biliJct,
     required String dedeUserId,
   }) async {
-    final user = User(
-      userId: dedeUserId,
-      nickname: '用户',
+    final user = await _repository.loginWithCookies(
       sessdata: sessdata,
       biliJct: biliJct,
-      isLoggedIn: true,
+      dedeUserId: dedeUserId,
     );
-    await _repository.saveSession(user);
-    final refreshed = await _repository.refreshSession();
-    if (refreshed != null) {
-      state = AsyncData(refreshed);
+    if (user != null) {
+      state = AsyncData(user);
     } else {
       // Cookie might be invalid — clear and throw
       await _repository.clearSession();
       state = const AsyncData(null);
       throw Exception('Cookie无效或已过期');
+    }
+  }
+
+  /// Log in by cookies captured from the app-managed web login view.
+  Future<void> loginWithWebCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  }) async {
+    final user = await _repository.loginWithCookies(
+      sessdata: sessdata,
+      biliJct: biliJct,
+      dedeUserId: dedeUserId,
+    );
+    if (user != null) {
+      state = AsyncData(user);
+    } else {
+      await _repository.clearSession();
+      state = const AsyncData(null);
+      throw Exception('网页登录态无效或已过期');
     }
   }
 

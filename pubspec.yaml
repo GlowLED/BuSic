@@ -4,8 +4,8 @@ publish_to: 'none'
 version: 0.3.8+14
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
-  flutter: '>=3.16.0'
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.29.0'
 
 dependencies:
   flutter:
@@ -51,6 +51,9 @@ dependencies:
 
   # URL Launcher
   url_launcher: ^6.2.5
+
+  # Web Login
+  flutter_inappwebview: ^6.1.5
 
   # Utilities
   crypto: ^3.0.3

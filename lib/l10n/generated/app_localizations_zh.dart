@@ -42,6 +42,73 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginFailed => '登录失败';
 
   @override
+  String get qrLoginTab => '扫码登录';
+
+  @override
+  String get webLoginTab => '网页登录';
+
+  @override
+  String get cookieLoginTab => 'Cookie登录';
+
+  @override
+  String get qrScannedConfirm => '已扫码，请在手机上确认';
+
+  @override
+  String get qrExpiredRefresh => '二维码已过期，请刷新';
+
+  @override
+  String get webLoginTitle => 'B 站网页登录';
+
+  @override
+  String get webLoginDesc => '在下方 B 站页面完成登录。BuSic 只会读取这个内置窗口中的 Cookie。';
+
+  @override
+  String get webLoginChecking => '正在验证登录...';
+
+  @override
+  String get webLoginCompleted => '我已完成登录';
+
+  @override
+  String get webLoginCookieMissing => '还没有读取到登录 Cookie';
+
+  @override
+  String get webLoginUnsupportedTitle => '当前平台暂不支持网页登录';
+
+  @override
+  String get webLoginUnsupportedDesc => '请在此设备上使用扫码登录或手动 Cookie 登录。';
+
+  @override
+  String webLoginFailedWithError(String error) {
+    return '网页登录失败: $error';
+  }
+
+  @override
+  String get cookieLoginTitle => 'Cookie登录';
+
+  @override
+  String get cookieLoginDesc => '从浏览器中获取 B 站 Cookie 后填入以下字段。在 bilibili.com 按 F12 → 应用 → Cookie → 找到对应值。';
+
+  @override
+  String get cookieRequired => '请填写所有 Cookie 字段';
+
+  @override
+  String get cookieSessdataHint => '粘贴 SESSDATA 值';
+
+  @override
+  String get cookieBiliJctHint => '粘贴 bili_jct 值';
+
+  @override
+  String get cookieDedeUserIdHint => '粘贴 DedeUserID 值';
+
+  @override
+  String cookieLoginFailedWithError(String error) {
+    return 'Cookie登录失败: $error';
+  }
+
+  @override
+  String get loggingIn => '登录中...';
+
+  @override
   String get play => '播放';
 
   @override

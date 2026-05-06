@@ -6,7 +6,7 @@ part of 'download_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$downloadNotifierHash() => r'a1ff35b15e0c855a4eb965ed9083562ebd757469';
+String _$downloadNotifierHash() => r'3d6f973f546084cb4b414daa607aa424b34fbe4e';
 
 /// State notifier managing the download task queue and status.
 ///

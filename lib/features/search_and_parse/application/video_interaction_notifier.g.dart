@@ -7,7 +7,7 @@ part of 'video_interaction_notifier.dart';
 // **************************************************************************
 
 String _$videoInteractionNotifierHash() =>
-    r'd37fb462c925fb342a67bd7f2e4bb6c3ae945783';
+    r'6c61a6bd33838458c64f55de0c78897ebcbfc578';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -42,6 +42,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Login failed';
 
   @override
+  String get qrLoginTab => 'QR Login';
+
+  @override
+  String get webLoginTab => 'Web Login';
+
+  @override
+  String get cookieLoginTab => 'Cookie Login';
+
+  @override
+  String get qrScannedConfirm => 'Scanned. Confirm on your phone';
+
+  @override
+  String get qrExpiredRefresh => 'QR code expired. Refresh to try again';
+
+  @override
+  String get webLoginTitle => 'Bilibili Web Login';
+
+  @override
+  String get webLoginDesc => 'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.';
+
+  @override
+  String get webLoginChecking => 'Checking login...';
+
+  @override
+  String get webLoginCompleted => 'I have logged in';
+
+  @override
+  String get webLoginCookieMissing => 'Login cookies were not found yet';
+
+  @override
+  String get webLoginUnsupportedTitle => 'Web login is unavailable on this platform';
+
+  @override
+  String get webLoginUnsupportedDesc => 'Use QR login or manual Cookie login on this device.';
+
+  @override
+  String webLoginFailedWithError(String error) {
+    return 'Web login failed: $error';
+  }
+
+  @override
+  String get cookieLoginTitle => 'Cookie Login';
+
+  @override
+  String get cookieLoginDesc => 'Paste the Bilibili cookies from your browser. Find them on bilibili.com in DevTools > Application > Cookies.';
+
+  @override
+  String get cookieRequired => 'Fill in all Cookie fields';
+
+  @override
+  String get cookieSessdataHint => 'Paste SESSDATA value';
+
+  @override
+  String get cookieBiliJctHint => 'Paste bili_jct value';
+
+  @override
+  String get cookieDedeUserIdHint => 'Paste DedeUserID value';
+
+  @override
+  String cookieLoginFailedWithError(String error) {
+    return 'Cookie login failed: $error';
+  }
+
+  @override
+  String get loggingIn => 'Logging in...';
+
+  @override
   String get play => 'Play';
 
   @override

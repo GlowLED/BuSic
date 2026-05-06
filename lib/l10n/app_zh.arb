@@ -11,6 +11,37 @@
   "scanToLogin": "使用哔哩哔哩App扫码登录",
   "loginSuccess": "登录成功",
   "loginFailed": "登录失败",
+  "qrLoginTab": "扫码登录",
+  "webLoginTab": "网页登录",
+  "cookieLoginTab": "Cookie登录",
+  "qrScannedConfirm": "已扫码，请在手机上确认",
+  "qrExpiredRefresh": "二维码已过期，请刷新",
+  "webLoginTitle": "B 站网页登录",
+  "webLoginDesc": "在下方 B 站页面完成登录。BuSic 只会读取这个内置窗口中的 Cookie。",
+  "webLoginChecking": "正在验证登录...",
+  "webLoginCompleted": "我已完成登录",
+  "webLoginCookieMissing": "还没有读取到登录 Cookie",
+  "webLoginUnsupportedTitle": "当前平台暂不支持网页登录",
+  "webLoginUnsupportedDesc": "请在此设备上使用扫码登录或手动 Cookie 登录。",
+  "webLoginFailedWithError": "网页登录失败: {error}",
+  "@webLoginFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "cookieLoginTitle": "Cookie登录",
+  "cookieLoginDesc": "从浏览器中获取 B 站 Cookie 后填入以下字段。在 bilibili.com 按 F12 → 应用 → Cookie → 找到对应值。",
+  "cookieRequired": "请填写所有 Cookie 字段",
+  "cookieSessdataHint": "粘贴 SESSDATA 值",
+  "cookieBiliJctHint": "粘贴 bili_jct 值",
+  "cookieDedeUserIdHint": "粘贴 DedeUserID 值",
+  "cookieLoginFailedWithError": "Cookie登录失败: {error}",
+  "@cookieLoginFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "loggingIn": "登录中...",
   "play": "播放",
   "pause": "暂停",
   "next": "下一曲",

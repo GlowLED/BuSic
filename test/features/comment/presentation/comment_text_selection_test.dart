@@ -155,6 +155,15 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<User?> loginWithCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  }) async {
+    return _user;
+  }
+
+  @override
   Future<void> saveSession(User user) async {}
 }
 

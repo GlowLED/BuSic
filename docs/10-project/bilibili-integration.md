@@ -25,6 +25,16 @@ Cookie: key1=value1; key2=value2; ...
 
 - `documents/busic/cookies.json`
 
+### 登录入口
+
+当前登录统一落到 `AuthRepository.loginWithCookies` 校验与保存，UI 提供三种入口：
+
+- 二维码登录：通过 passport 二维码接口拿到回调 URL，再解析 `SESSDATA` / `bili_jct` / `DedeUserID`。
+- Web 登录：在 BuSic 管理的内置 WebView 中打开 Bilibili 登录页，用户完成网页登录后读取该 WebView cookie store 中的 Bilibili cookies。
+- 手动 Cookie 登录：用户自行从浏览器开发者工具复制 `SESSDATA` / `bili_jct` / `DedeUserID`。
+
+Web 登录不读取系统浏览器或用户默认浏览器的 Cookie。它只读取 BuSic 创建的 WebView 会话，因此比“扫描用户浏览器配置目录”更可控，也避免跨浏览器、跨平台和权限问题。首版支持 Android / iOS / macOS / Windows；Linux 页面显示不支持提示，并保留二维码与手动 Cookie 登录。
+
 ## 2. 登录态会影响什么
 
 登录不仅影响“是否显示已登录头像”，还直接影响：

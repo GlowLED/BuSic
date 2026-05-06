@@ -85,7 +85,7 @@ void main() {
     test('loginWithCookie 成功时会保存并暴露刷新后的用户', () async {
       final repository = _FakeAuthRepository(
         loadSessionResult: null,
-        refreshResults: [
+        loginCookieResults: [
           const User(
             userId: '42',
             nickname: '刷新成功',
@@ -118,7 +118,7 @@ void main() {
     test('loginWithCookie 失败时会清理会话并抛错', () async {
       final repository = _FakeAuthRepository(
         loadSessionResult: null,
-        refreshResults: [null],
+        loginCookieResults: [null],
       );
       final container = _createContainer(repository);
       addTearDown(container.dispose);
@@ -136,6 +136,39 @@ void main() {
         throwsException,
       );
       expect(repository.clearSessionCallCount, 1);
+    });
+
+    test('loginWithWebCookies 成功时会更新用户状态', () async {
+      final repository = _FakeAuthRepository(
+        loadSessionResult: null,
+        loginCookieResults: [
+          const User(
+            userId: '88',
+            nickname: '网页登录成功',
+            sessdata: 'web-sess',
+            biliJct: 'web-csrf',
+            isLoggedIn: true,
+          ),
+        ],
+      );
+      final container = _createContainer(repository);
+      addTearDown(container.dispose);
+      final subscription = _listenAuth(container);
+      addTearDown(subscription.close);
+
+      await container.read(authNotifierProvider.future);
+      await container.read(authNotifierProvider.notifier).loginWithWebCookies(
+            sessdata: 'web-sess',
+            biliJct: 'web-csrf',
+            dedeUserId: '88',
+          );
+
+      expect(repository.loginCookieCalls, hasLength(1));
+      expect(repository.loginCookieCalls.single.dedeUserId, '88');
+      expect(
+        container.read(authNotifierProvider).valueOrNull?.nickname,
+        '网页登录成功',
+      );
     });
 
     test('login 轮询到 86090 和 86038 时会触发扫码与过期回调', () async {
@@ -178,7 +211,7 @@ void main() {
                 'https://passport.example.com/callback?DedeUserID=99&SESSDATA=saved-sess&bili_jct=saved-csrf',
           ),
         ],
-        refreshResults: [
+        loginCookieResults: [
           const User(
             userId: '99',
             nickname: '扫码登录成功',
@@ -337,16 +370,25 @@ class _FakeAuthRepository implements AuthRepository {
     required this.loadSessionResult,
     this.refreshResults = const [],
     this.pollResults = const [],
+    this.loginCookieResults = const [],
   });
 
   final User? loadSessionResult;
   final List<User?> refreshResults;
   final List<QrPollResult> pollResults;
+  final List<User?> loginCookieResults;
 
   int loadSessionCallCount = 0;
   int refreshSessionCallCount = 0;
   int clearSessionCallCount = 0;
   final List<User> savedSessions = [];
+  final List<
+      ({
+        String sessdata,
+        String biliJct,
+        String? dedeUserId,
+      })> loginCookieCalls = [];
+  late final List<User?> _loginCookieResults = List.of(loginCookieResults);
 
   @override
   Future<void> clearSession() async {
@@ -380,6 +422,29 @@ class _FakeAuthRepository implements AuthRepository {
     refreshSessionCallCount++;
     if (refreshResults.isEmpty) return null;
     return refreshResults.removeAt(0);
+  }
+
+  @override
+  Future<User?> loginWithCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  }) async {
+    loginCookieCalls.add((
+      sessdata: sessdata,
+      biliJct: biliJct,
+      dedeUserId: dedeUserId,
+    ));
+    final user = User(
+      userId: dedeUserId ?? '',
+      nickname: '用户',
+      sessdata: sessdata,
+      biliJct: biliJct,
+      isLoggedIn: true,
+    );
+    savedSessions.add(user);
+    if (_loginCookieResults.isEmpty) return null;
+    return _loginCookieResults.removeAt(0);
   }
 
   @override

@@ -180,6 +180,76 @@ void main() {
       expect(result, isNull);
     });
 
+    test('loginWithCookies 会校验 nav 并保存解析出的用户会话', () async {
+      biliAdapter
+        ..register(
+          '/x/web-interface/nav',
+          body: {
+            'code': 0,
+            'data': {
+              'isLogin': true,
+              'mid': 2233,
+              'uname': '网页登录用户',
+              'face': 'https://example.com/web-avatar.png',
+            },
+          },
+        )
+        ..register('/probe', body: {'ok': true});
+
+      final user = await repository.loginWithCookies(
+        sessdata: 'web-sess',
+        biliJct: 'web-csrf',
+      );
+      await biliDio.get('/probe');
+
+      final sessions = await db.select(db.userSessions).get();
+      expect(user?.userId, '2233');
+      expect(user?.nickname, '网页登录用户');
+      expect(user?.avatarUrl, 'https://example.com/web-avatar.png');
+      expect(sessions, hasLength(1));
+      expect(sessions.single.dedeUserId, '2233');
+      expect(sessions.single.sessdata, 'web-sess');
+      expect(
+        biliAdapter.lastRequest?.headers['Cookie'],
+        contains('SESSDATA=web-sess'),
+      );
+      expect(
+        biliAdapter.lastRequest?.headers['Cookie'],
+        contains('bili_jct=web-csrf'),
+      );
+      expect(
+        biliAdapter.lastRequest?.headers['Cookie'],
+        contains('DedeUserID=2233'),
+      );
+    });
+
+    test('loginWithCookies 在 nav 未登录时拒绝并清理临时 cookies', () async {
+      biliAdapter
+        ..register(
+          '/x/web-interface/nav',
+          body: {
+            'code': 0,
+            'data': {
+              'isLogin': false,
+              'mid': 404,
+            },
+          },
+        )
+        ..register('/probe', body: {'ok': true});
+
+      final user = await repository.loginWithCookies(
+        sessdata: 'bad-web-sess',
+        biliJct: 'bad-web-csrf',
+        dedeUserId: '404',
+      );
+      await biliDio.get('/probe');
+
+      final sessions = await db.select(db.userSessions).get();
+      expect(user, isNull);
+      expect(sessions, isEmpty);
+      expect(biliAdapter.lastRequest?.headers['Cookie'], isNull);
+    });
+
     test('generateQrCode 和 pollQrStatus 能解析 passport 响应', () async {
       authAdapter.register(
         'qrcode/generate',

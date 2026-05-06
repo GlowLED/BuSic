@@ -69,6 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> saveSession(User user) async {
+    await _db.delete(_db.userSessions).go();
     await _db.into(_db.userSessions).insert(
           UserSessionsCompanion.insert(
             sessdata: user.sessdata,
@@ -85,6 +86,62 @@ class AuthRepositoryImpl implements AuthRepository {
       'bili_jct': user.biliJct,
       'DedeUserID': user.userId,
     });
+  }
+
+  @override
+  Future<User?> loginWithCookies({
+    required String sessdata,
+    required String biliJct,
+    String? dedeUserId,
+  }) async {
+    Future<User?> rejectCookies() async {
+      await _biliDio.clearCookies();
+      return null;
+    }
+
+    if (sessdata.trim().isEmpty || biliJct.trim().isEmpty) {
+      return rejectCookies();
+    }
+
+    try {
+      await _biliDio.setSessionCookies({
+        'SESSDATA': sessdata,
+        'bili_jct': biliJct,
+        if (dedeUserId != null && dedeUserId.isNotEmpty)
+          'DedeUserID': dedeUserId,
+      });
+
+      final response = await _biliDio.get('/x/web-interface/nav');
+      final data = response.data;
+      if (data is! Map || data['code'] != 0) {
+        return rejectCookies();
+      }
+
+      final userData = data['data'];
+      if (userData is! Map || userData['isLogin'] != true) {
+        return rejectCookies();
+      }
+
+      final resolvedUserId =
+          dedeUserId?.isNotEmpty == true ? dedeUserId! : '${userData['mid']}';
+      if (resolvedUserId.isEmpty || resolvedUserId == 'null') {
+        return rejectCookies();
+      }
+
+      final user = User(
+        userId: resolvedUserId,
+        nickname: userData['uname'] as String? ?? '用户',
+        avatarUrl: userData['face'] as String?,
+        sessdata: sessdata,
+        biliJct: biliJct,
+        isLoggedIn: true,
+      );
+      await saveSession(user);
+      return user;
+    } catch (e) {
+      AppLogger.error('Cookie login validation failed', tag: 'Auth', error: e);
+      return rejectCookies();
+    }
   }
 
   @override

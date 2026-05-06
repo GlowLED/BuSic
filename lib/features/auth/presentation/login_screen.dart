@@ -5,6 +5,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../application/auth_notifier.dart';
+import '../application/web_login_providers.dart';
+import '../domain/models/bili_login_cookies.dart';
+import 'widgets/bili_web_login_view.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../../../shared/extensions/context_extensions.dart';
 
@@ -31,11 +34,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   final _biliJctController = TextEditingController();
   final _dedeUserIdController = TextEditingController();
   bool _isCookieLogging = false;
+  bool _isWebLogging = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -67,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         onScanned: () {
           if (mounted) {
             setState(() {
-              _statusText = '已扫码，请在手机上确认';
+              _statusText = context.l10n.qrScannedConfirm;
             });
           }
         },
@@ -75,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           if (mounted) {
             setState(() {
               _isExpired = true;
-              _statusText = '二维码已过期，请刷新';
+              _statusText = context.l10n.qrExpiredRefresh;
             });
           }
         },
@@ -99,7 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     if (sessdata.isEmpty || biliJct.isEmpty || dedeUserId.isEmpty) {
       if (mounted) {
-        context.showSnackBar('请填写所有Cookie字段');
+        context.showSnackBar(context.l10n.cookieRequired);
       }
       return;
     }
@@ -113,10 +117,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           );
     } catch (e) {
       if (mounted) {
-        context.showSnackBar('Cookie登录失败: $e');
+        context.showSnackBar(context.l10n.cookieLoginFailedWithError('$e'));
       }
     } finally {
       if (mounted) setState(() => _isCookieLogging = false);
+    }
+  }
+
+  Future<void> _loginWithWebCookies(BiliLoginCookies cookies) async {
+    if (_isWebLogging) return;
+
+    final cookieStore = ref.read(biliWebLoginCookieStoreProvider);
+    setState(() => _isWebLogging = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).loginWithWebCookies(
+            sessdata: cookies.sessdata,
+            biliJct: cookies.biliJct,
+            dedeUserId: cookies.dedeUserId,
+          );
+    } catch (e) {
+      if (mounted) {
+        context.showSnackBar(context.l10n.webLoginFailedWithError('$e'));
+      }
+    } finally {
+      await cookieStore.clearBiliCookies();
+      if (mounted) setState(() => _isWebLogging = false);
     }
   }
 
@@ -180,18 +205,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: '扫码登录'),
-            Tab(text: 'Cookie登录'),
+          tabs: [
+            Tab(text: context.l10n.qrLoginTab),
+            Tab(text: context.l10n.webLoginTab),
+            Tab(text: context.l10n.cookieLoginTab),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // ── QR Code Tab ──
           _buildQrCodeTab(colorScheme),
-          // ── Cookie Tab ──
+          _buildWebLoginTab(colorScheme),
           _buildCookieTab(colorScheme),
         ],
       ),
@@ -208,52 +233,136 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             padding: const EdgeInsets.all(40),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.music_note, size: 48, color: colorScheme.primary),
-              const SizedBox(height: 16),
-              Text('BuSic', style: context.textTheme.headlineMedium?.copyWith(
-                color: colorScheme.primary, fontWeight: FontWeight.bold,
-              )),
-              const SizedBox(height: 32),
-              if (_isLoading)
-                const SizedBox(
-                  width: 200, height: 200,
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else if (_qrUrl != null && !_isExpired)
-                QrImageView(
-                  data: _qrUrl!,
-                  version: QrVersions.auto,
-                  size: 200,
-                  backgroundColor: Colors.white,
-                )
-              else
-                SizedBox(
-                  width: 200, height: 200,
+              children: [
+                Icon(Icons.music_note, size: 48, color: colorScheme.primary),
+                const SizedBox(height: 16),
+                Text(
+                  context.l10n.appTitle,
+                  style: context.textTheme.headlineMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                if (_isLoading)
+                  const SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (_qrUrl != null && !_isExpired)
+                  QrImageView(
+                    data: _qrUrl!,
+                    version: QrVersions.auto,
+                    size: 200,
+                    backgroundColor: Colors.white,
+                  )
+                else
+                  SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.refresh,
+                            size: 48,
+                            color: colorScheme.error,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(context.l10n.loginFailed),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 24),
+                Text(_statusText, style: context.textTheme.bodyLarge),
+                const SizedBox(height: 16),
+                if (_isExpired || (!_isLoading && _qrUrl == null))
+                  FilledButton.icon(
+                    onPressed: _generateQrCode,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(context.l10n.reset),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebLoginTab(ColorScheme colorScheme) {
+    final isSupported = ref.watch(webLoginSupportedProvider);
+    if (!isSupported) {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Card(
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.public_off_outlined,
+                  size: 48,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  context.l10n.webLoginUnsupportedTitle,
+                  style: context.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.webLoginUnsupportedDesc,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final cookieStore = ref.watch(biliWebLoginCookieStoreProvider);
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        elevation: 4,
+        child: Stack(
+          children: [
+            BiliWebLoginView(
+              cookieStore: cookieStore,
+              onCookiesCaptured: _loginWithWebCookies,
+              onCookieMissing: () {
+                context.showSnackBar(context.l10n.webLoginCookieMissing);
+              },
+            ),
+            if (_isWebLogging)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: colorScheme.surface.withValues(alpha: 0.72),
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.refresh, size: 48, color: colorScheme.error),
-                        const SizedBox(height: 8),
-                        Text(context.l10n.loginFailed),
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(context.l10n.webLoginChecking),
                       ],
                     ),
                   ),
                 ),
-              const SizedBox(height: 24),
-              Text(_statusText, style: context.textTheme.bodyLarge),
-              const SizedBox(height: 16),
-              if (_isExpired || (!_isLoading && _qrUrl == null))
-                FilledButton.icon(
-                  onPressed: _generateQrCode,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(context.l10n.reset),
-                ),
-            ],
-          ),
+              ),
+          ],
         ),
-      ),
       ),
     );
   }
@@ -270,13 +379,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Cookie登录',
+                context.l10n.cookieLoginTitle,
                 style: context.textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                '从浏览器中获取B站Cookie后填入以下字段。\n'
-                '在 bilibili.com 按 F12 → 应用 → Cookie → 找到对应值。',
+                context.l10n.cookieLoginDesc,
                 style: context.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -284,31 +392,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               const SizedBox(height: 24),
               TextField(
                 controller: _sessdataController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'SESSDATA',
-                  hintText: '粘贴 SESSDATA 值',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.cookie_outlined),
+                  hintText: context.l10n.cookieSessdataHint,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.cookie_outlined),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _biliJctController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'bili_jct',
-                  hintText: '粘贴 bili_jct 值',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.cookie_outlined),
+                  hintText: context.l10n.cookieBiliJctHint,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.cookie_outlined),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _dedeUserIdController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'DedeUserID',
-                  hintText: '粘贴 DedeUserID 值',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person_outlined),
+                  hintText: context.l10n.cookieDedeUserIdHint,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.person_outlined),
                 ),
               ),
               const SizedBox(height: 24),
@@ -324,7 +432,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               strokeWidth: 2, color: Colors.white),
                         )
                       : const Icon(Icons.login),
-                  label: Text(_isCookieLogging ? '登录中...' : '登录'),
+                  label: Text(
+                    _isCookieLogging
+                        ? context.l10n.loggingIn
+                        : context.l10n.login,
+                  ),
                 ),
               ),
             ],

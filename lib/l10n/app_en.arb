@@ -12,6 +12,37 @@
   "scanToLogin": "Scan QR code with Bilibili app to login",
   "loginSuccess": "Login successful",
   "loginFailed": "Login failed",
+  "qrLoginTab": "QR Login",
+  "webLoginTab": "Web Login",
+  "cookieLoginTab": "Cookie Login",
+  "qrScannedConfirm": "Scanned. Confirm on your phone",
+  "qrExpiredRefresh": "QR code expired. Refresh to try again",
+  "webLoginTitle": "Bilibili Web Login",
+  "webLoginDesc": "Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.",
+  "webLoginChecking": "Checking login...",
+  "webLoginCompleted": "I have logged in",
+  "webLoginCookieMissing": "Login cookies were not found yet",
+  "webLoginUnsupportedTitle": "Web login is unavailable on this platform",
+  "webLoginUnsupportedDesc": "Use QR login or manual Cookie login on this device.",
+  "webLoginFailedWithError": "Web login failed: {error}",
+  "@webLoginFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "cookieLoginTitle": "Cookie Login",
+  "cookieLoginDesc": "Paste the Bilibili cookies from your browser. Find them on bilibili.com in DevTools > Application > Cookies.",
+  "cookieRequired": "Fill in all Cookie fields",
+  "cookieSessdataHint": "Paste SESSDATA value",
+  "cookieBiliJctHint": "Paste bili_jct value",
+  "cookieDedeUserIdHint": "Paste DedeUserID value",
+  "cookieLoginFailedWithError": "Cookie login failed: {error}",
+  "@cookieLoginFailedWithError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "loggingIn": "Logging in...",
   "play": "Play",
   "pause": "Pause",
   "next": "Next",
