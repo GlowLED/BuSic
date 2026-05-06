@@ -129,23 +129,9 @@ class PlayerBar extends ConsumerWidget {
           ),
           child: Stack(
             children: [
-              // 可拖动进度条（覆盖顶部，扩大触控区域至 20px）
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 20,
-                child: DraggableProgressBar(
-                  progress: progress,
-                  duration: playerState.duration,
-                  onSeek: (pos) {
-                    ref.read(playerNotifierProvider.notifier).seekTo(pos);
-                  },
-                ),
-              ),
               // 内容区域
               Padding(
-                padding: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: 14),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(
@@ -201,8 +187,7 @@ class PlayerBar extends ConsumerWidget {
                         // 音质标签
                         if (track.quality > 0)
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
@@ -224,8 +209,7 @@ class PlayerBar extends ConsumerWidget {
                         // 时间显示（仅桌面端）
                         if (context.isDesktop)
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Text(
                               '${Formatters.formatDuration(playerState.position)} / ${Formatters.formatDuration(playerState.duration)}',
                               style: context.textTheme.labelSmall?.copyWith(
@@ -240,9 +224,7 @@ class PlayerBar extends ConsumerWidget {
                       // ❤️ 收藏按钮
                       IconButton(
                         icon: Icon(
-                          isFavorited
-                              ? Icons.favorite
-                              : Icons.favorite_border,
+                          isFavorited ? Icons.favorite : Icons.favorite_border,
                           size: 20,
                           color: isFavorited
                               ? Colors.redAccent
@@ -255,17 +237,14 @@ class PlayerBar extends ConsumerWidget {
                         onPressed: () async {
                           if (track.songId > 0) {
                             ref
-                                .read(
-                                    favoriteNotifierProvider.notifier)
+                                .read(favoriteNotifierProvider.notifier)
                                 .toggleFavorite(track.songId);
                           } else {
                             final newId = await ref
-                                .read(
-                                    favoriteNotifierProvider.notifier)
+                                .read(favoriteNotifierProvider.notifier)
                                 .favoriteFromTrack(track);
                             ref
-                                .read(
-                                    playerNotifierProvider.notifier)
+                                .read(playerNotifierProvider.notifier)
                                 .updateCurrentTrackSongId(newId);
                           }
                         },
@@ -338,9 +317,7 @@ class PlayerBar extends ConsumerWidget {
                         icon: const Icon(Icons.skip_previous, size: 24),
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
-                          ref
-                              .read(playerNotifierProvider.notifier)
-                              .previous();
+                          ref.read(playerNotifierProvider.notifier).previous();
                         },
                       ),
                       // 播放/暂停
@@ -372,6 +349,20 @@ class PlayerBar extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+              // 可拖动进度条（覆盖顶部，扩大触控区域至 20px）
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 20,
+                child: DraggableProgressBar(
+                  progress: progress,
+                  duration: playerState.duration,
+                  onSeek: (pos) {
+                    ref.read(playerNotifierProvider.notifier).seekTo(pos);
+                  },
                 ),
               ),
             ],

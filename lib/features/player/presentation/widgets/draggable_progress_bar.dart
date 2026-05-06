@@ -34,6 +34,8 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
   /// 是否正在拖动（已超过移动阈值）。
   bool _isDragging = false;
 
+  bool _isHovered = false;
+
   /// 拖动目标进度 (0.0 ~ 1.0)。
   double _dragValue = 0.0;
 
@@ -48,6 +50,8 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
 
   /// 上滑取消的垂直阈值（像素）。
   static const double _cancelThreshold = 30.0;
+
+  static const Duration _emphasisDuration = Duration(milliseconds: 120);
 
   double _clampProgress(double dx, double width) {
     if (width <= 0) return 0.0;
@@ -118,6 +122,13 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
     _reset();
   }
 
+  void _setHovered(bool value) {
+    if (_isHovered == value) return;
+    setState(() {
+      _isHovered = value;
+    });
+  }
+
   void _reset() {
     setState(() {
       _isDragging = false;
@@ -129,23 +140,38 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerDown: _onPointerDown,
-      onPointerMove: _onPointerMove,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
-      child: CustomPaint(
-        painter: _ProgressBarPainter(
-          progress: widget.progress,
-          isDragging: _isDragging,
-          dragValue: _dragValue,
-          isCancelled: _isCancelled,
-          activeColor: context.colorScheme.primary,
-          inactiveColor:
-              context.colorScheme.primary.withValues(alpha: 0.2),
-          cancelledColor:
-              context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+    final isEmphasized = _isHovered || _isDragging;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => _setHovered(true),
+      onExit: (_) => _setHovered(false),
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerDown: _onPointerDown,
+        onPointerMove: _onPointerMove,
+        onPointerUp: _onPointerUp,
+        onPointerCancel: _onPointerCancel,
+        child: TweenAnimationBuilder<double>(
+          duration: _emphasisDuration,
+          curve: Curves.easeOutCubic,
+          tween: Tween<double>(end: isEmphasized ? 1.0 : 0.0),
+          builder: (context, emphasis, _) {
+            return CustomPaint(
+              painter: _ProgressBarPainter(
+                progress: widget.progress,
+                isDragging: _isDragging,
+                dragValue: _dragValue,
+                isCancelled: _isCancelled,
+                emphasis: emphasis,
+                activeColor: context.colorScheme.primary,
+                inactiveColor:
+                    context.colorScheme.primary.withValues(alpha: 0.2),
+                cancelledColor:
+                    context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -163,6 +189,7 @@ class _ProgressBarPainter extends CustomPainter {
   final bool isDragging;
   final double dragValue;
   final bool isCancelled;
+  final double emphasis;
   final Color activeColor;
   final Color inactiveColor;
   final Color cancelledColor;
@@ -172,21 +199,31 @@ class _ProgressBarPainter extends CustomPainter {
     required this.isDragging,
     required this.dragValue,
     required this.isCancelled,
+    required this.emphasis,
     required this.activeColor,
     required this.inactiveColor,
     required this.cancelledColor,
   });
 
-  static const double _trackHeight = 2.0;
+  static const double _baseTrackHeight = 3.0;
+  static const double _emphasizedTrackHeight = 6.0;
   static const double _dashWidth = 4.0;
   static const double _dashGap = 3.0;
-  static const double _thumbRadius = 4.0;
+  static const double _baseThumbRadius = 4.0;
+  static const double _emphasizedThumbRadius = 6.0;
+  static const double _topInset = 1.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    const y = 0.0;
-    final trackRect = Rect.fromLTWH(0, y, size.width, _trackHeight);
-    const radius = Radius.circular(1);
+    final emphasisValue = emphasis.clamp(0.0, 1.0);
+    final trackHeight = _baseTrackHeight +
+        (_emphasizedTrackHeight - _baseTrackHeight) * emphasisValue;
+    final thumbRadius = _baseThumbRadius +
+        (_emphasizedThumbRadius - _baseThumbRadius) * emphasisValue;
+    final centerY = thumbRadius + _topInset;
+    final y = centerY - trackHeight / 2;
+    final trackRect = Rect.fromLTWH(0, y, size.width, trackHeight);
+    final radius = Radius.circular(trackHeight / 2);
 
     // 1. 背景轨道（不活跃）
     canvas.drawRRect(
@@ -200,36 +237,63 @@ class _ProgressBarPainter extends CustomPainter {
       if (activeWidth > 0) {
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromLTWH(0, y, activeWidth, _trackHeight),
+            Rect.fromLTWH(0, y, activeWidth, trackHeight),
             radius,
           ),
           Paint()..color = activeColor,
+        );
+        _drawThumb(
+          canvas,
+          activeWidth,
+          centerY,
+          thumbRadius,
+          activeColor,
+          size.width,
         );
       }
     } else if (isCancelled) {
       // 2b. 拖动中 + 已取消：灰色虚线 + 灰色圆点
       final dragWidth = size.width * dragValue.clamp(0.0, 1.0);
-      _drawDashed(canvas, y, dragWidth, cancelledColor);
-      _drawThumb(canvas, dragWidth, y, cancelledColor);
+      _drawDashed(canvas, y, dragWidth, trackHeight, cancelledColor);
+      _drawThumb(
+        canvas,
+        dragWidth,
+        centerY,
+        thumbRadius,
+        cancelledColor,
+        size.width,
+      );
     } else {
       // 2c. 拖动中 + 未取消：活跃虚线预览 + 活跃圆点
       final dragWidth = size.width * dragValue.clamp(0.0, 1.0);
-      _drawDashed(canvas, y, dragWidth, activeColor);
-      _drawThumb(canvas, dragWidth, y, activeColor);
+      _drawDashed(canvas, y, dragWidth, trackHeight, activeColor);
+      _drawThumb(
+        canvas,
+        dragWidth,
+        centerY,
+        thumbRadius,
+        activeColor,
+        size.width,
+      );
     }
   }
 
   /// 绘制虚线轨道。
-  void _drawDashed(Canvas canvas, double y, double width, Color color) {
+  void _drawDashed(
+    Canvas canvas,
+    double y,
+    double width,
+    double trackHeight,
+    Color color,
+  ) {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
     double x = 0;
     while (x < width) {
-      final segmentWidth =
-          (x + _dashWidth > width) ? width - x : _dashWidth;
+      final segmentWidth = (x + _dashWidth > width) ? width - x : _dashWidth;
       canvas.drawRect(
-        Rect.fromLTWH(x, y, segmentWidth, _trackHeight),
+        Rect.fromLTWH(x, y, segmentWidth, trackHeight),
         paint,
       );
       x += _dashWidth + _dashGap;
@@ -237,11 +301,20 @@ class _ProgressBarPainter extends CustomPainter {
   }
 
   /// 绘制圆形拖动指示点。
-  void _drawThumb(Canvas canvas, double x, double y, Color color) {
-    final cx = x.clamp(_thumbRadius, double.infinity);
+  void _drawThumb(
+    Canvas canvas,
+    double x,
+    double centerY,
+    double radius,
+    Color color,
+    double width,
+  ) {
+    final cx = width <= radius * 2
+        ? width / 2
+        : x.clamp(radius, width - radius).toDouble();
     canvas.drawCircle(
-      Offset(cx, y + _trackHeight / 2),
-      _thumbRadius,
+      Offset(cx, centerY),
+      radius,
       Paint()..color = color,
     );
   }
@@ -252,6 +325,9 @@ class _ProgressBarPainter extends CustomPainter {
         isDragging != oldDelegate.isDragging ||
         dragValue != oldDelegate.dragValue ||
         isCancelled != oldDelegate.isCancelled ||
-        activeColor != oldDelegate.activeColor;
+        emphasis != oldDelegate.emphasis ||
+        activeColor != oldDelegate.activeColor ||
+        inactiveColor != oldDelegate.inactiveColor ||
+        cancelledColor != oldDelegate.cancelledColor;
   }
 }
