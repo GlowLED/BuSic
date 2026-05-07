@@ -9,8 +9,11 @@ abstract class BiliWebLoginCookieStore {
 }
 
 class InAppBiliWebLoginCookieStore implements BiliWebLoginCookieStore {
-  InAppBiliWebLoginCookieStore({CookieManager? cookieManager})
-      : _cookieManager = cookieManager ?? CookieManager.instance();
+  InAppBiliWebLoginCookieStore({
+    CookieManager? cookieManager,
+    WebViewEnvironment? webViewEnvironment,
+  }) : _cookieManager = cookieManager ??
+            CookieManager.instance(webViewEnvironment: webViewEnvironment);
 
   static final _cookieUrls = [
     WebUri('https://www.bilibili.com'),

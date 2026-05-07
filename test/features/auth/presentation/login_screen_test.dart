@@ -20,7 +20,9 @@ void main() {
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
           authQrPollIntervalProvider
               .overrideWithValue(const Duration(hours: 1)),
-          webLoginSupportedProvider.overrideWithValue(false),
+          webLoginAvailabilityProvider.overrideWith(
+            (ref) async => const WebLoginAvailability.unsupportedPlatform(),
+          ),
         ],
         child: buildTestApp(const LoginScreen()),
       ),
@@ -41,6 +43,34 @@ void main() {
     );
     expect(
       find.text('Use QR login or manual Cookie login on this device.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('LoginScreen explains missing WebView2 on Windows web login', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+          authQrPollIntervalProvider
+              .overrideWithValue(const Duration(hours: 1)),
+          webLoginAvailabilityProvider.overrideWith(
+            (ref) async => const WebLoginAvailability.webView2Missing(),
+          ),
+        ],
+        child: buildTestApp(const LoginScreen()),
+      ),
+    );
+
+    await tester.pump();
+    await tester.tap(find.text('Web Login'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('WebView2 Runtime is missing'), findsOneWidget);
+    expect(
+      find.textContaining('Microsoft Edge WebView2 Runtime'),
       findsOneWidget,
     );
   });

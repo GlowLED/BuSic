@@ -35,6 +35,8 @@ Cookie: key1=value1; key2=value2; ...
 
 Web 登录不读取系统浏览器或用户默认浏览器的 Cookie。它只读取 BuSic 创建的 WebView 会话，因此比“扫描用户浏览器配置目录”更可控，也避免跨浏览器、跨平台和权限问题。首版支持 Android / iOS / macOS / Windows；Linux 页面显示不支持提示，并保留二维码与手动 Cookie 登录。
 
+Windows 上 Web 登录依赖 Microsoft Edge WebView2 Runtime。创建内置 WebView 前必须先检查 Runtime 是否可用，并用 BuSic 数据目录下的可写 `webview2` 目录创建 `WebViewEnvironment`；不要让 WebView2 使用安装目录旁的默认 user data folder，否则安装到只读目录时可能导致 WebView 初始化失败或空白。
+
 ## 2. 登录态会影响什么
 
 登录不仅影响“是否显示已登录头像”，还直接影响：

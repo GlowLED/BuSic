@@ -6,6 +6,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../application/auth_notifier.dart';
 import '../application/web_login_providers.dart';
+import '../data/bili_web_login_cookie_store.dart';
 import '../domain/models/bili_login_cookies.dart';
 import 'widgets/bili_web_login_view.dart';
 import '../../../core/utils/platform_utils.dart';
@@ -124,10 +125,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
   }
 
-  Future<void> _loginWithWebCookies(BiliLoginCookies cookies) async {
+  Future<void> _loginWithWebCookies(
+    BiliLoginCookies cookies,
+    BiliWebLoginCookieStore cookieStore,
+  ) async {
     if (_isWebLogging) return;
 
-    final cookieStore = ref.read(biliWebLoginCookieStoreProvider);
     setState(() => _isWebLogging = true);
     try {
       await ref.read(authNotifierProvider.notifier).loginWithWebCookies(
@@ -294,53 +297,71 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Widget _buildWebLoginTab(ColorScheme colorScheme) {
-    final isSupported = ref.watch(webLoginSupportedProvider);
-    if (!isSupported) {
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Card(
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.public_off_outlined,
-                  size: 48,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  context.l10n.webLoginUnsupportedTitle,
-                  style: context.textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.l10n.webLoginUnsupportedDesc,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    final availability = ref.watch(webLoginAvailabilityProvider);
 
-    final cookieStore = ref.watch(biliWebLoginCookieStoreProvider);
+    return availability.when(
+      loading: () => _buildWebLoginStatusCard(
+        colorScheme,
+        icon: Icons.public_outlined,
+        title: context.l10n.webLoginPreparing,
+        description: context.l10n.webLoginDesc,
+        isLoading: true,
+      ),
+      error: (error, stackTrace) => _buildWebLoginStatusCard(
+        colorScheme,
+        icon: Icons.public_off_outlined,
+        title: context.l10n.webLoginInitFailedTitle,
+        description: context.l10n.webLoginInitFailedDesc,
+      ),
+      data: (availability) {
+        switch (availability.status) {
+          case WebLoginAvailabilityStatus.unsupportedPlatform:
+            return _buildWebLoginStatusCard(
+              colorScheme,
+              icon: Icons.public_off_outlined,
+              title: context.l10n.webLoginUnsupportedTitle,
+              description: context.l10n.webLoginUnsupportedDesc,
+            );
+          case WebLoginAvailabilityStatus.webView2Missing:
+            return _buildWebLoginStatusCard(
+              colorScheme,
+              icon: Icons.web_asset_off_outlined,
+              title: context.l10n.webLoginWebView2MissingTitle,
+              description: context.l10n.webLoginWebView2MissingDesc,
+            );
+          case WebLoginAvailabilityStatus.initializationFailed:
+            return _buildWebLoginStatusCard(
+              colorScheme,
+              icon: Icons.public_off_outlined,
+              title: context.l10n.webLoginInitFailedTitle,
+              description: context.l10n.webLoginInitFailedDesc,
+            );
+          case WebLoginAvailabilityStatus.available:
+            return _buildWebLoginCard(colorScheme, availability);
+        }
+      },
+    );
+  }
+
+  Widget _buildWebLoginCard(
+    ColorScheme colorScheme,
+    WebLoginAvailability availability,
+  ) {
+    final cookieStore = ref.watch(
+      biliWebLoginCookieStoreProvider(availability.webViewEnvironment),
+    );
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Card(
-        clipBehavior: Clip.antiAlias,
         elevation: 4,
         child: Stack(
           children: [
             BiliWebLoginView(
               cookieStore: cookieStore,
-              onCookiesCaptured: _loginWithWebCookies,
+              webViewEnvironment: availability.webViewEnvironment,
+              onCookiesCaptured: (cookies) {
+                _loginWithWebCookies(cookies, cookieStore);
+              },
               onCookieMissing: () {
                 context.showSnackBar(context.l10n.webLoginCookieMissing);
               },
@@ -362,6 +383,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebLoginStatusCard(
+    ColorScheme colorScheme, {
+    required IconData icon,
+    required String title,
+    required String description,
+    bool isLoading = false,
+  }) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Card(
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 48,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: context.textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (isLoading) ...[
+                const SizedBox(height: 24),
+                const CircularProgressIndicator(),
+              ],
+            ],
+          ),
         ),
       ),
     );

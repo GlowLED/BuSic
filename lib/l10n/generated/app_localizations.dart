@@ -203,6 +203,12 @@ abstract class AppLocalizations {
   /// **'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.'**
   String get webLoginDesc;
 
+  /// No description provided for @webLoginPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing web login...'**
+  String get webLoginPreparing;
+
   /// No description provided for @webLoginChecking.
   ///
   /// In en, this message translates to:
@@ -232,6 +238,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use QR login or manual Cookie login on this device.'**
   String get webLoginUnsupportedDesc;
+
+  /// No description provided for @webLoginWebView2MissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WebView2 Runtime is missing'**
+  String get webLoginWebView2MissingTitle;
+
+  /// No description provided for @webLoginWebView2MissingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This Windows device does not have Microsoft Edge WebView2 Runtime available. Install it, or use QR login or manual Cookie login.'**
+  String get webLoginWebView2MissingDesc;
+
+  /// No description provided for @webLoginInitFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Web login failed to start'**
+  String get webLoginInitFailedTitle;
+
+  /// No description provided for @webLoginInitFailedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The in-app WebView could not be started. Check that WebView2 Runtime is available, or use QR login or manual Cookie login.'**
+  String get webLoginInitFailedDesc;
+
+  /// No description provided for @webLoginPageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The login page failed to load. Check your network and try again.'**
+  String get webLoginPageLoadFailed;
 
   /// No description provided for @webLoginFailedWithError.
   ///

@@ -63,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webLoginDesc => 'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.';
 
   @override
+  String get webLoginPreparing => 'Preparing web login...';
+
+  @override
   String get webLoginChecking => 'Checking login...';
 
   @override
@@ -76,6 +79,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webLoginUnsupportedDesc => 'Use QR login or manual Cookie login on this device.';
+
+  @override
+  String get webLoginWebView2MissingTitle => 'WebView2 Runtime is missing';
+
+  @override
+  String get webLoginWebView2MissingDesc => 'This Windows device does not have Microsoft Edge WebView2 Runtime available. Install it, or use QR login or manual Cookie login.';
+
+  @override
+  String get webLoginInitFailedTitle => 'Web login failed to start';
+
+  @override
+  String get webLoginInitFailedDesc => 'The in-app WebView could not be started. Check that WebView2 Runtime is available, or use QR login or manual Cookie login.';
+
+  @override
+  String get webLoginPageLoadFailed => 'The login page failed to load. Check your network and try again.';
 
   @override
   String webLoginFailedWithError(String error) {

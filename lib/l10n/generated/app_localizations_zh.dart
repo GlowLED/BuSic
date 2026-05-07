@@ -63,6 +63,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get webLoginDesc => '在下方 B 站页面完成登录。BuSic 只会读取这个内置窗口中的 Cookie。';
 
   @override
+  String get webLoginPreparing => '正在准备网页登录...';
+
+  @override
   String get webLoginChecking => '正在验证登录...';
 
   @override
@@ -76,6 +79,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get webLoginUnsupportedDesc => '请在此设备上使用扫码登录或手动 Cookie 登录。';
+
+  @override
+  String get webLoginWebView2MissingTitle => '缺少 WebView2 运行时';
+
+  @override
+  String get webLoginWebView2MissingDesc => '当前 Windows 设备缺少 Microsoft Edge WebView2 Runtime。请安装后重试，或使用扫码登录 / 手动 Cookie 登录。';
+
+  @override
+  String get webLoginInitFailedTitle => '网页登录启动失败';
+
+  @override
+  String get webLoginInitFailedDesc => '内置 WebView 无法启动。请确认 WebView2 Runtime 可用，或改用扫码登录 / 手动 Cookie 登录。';
+
+  @override
+  String get webLoginPageLoadFailed => '登录页面加载失败，请检查网络后重试。';
 
   @override
   String webLoginFailedWithError(String error) {
