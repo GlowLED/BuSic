@@ -12,6 +12,7 @@
   - GoRouter
   - Drift + SQLite
   - Dio
+  - `flutter_inappwebview`
   - `media_kit`
   - `audio_service`
   - `shared_preferences`
@@ -123,6 +124,22 @@ lib/
 - 下载任务创建、状态监听、重试、删除
 - 任务进度与数据库同步
 - 下载成功后回写 `songs.localPath` 和 `songs.audioQuality`
+- 下载页按缓存管理页面理解：进行中 / 等待 / 失败是任务，本地已落盘歌曲是缓存项目
+
+### `auth`
+
+负责：
+
+- 二维码登录
+- 内置 WebView 登录
+- 手动 Cookie 登录
+- 登录 Cookie 校验、持久化与失效清理
+
+最重要的实现点：
+
+- 三种入口统一落到 `AuthRepository.loginWithCookies`
+- Web 登录只读取 BuSic 内置 WebView 的 cookie store，不读取系统浏览器 Cookie
+- Linux 当前显示网页登录不支持 fallback，仍保留二维码和手动 Cookie 登录
 
 ### `share`
 

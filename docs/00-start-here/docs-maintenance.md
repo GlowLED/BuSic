@@ -158,12 +158,13 @@ BuSic 的 docs 统一遵守以下原则：
 - `10-project/ui-and-platform-quirks.md`
 - `30-reference/source-of-truth.md`
 
-### 改 B站接口、Cookie、WBI、评论、收藏夹
+### 改 B站接口、登录、Cookie、WBI、评论、收藏夹
 
 至少检查：
 
 - `10-project/bilibili-integration.md`
 - 必要时 `10-project/project-specific-rules.md`
+- 如果改 Web 登录，还要检查 `00-start-here/agent-quickstart.md` 和 `30-reference/source-of-truth.md`
 
 ### 改下载缓存、歌曲唯一标识、分享/备份规则
 

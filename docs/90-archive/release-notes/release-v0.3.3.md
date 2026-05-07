@@ -1,6 +1,8 @@
 # V0.3.3 发布操作清单
 
-> 使用发布 CLI 一键完成全部流程，参考 [dev-workflow.md 第 8 节](dev-workflow.md#8-版本号与发布)。
+> 归档提示：本文是 v0.3.3 的一次性发布记录，不是当前发布流程真源。当前请先读 [../../20-workflows/release-workflow.md](../../20-workflows/release-workflow.md)。
+
+> 使用发布 CLI 一键完成全部流程，当前发布入口参考 [../../20-workflows/release-workflow.md](../../20-workflows/release-workflow.md)。
 
 ## 一键发布（推荐）
 

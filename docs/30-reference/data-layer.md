@@ -7,18 +7,25 @@
 数据库定义在 `lib/core/database/app_database.dart`，使用 `@DriftDatabase` 注解注册所有表：
 
 ```dart
-@DriftDatabase(tables: [Songs, Playlists, PlaylistSongs, DownloadTasks, UserSessions])
+@DriftDatabase(tables: [
+  Songs,
+  Playlists,
+  PlaylistSongs,
+  DownloadTasks,
+  UserSessions,
+  Subtitles,
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 4;
 }
 ```
 
 - 数据库文件位于 `documents/busic/busic.db`
 - 使用 `LazyDatabase` + `NativeDatabase.createInBackground` 异步初始化
-- `schemaVersion` 起始为 1，新增迁移时递增
+- 当前 `schemaVersion = 4`；新增迁移时递增，并在 `onUpgrade` 写明从旧版本升级的补表 / 补列逻辑
 
 ### 现有表结构
 
@@ -29,6 +36,7 @@ class AppDatabase extends _$AppDatabase {
 | `PlaylistSongs` | `tables/playlist_songs.dart` | 多对多联结表，`(playlistId, songId)` 复合主键 |
 | `DownloadTasks` | `tables/download_tasks.dart` | 下载状态：0=pending / 1=downloading / 2=completed / 3=failed |
 | `UserSessions` | `tables/user_sessions.dart` | B站登录凭据（sessdata, biliJct, dedeUserId 等） |
+| `Subtitles` | `tables/subtitles.dart` | 字幕 / 歌词缓存，按视频与字幕来源保存 |
 
 ### 新增表规范
 
@@ -192,8 +200,9 @@ class XxxRepositoryImpl implements XxxRepository {
 
 1. **Repository 接口**定义在 `data/` 目录（非 `domain/`），与实现类在同一层
 2. **Domain 模型**和 **DB 表**是分离的，Repository 负责二者之间的映射转换
-3. Repository **不是 Riverpod Provider**，由 Notifier 在 `build()` 中手动创建实例
-4. 需要 keep-alive 的 Repository（如 `DownloadRepository`）用手动 `Provider` 管理
+3. Repository **不是业务状态容器**；状态编排仍放在 Notifier
+4. 普通 Repository 通常在 Notifier `build()` 中创建
+5. 需要全局注入、测试 override 或长期存活的 Repository，再用手动 `Provider` 管理（如 `authRepositoryProvider`、`downloadRepositoryProvider`）
 
 ## API 层
 
@@ -202,8 +211,8 @@ class XxxRepositoryImpl implements XxxRepository {
 `BiliDio` 是单例模式，全局共享一个 Dio 实例：
 
 ```dart
-final response = await BiliDio.instance.get(
-  'https://api.bilibili.com/x/web-interface/view',
+final response = await BiliDio().get(
+  '/x/web-interface/view',
   queryParameters: {'bvid': bvid},
 );
 ```
@@ -233,6 +242,7 @@ final signedParams = WbiSign.encodeWbi(params, keys.imgKey, keys.subKey);
 - 登录成功后通过 `BiliDio.setSessionCookies()` 设置
 - 退出登录通过 `BiliDio.clearCookies()` 清除
 - **注意**：B站 SESSDATA 包含逗号，不使用 `dart:io` 的 `Cookie` 类解析
+- Web 登录使用内置 WebView cookie store 提取登录 Cookie，再交给 `AuthRepository.loginWithCookies` 统一校验与保存；它不读取系统浏览器 Cookie
 
 ### 音频流获取
 

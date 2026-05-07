@@ -37,6 +37,8 @@ python3 scripts/release.py
 
 这个 CLI 会引导你完成版本设置、构建、manifest 更新、提交、打 tag 和推送。
 
+注意：当前 `scripts/release.py` 只本地构建 Android APK 与 Windows ZIP，并且它的 Linux manifest 资产名仍是 `busic-linux-x64.tar.gz`。真正的多平台 Release 产物以 `.github/workflows/release.yml` 为准。
+
 ## 4. 当前 CI / Release 关系
 
 - `CI`
@@ -54,7 +56,7 @@ python3 scripts/release.py
 
 ## 5. 当前资产命名
 
-应用内更新逻辑依赖这些固定名字：
+`.github/workflows/release.yml` 当前上传这些 Release 文件：
 
 - `busic-android.apk`
 - `busic-windows-x64.zip`
@@ -62,10 +64,14 @@ python3 scripts/release.py
 - `busic-macos.zip`
 - `busic-ios-unsigned.ipa`
 
+当前已知不一致：`lib/features/app_update/data/update_repository_impl.dart` 的 Linux fallback、`scripts/release.py` 和 `scripts/update-manifest.py` 仍使用 `busic-linux-x64.tar.gz`。改 Linux 更新或发布链路时，需要把这三处和 `versions-manifest.json` 一起修正。
+
 若改资产名，必须同步检查：
 
 - `versions-manifest.json`
 - `app_update` feature
+- `scripts/release.py`
+- `scripts/update-manifest.py`
 - Release workflow
 
 ## 6. `versions-manifest.json` 维护规则
@@ -87,6 +93,7 @@ python3 scripts/release.py
 
 - 只改了 `pubspec.yaml`，没改 `versions-manifest.json`
 - 改了 Release 资产名，但忘了更新应用内更新逻辑
+- Linux Release 产物、manifest 生成脚本和应用内 fallback 文件名不一致
 - 打 tag 前没跑 analyze / test
 - 蓝奏云链接没补
 - 只看 GitHub Releases 页面，没检查 manifest

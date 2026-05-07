@@ -17,11 +17,12 @@
 - `test/test_helpers/test_app.dart`
 - `lib/core/database/app_database.dart`
 
-2026-05-02 已确认当前本地基线：
+最近一次已记录的本地基线（2026-05-02）：
 
 - `flutter analyze --no-fatal-infos` 通过
 - `flutter test -r expanded` 通过
-- 当前总计 **183 个测试**
+
+测试数量不要在本文长期固定；实际数量以最新一次 `flutter test -r expanded` 输出为准。维护覆盖矩阵时先用 `find test -type f -name '*_test.dart'` 重新核对测试文件。
 
 CI 当前执行顺序与本地保持一致：
 
@@ -98,6 +99,7 @@ test/
 │   └── widgets/
 ├── test_helpers/
 │   └── test_app.dart
+├── app_test.dart
 └── widget_test.dart
 ```
 
@@ -228,17 +230,18 @@ group('备份导出不含下载路径', () {
 |---|---|---|---|
 | `test/core/router` | `app_router_test.dart` | 已覆盖 | 路由结构变动时同步补回归 |
 | `test/core/theme` | `app_theme_test.dart` | 已覆盖 | 改主题 token 时补断言 |
-| `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` | 部分覆盖 | 新增共享组件时同步补 widget tests |
+| `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` / `desktop_window_resize_frame` | 部分覆盖 | 新增共享组件时同步补 widget tests |
+| `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
 | `features/app_update` | `data` + `domain/models` | 覆盖较好 | 后续补 `application` / `presentation` |
-| `features/download` | `download_cache_mechanism_test.dart` | 关键链路已覆盖 | 后续补 Notifier 与 UI 回归 |
+| `features/download` | `download_cache_mechanism_test.dart` + `presentation/download_screen_test.dart` | 缓存主链路与下载页缓存语义已覆盖 | 后续补 Notifier 边界回归 |
 | `features/playlist` | `presentation/widgets/playlist_tile_test.dart` | 覆盖偏浅 | 优先补 `data` / `application` |
 | `features/search_and_parse` | `data` 层 3 个文件 + `application` + `domain/models` + `presentation` 层 2 个文件 | 覆盖较好 | 后续补 `presentation/search_screen.dart` 交互回归 |
 | `features/settings` | `application/settings_notifier_test.dart` | 局部覆盖 | 改设置持久化时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
-| `features/auth` | `data/auth_repository_impl_test.dart` + `application/auth_notifier_test.dart` | 关键登录与会话链路已覆盖 | 后续补 `presentation/login_screen.dart` 交互回归 |
+| `features/auth` | `domain/bili_login_cookies_test.dart` + `data/auth_repository_impl_test.dart` + `application/auth_notifier_test.dart` + `presentation/login_screen_test.dart` | Cookie 解析、登录校验、会话编排和三登录入口 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
 | `features/comment` | `presentation/comment_text_selection_test.dart` | 文本选择已覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
-| `features/player` | `application/player_notifier_test.dart` + `presentation/widgets/player_section_switcher_test.dart` | 主链路状态与缓存联动已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
+| `features/player` | `application/player_notifier_test.dart` + `presentation/player_bar_favorite_test.dart` + `presentation/widgets/player_section_switcher_test.dart` + `presentation/widgets/draggable_progress_bar_test.dart` | 主链路状态、收藏显示和关键控件已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
 | `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` | 缓存、重试与状态映射已覆盖 | 后续补 `presentation/widgets/lyrics_panel.dart` 联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 
@@ -267,7 +270,7 @@ group('备份导出不含下载路径', () {
 
 ### P2
 
-- 继续加深 `auth` / `player` / `subtitle` / `download` / `share` 的 `presentation` 或更细粒度状态回归
+- 继续加深 `player` / `subtitle` / `download` / `share` 的 `presentation` 或更细粒度状态回归；`auth` 后续重点是平台 WebView 行为验证
 
 原因：
 

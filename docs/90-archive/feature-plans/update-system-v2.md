@@ -1,5 +1,7 @@
 # 更新系统 V2 — 多渠道下载 + 版本回退 + 后台下载
 
+> 归档提示：本文是更新系统演进规划，不是当前实现真源。当前请先读 [../../10-project/update-system.md](../../10-project/update-system.md) 和 [../../20-workflows/release-workflow.md](../../20-workflows/release-workflow.md)。
+
 ## 0. 背景与目标
 
 当前更新系统 (`app_update` feature) 已实现：

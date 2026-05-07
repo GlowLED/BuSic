@@ -1,5 +1,7 @@
 # "我喜欢" 收藏功能 — 功能规划
 
+> 归档提示：本文是收藏功能早期规划，不是当前实现真源。当前请先读 [../../10-project/bilibili-integration.md](../../10-project/bilibili-integration.md)、[../../10-project/project-overview.md](../../10-project/project-overview.md) 和 [../../30-reference/data-layer.md](../../30-reference/data-layer.md)。
+
 > 对应 Issue: [#4 — 增加 "我喜欢" 功能](https://github.com/GlowLED/BuSic/issues/4)
 
 ## 概述

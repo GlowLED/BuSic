@@ -1,5 +1,7 @@
 # 评论区功能设计文档
 
+> 归档提示：本文是评论系统规划，不是当前实现真源。当前请先读 [../../10-project/bilibili-integration.md](../../10-project/bilibili-integration.md)。
+
 ## 1. 需求概述
 
 为 BuSic 接入 Bilibili 视频评论区功能，用户可以：

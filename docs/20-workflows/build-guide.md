@@ -6,8 +6,8 @@
 
 先看 `pubspec.yaml`：
 
-- Dart：`>=3.2.0 <4.0.0`
-- Flutter：`>=3.16.0`
+- Dart：`>=3.5.0 <4.0.0`
+- Flutter：`>=3.29.0`
 
 如果本地工具链不满足这里的约束，后续分析、代码生成和构建结果都不可信。
 
@@ -36,6 +36,7 @@
 
 - `window_manager`
 - `tray_manager`
+- `flutter_inappwebview`（用于 B 站网页登录；Linux 当前显示不支持 fallback）
 
 桌面构建和运行需要对应平台的原生开发环境正常。
 

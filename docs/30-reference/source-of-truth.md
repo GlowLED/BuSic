@@ -44,6 +44,14 @@
 - `lib/core/api/wbi_sign.dart`
   - WBI 签名
 
+- `lib/features/auth/data/auth_repository_impl.dart`
+  - 二维码 / Web / 手动 Cookie 登录统一校验
+  - `UserSessions` 保存与失效清理
+
+- `lib/features/auth/data/bili_web_login_cookie_store.dart`
+  - BuSic 内置 WebView cookie store 读取
+  - Web 登录不读取系统浏览器 Cookie
+
 ## 5. 更新系统
 
 - `versions-manifest.json`

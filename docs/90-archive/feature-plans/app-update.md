@@ -1,5 +1,7 @@
 # 应用自动更新 — 功能规划
 
+> 归档提示：本文是早期更新方案，不是当前实现真源。当前请先读 [../../10-project/update-system.md](../../10-project/update-system.md) 和 [../../20-workflows/release-workflow.md](../../20-workflows/release-workflow.md)。
+
 ## 概述
 
 为 BuSic 实现**检查更新 + 自动更新**功能。  

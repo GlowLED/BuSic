@@ -134,7 +134,10 @@ WBI 相关真源：
 - `lib/core/api/bili_dio.dart`
 - `lib/core/api/wbi_sign.dart`
 - `lib/features/auth/*`
+- `lib/features/auth/data/bili_web_login_cookie_store.dart`
 - `lib/features/search_and_parse/*`
 - `lib/features/comment/*`
 - `lib/features/subtitle/*`
 - `lib/features/playlist/application/bili_fav_import_notifier.dart`
+
+如果改 Web 登录，还要额外验证 Linux fallback 页面仍可编译，并确认不会尝试读取系统浏览器 Cookie。

@@ -1,5 +1,7 @@
 # B站 AI 字幕歌词系统 — 研究报告
 
+> 归档提示：本文是歌词方案研究材料，不是当前实现真源。当前请先读 [../../10-project/subtitle-and-lyrics.md](../../10-project/subtitle-and-lyrics.md)。
+
 > 对应 Issue: [#15 - [Feat] 实现基于字幕自动抓取、AI 字幕有关的歌词系统](https://github.com/GlowLED/BuSic/issues/15)  
 > 日期: 2025-07  
 > 状态: 研究完成，待实现

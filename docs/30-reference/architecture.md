@@ -86,7 +86,7 @@ lib/
 
 | Feature | 作用 |
 |---|---|
-| `auth` | B 站登录、Cookie、会话持久化 |
+| `auth` | B 站二维码 / Web / 手动 Cookie 登录、Cookie 校验、会话持久化 |
 | `playlist` | 本地歌单、歌曲关系、元数据编辑、收藏夹导入承接 |
 | `search_and_parse` | 搜索、BV 解析、流地址获取、视频信息拉取 |
 | `player` | 队列、播放控制、恢复、离线优先、媒体会话 |
@@ -172,6 +172,16 @@ presentation
 
 它不是简单的一次接口调用。
 
+### 6.5 登录入口 -> Cookie 校验 -> BiliDio
+
+三种登录入口最终都要收敛到同一条链路：
+
+- 二维码回调 URL 解析 Cookie
+- 内置 WebView 读取自身 cookie store
+- 手动输入 Cookie
+
+随后统一由 `AuthRepository.loginWithCookies` 调用 B 站 `nav` 校验，确认有效后再写入 `UserSessions` 并同步 `BiliDio` raw cookies。不要让 UI 层直接写登录会话。
+
 ## 7. 改动入口速查
 
 | 目标 | 先看哪里 |
@@ -180,6 +190,7 @@ presentation
 | 路由或页面壳层 | `lib/core/router/app_router.dart`, `lib/shared/widgets/responsive_scaffold.dart` |
 | 数据表或迁移 | `lib/core/database/app_database.dart`, `lib/core/database/tables/` |
 | B 站请求 | `lib/core/api/bili_dio.dart` |
+| 登录与 Cookie 校验 | `lib/features/auth/data/auth_repository_impl.dart`, `lib/features/auth/data/bili_web_login_cookie_store.dart` |
 | 播放器 | `lib/features/player/application/player_notifier.dart` |
 | 下载与离线播放 | `lib/features/download/data/download_repository_impl.dart` |
 | 分享与备份 | `lib/features/share/data/share_repository_impl.dart`, `lib/features/share/data/sync_repository_impl.dart` |

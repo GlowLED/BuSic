@@ -60,6 +60,9 @@
 
 - `BiliDio` 用的是 **raw cookie header 注入**
 - 原因：`SESSDATA` 常带逗号，Dart 的 `Cookie` 解析不可靠
+- 登录入口有三种：二维码登录、内置 Web 登录、手动 Cookie 登录
+- 三种入口都必须经过 `AuthRepository.loginWithCookies` 调用 B 站 `nav` 校验后再保存会话
+- 内置 Web 登录只读取 BuSic WebView cookie store，不读取系统浏览器 Cookie；Linux 当前展示 fallback
 - 所有请求默认带：
   - 浏览器风格 `User-Agent`
   - `Referer: https://www.bilibili.com`

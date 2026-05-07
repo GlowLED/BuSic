@@ -1,5 +1,7 @@
 # 导入 B 站收藏夹 — 功能规划
 
+> 归档提示：本文是收藏夹导入落地规划，不是当前实现真源。当前请先读 [../../10-project/bilibili-integration.md](../../10-project/bilibili-integration.md) 和 [../../10-project/project-overview.md](../../10-project/project-overview.md)。
+
 > 对应 Issue: [#7 — 一键导入 B 站收藏夹](https://github.com/GlowLED/BuSic/issues/7)
 
 ## 概述
