@@ -78,7 +78,7 @@ docs/
 - 数据库方案是 **Drift**，不是 Isar。
 - Android 后台播放已经通过 `audio_service` 接入。
 - `BiliDio` 不是普通 CookieJar 封装，而是 **raw cookie 注入**，专门绕过 `SESSDATA` 含逗号的问题。
-- Web 登录只读取 BuSic 内置 WebView 的 cookie store，不读取系统浏览器 Cookie。
+- Web 登录只读取 BuSic 管理的隔离登录会话，不读取系统浏览器 Cookie；Linux 使用临时受控浏览器 profile 捕获 Cookie，Chromium 系优先，Firefox fallback。
 - 歌词/字幕不是“调用一次 API 就能稳定拿到”，存在 **AI 字幕错配**，当前实现依赖 **前缀校验 + 重试**。
 - 更新系统的主真源是 `versions-manifest.json`，不是仅靠 GitHub Releases 页面。
 - 蓝奏云渠道是**手动维护**的，不是全自动上传。

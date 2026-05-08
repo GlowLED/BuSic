@@ -43,7 +43,7 @@
   `SESSDATA` 含逗号，当前实现用 raw header 注入。
 
 - **不要假设 BuSic 会读取系统浏览器 Cookie。**
-  Web 登录只读取 BuSic 内置 WebView 的 cookie store；Linux 当前显示 fallback，继续使用二维码或手动 Cookie 登录。
+  Web 登录只读取 BuSic 管理的登录会话：Android / iOS / macOS / Windows 是内置 WebView，Linux 是临时受控浏览器 profile（Chromium 系优先，Firefox fallback）+ 协议 Cookie 捕获；不扫描用户默认浏览器 Cookie。
 
 - **不要把 `pubspec.yaml` 当成更新系统唯一真源。**
   当前主真源是 `versions-manifest.json`，`x_update` 只是 fallback。

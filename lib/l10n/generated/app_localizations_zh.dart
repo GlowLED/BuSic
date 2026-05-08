@@ -81,6 +81,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get webLoginUnsupportedDesc => '请在此设备上使用扫码登录或手动 Cookie 登录。';
 
   @override
+  String get webLoginBrowserMissingTitle => '未找到支持的浏览器';
+
+  @override
+  String get webLoginBrowserMissingDesc => '请安装 Chrome、Chromium、Edge、Brave、Vivaldi 或 Firefox 后使用 Linux 网页登录，或改用扫码登录 / 手动 Cookie 登录。';
+
+  @override
   String get webLoginWebView2MissingTitle => '缺少 WebView2 运行时';
 
   @override
@@ -94,6 +100,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get webLoginPageLoadFailed => '登录页面加载失败，请检查网络后重试。';
+
+  @override
+  String get webLoginLinuxTitle => 'Linux 网页登录';
+
+  @override
+  String get webLoginLinuxDesc => 'BuSic 会打开一个临时浏览器窗口，只读取这个隔离登录会话中的 Cookie。';
+
+  @override
+  String get webLoginLinuxOpenBrowser => '打开登录窗口';
+
+  @override
+  String get webLoginLinuxWaiting => '请在浏览器窗口中完成 B 站登录，然后回到这里验证。';
+
+  @override
+  String get webLoginLinuxCancel => '取消';
+
+  @override
+  String get webLoginLinuxStartFailed => '临时浏览器登录启动失败，请改用扫码登录或手动 Cookie 登录。';
 
   @override
   String webLoginFailedWithError(String error) {

@@ -50,6 +50,9 @@
 
 - `lib/features/auth/data/bili_web_login_cookie_store.dart`
   - BuSic 内置 WebView cookie store 读取
+
+- `lib/features/auth/data/linux_managed_browser_login_service.dart`
+  - Linux 临时受控浏览器登录会话 Cookie 捕获，Chromium 系优先，Firefox fallback
   - Web 登录不读取系统浏览器 Cookie
 
 ## 5. 更新系统

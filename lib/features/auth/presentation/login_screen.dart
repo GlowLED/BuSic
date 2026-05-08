@@ -7,8 +7,10 @@ import 'package:window_manager/window_manager.dart';
 import '../application/auth_notifier.dart';
 import '../application/web_login_providers.dart';
 import '../data/bili_web_login_cookie_store.dart';
+import '../data/linux_managed_browser_login_service.dart';
 import '../domain/models/bili_login_cookies.dart';
 import 'widgets/bili_web_login_view.dart';
+import 'widgets/linux_managed_web_login_view.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../../../shared/extensions/context_extensions.dart';
 
@@ -129,6 +131,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     BiliLoginCookies cookies,
     BiliWebLoginCookieStore cookieStore,
   ) async {
+    await _loginWithCapturedWebCookies(
+      cookies,
+      cleanup: cookieStore.clearBiliCookies,
+    );
+  }
+
+  Future<void> _loginWithManagedBrowserCookies(
+    BiliLoginCookies cookies,
+    LinuxManagedBrowserLoginSession session,
+  ) async {
+    await _loginWithCapturedWebCookies(
+      cookies,
+      cleanup: session.close,
+    );
+  }
+
+  Future<void> _loginWithCapturedWebCookies(
+    BiliLoginCookies cookies, {
+    required Future<void> Function() cleanup,
+  }) async {
     if (_isWebLogging) return;
 
     setState(() => _isWebLogging = true);
@@ -143,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         context.showSnackBar(context.l10n.webLoginFailedWithError('$e'));
       }
     } finally {
-      await cookieStore.clearBiliCookies();
+      await cleanup();
       if (mounted) setState(() => _isWebLogging = false);
     }
   }
@@ -297,6 +319,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Widget _buildWebLoginTab(ColorScheme colorScheme) {
+    final hostPlatform = ref.watch(webLoginHostPlatformProvider);
     final availability = ref.watch(webLoginAvailabilityProvider);
 
     return availability.when(
@@ -311,9 +334,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         colorScheme,
         icon: Icons.public_off_outlined,
         title: context.l10n.webLoginInitFailedTitle,
-        description: context.l10n.webLoginInitFailedDesc,
+        description: _webLoginInitFailedDescription(hostPlatform),
       ),
       data: (availability) {
+        if (hostPlatform == WebLoginHostPlatform.linux) {
+          return _buildLinuxWebLoginTab(colorScheme, availability);
+        }
+
         switch (availability.status) {
           case WebLoginAvailabilityStatus.unsupportedPlatform:
             return _buildWebLoginStatusCard(
@@ -321,6 +348,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               icon: Icons.public_off_outlined,
               title: context.l10n.webLoginUnsupportedTitle,
               description: context.l10n.webLoginUnsupportedDesc,
+            );
+          case WebLoginAvailabilityStatus.browserMissing:
+            return _buildWebLoginStatusCard(
+              colorScheme,
+              icon: Icons.web_asset_off_outlined,
+              title: context.l10n.webLoginBrowserMissingTitle,
+              description: context.l10n.webLoginBrowserMissingDesc,
             );
           case WebLoginAvailabilityStatus.webView2Missing:
             return _buildWebLoginStatusCard(
@@ -337,10 +371,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               description: context.l10n.webLoginInitFailedDesc,
             );
           case WebLoginAvailabilityStatus.available:
+            if (availability.mode == WebLoginMode.managedBrowser) {
+              return _buildLinuxManagedWebLoginCard(colorScheme);
+            }
             return _buildWebLoginCard(colorScheme, availability);
         }
       },
     );
+  }
+
+  Widget _buildLinuxWebLoginTab(
+    ColorScheme colorScheme,
+    WebLoginAvailability availability,
+  ) {
+    switch (availability.status) {
+      case WebLoginAvailabilityStatus.browserMissing:
+        return _buildWebLoginStatusCard(
+          colorScheme,
+          icon: Icons.web_asset_off_outlined,
+          title: context.l10n.webLoginBrowserMissingTitle,
+          description: context.l10n.webLoginBrowserMissingDesc,
+        );
+      case WebLoginAvailabilityStatus.initializationFailed:
+        return _buildWebLoginStatusCard(
+          colorScheme,
+          icon: Icons.public_off_outlined,
+          title: context.l10n.webLoginInitFailedTitle,
+          description: context.l10n.webLoginLinuxStartFailed,
+        );
+      case WebLoginAvailabilityStatus.unsupportedPlatform:
+        return _buildWebLoginStatusCard(
+          colorScheme,
+          icon: Icons.public_off_outlined,
+          title: context.l10n.webLoginUnsupportedTitle,
+          description: context.l10n.webLoginUnsupportedDesc,
+        );
+      case WebLoginAvailabilityStatus.webView2Missing:
+      case WebLoginAvailabilityStatus.available:
+        return _buildLinuxManagedWebLoginCard(colorScheme);
+    }
+  }
+
+  String _webLoginInitFailedDescription(WebLoginHostPlatform hostPlatform) {
+    return switch (hostPlatform) {
+      WebLoginHostPlatform.linux => context.l10n.webLoginLinuxStartFailed,
+      WebLoginHostPlatform.windows => context.l10n.webLoginInitFailedDesc,
+      WebLoginHostPlatform.other => context.l10n.webLoginUnsupportedDesc,
+    };
   }
 
   Widget _buildWebLoginCard(
@@ -361,6 +438,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               webViewEnvironment: availability.webViewEnvironment,
               onCookiesCaptured: (cookies) {
                 _loginWithWebCookies(cookies, cookieStore);
+              },
+              onCookieMissing: () {
+                context.showSnackBar(context.l10n.webLoginCookieMissing);
+              },
+            ),
+            if (_isWebLogging)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: colorScheme.surface.withValues(alpha: 0.72),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(context.l10n.webLoginChecking),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLinuxManagedWebLoginCard(ColorScheme colorScheme) {
+    final loginService = ref.watch(linuxManagedBrowserLoginServiceProvider);
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Card(
+        elevation: 4,
+        child: Stack(
+          children: [
+            LinuxManagedWebLoginView(
+              loginService: loginService,
+              isVerifying: _isWebLogging,
+              onCookiesCaptured: (cookies, session) {
+                return _loginWithManagedBrowserCookies(cookies, session);
               },
               onCookieMissing: () {
                 context.showSnackBar(context.l10n.webLoginCookieMissing);

@@ -30,12 +30,16 @@ Cookie: key1=value1; key2=value2; ...
 当前登录统一落到 `AuthRepository.loginWithCookies` 校验与保存，UI 提供三种入口：
 
 - 二维码登录：通过 passport 二维码接口拿到回调 URL，再解析 `SESSDATA` / `bili_jct` / `DedeUserID`。
-- Web 登录：在 BuSic 管理的内置 WebView 中打开 Bilibili 登录页，用户完成网页登录后读取该 WebView cookie store 中的 Bilibili cookies。
+- Web 登录：
+  - Android / iOS / macOS / Windows：在 BuSic 管理的内置 WebView 中打开 Bilibili 登录页，用户完成网页登录后读取该 WebView cookie store 中的 Bilibili cookies。
+  - Linux：启动 BuSic 管理的临时受控浏览器 profile，Chromium 系浏览器优先，Firefox 作为 fallback；通过对应远程协议读取该隔离会话中的 Bilibili cookies。
 - 手动 Cookie 登录：用户自行从浏览器开发者工具复制 `SESSDATA` / `bili_jct` / `DedeUserID`。
 
-Web 登录不读取系统浏览器或用户默认浏览器的 Cookie。它只读取 BuSic 创建的 WebView 会话，因此比“扫描用户浏览器配置目录”更可控，也避免跨浏览器、跨平台和权限问题。首版支持 Android / iOS / macOS / Windows；Linux 页面显示不支持提示，并保留二维码与手动 Cookie 登录。
+Web 登录不读取系统浏览器或用户默认浏览器的 Cookie。它只读取 BuSic 创建的隔离登录会话，因此比“扫描用户浏览器配置目录”更可控，也避免跨浏览器、跨平台和权限问题。Linux 如果找不到 Chrome / Chromium / Edge / Brave / Vivaldi 等 Chromium 系浏览器，会继续尝试 Firefox；两类浏览器都找不到时才显示 fallback，并保留二维码与手动 Cookie 登录。
 
 Windows 上 Web 登录依赖 Microsoft Edge WebView2 Runtime。创建内置 WebView 前必须先检查 Runtime 是否可用，并用 BuSic 数据目录下的可写 `webview2` 目录创建 `WebViewEnvironment`；不要让 WebView2 使用安装目录旁的默认 user data folder，否则安装到只读目录时可能导致 WebView 初始化失败或空白。
+
+Linux 上 Web 登录不依赖 `flutter_inappwebview` Linux beta。当前保守实现会用临时 profile 启动受控浏览器：Chromium 系使用 `--remote-debugging-port=0` + `DevToolsActivePort` + CDP `Storage.getCookies`，Firefox 使用 WebDriver BiDi `storage.getCookies`。登录完成、取消或失败后必须关闭浏览器进程并删除临时 profile。
 
 ## 2. 登录态会影响什么
 
@@ -135,9 +139,10 @@ WBI 相关真源：
 - `lib/core/api/wbi_sign.dart`
 - `lib/features/auth/*`
 - `lib/features/auth/data/bili_web_login_cookie_store.dart`
+- `lib/features/auth/data/linux_managed_browser_login_service.dart`
 - `lib/features/search_and_parse/*`
 - `lib/features/comment/*`
 - `lib/features/subtitle/*`
 - `lib/features/playlist/application/bili_fav_import_notifier.dart`
 
-如果改 Web 登录，还要额外验证 Linux fallback 页面仍可编译，并确认不会尝试读取系统浏览器 Cookie。
+如果改 Web 登录，还要额外验证 Linux 托管浏览器路径和无浏览器 fallback 页面仍可编译，并确认不会尝试读取系统浏览器 Cookie。

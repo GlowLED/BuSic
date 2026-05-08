@@ -81,6 +81,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webLoginUnsupportedDesc => 'Use QR login or manual Cookie login on this device.';
 
   @override
+  String get webLoginBrowserMissingTitle => 'No supported browser found';
+
+  @override
+  String get webLoginBrowserMissingDesc => 'Install Chrome, Chromium, Edge, Brave, Vivaldi, or Firefox to use Linux web login, or use QR login / manual Cookie login.';
+
+  @override
   String get webLoginWebView2MissingTitle => 'WebView2 Runtime is missing';
 
   @override
@@ -94,6 +100,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webLoginPageLoadFailed => 'The login page failed to load. Check your network and try again.';
+
+  @override
+  String get webLoginLinuxTitle => 'Linux Web Login';
+
+  @override
+  String get webLoginLinuxDesc => 'BuSic will open a temporary browser window and only read cookies from that isolated login session.';
+
+  @override
+  String get webLoginLinuxOpenBrowser => 'Open login window';
+
+  @override
+  String get webLoginLinuxWaiting => 'Complete Bilibili login in the browser window, then return here to verify.';
+
+  @override
+  String get webLoginLinuxCancel => 'Cancel';
+
+  @override
+  String get webLoginLinuxStartFailed => 'The temporary browser login could not start. Use QR login or manual Cookie login.';
 
   @override
   String webLoginFailedWithError(String error) {

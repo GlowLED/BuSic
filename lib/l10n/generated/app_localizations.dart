@@ -239,6 +239,18 @@ abstract class AppLocalizations {
   /// **'Use QR login or manual Cookie login on this device.'**
   String get webLoginUnsupportedDesc;
 
+  /// No description provided for @webLoginBrowserMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No supported browser found'**
+  String get webLoginBrowserMissingTitle;
+
+  /// No description provided for @webLoginBrowserMissingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Install Chrome, Chromium, Edge, Brave, Vivaldi, or Firefox to use Linux web login, or use QR login / manual Cookie login.'**
+  String get webLoginBrowserMissingDesc;
+
   /// No description provided for @webLoginWebView2MissingTitle.
   ///
   /// In en, this message translates to:
@@ -268,6 +280,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The login page failed to load. Check your network and try again.'**
   String get webLoginPageLoadFailed;
+
+  /// No description provided for @webLoginLinuxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Linux Web Login'**
+  String get webLoginLinuxTitle;
+
+  /// No description provided for @webLoginLinuxDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'BuSic will open a temporary browser window and only read cookies from that isolated login session.'**
+  String get webLoginLinuxDesc;
+
+  /// No description provided for @webLoginLinuxOpenBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open login window'**
+  String get webLoginLinuxOpenBrowser;
+
+  /// No description provided for @webLoginLinuxWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Bilibili login in the browser window, then return here to verify.'**
+  String get webLoginLinuxWaiting;
+
+  /// No description provided for @webLoginLinuxCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get webLoginLinuxCancel;
+
+  /// No description provided for @webLoginLinuxStartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The temporary browser login could not start. Use QR login or manual Cookie login.'**
+  String get webLoginLinuxStartFailed;
 
   /// No description provided for @webLoginFailedWithError.
   ///

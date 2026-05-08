@@ -177,7 +177,7 @@ presentation
 三种登录入口最终都要收敛到同一条链路：
 
 - 二维码回调 URL 解析 Cookie
-- 内置 WebView 读取自身 cookie store
+- Web 登录读取 BuSic 管理的隔离会话 Cookie：内置 WebView 或 Linux 临时受控浏览器 profile（Chromium 系优先，Firefox fallback）
 - 手动输入 Cookie
 
 随后统一由 `AuthRepository.loginWithCookies` 调用 B 站 `nav` 校验，确认有效后再写入 `UserSessions` 并同步 `BiliDio` raw cookies。不要让 UI 层直接写登录会话。

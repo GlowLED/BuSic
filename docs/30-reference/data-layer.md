@@ -242,7 +242,7 @@ final signedParams = WbiSign.encodeWbi(params, keys.imgKey, keys.subKey);
 - 登录成功后通过 `BiliDio.setSessionCookies()` 设置
 - 退出登录通过 `BiliDio.clearCookies()` 清除
 - **注意**：B站 SESSDATA 包含逗号，不使用 `dart:io` 的 `Cookie` 类解析
-- Web 登录使用内置 WebView cookie store 提取登录 Cookie，再交给 `AuthRepository.loginWithCookies` 统一校验与保存；它不读取系统浏览器 Cookie
+- Web 登录使用 BuSic 管理的隔离会话提取登录 Cookie，再交给 `AuthRepository.loginWithCookies` 统一校验与保存；Android / iOS / macOS / Windows 读取内置 WebView cookie store，Linux 读取临时受控浏览器 profile 的协议 Cookie（Chromium 系走 CDP，Firefox 走 WebDriver BiDi），它们都不读取系统浏览器 Cookie
 
 ### 音频流获取
 

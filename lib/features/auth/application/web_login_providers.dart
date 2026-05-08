@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path/path.dart' as p;
@@ -5,10 +6,23 @@ import 'package:path/path.dart' as p;
 import '../../../core/utils/logger.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../data/bili_web_login_cookie_store.dart';
+import '../data/linux_managed_browser_login_service.dart';
+
+enum WebLoginMode {
+  embeddedWebView,
+  managedBrowser,
+}
+
+enum WebLoginHostPlatform {
+  linux,
+  windows,
+  other,
+}
 
 enum WebLoginAvailabilityStatus {
   available,
   unsupportedPlatform,
+  browserMissing,
   webView2Missing,
   initializationFailed,
 }
@@ -16,19 +30,25 @@ enum WebLoginAvailabilityStatus {
 class WebLoginAvailability {
   const WebLoginAvailability._({
     required this.status,
+    this.mode = WebLoginMode.embeddedWebView,
     this.webViewEnvironment,
     this.error,
   });
 
   const WebLoginAvailability.available({
+    WebLoginMode mode = WebLoginMode.embeddedWebView,
     WebViewEnvironment? webViewEnvironment,
   }) : this._(
           status: WebLoginAvailabilityStatus.available,
+          mode: mode,
           webViewEnvironment: webViewEnvironment,
         );
 
   const WebLoginAvailability.unsupportedPlatform()
       : this._(status: WebLoginAvailabilityStatus.unsupportedPlatform);
+
+  const WebLoginAvailability.browserMissing()
+      : this._(status: WebLoginAvailabilityStatus.browserMissing);
 
   const WebLoginAvailability.webView2Missing()
       : this._(status: WebLoginAvailabilityStatus.webView2Missing);
@@ -40,6 +60,7 @@ class WebLoginAvailability {
         );
 
   final WebLoginAvailabilityStatus status;
+  final WebLoginMode mode;
   final WebViewEnvironment? webViewEnvironment;
   final Object? error;
 
@@ -48,11 +69,20 @@ class WebLoginAvailability {
 
 final webLoginAvailabilityProvider =
     FutureProvider.autoDispose<WebLoginAvailability>((ref) async {
-  if (PlatformUtils.isLinux) {
-    return const WebLoginAvailability.unsupportedPlatform();
+  final hostPlatform = ref.watch(webLoginHostPlatformProvider);
+
+  if (hostPlatform == WebLoginHostPlatform.linux) {
+    final service = ref.watch(linuxManagedBrowserLoginServiceProvider);
+    final available = await service.isAvailable();
+    if (!available) {
+      return const WebLoginAvailability.browserMissing();
+    }
+    return const WebLoginAvailability.available(
+      mode: WebLoginMode.managedBrowser,
+    );
   }
 
-  if (!PlatformUtils.isWindows) {
+  if (hostPlatform != WebLoginHostPlatform.windows) {
     return const WebLoginAvailability.available();
   }
 
@@ -87,6 +117,17 @@ final webLoginAvailabilityProvider =
   }
 });
 
+final webLoginHostPlatformProvider = Provider<WebLoginHostPlatform>((ref) {
+  if (PlatformUtils.isLinux || defaultTargetPlatform == TargetPlatform.linux) {
+    return WebLoginHostPlatform.linux;
+  }
+  if (PlatformUtils.isWindows ||
+      defaultTargetPlatform == TargetPlatform.windows) {
+    return WebLoginHostPlatform.windows;
+  }
+  return WebLoginHostPlatform.other;
+});
+
 final biliWebLoginCookieStoreProvider =
     Provider.autoDispose.family<BiliWebLoginCookieStore, WebViewEnvironment?>(
   (ref, webViewEnvironment) {
@@ -95,3 +136,8 @@ final biliWebLoginCookieStoreProvider =
     );
   },
 );
+
+final linuxManagedBrowserLoginServiceProvider =
+    Provider<LinuxManagedBrowserLoginService>((ref) {
+  return ProcessLinuxManagedBrowserLoginService();
+});

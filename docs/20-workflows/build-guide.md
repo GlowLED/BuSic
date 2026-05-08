@@ -36,7 +36,7 @@
 
 - `window_manager`
 - `tray_manager`
-- `flutter_inappwebview`（用于 B 站网页登录；Linux 当前显示不支持 fallback）
+- `flutter_inappwebview`（用于 Android / iOS / macOS / Windows B 站网页登录；Linux Web 登录使用外部受控浏览器的临时隔离会话，Chromium 系优先，Firefox fallback）
 
 桌面构建和运行需要对应平台的原生开发环境正常。
 

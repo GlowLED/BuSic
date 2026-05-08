@@ -131,15 +131,15 @@ lib/
 负责：
 
 - 二维码登录
-- 内置 WebView 登录
+- Web 登录（内置 WebView；Linux 使用临时受控浏览器会话）
 - 手动 Cookie 登录
 - 登录 Cookie 校验、持久化与失效清理
 
 最重要的实现点：
 
 - 三种入口统一落到 `AuthRepository.loginWithCookies`
-- Web 登录只读取 BuSic 内置 WebView 的 cookie store，不读取系统浏览器 Cookie
-- Linux 当前显示网页登录不支持 fallback，仍保留二维码和手动 Cookie 登录
+- Web 登录只读取 BuSic 管理的隔离登录会话，不读取系统浏览器 Cookie
+- Linux 使用临时受控浏览器 profile 捕获 Cookie，Chromium 系优先，Firefox fallback；找不到支持浏览器时显示 fallback，仍保留二维码和手动 Cookie 登录
 
 ### `share`
 
