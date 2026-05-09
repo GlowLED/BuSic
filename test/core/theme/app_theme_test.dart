@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -83,6 +84,31 @@ void main() {
             ),
           );
         }
+      }
+    });
+
+    test('windows text theme uses stable CJK fonts and regular body weight',
+        () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+      for (final theme in [
+        AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
+        AppTheme.darkTheme(seedColor: AppTheme.pinkSeed),
+      ]) {
+        expect(theme.textTheme.bodyLarge?.fontFamily, 'Microsoft YaHei UI');
+        expect(theme.textTheme.bodyMedium?.fontFamily, 'Microsoft YaHei UI');
+        expect(theme.textTheme.bodySmall?.fontFamily, 'Microsoft YaHei UI');
+        expect(
+          theme.textTheme.bodyMedium?.fontFamilyFallback,
+          const ['Microsoft YaHei', 'Segoe UI', 'Arial'],
+        );
+
+        expect(theme.textTheme.bodyLarge?.fontWeight, FontWeight.w400);
+        expect(theme.textTheme.bodyMedium?.fontWeight, FontWeight.w400);
+        expect(theme.textTheme.bodySmall?.fontWeight, FontWeight.w400);
+        expect(theme.textTheme.titleMedium?.fontWeight, FontWeight.w700);
+        expect(theme.textTheme.labelMedium?.fontWeight, FontWeight.w700);
       }
     });
   });

@@ -25,7 +25,18 @@
 - 移动端底部 dock
 - `PlayerBar` 是否仍正确显示
 
-## 2. 自定义桌面标题栏
+## 2. Windows 中文字体渲染
+
+Windows 桌面端的中文正文使用全局主题里的系统字体策略：
+
+- 首选 `Microsoft YaHei UI`
+- fallback：`Microsoft YaHei`、`Segoe UI`、`Arial`
+- 正文 `bodyLarge / bodyMedium / bodySmall` 在 Windows 上使用 `FontWeight.w400`
+- 标题、标签、按钮等强调文本仍保留现有 `w600 / w700`
+
+原因是 Windows CJK 字体 fallback 和 `w500` 伪中粗容易在长中文段落中出现粗细不均。改 `AppTheme` 或长文本页面时，不要在局部重新把正文中文强行设回 `w500`。
+
+## 3. 自定义桌面标题栏
 
 桌面标题栏不是系统默认标题栏，而是壳层自绘的一部分，并且和侧栏共用同一套 surface / border / glow 视觉语言：
 - 左侧拖拽区显示应用品牌和当前分支标题
@@ -35,7 +46,7 @@
 
 这意味着“点关闭 = 退出程序”在桌面端并不成立。
 
-## 3. 托盘行为
+## 4. 托盘行为
 
 `TrayService` 当前负责：
 - 托盘图标
@@ -47,7 +58,7 @@
 - `lib/core/window/tray_service.dart`
 - `lib/core/window/window_service.dart`
 
-## 4. 极简模式不是普通主题变体
+## 5. 极简模式不是普通主题变体
 
 极简模式当前是：
 - 独立路由 `/minimal`
@@ -55,7 +66,7 @@
 - 仍会读取已绑定的歌单 ID 作为极简页内部播放来源
 - 有自己的独立生命周期策略
 
-## 5. 极简模式生命周期策略
+## 6. 极简模式生命周期策略
 
 这是 BuSic 很特化的一条规则：
 - `paused / resumed / hidden`：**不干预播放**
@@ -64,7 +75,7 @@
 原因是 Flutter 无法可靠区分锁屏和切后台。
 如果在 `paused` 里暂停，锁屏听歌会断；如果在 `resumed` 里做播放切换，解锁会误触发。
 
-## 6. 全屏播放器与其他页面的手势关系
+## 7. 全屏播放器与其他页面的手势关系
 
 全屏播放器并不只是一个静态页面：
 - 横向切换评论
@@ -74,7 +85,7 @@
 
 改全屏播放器 UI 时，不要只看单个 Widget，还要看整套 PageView 与手势冲突。
 
-## 7. 最常见误区
+## 8. 最常见误区
 
 - 以为桌面端关闭就等于退出
 - 以为极简模式只是换皮
@@ -82,7 +93,7 @@
 - 以为紧凑侧栏仍然会显示文字或 tooltip
 - 只在一个平台验证就提交
 
-## 8. 修改这部分时要一起看什么？
+## 9. 修改这部分时要一起看什么？
 
 - `lib/shared/widgets/responsive_scaffold.dart`
 - `lib/shared/widgets/desktop_window_resize_frame.dart`

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
 import 'app_theme_tokens.dart';
@@ -623,6 +625,9 @@ class AppTheme {
     TextTheme base,
     AppThemePalette palette,
   ) {
+    final isWindows = defaultTargetPlatform == TargetPlatform.windows;
+    final bodyWeight = isWindows ? FontWeight.w400 : FontWeight.w500;
+
     TextStyle tune(
       TextStyle? style, {
       double? size,
@@ -631,12 +636,25 @@ class AppTheme {
       double? letterSpacing,
       Color? color,
     }) {
-      return (style ?? const TextStyle()).copyWith(
+      final tuned = (style ?? const TextStyle()).copyWith(
         fontSize: size,
         fontWeight: weight,
         height: height,
         letterSpacing: letterSpacing,
         color: color ?? palette.textPrimary,
+      );
+
+      if (!isWindows) {
+        return tuned;
+      }
+
+      return tuned.copyWith(
+        fontFamily: 'Microsoft YaHei UI',
+        fontFamilyFallback: const [
+          'Microsoft YaHei',
+          'Segoe UI',
+          'Arial',
+        ],
       );
     }
 
@@ -705,19 +723,19 @@ class AppTheme {
       bodyLarge: tune(
         base.bodyLarge,
         size: 16,
-        weight: FontWeight.w500,
+        weight: bodyWeight,
         height: 1.42,
       ),
       bodyMedium: tune(
         base.bodyMedium,
         size: 14,
-        weight: FontWeight.w500,
+        weight: bodyWeight,
         height: 1.45,
       ),
       bodySmall: tune(
         base.bodySmall,
         size: 12,
-        weight: FontWeight.w500,
+        weight: bodyWeight,
         height: 1.45,
         color: palette.textSecondary,
       ),
