@@ -1083,6 +1083,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get colorCyan => '蓝绿';
 
   @override
+  String get windowMinimize => '最小化';
+
+  @override
+  String get windowMaximizeRestore => '最大化或还原';
+
+  @override
+  String get windowHideToTray => '隐藏到托盘';
+
+  @override
   String get lyricsTitle => '歌词';
 
   @override

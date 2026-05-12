@@ -1083,6 +1083,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorCyan => 'Cyan';
 
   @override
+  String get windowMinimize => 'Minimize';
+
+  @override
+  String get windowMaximizeRestore => 'Maximize or restore';
+
+  @override
+  String get windowHideToTray => 'Hide to tray';
+
+  @override
   String get lyricsTitle => 'Lyrics';
 
   @override

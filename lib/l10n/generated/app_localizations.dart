@@ -2099,6 +2099,24 @@ abstract class AppLocalizations {
   /// **'Cyan'**
   String get colorCyan;
 
+  /// No description provided for @windowMinimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimize'**
+  String get windowMinimize;
+
+  /// No description provided for @windowMaximizeRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximize or restore'**
+  String get windowMaximizeRestore;
+
+  /// No description provided for @windowHideToTray.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide to tray'**
+  String get windowHideToTray;
+
   /// No description provided for @lyricsTitle.
   ///
   /// In en, this message translates to:
