@@ -1,7 +1,28 @@
 {
-  "latest": "0.3.8",
+  "latest": "0.4.0",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.4.0",
+      "build": 15,
+      "date": "2026-05-13",
+      "changelog": "## BuSic 0.4.0\n\nBuSic 0.4.0 带来了全新的界面体验、更完整的 B 站视频详情能力，以及更顺手的登录、播放和缓存管理流程。\n\n### 新功能与体验改进\n- 全新设计的主界面、响应式导航壳层、歌单页、搜索页、设置页和通用媒体组件。\n- 搜索结果支持更接近 B 站体验的视频详情页，包含简介、分 P、统计信息、互动状态和评论相关展示。\n- 新增 B 站网页登录入口，并改进 Windows WebView2 初始化与 Linux 受控浏览器登录流程，Linux 现在支持 Firefox fallback。\n- 播放器新增全屏页分区切换、BV 号复制、收藏状态恢复和更清晰的进度条交互。\n- 下载页将已完成下载按“本地缓存”理解，缓存管理语义更明确。\n\n### 修复与稳定性\n- 修复冷启动播放进度恢复、进入登录页导致播放暂停、播放器收藏状态不同步等问题。\n- 修复 Windows 中文正文渲染、Linux 无边框窗口缩放、移动端弹窗关闭后键盘残留等界面问题。\n- 改进文本选择、主题对比度、桌面侧边栏布局和全屏播放页窗口控制。\n- 过期 B 站登录会话现在会被正确清理。\n\n### 工程与文档\n- 补齐 auth、player、subtitle、搜索详情、视频互动、响应式壳层等关键路径测试。\n- 重整 docs 与 agent 技能文档，当前开发、测试、发布和项目真源更清晰。",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.0/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.0/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.0/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.0/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.3.8",
       "build": 14,

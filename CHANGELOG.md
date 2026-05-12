@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-05-13
+
+### Features
+- 全新设计主界面、响应式导航壳层、歌单页、搜索页、设置页和通用媒体组件。
+- 搜索结果支持更接近 B 站体验的视频详情页，包含简介、分 P、统计信息、互动状态和评论相关展示。
+- 新增 B 站网页登录入口，并改进 Windows WebView2 初始化与 Linux 受控浏览器登录流程，Linux 现在支持 Firefox fallback。
+- 播放器新增全屏页分区切换、BV 号复制、收藏状态恢复和更清晰的进度条交互。
+- 下载页将已完成下载按本地缓存理解，缓存管理语义更明确。
+
+### Bug Fixes
+- 修复冷启动播放进度恢复、进入登录页导致播放暂停、播放器收藏状态不同步等问题。
+- 修复 Windows 中文正文渲染、Linux 无边框窗口缩放、移动端弹窗关闭后键盘残留等界面问题。
+- 改进文本选择、主题对比度、桌面侧边栏布局和全屏播放页窗口控制。
+- 过期 B 站登录会话现在会被正确清理。
+
+### Documentation
+- 重整 docs 与 agent 技能文档，当前开发、测试、发布和项目真源更清晰。
+
+### Tests
+- 补齐 auth、player、subtitle、搜索详情、视频互动、响应式壳层等关键路径测试。
+
 ## [0.3.8] - 2026-04-16
 
 ### Bug Fixes
@@ -42,4 +63,3 @@ All notable changes to this project will be documented in this file.
 
 ### Documentation
 - docs: add .opencode to .gitignore (69544f5)
-
