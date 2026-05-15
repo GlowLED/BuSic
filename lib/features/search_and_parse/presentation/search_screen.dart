@@ -105,6 +105,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

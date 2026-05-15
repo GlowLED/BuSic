@@ -9,7 +9,6 @@ import '../../features/auth/presentation/widgets/user_avatar_widget.dart';
 import '../../features/player/presentation/player_bar.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../extensions/context_extensions.dart';
-import 'app_panel.dart';
 
 const _navigationAnimationDuration = Duration(milliseconds: 220);
 const _navigationAnimationCurve = Curves.easeOutCubic;
@@ -211,7 +210,8 @@ class _DesktopTitleBar extends StatelessWidget {
     final spacing = context.appSpacing;
     final textTheme = context.textTheme;
 
-    return _ShellPanel(
+    return Container(
+      color: Colors.transparent,
       child: SizedBox(
         height: 72,
         child: Row(
@@ -313,37 +313,49 @@ class _DesktopSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.appPalette;
     final spacing = context.appSpacing;
 
-    return _ShellPanel(
-      padding: EdgeInsets.all(spacing.sm),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: ListView.separated(
-              padding: EdgeInsets.zero,
-              itemCount: destinations.length - 1, // 排除设置
-              separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
-              itemBuilder: (context, index) {
-                return _DesktopNavigationItem(
-                  destination: destinations[index],
-                  isSelected: currentIndex == index,
-                  onTap: () => onDestinationSelected(index),
-                );
-              },
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            color: Colors.transparent,
+            padding: EdgeInsets.all(spacing.sm),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    padding: EdgeInsets.zero,
+                    itemCount: destinations.length - 1, // 排除设置
+                    separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
+                    itemBuilder: (context, index) {
+                      return _DesktopNavigationItem(
+                        destination: destinations[index],
+                        isSelected: currentIndex == index,
+                        onTap: () => onDestinationSelected(index),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: spacing.sm),
+                _DesktopNavigationItem(
+                  destination: destinations[3], // 设置目的地
+                  isSelected: currentIndex == 3,
+                  onTap: () => onDestinationSelected(3),
+                ),
+                SizedBox(height: spacing.sm),
+                const _DesktopSidebarStatusCard(),
+              ],
             ),
           ),
-          SizedBox(height: spacing.sm),
-          _DesktopNavigationItem(
-            destination: destinations[3], // 设置目的地
-            isSelected: currentIndex == 3,
-            onTap: () => onDestinationSelected(3),
-          ),
-          SizedBox(height: spacing.sm),
-          const _DesktopSidebarStatusCard(),
-        ],
-      ),
+        ),
+        Container(
+          width: 1,
+          color: palette.borderSubtle.withValues(alpha: 0.5),
+        ),
+      ],
     );
   }
 }
@@ -393,13 +405,12 @@ class _DesktopSidebarStatusCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final palette = context.appPalette;
     final spacing = context.appSpacing;
 
     return Container(
       padding: EdgeInsets.all(spacing.sm),
-      decoration: BoxDecoration(
-        color: palette.surfaceSecondary.withValues(alpha: 0.56),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
       ),
       child: const UserAvatarWidget(),
     );
@@ -419,27 +430,11 @@ class _MobileNavDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.appPalette;
     final spacing = context.appSpacing;
 
     return Container(
       padding: EdgeInsets.all(spacing.xs),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            palette.surfaceElevated.withValues(alpha: 0.98),
-            palette.surfaceSecondary.withValues(alpha: 0.94),
-          ],
-        ),
-        borderRadius: context.appRadii.xLargeRadius,
-        border: Border.all(
-          color: palette.borderSubtle.withValues(alpha: 0.95),
-          width: context.appDepth.outline,
-        ),
-        boxShadow: context.appDepth.floatingShadow,
-      ),
+      color: Colors.transparent,
       child: Row(
         children: [
           for (var index = 0; index < destinations.length; index++)
@@ -484,24 +479,10 @@ class _MobileNavigationItem extends StatelessWidget {
             vertical: spacing.sm,
           ),
           decoration: BoxDecoration(
-            gradient: isSelected
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      palette.accentSoft,
-                      palette.surfaceElevated,
-                    ],
-                  )
-                : null,
+            color: isSelected
+                ? palette.accentSoft.withValues(alpha: 0.3)
+                : Colors.transparent,
             borderRadius: context.appRadii.largeRadius,
-            border: Border.all(
-              color: isSelected
-                  ? palette.accentStrong.withValues(alpha: 0.68)
-                  : Colors.transparent,
-              width: context.appDepth.outline,
-            ),
-            boxShadow: isSelected ? context.appDepth.coverGlowShadow : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -537,14 +518,8 @@ class _ShellPlayerDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: context.appRadii.xLargeRadius,
-        boxShadow: context.appDepth.floatingShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: context.appRadii.xLargeRadius,
-        child: const PlayerBar(),
-      ),
+      color: Colors.transparent,
+      child: const PlayerBar(),
     );
   }
 }
@@ -556,43 +531,8 @@ class _ShellContentFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.appPalette;
-
-    return AppPanel(
-      borderRadius: context.appRadii.xLargeRadius,
-      blurSigma: 12,
-      backgroundColors: [
-        palette.surfacePrimary.withValues(alpha: 0.98),
-        palette.backgroundPrimary.withValues(alpha: 0.94),
-      ],
-      gradientBegin: Alignment.topCenter,
-      gradientEnd: Alignment.bottomCenter,
-      child: child,
-    );
-  }
-}
-
-class _ShellPanel extends StatelessWidget {
-  const _ShellPanel({
-    required this.child,
-    this.padding,
-  });
-
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.appPalette;
-
-    return AppPanel(
-      borderRadius: context.appRadii.xLargeRadius,
-      blurSigma: 18,
-      padding: padding,
-      backgroundColors: [
-        palette.surfaceElevated.withValues(alpha: 0.96),
-        palette.surfaceSecondary.withValues(alpha: 0.92),
-      ],
+    return Container(
+      color: Colors.transparent,
       child: child,
     );
   }
@@ -621,61 +561,8 @@ class _ShellBackdrop extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Positioned(
-            top: -96,
-            left: -72,
-            child: _BackdropGlow(
-              size: 260,
-              color: palette.accentStrong.withValues(alpha: 0.18),
-            ),
-          ),
-          Positioned(
-            right: -120,
-            bottom: -110,
-            child: _BackdropGlow(
-              size: 320,
-              color: palette.coverGlow.withValues(alpha: 0.34),
-            ),
-          ),
-          Positioned(
-            top: 120,
-            right: 80,
-            child: _BackdropGlow(
-              size: 180,
-              color: palette.overlayStrong.withValues(alpha: 0.2),
-            ),
-          ),
           child,
         ],
-      ),
-    );
-  }
-}
-
-class _BackdropGlow extends StatelessWidget {
-  const _BackdropGlow({
-    required this.size,
-    required this.color,
-  });
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [
-              color,
-              color.withValues(alpha: 0),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -707,14 +594,8 @@ class _NavigationIconPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: isSelected
             ? palette.accentStrong
-            : palette.surfaceElevated.withValues(alpha: 0.92),
+            : Colors.transparent,
         borderRadius: context.appRadii.mediumRadius,
-        border: Border.all(
-          color: isSelected
-              ? palette.accentStrong.withValues(alpha: 0.7)
-              : palette.borderSubtle.withValues(alpha: 0.9),
-          width: context.appDepth.outline,
-        ),
       ),
       child: Stack(
         alignment: Alignment.center,

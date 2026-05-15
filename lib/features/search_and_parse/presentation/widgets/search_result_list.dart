@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/extensions/context_extensions.dart';
-import '../../../../shared/widgets/app_panel.dart';
 import '../../../../shared/widgets/media_cover.dart';
 import '../../../../shared/widgets/media_row.dart';
 import '../../domain/models/bvid_info.dart';
@@ -71,6 +70,7 @@ class SearchResultList extends StatelessWidget {
                   onTap: () => onVideoTap(video),
                 ),
                 onTap: () => onVideoTap(video),
+                embedded: true,
               );
             },
           ),
@@ -109,8 +109,7 @@ class _PaginationBar extends StatelessWidget {
         spacing.md,
         spacing.md,
       ),
-      child: AppPanel(
-        blurSigma: 14,
+      child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: spacing.md,
           vertical: spacing.sm,

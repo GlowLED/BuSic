@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
-import '../../../../shared/widgets/app_panel.dart';
 
 /// Console-style settings section used by the settings screen.
 class SettingsSectionPanel extends StatelessWidget {
@@ -23,9 +22,9 @@ class SettingsSectionPanel extends StatelessWidget {
     final spacing = context.appSpacing;
     final palette = context.appPalette;
 
-    return AppPanel(
+    return Container(
       padding: EdgeInsets.all(spacing.md),
-      borderRadius: context.appRadii.xLargeRadius,
+      color: palette.backgroundPrimary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -37,10 +36,6 @@ class SettingsSectionPanel extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: palette.accentSoft.withValues(alpha: 0.72),
                   borderRadius: context.appRadii.mediumRadius,
-                  border: Border.all(
-                    color: palette.accentStrong.withValues(alpha: 0.28),
-                    width: context.appDepth.outline,
-                  ),
                 ),
                 child: Icon(icon, size: 20, color: palette.accentStrong),
               ),
@@ -119,17 +114,12 @@ class SettingsTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: context.appRadii.largeRadius,
+          borderRadius: context.appRadii.smallRadius,
           onTap: active ? onTap : null,
           onLongPress: active ? onLongPress : null,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: palette.surfacePrimary.withValues(alpha: 0.42),
-              borderRadius: context.appRadii.largeRadius,
-              border: Border.all(
-                color: palette.borderSubtle.withValues(alpha: 0.72),
-                width: context.appDepth.hairline,
-              ),
+              color: palette.surfacePrimary.withValues(alpha: 0.15),
             ),
             child: Padding(
               padding: EdgeInsets.all(spacing.sm),

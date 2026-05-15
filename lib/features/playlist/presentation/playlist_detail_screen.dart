@@ -380,6 +380,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         ],
       ),
       isActive: isCurrentSong,
+      embedded: true,
     );
   }
 
@@ -423,6 +424,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
       onTap: () => _toggleSongSelection(song.id),
       isActive: isCurrentSong,
       isSelected: isSelected,
+      embedded: true,
     );
   }
 
@@ -712,10 +714,6 @@ class _AccessoryPill extends StatelessWidget {
         decoration: BoxDecoration(
           color: palette.surfaceSecondary.withValues(alpha: 0.9),
           borderRadius: context.appRadii.mediumRadius,
-          border: Border.all(
-            color: palette.borderSubtle.withValues(alpha: 0.88),
-            width: context.appDepth.outline,
-          ),
         ),
         child: Icon(
           icon,

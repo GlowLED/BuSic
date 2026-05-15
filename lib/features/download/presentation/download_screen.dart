@@ -18,6 +18,7 @@ class DownloadScreen extends ConsumerWidget {
     final l10n = context.l10n;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: tasksAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),

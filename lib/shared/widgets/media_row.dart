@@ -19,6 +19,7 @@ class MediaRow extends StatefulWidget {
     this.isSelected = false,
     this.enabled = true,
     this.padding,
+    this.embedded = false,
   });
 
   final Widget cover;
@@ -33,6 +34,7 @@ class MediaRow extends StatefulWidget {
   final bool isSelected;
   final bool enabled;
   final EdgeInsetsGeometry? padding;
+  final bool embedded;
 
   @override
   State<MediaRow> createState() => _MediaRowState();
@@ -91,6 +93,99 @@ class _MediaRowState extends State<MediaRow> {
       spreadRadius: depth.glowSpread * 0.35,
     );
 
+    // Embedded mode: simple container without glass effect
+    if (widget.embedded) {
+      return Semantics(
+        container: true,
+        button: widget.onTap != null,
+        enabled: widget.enabled,
+        selected: widget.isSelected,
+        child: Opacity(
+          opacity: widget.enabled ? 1 : 0.58,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: hasSurfaceInteraction ? widget.onTap : null,
+              onLongPress: hasSurfaceInteraction ? widget.onLongPress : null,
+              onHover: hasSurfaceInteraction
+                  ? (value) {
+                      if (_isHovered == value) return;
+                      setState(() {
+                        _isHovered = value;
+                      });
+                    }
+                  : null,
+              onHighlightChanged: hasSurfaceInteraction
+                  ? (value) {
+                      if (_isPressed == value) return;
+                      setState(() {
+                        _isPressed = value;
+                      });
+                    }
+                  : null,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: widget.isActive
+                      ? palette.accentSoft.withValues(alpha: 0.15)
+                      : _isHovered
+                          ? palette.overlaySoft
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Padding(
+                  padding: widget.padding ??
+                      EdgeInsets.symmetric(
+                        horizontal: spacing.sm,
+                        vertical: spacing.sm,
+                      ),
+                  child: Row(
+                    children: [
+                      if (widget.leadingAccessory != null) ...[
+                        widget.leadingAccessory!,
+                        SizedBox(width: spacing.sm),
+                      ],
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: widget.cover,
+                      ),
+                      SizedBox(width: spacing.md),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            widget.title,
+                            if (widget.subtitle != null) ...[
+                              SizedBox(height: spacing.xxs),
+                              widget.subtitle!,
+                            ],
+                            if (widget.badges.isNotEmpty) ...[
+                              SizedBox(height: spacing.sm),
+                              Wrap(
+                                spacing: spacing.xs,
+                                runSpacing: spacing.xs,
+                                children: widget.badges,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (widget.trailing != null) ...[
+                        SizedBox(width: spacing.sm),
+                        widget.trailing!,
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Default mode: glass panel with borders and shadows
     return Semantics(
       container: true,
       button: widget.onTap != null,

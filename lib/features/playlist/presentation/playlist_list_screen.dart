@@ -30,6 +30,7 @@ class PlaylistListScreen extends ConsumerWidget {
     final playlistsAsync = ref.watch(playlistListNotifierProvider);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: playlistsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),

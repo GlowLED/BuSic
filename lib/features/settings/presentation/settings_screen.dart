@@ -23,6 +23,7 @@ class SettingsScreen extends ConsumerWidget {
     final palette = context.appPalette;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.fromLTRB(
