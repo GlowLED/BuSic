@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/utils/formatters.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/extensions/context_extensions.dart';
@@ -10,6 +11,11 @@ import '../application/parse_notifier.dart';
 import '../domain/models/bvid_info.dart';
 import 'widgets/search_result_list.dart';
 import 'widgets/video_detail_view.dart';
+
+const _searchBarAnimationDuration = Duration(milliseconds: 260);
+const _contentSwitchDuration = Duration(milliseconds: 180);
+const _compactSearchBreakpoint = 560.0;
+const _centeredSearchMaxWidth = 720.0;
 
 /// Main search screen with unified input for BV number parsing and keyword search.
 ///
@@ -33,16 +39,39 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   int _currentPage = 1;
   int _totalPages = 1;
   String _currentKeyword = '';
+  bool _hasSubmittedInput = false;
+  bool _hasInputText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_handleInputTextChanged);
+  }
 
   @override
   void dispose() {
+    _controller.removeListener(_handleInputTextChanged);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _handleInputTextChanged() {
+    final hasInputText = _controller.text.trim().isNotEmpty;
+    if (_hasInputText == hasInputText) return;
+
+    setState(() {
+      _hasInputText = hasInputText;
+      if (!hasInputText) {
+        _hasSubmittedInput = false;
+      }
+    });
   }
 
   void _handleSubmit() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
+
+    setState(() => _hasSubmittedInput = true);
 
     final bvid = Formatters.parseBvid(text);
     if (bvid != null) {
@@ -97,7 +126,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final parseState = ref.watch(parseNotifierProvider);
     final l10n = AppLocalizations.of(context)!;
-    final spacing = context.appSpacing;
 
     final showVideoDetail = parseState.whenOrNull(
       success: (info) => info,
@@ -107,46 +135,87 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (showVideoDetail == null) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.lg,
-                  spacing.md,
-                  spacing.lg,
-                  spacing.xs,
+        child: showVideoDetail == null
+            ? _buildSearchLayout(
+                parseState: parseState,
+                l10n: l10n,
+              )
+            : SizedBox.expand(
+                child: AnimatedSwitcher(
+                  duration: _contentSwitchDuration,
+                  child: _buildContent(
+                    parseState: parseState,
+                    showVideoDetail: showVideoDetail,
+                    l10n: l10n,
+                  ),
                 ),
-                child: _buildInputBar(l10n, parseState),
               ),
-              parseState.whenOrNull(
-                    error: (msg) => Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        spacing.lg,
-                        spacing.sm,
-                        spacing.lg,
-                        0,
-                      ),
-                      child: _SearchErrorBanner(message: msg),
+      ),
+    );
+  }
+
+  Widget _buildSearchLayout({
+    required ParseState parseState,
+    required AppLocalizations l10n,
+  }) {
+    final spacing = context.appSpacing;
+    final inputDocked = _shouldDockInput(parseState);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < _compactSearchBreakpoint;
+        final reservedInputHeight = compact
+            ? spacing.xxxl + spacing.xxl + spacing.xl + spacing.lg
+            : spacing.xxxl + spacing.xl + spacing.md;
+
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedPadding(
+                duration: _searchBarAnimationDuration,
+                curve: Curves.easeInOutCubic,
+                padding: EdgeInsets.only(
+                  top: inputDocked ? reservedInputHeight : 0,
+                ),
+                child: AnimatedSwitcher(
+                  duration: _contentSwitchDuration,
+                  child: _buildContent(
+                    parseState: parseState,
+                    showVideoDetail: null,
+                    l10n: l10n,
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: AnimatedAlign(
+                duration: _searchBarAnimationDuration,
+                curve: Curves.easeInOutCubic,
+                alignment: inputDocked ? Alignment.topCenter : Alignment.center,
+                child: AnimatedPadding(
+                  duration: _searchBarAnimationDuration,
+                  curve: Curves.easeInOutCubic,
+                  padding: EdgeInsets.fromLTRB(
+                    spacing.lg,
+                    inputDocked ? spacing.md : 0,
+                    spacing.lg,
+                    0,
+                  ),
+                  child: _SearchInputHost(
+                    docked: inputDocked,
+                    maxWidth: constraints.maxWidth,
+                    child: _buildInputBar(
+                      l10n,
+                      parseState,
+                      compact: compact,
                     ),
-                  ) ??
-                  const SizedBox.shrink(),
-              SizedBox(height: spacing.sm),
-            ],
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
-                child: _buildContent(
-                  parseState: parseState,
-                  showVideoDetail: showVideoDetail,
-                  l10n: l10n,
+                  ),
                 ),
               ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -178,6 +247,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
 
+    final errorMessage = parseState.whenOrNull(error: (msg) => msg);
+    if (errorMessage != null) {
+      return Padding(
+        key: const ValueKey('search_error'),
+        padding: EdgeInsets.symmetric(horizontal: context.appSpacing.lg),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: _SearchErrorBanner(message: errorMessage),
+        ),
+      );
+    }
+
     if (_searchResults.isNotEmpty) {
       return SearchResultList(
         key: ValueKey('results_$_currentKeyword-$_currentPage'),
@@ -189,138 +270,134 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
 
-    return _buildEmptyState(l10n);
+    return const SizedBox.shrink(key: ValueKey('empty_search_content'));
+  }
+
+  bool _shouldDockInput(ParseState parseState) {
+    final hasActiveParseState = parseState.when(
+      idle: () => false,
+      parsing: () => true,
+      success: (_) => true,
+      selectingPages: (_, __) => true,
+      error: (_) => true,
+    );
+
+    return _isSearching ||
+        _searchResults.isNotEmpty ||
+        hasActiveParseState ||
+        (_hasSubmittedInput && _hasInputText);
   }
 
   // ── Input bar ───────────────────────────────────────────────────────
 
-  Widget _buildInputBar(AppLocalizations l10n, ParseState parseState) {
+  Widget _buildInputBar(
+    AppLocalizations l10n,
+    ParseState parseState, {
+    required bool compact,
+  }) {
     final isParsing = parseState.whenOrNull(parsing: () => true) == true;
     final spacing = context.appSpacing;
     final palette = context.appPalette;
 
+    final field = DecoratedBox(
+      key: const ValueKey('search_input_surface'),
+      decoration: BoxDecoration(
+        color: palette.surfacePrimary.withValues(alpha: 0.58),
+        borderRadius: context.appRadii.largeRadius,
+        border: Border.all(
+          color: palette.borderSubtle.withValues(alpha: 0.78),
+          width: context.appDepth.outline,
+        ),
+      ),
+      child: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: l10n.parseInput,
+          prefixIcon: Icon(
+            Icons.manage_search_rounded,
+            color: palette.textSecondary,
+          ),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.content_paste_rounded),
+            tooltip: l10n.pasteFromClipboard,
+            onPressed: isParsing ? null : _onPaste,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: spacing.sm,
+            vertical: spacing.xs,
+          ),
+        ),
+        onSubmitted: (_) => _handleSubmit(),
+        enabled: !isParsing,
+      ),
+    );
+
+    final submit = FilledButton.icon(
+      onPressed: isParsing ? null : _handleSubmit,
+      icon: isParsing
+          ? SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: context.colorScheme.onPrimary,
+              ),
+            )
+          : const Icon(Icons.search_rounded),
+      label: Text(isParsing ? l10n.parsing : l10n.search),
+    );
+
     return AppPanel(
       padding: EdgeInsets.all(spacing.sm),
       borderRadius: context.appRadii.largeRadius,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < 560;
-          final field = DecoratedBox(
-            decoration: BoxDecoration(
-              color: palette.surfacePrimary.withValues(alpha: 0.58),
-              borderRadius: context.appRadii.largeRadius,
-              border: Border.all(
-                color: palette.borderSubtle.withValues(alpha: 0.78),
-                width: context.appDepth.outline,
-              ),
-            ),
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: l10n.parseInput,
-                prefixIcon: Icon(
-                  Icons.manage_search_rounded,
-                  color: palette.textSecondary,
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.content_paste_rounded),
-                  tooltip: l10n.pasteFromClipboard,
-                  onPressed: isParsing ? null : _onPaste,
-                ),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: spacing.xs,
-                ),
-              ),
-              onSubmitted: (_) => _handleSubmit(),
-              enabled: !isParsing,
-            ),
-          );
-
-          final submit = FilledButton.icon(
-            onPressed: isParsing ? null : _handleSubmit,
-            icon: isParsing
-                ? SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: context.colorScheme.onPrimary,
-                    ),
-                  )
-                : const Icon(Icons.search_rounded),
-            label: Text(isParsing ? l10n.parsing : l10n.search),
-          );
-
-          if (compact) {
-            return Column(
+      child: compact
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 field,
                 SizedBox(height: spacing.sm),
                 SizedBox(width: double.infinity, child: submit),
               ],
-            );
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(child: field),
-                  SizedBox(width: spacing.sm),
-                  submit,
-                ],
-              ),
-            ],
-          );
-        },
-      ),
+            )
+          : Row(
+              children: [
+                Expanded(child: field),
+                SizedBox(width: spacing.sm),
+                submit,
+              ],
+            ),
     );
   }
+}
 
-  // ── Empty state ─────────────────────────────────────────────────────
+class _SearchInputHost extends StatelessWidget {
+  const _SearchInputHost({
+    required this.docked,
+    required this.maxWidth,
+    required this.child,
+  });
 
-  Widget _buildEmptyState(AppLocalizations l10n) {
+  final bool docked;
+  final double maxWidth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final palette = context.appPalette;
+    final availableWidth =
+        (maxWidth - spacing.lg * 2).clamp(0.0, maxWidth).toDouble();
+    final centeredWidth =
+        availableWidth.clamp(0.0, _centeredSearchMaxWidth).toDouble();
 
-    return Center(
-      key: const ValueKey('empty'),
-      child: AppPanel(
-        padding: EdgeInsets.all(spacing.xl),
-        borderRadius: context.appRadii.xLargeRadius,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.travel_explore_rounded,
-              size: 56,
-              color: palette.accentStrong.withValues(alpha: 0.72),
-            ),
-            SizedBox(height: spacing.md),
-            Text(
-              l10n.searchEmptyTitle,
-              style: context.textTheme.titleMedium?.copyWith(
-                color: palette.textPrimary,
-              ),
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              l10n.searchEmptySubtitle,
-              textAlign: TextAlign.center,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: palette.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AnimatedContainer(
+      duration: _searchBarAnimationDuration,
+      curve: Curves.easeInOutCubic,
+      width: docked ? availableWidth : centeredWidth,
+      child: child,
     );
   }
 }
