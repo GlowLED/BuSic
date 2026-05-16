@@ -41,7 +41,6 @@ class VideoDetailView extends ConsumerStatefulWidget {
 }
 
 class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
-  bool _isTitleExpanded = false;
   bool _isDescriptionExpanded = false;
 
   @override
@@ -113,6 +112,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                 delegate: _VideoDetailTabsDelegate(
                   videoInfo: videoInfo,
                   maxWidth: contentMaxWidth,
+                  themeSignature: _VideoDetailTabsThemeSignature.from(context),
                 ),
               ),
             ],
@@ -418,32 +418,15 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
 
   Widget _buildTitleBlock(BvidInfo videoInfo) {
     final palette = context.appPalette;
-    final showToggle = videoInfo.title.length > 42;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SelectionArea(
-          child: Text(
-            videoInfo.title,
-            maxLines: _isTitleExpanded ? null : 2,
-            overflow: _isTitleExpanded ? null : TextOverflow.ellipsis,
-            style: context.textTheme.titleLarge?.copyWith(
-              color: palette.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+    return SelectionArea(
+      child: Text(
+        videoInfo.title,
+        style: context.textTheme.titleLarge?.copyWith(
+          color: palette.textPrimary,
+          fontWeight: FontWeight.w700,
         ),
-        if (showToggle)
-          TextButton(
-            onPressed: () {
-              setState(() => _isTitleExpanded = !_isTitleExpanded);
-            },
-            child: Text(
-              _isTitleExpanded ? context.l10n.collapse : context.l10n.expand,
-            ),
-          ),
-      ],
+      ),
     );
   }
 
@@ -1172,12 +1155,14 @@ class _VideoDetailTabsDelegate extends SliverPersistentHeaderDelegate {
   const _VideoDetailTabsDelegate({
     required this.videoInfo,
     required this.maxWidth,
+    required this.themeSignature,
   });
 
   static const double height = kTextTabBarHeight;
 
   final BvidInfo videoInfo;
   final double maxWidth;
+  final _VideoDetailTabsThemeSignature themeSignature;
 
   @override
   double get minExtent => height;
@@ -1192,7 +1177,9 @@ class _VideoDetailTabsDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     return Material(
-      color: context.appPalette.backgroundPrimary,
+      key: const ValueKey('video-detail-tabs-surface'),
+      color: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       child: _VideoDetailTabs(videoInfo: videoInfo, maxWidth: maxWidth),
     );
   }
@@ -1201,8 +1188,57 @@ class _VideoDetailTabsDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant _VideoDetailTabsDelegate oldDelegate) {
     return oldDelegate.videoInfo.bvid != videoInfo.bvid ||
         oldDelegate.videoInfo.stats.reply != videoInfo.stats.reply ||
-        oldDelegate.maxWidth != maxWidth;
+        oldDelegate.maxWidth != maxWidth ||
+        oldDelegate.themeSignature != themeSignature;
   }
+}
+
+class _VideoDetailTabsThemeSignature {
+  const _VideoDetailTabsThemeSignature({
+    required this.brightness,
+    required this.accentStrong,
+    required this.textSecondary,
+    required this.borderSubtle,
+    required this.outline,
+  });
+
+  factory _VideoDetailTabsThemeSignature.from(BuildContext context) {
+    final palette = context.appPalette;
+
+    return _VideoDetailTabsThemeSignature(
+      brightness: Theme.of(context).brightness,
+      accentStrong: palette.accentStrong,
+      textSecondary: palette.textSecondary,
+      borderSubtle: palette.borderSubtle,
+      outline: context.appDepth.outline,
+    );
+  }
+
+  final Brightness brightness;
+  final Color accentStrong;
+  final Color textSecondary;
+  final Color borderSubtle;
+  final double outline;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is _VideoDetailTabsThemeSignature &&
+            other.brightness == brightness &&
+            other.accentStrong == accentStrong &&
+            other.textSecondary == textSecondary &&
+            other.borderSubtle == borderSubtle &&
+            other.outline == outline;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        brightness,
+        accentStrong,
+        textSecondary,
+        borderSubtle,
+        outline,
+      );
 }
 
 class _VideoDetailTabs extends StatelessWidget {

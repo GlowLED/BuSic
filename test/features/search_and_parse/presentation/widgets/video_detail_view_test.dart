@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:busic/core/theme/app_theme.dart';
+import 'package:busic/core/theme/app_theme_tokens.dart';
 import 'package:busic/features/auth/application/auth_notifier.dart';
 import 'package:busic/features/auth/data/auth_repository.dart';
 import 'package:busic/features/auth/domain/models/qr_poll_result.dart';
@@ -166,6 +168,83 @@ void main() {
       expect(didBack, isTrue);
     });
 
+    testWidgets('updates tab bar colors when the theme changes',
+        (tester) async {
+      final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
+      final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
+      final lightPalette = lightTheme.extension<AppThemePalette>()!;
+      final darkPalette = darkTheme.extension<AppThemePalette>()!;
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: const ParseState.success(_video),
+        theme: lightTheme,
+      );
+
+      expect(_tabsSurface(tester).color, Colors.transparent);
+      expect(_tabsSurface(tester).surfaceTintColor, Colors.transparent);
+      expect(_tabBar(tester).labelColor, lightPalette.accentStrong);
+      expect(_tabBar(tester).unselectedLabelColor, lightPalette.textSecondary);
+      expect(_tabBar(tester).indicatorColor, lightPalette.accentStrong);
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: const ParseState.success(_video),
+        theme: darkTheme,
+      );
+
+      expect(_tabsSurface(tester).color, Colors.transparent);
+      expect(_tabsSurface(tester).surfaceTintColor, Colors.transparent);
+      expect(_tabBar(tester).labelColor, darkPalette.accentStrong);
+      expect(_tabBar(tester).unselectedLabelColor, darkPalette.textSecondary);
+      expect(_tabBar(tester).indicatorColor, darkPalette.accentStrong);
+    });
+
+    testWidgets('does not render a title expand control for long titles',
+        (tester) async {
+      const longTitle =
+          'Night Drive Live Performance Extended Arrangement With Long Title';
+      final video = _video.copyWith(title: longTitle);
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: ParseState.success(video),
+      );
+
+      expect(find.text(longTitle), findsOneWidget);
+      _expectTextInSelectionArea(longTitle);
+      expect(find.text('Expand'), findsNothing);
+      expect(find.text('Collapse'), findsNothing);
+    });
+
+    testWidgets('keeps the description expand control available',
+        (tester) async {
+      final video = _video.copyWith(
+        description: List.filled(
+          8,
+          'A detailed description line for the parsed Bilibili video.',
+        ).join('\n'),
+      );
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: ParseState.success(video),
+      );
+
+      expect(find.text('Expand'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Expand'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Expand'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Collapse'), findsOneWidget);
+    });
+
     testWidgets('多 P 状态展示分 P 选择和已选数量', (tester) async {
       await _pumpVideoDetail(
         tester,
@@ -218,6 +297,7 @@ Future<void> _pumpVideoDetail(
   VoidCallback? onBack,
   List<BiliFavFolder>? favoriteFolders,
   CommentState? commentState,
+  ThemeData? theme,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -232,10 +312,21 @@ Future<void> _pumpVideoDetail(
           showBackButton: showBackButton,
           onBack: onBack,
         ),
+        theme: theme,
       ),
     ),
   );
   await tester.pumpAndSettle();
+}
+
+Material _tabsSurface(WidgetTester tester) {
+  return tester.widget<Material>(
+    find.byKey(const ValueKey('video-detail-tabs-surface')),
+  );
+}
+
+TabBar _tabBar(WidgetTester tester) {
+  return tester.widget<TabBar>(find.byType(TabBar));
 }
 
 void _setDesktopViewport(WidgetTester tester) {
