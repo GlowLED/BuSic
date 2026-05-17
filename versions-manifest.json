@@ -1,7 +1,28 @@
 {
-  "latest": "0.4.1",
+  "latest": "0.4.2",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.4.2",
+      "build": 17,
+      "date": "2026-05-17",
+      "changelog": "## BuSic 0.4.2\n\nBuSic 0.4.2 聚焦搜索移动端体验、移动导航选择逻辑与 agent 启动文档准确性。\n\n### 修复\n- 改进移动端搜索流程，补齐搜索页相关本地化与回归测试。\n- 简化移动端导航选中逻辑，并补充响应式壳层回归测试。\n\n### 工程与文档\n- 同步 agent quickstart 当前版本信息，避免冷启动 agent 读取过期版本。\n- 将版本管理 skill 中的旧版本示例改为占位示例，降低后续文档漂移风险。",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.2/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.2/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.2/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.2/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.4.1",
       "build": 16,

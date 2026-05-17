@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] - 2026-05-17
+
+### Bug Fixes
+- 改进移动端搜索流程，补齐搜索页本地化文本与回归测试。
+- 简化移动端导航选中逻辑，减少移动端导航状态分支。
+
+### Documentation
+- 同步 agent quickstart 当前版本，并将版本管理 skill 的历史版本号示例改为占位示例。
+
+### Tests
+- 补充搜索页移动流程和响应式壳层导航回归测试。
+
 ## [0.4.1] - 2026-05-17
 
 ### Improvements
