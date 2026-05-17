@@ -18,7 +18,8 @@ const _navigationAnimationCurve = Curves.easeOutCubic;
 /// Desktop and mobile share the same navigation language, but use different
 /// layouts:
 /// - Desktop: custom title bar + control-console sidebar.
-/// - Mobile: floating bottom dock.
+/// - Mobile portrait: compact label-only bottom dock.
+/// - Mobile landscape: compact icon-only side rail.
 /// - Both keep [PlayerBar] visible at the bottom.
 class ResponsiveScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -60,7 +61,7 @@ class ResponsiveScaffold extends StatelessWidget {
     final destinations = _buildDestinations(context.l10n);
     final currentIndex = navigationShell.currentIndex;
 
-    if (context.isDesktop) {
+    if (PlatformUtils.isDesktop && context.isDesktop) {
       return _DesktopShell(
         navigationShell: navigationShell,
         destinations: destinations,
@@ -151,6 +152,8 @@ class _MobileShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
 
     return PopScope(
       canPop: true,
@@ -160,39 +163,71 @@ class _MobileShell extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: _ShellBackdrop(
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                Expanded(child: navigationShell),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    spacing.sm,
-                    spacing.sm,
-                    spacing.sm,
-                    0,
-                  ),
-                  child: const _ShellPlayerDock(),
-                ),
-                SafeArea(
-                  top: false,
+          child: isLandscape
+              ? SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      spacing.sm,
-                      spacing.sm,
-                      spacing.sm,
-                      spacing.sm,
-                    ),
-                    child: _MobileNavDock(
-                      destinations: destinations,
-                      currentIndex: currentIndex,
-                      onDestinationSelected: onDestinationSelected,
+                    padding: EdgeInsets.all(spacing.sm),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 72,
+                          child: _MobileLandscapeNavRail(
+                            destinations: destinations,
+                            currentIndex: currentIndex,
+                            onDestinationSelected: onDestinationSelected,
+                          ),
+                        ),
+                        SizedBox(width: spacing.sm),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: _ShellContentFrame(
+                                  child: navigationShell,
+                                ),
+                              ),
+                              SizedBox(height: spacing.sm),
+                              const _ShellPlayerDock(),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                )
+              : SafeArea(
+                  bottom: false,
+                  child: Column(
+                    children: [
+                      Expanded(child: navigationShell),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          spacing.sm,
+                          spacing.sm,
+                          spacing.sm,
+                          0,
+                        ),
+                        child: const _ShellPlayerDock(),
+                      ),
+                      SafeArea(
+                        top: false,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            spacing.sm,
+                            spacing.xs,
+                            spacing.sm,
+                            spacing.sm,
+                          ),
+                          child: _MobileNavDock(
+                            destinations: destinations,
+                            currentIndex: currentIndex,
+                            onDestinationSelected: onDestinationSelected,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -433,7 +468,10 @@ class _MobileNavDock extends StatelessWidget {
     final spacing = context.appSpacing;
 
     return Container(
-      padding: EdgeInsets.all(spacing.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.xs,
+        vertical: spacing.xxs,
+      ),
       color: Colors.transparent,
       child: Row(
         children: [
@@ -476,7 +514,7 @@ class _MobileNavigationItem extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           padding: EdgeInsets.symmetric(
             horizontal: spacing.xs,
-            vertical: spacing.sm,
+            vertical: spacing.xs,
           ),
           decoration: BoxDecoration(
             color: isSelected
@@ -487,13 +525,6 @@ class _MobileNavigationItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _NavigationIconPill(
-                icon: destination.icon,
-                selectedIcon: destination.selectedIcon,
-                isSelected: isSelected,
-                compact: true,
-              ),
-              SizedBox(height: spacing.xs),
               Text(
                 destination.label,
                 maxLines: 1,
@@ -502,9 +533,113 @@ class _MobileNavigationItem extends StatelessWidget {
                 style: context.textTheme.labelSmall?.copyWith(
                   color:
                       isSelected ? palette.textPrimary : palette.textSecondary,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileLandscapeNavRail extends StatelessWidget {
+  const _MobileLandscapeNavRail({
+    required this.destinations,
+    required this.currentIndex,
+    required this.onDestinationSelected,
+  });
+
+  final List<_ShellDestination> destinations;
+  final int currentIndex;
+  final ValueChanged<int> onDestinationSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final spacing = context.appSpacing;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            color: Colors.transparent,
+            padding: EdgeInsets.symmetric(vertical: spacing.xs),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    padding: EdgeInsets.zero,
+                    itemCount: destinations.length - 1,
+                    separatorBuilder: (_, __) => SizedBox(height: spacing.xxs),
+                    itemBuilder: (context, index) {
+                      return _MobileLandscapeNavigationItem(
+                        destination: destinations[index],
+                        isSelected: currentIndex == index,
+                        onTap: () => onDestinationSelected(index),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: spacing.xs),
+                _MobileLandscapeNavigationItem(
+                  destination: destinations.last,
+                  isSelected: currentIndex == destinations.length - 1,
+                  onTap: () => onDestinationSelected(destinations.length - 1),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: 1,
+          color: palette.borderSubtle.withValues(alpha: 0.5),
+        ),
+      ],
+    );
+  }
+}
+
+class _MobileLandscapeNavigationItem extends StatelessWidget {
+  const _MobileLandscapeNavigationItem({
+    required this.destination,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final _ShellDestination destination;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+
+    return Semantics(
+      label: destination.label,
+      button: true,
+      selected: isSelected,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: context.appRadii.xLargeRadius,
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 56),
+            padding: EdgeInsets.symmetric(
+              horizontal: spacing.xs,
+              vertical: spacing.xs,
+            ),
+            child: Center(
+              child: _NavigationIconPill(
+                icon: destination.icon,
+                selectedIcon: destination.selectedIcon,
+                isSelected: isSelected,
+                compact: true,
+              ),
+            ),
           ),
         ),
       ),
@@ -592,9 +727,7 @@ class _NavigationIconPill extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: isSelected
-            ? palette.accentStrong
-            : Colors.transparent,
+        color: isSelected ? palette.accentStrong : Colors.transparent,
         borderRadius: context.appRadii.mediumRadius,
       ),
       child: Stack(

@@ -28,41 +28,7 @@ void main() {
 
   testWidgets('keeps desktop sidebar compact on extra-wide layouts',
       (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    tester.view.physicalSize = const Size(1600, 900);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final db = AppDatabase.forTesting(NativeDatabase.memory());
-    addTearDown(db.close);
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(db),
-          audioHandlerProvider.overrideWithValue(_FakeAudioHandler()),
-          playerRepositoryProvider.overrideWithValue(_FakePlayerRepository()),
-          playerParseRepositoryProvider.overrideWithValue(
-            _FakeParseRepository(),
-          ),
-        ],
-        child: Consumer(
-          builder: (context, ref, _) {
-            return MaterialApp.router(
-              locale: const Locale('en'),
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              theme: AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
-              routerConfig: ref.watch(appRouterProvider),
-            );
-          },
-        ),
-      ),
-    );
-
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await _pumpShell(tester, const Size(1600, 900));
 
     expect(find.byIcon(Icons.search_outlined), findsOneWidget);
     expect(find.byIcon(Icons.download_outlined), findsOneWidget);
@@ -71,6 +37,68 @@ void main() {
     expect(find.text('Downloads'), findsNothing);
     expect(find.text('Settings'), findsNothing);
   });
+
+  testWidgets('uses label-only bottom navigation in mobile portrait',
+      (tester) async {
+    await _pumpShell(tester, const Size(390, 844));
+
+    expect(find.text('Search'), findsOneWidget);
+    expect(find.text('Downloads'), findsOneWidget);
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.byIcon(Icons.search_outlined), findsNothing);
+    expect(find.byIcon(Icons.download_outlined), findsNothing);
+    expect(find.byIcon(Icons.settings_outlined), findsNothing);
+  });
+
+  testWidgets('uses icon-only side navigation in mobile landscape',
+      (tester) async {
+    await _pumpShell(tester, const Size(700, 390));
+
+    expect(find.byIcon(Icons.search_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.download_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+    expect(find.text('Search'), findsNothing);
+    expect(find.text('Downloads'), findsNothing);
+    expect(find.text('Settings'), findsNothing);
+  });
+}
+
+Future<void> _pumpShell(WidgetTester tester, Size size) async {
+  SharedPreferences.setMockInitialValues({});
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  final db = AppDatabase.forTesting(NativeDatabase.memory());
+  addTearDown(db.close);
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(db),
+        audioHandlerProvider.overrideWithValue(_FakeAudioHandler()),
+        playerRepositoryProvider.overrideWithValue(_FakePlayerRepository()),
+        playerParseRepositoryProvider.overrideWithValue(
+          _FakeParseRepository(),
+        ),
+      ],
+      child: Consumer(
+        builder: (context, ref, _) {
+          return MaterialApp.router(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
+            routerConfig: ref.watch(appRouterProvider),
+          );
+        },
+      ),
+    ),
+  );
+
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 class _FakeAudioHandler extends BusicAudioHandler {}
