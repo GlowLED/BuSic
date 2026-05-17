@@ -10,6 +10,7 @@ import 'package:busic/core/database/app_database.dart';
 import 'package:busic/core/router/app_router.dart';
 import 'package:busic/core/services/audio_handler.dart';
 import 'package:busic/core/theme/app_theme.dart';
+import 'package:busic/core/theme/app_theme_tokens.dart';
 import 'package:busic/features/auth/application/auth_notifier.dart';
 import 'package:busic/features/player/application/player_notifier.dart';
 import 'package:busic/features/player/data/player_repository.dart';
@@ -48,6 +49,38 @@ void main() {
     expect(find.byIcon(Icons.search_outlined), findsNothing);
     expect(find.byIcon(Icons.download_outlined), findsNothing);
     expect(find.byIcon(Icons.settings_outlined), findsNothing);
+  });
+
+  testWidgets('uses static text-only selection in mobile portrait',
+      (tester) async {
+    await _pumpShell(tester, const Size(390, 844));
+
+    final playlistLabel = _navLabel('Playlists');
+    final searchLabel = _navLabel('Search');
+    final palette =
+        Theme.of(tester.element(searchLabel)).extension<AppThemePalette>()!;
+
+    expect(
+        tester.widget<Text>(playlistLabel).style?.color, palette.textPrimary);
+    expect(tester.widget<Text>(searchLabel).style?.color, palette.textMuted);
+    expect(tester.widget<Text>(searchLabel).style?.fontSize, 13);
+    expect(tester.widget<Text>(searchLabel).style?.fontWeight, FontWeight.w600);
+    expect(tester.widget<Text>(searchLabel).style?.letterSpacing, 0);
+    expect(
+      find.ancestor(of: searchLabel, matching: find.byType(InkWell)),
+      findsNothing,
+    );
+    expect(
+      find.ancestor(of: searchLabel, matching: find.byType(AnimatedContainer)),
+      findsNothing,
+    );
+
+    await tester.tap(searchLabel);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(tester.widget<Text>(searchLabel).style?.color, palette.textPrimary);
+    expect(tester.widget<Text>(playlistLabel).style?.color, palette.textMuted);
   });
 
   testWidgets('uses icon-only side navigation in mobile landscape',
@@ -99,6 +132,13 @@ Future<void> _pumpShell(WidgetTester tester, Size size) async {
 
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
+}
+
+Finder _navLabel(String label) {
+  return find.byWidgetPredicate(
+    (widget) =>
+        widget is Text && widget.data == label && widget.style?.fontSize == 13,
+  );
 }
 
 class _FakeAudioHandler extends BusicAudioHandler {}

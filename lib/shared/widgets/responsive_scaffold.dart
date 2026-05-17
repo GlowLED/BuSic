@@ -505,38 +505,30 @@ class _MobileNavigationItem extends StatelessWidget {
     final palette = context.appPalette;
     final spacing = context.appSpacing;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: context.appRadii.largeRadius,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
+        child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: spacing.xs,
             vertical: spacing.xs,
           ),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? palette.accentSoft.withValues(alpha: 0.3)
-                : Colors.transparent,
-            borderRadius: context.appRadii.largeRadius,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                destination.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: context.textTheme.labelSmall?.copyWith(
-                  color:
-                      isSelected ? palette.textPrimary : palette.textSecondary,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
+          child: Center(
+            child: Text(
+              destination.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: isSelected ? palette.textPrimary : palette.textMuted,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0,
               ),
-            ],
+            ),
           ),
         ),
       ),
