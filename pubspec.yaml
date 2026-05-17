@@ -1,7 +1,7 @@
 name: busic
 description: A modern cross-platform music player powered by Bilibili.
 publish_to: 'none'
-version: 0.4.0+15
+version: 0.4.1+16
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -116,4 +116,4 @@ flutter:
 # ── App Update Metadata (机器可读, 勿手动删除) ──
 x_update:
   min_supported: "0.2.0"
-  changelog: "新增应用自动更新功能"
+  changelog: "优化移动端导航占用，改进搜索详情与界面表现"

@@ -1,7 +1,28 @@
 {
-  "latest": "0.4.0",
+  "latest": "0.4.1",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.4.1",
+      "build": 16,
+      "date": "2026-05-17",
+      "changelog": "## BuSic 0.4.1\n\nBuSic 0.4.1 聚焦移动端导航空间优化，并包含 0.4.0 之后的搜索详情与界面细节修复。\n\n### 改进\n- 移动端竖屏底部导航改为只显示名称，显著降低导航栏高度占用。\n- 移动端横屏改为左侧纯图标导航，保留更多横向内容空间。\n- 优化界面背景嵌入效果，减少不必要的悬浮视觉。\n\n### 修复\n- 修复搜索页空态输入框布局，使初始搜索入口保持居中。\n- 清理视频详情页控制区交互和展示细节。\n\n### 工程与文档\n- 补充响应式壳层移动竖屏和横屏导航回归测试。\n- 同步移动端导航差异到 UI 与平台差异文档。",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.1/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.1/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.1/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.1/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.4.0",
       "build": 15,
