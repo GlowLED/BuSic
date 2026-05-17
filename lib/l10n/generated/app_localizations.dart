@@ -1319,6 +1319,18 @@ abstract class AppLocalizations {
   /// **'Results, parsed video details, page selection and comments will appear here.'**
   String get searchEmptySubtitle;
 
+  /// Title shown after a keyword search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get searchNoResultsTitle;
+
+  /// Subtitle shown after a keyword search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'Try another keyword or paste a BV link.'**
+  String get searchNoResultsSubtitle;
+
   /// No description provided for @backToSearchResults.
   ///
   /// In en, this message translates to:

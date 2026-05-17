@@ -266,6 +266,10 @@
   "pasteFromClipboard": "Paste from clipboard",
   "searchEmptyTitle": "Start with a keyword or BV link",
   "searchEmptySubtitle": "Results, parsed video details, page selection and comments will appear here.",
+  "searchNoResultsTitle": "No results found",
+  "@searchNoResultsTitle": { "description": "Title shown after a keyword search returns no results" },
+  "searchNoResultsSubtitle": "Try another keyword or paste a BV link.",
+  "@searchNoResultsSubtitle": { "description": "Subtitle shown after a keyword search returns no results" },
   "backToSearchResults": "Back to search results",
   "pagesCount": "{count} pages",
   "@pagesCount": {

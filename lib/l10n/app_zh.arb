@@ -264,6 +264,8 @@
   "pasteFromClipboard": "从剪贴板粘贴",
   "searchEmptyTitle": "输入关键词或 BV 链接开始",
   "searchEmptySubtitle": "搜索结果、视频详情、分 P 选择和评论会显示在这里。",
+  "searchNoResultsTitle": "没有找到结果",
+  "searchNoResultsSubtitle": "换个关键词，或直接粘贴 BV 链接试试。",
   "backToSearchResults": "返回搜索结果",
   "pagesCount": "{count} 个分 P",
   "@pagesCount": {

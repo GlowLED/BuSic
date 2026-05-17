@@ -643,6 +643,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchEmptySubtitle => 'Results, parsed video details, page selection and comments will appear here.';
 
   @override
+  String get searchNoResultsTitle => 'No results found';
+
+  @override
+  String get searchNoResultsSubtitle => 'Try another keyword or paste a BV link.';
+
+  @override
   String get backToSearchResults => 'Back to search results';
 
   @override

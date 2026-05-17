@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/extensions/context_extensions.dart';
@@ -71,11 +72,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
+    FocusScope.of(context).unfocus();
     setState(() => _hasSubmittedInput = true);
 
     final bvid = Formatters.parseBvid(text);
     if (bvid != null) {
-      setState(() => _searchResults = []);
+      setState(() {
+        _currentKeyword = '';
+        _searchResults = [];
+      });
       ref.read(parseNotifierProvider.notifier).parseInput(text);
     } else {
       _currentKeyword = text;
@@ -88,6 +93,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     setState(() {
       _isSearching = true;
       _currentPage = page;
+      _searchResults = [];
     });
     final searchResult = await ref
         .read(parseNotifierProvider.notifier)
@@ -163,7 +169,54 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final mobileLayout = constraints.maxWidth < AppTheme.desktopBreakpoint;
         final compact = constraints.maxWidth < _compactSearchBreakpoint;
+        final inputBar = _SearchInputHost(
+          docked: inputDocked,
+          maxWidth: constraints.maxWidth,
+          child: _buildInputBar(
+            l10n,
+            parseState,
+            compact: compact,
+            showSubmitButton: !mobileLayout,
+          ),
+        );
+
+        if (mobileLayout) {
+          if (!inputDocked) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing.md),
+                child: inputBar,
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  spacing.md,
+                  spacing.sm,
+                  spacing.md,
+                  spacing.xs,
+                ),
+                child: inputBar,
+              ),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: _contentSwitchDuration,
+                  child: _buildContent(
+                    parseState: parseState,
+                    showVideoDetail: null,
+                    l10n: l10n,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
         final reservedInputHeight = compact
             ? spacing.xxxl + spacing.xxl + spacing.xl + spacing.lg
             : spacing.xxxl + spacing.xl + spacing.md;
@@ -201,15 +254,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     spacing.lg,
                     0,
                   ),
-                  child: _SearchInputHost(
-                    docked: inputDocked,
-                    maxWidth: constraints.maxWidth,
-                    child: _buildInputBar(
-                      l10n,
-                      parseState,
-                      compact: compact,
-                    ),
-                  ),
+                  child: inputBar,
                 ),
               ),
             ),
@@ -270,6 +315,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
 
+    if (_hasSubmittedInput && _currentKeyword.isNotEmpty) {
+      return _SearchEmptyResultState(
+        key: const ValueKey('empty_search_result'),
+        title: l10n.searchNoResultsTitle,
+        subtitle: l10n.searchNoResultsSubtitle,
+      );
+    }
+
     return const SizedBox.shrink(key: ValueKey('empty_search_content'));
   }
 
@@ -294,6 +347,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     AppLocalizations l10n,
     ParseState parseState, {
     required bool compact,
+    required bool showSubmitButton,
   }) {
     final isParsing = parseState.whenOrNull(parsing: () => true) == true;
     final spacing = context.appSpacing;
@@ -331,6 +385,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             vertical: spacing.xs,
           ),
         ),
+        textInputAction: TextInputAction.search,
         onSubmitted: (_) => _handleSubmit(),
         enabled: !isParsing,
       ),
@@ -354,22 +409,76 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return AppPanel(
       padding: EdgeInsets.all(spacing.sm),
       borderRadius: context.appRadii.largeRadius,
-      child: compact
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                field,
-                SizedBox(height: spacing.sm),
-                SizedBox(width: double.infinity, child: submit),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(child: field),
-                SizedBox(width: spacing.sm),
-                submit,
-              ],
-            ),
+      child: !showSubmitButton
+          ? field
+          : compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    field,
+                    SizedBox(height: spacing.sm),
+                    SizedBox(width: double.infinity, child: submit),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: field),
+                    SizedBox(width: spacing.sm),
+                    submit,
+                  ],
+                ),
+    );
+  }
+}
+
+class _SearchEmptyResultState extends StatelessWidget {
+  const _SearchEmptyResultState({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final palette = context.appPalette;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.lg),
+        child: AppPanel(
+          padding: EdgeInsets.all(spacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.manage_search_rounded,
+                size: 36,
+                color: palette.textMuted,
+              ),
+              SizedBox(height: spacing.sm),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: context.textTheme.titleMedium?.copyWith(
+                  color: palette.textPrimary,
+                ),
+              ),
+              SizedBox(height: spacing.xs),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: palette.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

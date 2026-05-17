@@ -75,11 +75,69 @@ void main() {
 
       expect(find.text('Start with a keyword or BV link'), findsNothing);
       expect(find.text('输入关键词或 BV 链接开始'), findsNothing);
+      expect(find.text('No results found'), findsOneWidget);
       expect(notifier.searchCalls.single, (keyword: 'missing song', page: 1));
 
       final inputRect = _inputBarRect(tester);
       expect(inputRect.top, lessThan(80));
       expect(inputRect.center.dy, lessThan(140));
+    });
+
+    testWidgets('mobile portrait centers input and hides search button',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+
+      await _pumpSearchScreen(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.search_rounded), findsNothing);
+
+      final inputRect = _inputBarRect(tester);
+      expect(inputRect.top, greaterThan(250));
+      expect((inputRect.center.dy - 422).abs(), lessThan(100));
+    });
+
+    testWidgets('mobile portrait submits with keyboard search action',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.search_rounded), findsNothing);
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+
+      final inputRect = _inputBarRect(tester);
+      expect(inputRect.top, lessThan(100));
+    });
+
+    testWidgets('mobile portrait shows empty result state after no matches',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier();
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'missing song');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.text('No results found'), findsOneWidget);
+      expect(
+          find.text('Try another keyword or paste a BV link.'), findsOneWidget);
+      expect(notifier.searchCalls.single, (keyword: 'missing song', page: 1));
     });
   });
 }
@@ -107,6 +165,13 @@ Rect _inputBarRect(WidgetTester tester) {
 void _setDesktopViewport(WidgetTester tester) {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(1000, 800);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+}
+
+void _setMobilePortraitViewport(WidgetTester tester) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = const Size(390, 844);
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
 }

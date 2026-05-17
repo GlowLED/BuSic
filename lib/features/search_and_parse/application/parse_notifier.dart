@@ -92,7 +92,8 @@ class ParseNotifier extends _$ParseNotifier {
   void selectAllPages() {
     final current = state;
     if (current is! _SelectingPages) return;
-    state = ParseState.selectingPages(current.info, List.from(current.info.pages));
+    state =
+        ParseState.selectingPages(current.info, List.from(current.info.pages));
   }
 
   /// Deselect all pages.
@@ -142,11 +143,14 @@ class ParseNotifier extends _$ParseNotifier {
   /// Search videos on Bilibili with pagination support.
   ///
   /// Returns a record containing the result list and total page count.
-  Future<({List<BvidInfo> results, int numPages})> searchVideos(String keyword, {int page = 1, int pageSize = 20}) async {
+  Future<({List<BvidInfo> results, int numPages})> searchVideos(String keyword,
+      {int page = 1, int pageSize = 20}) async {
     try {
-      return await _repository.searchVideos(keyword, page: page, pageSize: pageSize);
+      return await _repository.searchVideos(keyword,
+          page: page, pageSize: pageSize);
     } catch (e) {
       AppLogger.error('Search failed', tag: 'Parse', error: e);
+      state = ParseState.error('搜索失败: $e');
       return (results: <BvidInfo>[], numPages: 1);
     }
   }

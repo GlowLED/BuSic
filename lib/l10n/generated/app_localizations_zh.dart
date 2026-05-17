@@ -643,6 +643,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchEmptySubtitle => '搜索结果、视频详情、分 P 选择和评论会显示在这里。';
 
   @override
+  String get searchNoResultsTitle => '没有找到结果';
+
+  @override
+  String get searchNoResultsSubtitle => '换个关键词，或直接粘贴 BV 链接试试。';
+
+  @override
   String get backToSearchResults => '返回搜索结果';
 
   @override
