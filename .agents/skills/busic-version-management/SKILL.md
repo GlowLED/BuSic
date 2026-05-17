@@ -35,11 +35,11 @@ major.minor.patch+build
 - `patch`：向后兼容的修复或小优化
 - `build`：构建序号，只在内部流转和发布资产中使用
 
-用户可见版本与 Git tag 不带 `+build`：
+用户可见版本与 Git tag 不带 `+build`，示例：
 
-- `pubspec.yaml`：`0.3.8+14`
-- 用户可见：`0.3.8`
-- Git tag：`v0.3.8`
+- `pubspec.yaml`：`1.2.3+45`
+- 用户可见：`1.2.3`
+- Git tag：`v1.2.3`
 
 ## 发布时必须同步的文件
 

@@ -5,7 +5,7 @@
 ## 30 秒项目画像
 
 - 仓库：Bilibili 音乐播放器，重点能力是播放、歌单、下载、分享/备份、字幕歌词、评论、应用更新。
-- 当前版本：`pubspec.yaml` 中 `version: 0.3.8+14`
+- 当前版本：`pubspec.yaml` 中 `version: 0.4.1+16`
 - 更新系统真源：`versions-manifest.json`
 - 架构：`core / features / shared / l10n`
 - 路由：`StatefulShellRoute.indexedStack`
