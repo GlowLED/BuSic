@@ -471,37 +471,24 @@ class _PlaylistEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final palette = context.appPalette;
 
     return Center(
-      child: AppPanel(
-        padding: EdgeInsets.all(spacing.xl),
-        borderRadius: context.appRadii.xLargeRadius,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.library_music_outlined,
-              size: 54,
-              color: palette.accentStrong.withValues(alpha: 0.72),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.library_music_outlined,
+            size: 64,
+            color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+          ),
+          SizedBox(height: spacing.md),
+          Text(
+            context.l10n.noPlaylists,
+            style: context.textTheme.bodyLarge?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
             ),
-            SizedBox(height: spacing.md),
-            Text(
-              context.l10n.noPlaylists,
-              style: context.textTheme.titleMedium?.copyWith(
-                color: palette.textPrimary,
-              ),
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              context.l10n.noPlaylistsHint,
-              textAlign: TextAlign.center,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: palette.textSecondary,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
