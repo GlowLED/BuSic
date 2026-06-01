@@ -172,7 +172,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         final mobileLayout = constraints.maxWidth < AppTheme.desktopBreakpoint;
         final compact = constraints.maxWidth < _compactSearchBreakpoint;
         final inputBar = _SearchInputHost(
-          docked: inputDocked,
+          docked: !mobileLayout && inputDocked,
           maxWidth: constraints.maxWidth,
           child: _buildInputBar(
             l10n,
@@ -183,33 +183,43 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         );
 
         if (mobileLayout) {
-          if (!inputDocked) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: spacing.md),
-                child: inputBar,
-              ),
-            );
-          }
+          final reservedInputHeight = spacing.xxxl + spacing.xl + spacing.sm;
 
-          return Column(
+          return Stack(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  spacing.md,
-                  spacing.sm,
-                  spacing.md,
-                  spacing.xs,
+              Positioned.fill(
+                child: AnimatedPadding(
+                  duration: _searchBarAnimationDuration,
+                  curve: Curves.easeInOutCubic,
+                  padding: EdgeInsets.only(
+                    top: inputDocked ? reservedInputHeight : 0,
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: _contentSwitchDuration,
+                    child: _buildContent(
+                      parseState: parseState,
+                      showVideoDetail: null,
+                      l10n: l10n,
+                    ),
+                  ),
                 ),
-                child: inputBar,
               ),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: _contentSwitchDuration,
-                  child: _buildContent(
-                    parseState: parseState,
-                    showVideoDetail: null,
-                    l10n: l10n,
+              Positioned.fill(
+                child: AnimatedAlign(
+                  duration: _searchBarAnimationDuration,
+                  curve: Curves.easeInOutCubic,
+                  alignment:
+                      inputDocked ? Alignment.topCenter : Alignment.center,
+                  child: AnimatedPadding(
+                    duration: _searchBarAnimationDuration,
+                    curve: Curves.easeInOutCubic,
+                    padding: EdgeInsets.fromLTRB(
+                      spacing.md,
+                      inputDocked ? spacing.sm : 0,
+                      spacing.md,
+                      0,
+                    ),
+                    child: inputBar,
                   ),
                 ),
               ),

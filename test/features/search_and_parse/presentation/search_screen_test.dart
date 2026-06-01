@@ -112,8 +112,12 @@ void main() {
       );
 
       await _pumpSearchScreen(tester, notifier: notifier);
+      final centeredRect = _inputBarRect(tester);
       await tester.enterText(find.byType(TextField), 'night drive');
       await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 130));
+      final animatingRect = _inputBarRect(tester);
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.search_rounded), findsNothing);
@@ -121,7 +125,10 @@ void main() {
       expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
 
       final inputRect = _inputBarRect(tester);
+      expect(animatingRect.top, lessThan(centeredRect.top));
+      expect(animatingRect.top, greaterThan(inputRect.top));
       expect(inputRect.top, lessThan(100));
+      expect((inputRect.width - centeredRect.width).abs(), lessThan(1));
     });
 
     testWidgets('mobile portrait shows empty result state after no matches',
