@@ -186,7 +186,6 @@ class _MobileShell extends StatelessWidget {
                                   child: navigationShell,
                                 ),
                               ),
-                              SizedBox(height: spacing.sm),
                               const _ShellPlayerDock(),
                             ],
                           ),
@@ -203,7 +202,7 @@ class _MobileShell extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.fromLTRB(
                           spacing.sm,
-                          spacing.sm,
+                          0,
                           spacing.sm,
                           0,
                         ),

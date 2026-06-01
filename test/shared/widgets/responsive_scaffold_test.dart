@@ -15,12 +15,14 @@ import 'package:busic/features/auth/application/auth_notifier.dart';
 import 'package:busic/features/player/application/player_notifier.dart';
 import 'package:busic/features/player/data/player_repository.dart';
 import 'package:busic/features/player/domain/models/audio_track.dart';
+import 'package:busic/features/player/presentation/player_bar.dart';
 import 'package:busic/features/search_and_parse/data/parse_repository.dart';
 import 'package:busic/features/search_and_parse/domain/models/audio_stream_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.dart';
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_item.dart';
 import 'package:busic/features/search_and_parse/domain/models/bvid_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/video_tag.dart';
+import 'package:busic/features/search_and_parse/presentation/search_screen.dart';
 import 'package:busic/l10n/generated/app_localizations.dart';
 import 'package:busic/main.dart';
 
@@ -93,6 +95,37 @@ void main() {
     expect(find.text('Search'), findsNothing);
     expect(find.text('Downloads'), findsNothing);
     expect(find.text('Settings'), findsNothing);
+  });
+
+  testWidgets('places mobile portrait content directly above the player bar',
+      (tester) async {
+    await _pumpShell(tester, const Size(390, 844));
+
+    await tester.tap(_navLabel('Search'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final searchRect = tester.getRect(find.byType(SearchScreen));
+    final playerRect = tester.getRect(find.byType(PlayerBar));
+
+    expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
+  });
+
+  testWidgets('places mobile landscape content directly above the player bar',
+      (tester) async {
+    await _pumpShell(tester, const Size(700, 390));
+
+    await tester.tap(find.ancestor(
+      of: find.byIcon(Icons.search_outlined),
+      matching: find.byType(InkWell),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final searchRect = tester.getRect(find.byType(SearchScreen));
+    final playerRect = tester.getRect(find.byType(PlayerBar));
+
+    expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
 }
 

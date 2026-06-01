@@ -37,6 +37,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   List<BvidInfo> _searchResults = [];
   bool _isSearching = false;
+  bool _isLoadingMore = false;
+  String? _loadMoreErrorMessage;
   int _currentPage = 1;
   int _totalPages = 1;
   String _currentKeyword = '';
@@ -80,6 +82,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       setState(() {
         _currentKeyword = '';
         _searchResults = [];
+        _isLoadingMore = false;
+        _loadMoreErrorMessage = null;
       });
       ref.read(parseNotifierProvider.notifier).parseInput(text);
     } else {
@@ -92,6 +96,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     ref.read(parseNotifierProvider.notifier).reset();
     setState(() {
       _isSearching = true;
+      _isLoadingMore = false;
+      _loadMoreErrorMessage = null;
       _currentPage = page;
       _searchResults = [];
     });
@@ -104,6 +110,43 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _totalPages = searchResult.numPages;
       _isSearching = false;
     });
+  }
+
+  Future<void> _loadNextSearchPage() async {
+    if (_currentKeyword.isEmpty ||
+        _isSearching ||
+        _isLoadingMore ||
+        _currentPage >= _totalPages) {
+      return;
+    }
+
+    final nextPage = _currentPage + 1;
+    setState(() {
+      _isLoadingMore = true;
+      _loadMoreErrorMessage = null;
+    });
+
+    try {
+      final searchResult =
+          await ref.read(parseNotifierProvider.notifier).searchVideos(
+                _currentKeyword,
+                page: nextPage,
+                updateStateOnError: false,
+              );
+      if (!mounted) return;
+      setState(() {
+        _searchResults = [..._searchResults, ...searchResult.results];
+        _currentPage = nextPage;
+        _totalPages = searchResult.numPages;
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingMore = false;
+        _loadMoreErrorMessage = context.l10n.searchLoadMoreFailed;
+      });
+    }
   }
 
   void _goToPage(int page) {
@@ -200,6 +243,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       parseState: parseState,
                       showVideoDetail: null,
                       l10n: l10n,
+                      useMobileSearchResults: mobileLayout,
                     ),
                   ),
                 ),
@@ -246,6 +290,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     parseState: parseState,
                     showVideoDetail: null,
                     l10n: l10n,
+                    useMobileSearchResults: mobileLayout,
                   ),
                 ),
               ),
@@ -278,6 +323,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     required ParseState parseState,
     required BvidInfo? showVideoDetail,
     required AppLocalizations l10n,
+    bool useMobileSearchResults = false,
   }) {
     if (parseState.whenOrNull(parsing: () => true) == true) {
       return _SearchLoadingState(
@@ -316,12 +362,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     if (_searchResults.isNotEmpty) {
       return SearchResultList(
-        key: ValueKey('results_$_currentKeyword-$_currentPage'),
+        key: ValueKey('results_$_currentKeyword'),
         results: _searchResults,
         currentPage: _currentPage,
         totalPages: _totalPages,
         onVideoTap: _onVideoTap,
         onPageChanged: _goToPage,
+        onLoadMore: _loadNextSearchPage,
+        isLoadingMore: _isLoadingMore,
+        loadMoreErrorMessage: _loadMoreErrorMessage,
+        onRetryLoadMore: _loadNextSearchPage,
+        useInfiniteScroll: useMobileSearchResults,
+        listStorageKey: 'search_results_$_currentKeyword',
       );
     }
 

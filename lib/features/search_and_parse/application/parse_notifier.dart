@@ -143,15 +143,28 @@ class ParseNotifier extends _$ParseNotifier {
   /// Search videos on Bilibili with pagination support.
   ///
   /// Returns a record containing the result list and total page count.
-  Future<({List<BvidInfo> results, int numPages})> searchVideos(String keyword,
-      {int page = 1, int pageSize = 20}) async {
+  Future<({List<BvidInfo> results, int numPages})> searchVideos(
+    String keyword, {
+    int page = 1,
+    int pageSize = 20,
+    bool updateStateOnError = true,
+  }) async {
+    final link = ref.keepAlive();
     try {
-      return await _repository.searchVideos(keyword,
-          page: page, pageSize: pageSize);
+      return await _repository.searchVideos(
+        keyword,
+        page: page,
+        pageSize: pageSize,
+      );
     } catch (e) {
       AppLogger.error('Search failed', tag: 'Parse', error: e);
+      if (!updateStateOnError) {
+        rethrow;
+      }
       state = ParseState.error('搜索失败: $e');
       return (results: <BvidInfo>[], numPages: 1);
+    } finally {
+      link.close();
     }
   }
 

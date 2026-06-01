@@ -270,6 +270,12 @@
   "@searchNoResultsTitle": { "description": "Title shown after a keyword search returns no results" },
   "searchNoResultsSubtitle": "Try another keyword or paste a BV link.",
   "@searchNoResultsSubtitle": { "description": "Subtitle shown after a keyword search returns no results" },
+  "searchLoadingMore": "Loading more...",
+  "@searchLoadingMore": { "description": "Footer text shown while mobile search is loading the next page" },
+  "searchAllResultsLoaded": "All results loaded",
+  "@searchAllResultsLoaded": { "description": "Footer text shown after mobile search has loaded all pages" },
+  "searchLoadMoreFailed": "Failed to load more",
+  "@searchLoadMoreFailed": { "description": "Footer text shown when mobile search fails to load the next page" },
   "backToSearchResults": "Back to search results",
   "pagesCount": "{count} pages",
   "@pagesCount": {

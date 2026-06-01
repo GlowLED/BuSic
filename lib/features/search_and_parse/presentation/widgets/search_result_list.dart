@@ -16,6 +16,12 @@ class SearchResultList extends StatelessWidget {
     required this.totalPages,
     required this.onVideoTap,
     required this.onPageChanged,
+    this.onLoadMore,
+    this.isLoadingMore = false,
+    this.loadMoreErrorMessage,
+    this.onRetryLoadMore,
+    this.useInfiniteScroll = false,
+    this.listStorageKey,
   });
 
   final List<BvidInfo> results;
@@ -23,65 +29,249 @@ class SearchResultList extends StatelessWidget {
   final int totalPages;
   final ValueChanged<BvidInfo> onVideoTap;
   final ValueChanged<int> onPageChanged;
+  final Future<void> Function()? onLoadMore;
+  final bool isLoadingMore;
+  final String? loadMoreErrorMessage;
+  final Future<void> Function()? onRetryLoadMore;
+  final bool useInfiniteScroll;
+  final String? listStorageKey;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            key: PageStorageKey<String>('search_results_page_$currentPage'),
-            padding: EdgeInsets.fromLTRB(
-              spacing.md,
-              spacing.md,
-              spacing.md,
-              spacing.sm,
+    if (!useInfiniteScroll) {
+      return Column(
+        children: [
+          Expanded(
+            child: _SearchResultsListView(
+              results: results,
+              currentPage: currentPage,
+              bottomPadding: spacing.sm,
+              onVideoTap: onVideoTap,
             ),
-            itemCount: results.length,
-            separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
-            itemBuilder: (context, index) {
-              final video = results[index];
+          ),
+          _PaginationBar(
+            currentPage: currentPage,
+            totalPages: totalPages,
+            onPageChanged: onPageChanged,
+          ),
+        ],
+      );
+    }
 
-              return MediaRow(
-                cover: MediaCover(
-                  coverUrl: video.coverUrl,
-                  width: 96,
-                  height: 58,
-                  placeholderIcon: Icons.video_library_rounded,
+    final hasMore = currentPage < totalPages;
+
+    return _SearchResultsListView(
+      results: results,
+      currentPage: currentPage,
+      bottomPadding: spacing.sm,
+      onVideoTap: onVideoTap,
+      storageKey: listStorageKey ?? 'search_results_infinite',
+      useScrollController: true,
+      onLoadMore: hasMore && !isLoadingMore && loadMoreErrorMessage == null
+          ? onLoadMore
+          : null,
+      footer: _MobileLoadMoreFooter(
+        isLoading: isLoadingMore,
+        isEnd: !hasMore,
+        errorMessage: loadMoreErrorMessage,
+        onRetry: onRetryLoadMore,
+      ),
+    );
+  }
+}
+
+class _SearchResultsListView extends StatefulWidget {
+  const _SearchResultsListView({
+    required this.results,
+    required this.currentPage,
+    required this.bottomPadding,
+    required this.onVideoTap,
+    this.storageKey,
+    this.useScrollController = false,
+    this.onLoadMore,
+    this.footer,
+  });
+
+  final List<BvidInfo> results;
+  final int currentPage;
+  final double bottomPadding;
+  final ValueChanged<BvidInfo> onVideoTap;
+  final String? storageKey;
+  final bool useScrollController;
+  final Future<void> Function()? onLoadMore;
+  final Widget? footer;
+
+  @override
+  State<_SearchResultsListView> createState() => _SearchResultsListViewState();
+}
+
+class _SearchResultsListViewState extends State<_SearchResultsListView> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_handleScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    final onLoadMore = widget.onLoadMore;
+    if (onLoadMore == null || !_scrollController.hasClients) return;
+
+    if (_scrollController.position.extentAfter < 200) {
+      onLoadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+    final itemCount = widget.results.length + (widget.footer == null ? 0 : 1);
+
+    return ListView.separated(
+      key: PageStorageKey<String>(
+        widget.storageKey ?? 'search_results_page_${widget.currentPage}',
+      ),
+      controller: widget.useScrollController ? _scrollController : null,
+      padding: EdgeInsets.fromLTRB(
+        spacing.md,
+        spacing.md,
+        spacing.md,
+        widget.bottomPadding,
+      ),
+      itemCount: itemCount,
+      separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
+      itemBuilder: (context, index) {
+        if (index >= widget.results.length) {
+          return widget.footer!;
+        }
+
+        final video = widget.results[index];
+
+        return MediaRow(
+          cover: MediaCover(
+            coverUrl: video.coverUrl,
+            width: 96,
+            height: 58,
+            placeholderIcon: Icons.video_library_rounded,
+          ),
+          title: Text(
+            video.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.titleSmall,
+          ),
+          subtitle: Text(
+            '${video.owner} · '
+            '${Formatters.formatDuration(Duration(seconds: video.duration))}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.appPalette.textSecondary,
+            ),
+          ),
+          trailing: _SearchResultTrailing(
+            onTap: () => widget.onVideoTap(video),
+          ),
+          onTap: () => widget.onVideoTap(video),
+          embedded: true,
+        );
+      },
+    );
+  }
+}
+
+class _MobileLoadMoreFooter extends StatelessWidget {
+  const _MobileLoadMoreFooter({
+    required this.isLoading,
+    required this.isEnd,
+    required this.errorMessage,
+    required this.onRetry,
+  });
+
+  final bool isLoading;
+  final bool isEnd;
+  final String? errorMessage;
+  final Future<void> Function()? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final spacing = context.appSpacing;
+
+    if (isLoading) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.md),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: spacing.sm),
+            Text(
+              context.l10n.searchLoadingMore,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (errorMessage != null) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.sm),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Text(
+                errorMessage!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: palette.textSecondary,
                 ),
-                title: Text(
-                  video.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.titleSmall,
-                ),
-                subtitle: Text(
-                  '${video.owner} · '
-                  '${Formatters.formatDuration(Duration(seconds: video.duration))}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: context.appPalette.textSecondary,
-                  ),
-                ),
-                trailing: _SearchResultTrailing(
-                  onTap: () => onVideoTap(video),
-                ),
-                onTap: () => onVideoTap(video),
-                embedded: true,
-              );
-            },
+              ),
+            ),
+            SizedBox(width: spacing.xs),
+            TextButton(
+              onPressed: onRetry == null ? null : () => onRetry!.call(),
+              child: Text(context.l10n.retry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isEnd) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.md),
+        child: Center(
+          child: Text(
+            '— ${context.l10n.searchAllResultsLoaded} —',
+            style: context.textTheme.labelSmall?.copyWith(
+              color: palette.textMuted,
+            ),
           ),
         ),
-        _PaginationBar(
-          currentPage: currentPage,
-          totalPages: totalPages,
-          onPageChanged: onPageChanged,
-        ),
-      ],
-    );
+      );
+    }
+
+    return SizedBox(height: spacing.md);
   }
 }
 
@@ -103,6 +293,7 @@ class _PaginationBar extends StatelessWidget {
     final spacing = context.appSpacing;
 
     return Padding(
+      key: const ValueKey('search_pagination_bar'),
       padding: EdgeInsets.fromLTRB(
         spacing.md,
         0,
@@ -147,11 +338,6 @@ class _PaginationBar extends StatelessWidget {
                 totalPages: totalPages,
                 onPageChanged: onPageChanged,
               )
-            else
-              _MobileJumpButton(
-                totalPages: totalPages,
-                onPageChanged: onPageChanged,
-              ),
           ],
         ),
       ),
@@ -424,71 +610,5 @@ class _DesktopJumpField extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _MobileJumpButton extends StatelessWidget {
-  const _MobileJumpButton({
-    required this.totalPages,
-    required this.onPageChanged,
-  });
-
-  final int totalPages;
-  final ValueChanged<int> onPageChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return _PaginationIconButton(
-      icon: Icons.edit_rounded,
-      tooltip: context.l10n.jumpToPage,
-      onTap: () => _showJumpToPageDialog(context),
-    );
-  }
-
-  Future<void> _showJumpToPageDialog(BuildContext context) async {
-    final controller = TextEditingController();
-    final l10n = context.l10n;
-
-    final result = await showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.jumpToPage),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: l10n.enterPageRange(totalPages),
-            labelText: l10n.pageNumberLabel,
-          ),
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onSubmitted: (value) {
-            final page = int.tryParse(value);
-            if (page != null && page >= 1 && page <= totalPages) {
-              Navigator.of(context).pop(page);
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final page = int.tryParse(controller.text);
-              if (page != null && page >= 1 && page <= totalPages) {
-                Navigator.of(context).pop(page);
-              }
-            },
-            child: Text(l10n.confirm),
-          ),
-        ],
-      ),
-    );
-
-    if (result != null) {
-      onPageChanged(result);
-    }
   }
 }

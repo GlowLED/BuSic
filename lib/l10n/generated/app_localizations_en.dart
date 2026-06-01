@@ -649,6 +649,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchNoResultsSubtitle => 'Try another keyword or paste a BV link.';
 
   @override
+  String get searchLoadingMore => 'Loading more...';
+
+  @override
+  String get searchAllResultsLoaded => 'All results loaded';
+
+  @override
+  String get searchLoadMoreFailed => 'Failed to load more';
+
+  @override
   String get backToSearchResults => 'Back to search results';
 
   @override

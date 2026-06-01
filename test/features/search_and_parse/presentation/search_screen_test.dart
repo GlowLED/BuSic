@@ -146,6 +146,157 @@ void main() {
           find.text('Try another keyword or paste a BV link.'), findsOneWidget);
       expect(notifier.searchCalls.single, (keyword: 'missing song', page: 1));
     });
+
+    testWidgets('mobile portrait appends next search page when scrolling down',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResultsByPage: {
+          1: _pageResults('Page One', 8),
+          2: const [
+            BvidInfo(
+              bvid: 'BVpage2001',
+              title: 'Page Two Result',
+              owner: 'BuSic',
+              duration: 245,
+            ),
+          ],
+        },
+        numPages: 2,
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page One 1'), findsOneWidget);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+
+      await _scrollSearchResultsToBottom(tester);
+
+      expect(notifier.searchCalls, [
+        (keyword: 'night drive', page: 1),
+        (keyword: 'night drive', page: 2),
+      ]);
+      expect(
+        _searchResultsScrollableState(tester, keyword: 'night drive')
+            .position
+            .pixels,
+        greaterThan(0),
+      );
+      await _scrollSearchResultsUntilVisible(
+        tester,
+        'Page Two Result',
+      );
+      expect(find.text('Page Two Result'), findsOneWidget);
+    });
+
+    testWidgets('mobile load-more failure keeps existing results and retries',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResultsByPage: {
+          1: _pageResults('Page One', 8),
+          2: const [
+            BvidInfo(
+              bvid: 'BVpage2001',
+              title: 'Page Two Result',
+              owner: 'BuSic',
+              duration: 245,
+            ),
+          ],
+        },
+        numPages: 2,
+        failPages: {2},
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      await _scrollSearchResultsToBottom(tester);
+
+      expect(find.text('Page One 1'), findsOneWidget);
+      expect(find.text('Failed to load more'), findsOneWidget);
+      expect(find.text('Page Two Result'), findsNothing);
+
+      notifier.failPages.clear();
+      await _scrollSearchResultsToBottom(tester);
+      await tester.tap(find.text('Retry'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.searchCalls, [
+        (keyword: 'night drive', page: 1),
+        (keyword: 'night drive', page: 2),
+        (keyword: 'night drive', page: 2),
+      ]);
+      await _scrollSearchResultsUntilVisible(
+        tester,
+        'Page Two Result',
+      );
+      expect(find.text('Page Two Result'), findsOneWidget);
+    });
+
+    testWidgets('new mobile search resets previously appended results',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResultsByKeywordAndPage: {
+          'night drive': {
+            1: _pageResults('Old Page', 8),
+            2: const [
+              BvidInfo(
+                bvid: 'BVold2001',
+                title: 'Old Page Two Result',
+                owner: 'BuSic',
+                duration: 245,
+              ),
+            ],
+          },
+          'new song': {
+            1: const [
+              BvidInfo(
+                bvid: 'BVnew1001',
+                title: 'New Search Result',
+                owner: 'BuSic',
+                duration: 245,
+              ),
+            ],
+          },
+        },
+        numPagesByKeyword: const {
+          'night drive': 2,
+          'new song': 1,
+        },
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      await _scrollSearchResultsToBottom(tester);
+
+      expect(notifier.searchCalls, [
+        (keyword: 'night drive', page: 1),
+        (keyword: 'night drive', page: 2),
+      ]);
+      await _scrollSearchResultsUntilVisible(
+        tester,
+        'Old Page Two Result',
+      );
+      expect(find.text('Old Page Two Result'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'new song');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.text('New Search Result'), findsOneWidget);
+      expect(find.text('Old Page 1'), findsNothing);
+      expect(find.text('Old Page Two Result'), findsNothing);
+      expect(notifier.searchCalls.last, (keyword: 'new song', page: 1));
+    });
   });
 }
 
@@ -183,12 +334,71 @@ void _setMobilePortraitViewport(WidgetTester tester) {
   addTearDown(tester.view.resetPhysicalSize);
 }
 
+List<BvidInfo> _pageResults(String prefix, int count) {
+  return List.generate(
+    count,
+    (index) => BvidInfo(
+      bvid: 'BV${prefix.replaceAll(' ', '')}${index + 1}',
+      title: '$prefix ${index + 1}',
+      owner: 'BuSic',
+      duration: 245,
+    ),
+  );
+}
+
+Future<void> _scrollSearchResultsToBottom(
+  WidgetTester tester, {
+  String keyword = 'night drive',
+}) async {
+  final scrollable = _searchResultsScrollableState(tester, keyword: keyword);
+  scrollable.position.jumpTo(scrollable.position.maxScrollExtent);
+  await tester.pump();
+  await tester.pumpAndSettle();
+}
+
+Future<void> _scrollSearchResultsUntilVisible(
+  WidgetTester tester,
+  String text, {
+  String keyword = 'night drive',
+}) async {
+  await tester.scrollUntilVisible(
+    find.text(text),
+    200,
+    scrollable: _searchResultsScrollableFinder(keyword),
+  );
+  await tester.pumpAndSettle();
+}
+
+ScrollableState _searchResultsScrollableState(
+  WidgetTester tester, {
+  required String keyword,
+}) {
+  return tester.state<ScrollableState>(_searchResultsScrollableFinder(keyword));
+}
+
+Finder _searchResultsScrollableFinder(String keyword) {
+  return find.descendant(
+    of: find.byKey(PageStorageKey<String>('search_results_$keyword')),
+    matching: find.byType(Scrollable),
+  );
+}
+
 class _FakeParseNotifier extends ParseNotifier {
   _FakeParseNotifier({
     this.searchResults = const [],
-  });
+    this.searchResultsByPage,
+    this.searchResultsByKeywordAndPage,
+    this.numPages = 1,
+    this.numPagesByKeyword = const {},
+    Set<int>? failPages,
+  }) : failPages = failPages ?? <int>{};
 
   final List<BvidInfo> searchResults;
+  final Map<int, List<BvidInfo>>? searchResultsByPage;
+  final Map<String, Map<int, List<BvidInfo>>>? searchResultsByKeywordAndPage;
+  final int numPages;
+  final Map<String, int> numPagesByKeyword;
+  final Set<int> failPages;
   final List<({String keyword, int page})> searchCalls = [];
 
   @override
@@ -211,8 +421,24 @@ class _FakeParseNotifier extends ParseNotifier {
     String keyword, {
     int page = 1,
     int pageSize = 20,
+    bool updateStateOnError = true,
   }) async {
     searchCalls.add((keyword: keyword, page: page));
-    return (results: searchResults, numPages: 1);
+    if (failPages.contains(page)) {
+      throw StateError('load more failed');
+    }
+
+    final keywordPages = searchResultsByKeywordAndPage?[keyword];
+    if (keywordPages != null) {
+      return (
+        results: keywordPages[page] ?? const <BvidInfo>[],
+        numPages: numPagesByKeyword[keyword] ?? numPages,
+      );
+    }
+
+    return (
+      results: searchResultsByPage?[page] ?? searchResults,
+      numPages: numPages,
+    );
   }
 }

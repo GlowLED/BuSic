@@ -1331,6 +1331,24 @@ abstract class AppLocalizations {
   /// **'Try another keyword or paste a BV link.'**
   String get searchNoResultsSubtitle;
 
+  /// Footer text shown while mobile search is loading the next page
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more...'**
+  String get searchLoadingMore;
+
+  /// Footer text shown after mobile search has loaded all pages
+  ///
+  /// In en, this message translates to:
+  /// **'All results loaded'**
+  String get searchAllResultsLoaded;
+
+  /// Footer text shown when mobile search fails to load the next page
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load more'**
+  String get searchLoadMoreFailed;
+
   /// No description provided for @backToSearchResults.
   ///
   /// In en, this message translates to:
