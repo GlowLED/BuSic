@@ -634,6 +634,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searching => '搜索中...';
 
   @override
+  String get clearSearchInput => '清空搜索输入';
+
+  @override
   String get pasteFromClipboard => '从剪贴板粘贴';
 
   @override

@@ -634,6 +634,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searching => 'Searching...';
 
   @override
+  String get clearSearchInput => 'Clear search input';
+
+  @override
   String get pasteFromClipboard => 'Paste from clipboard';
 
   @override

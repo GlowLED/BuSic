@@ -263,6 +263,8 @@
   "searchPageSubtitle": "Search Bilibili or paste a BV link without leaving your music flow.",
   "searchCommandTitle": "Search or parse",
   "searching": "Searching...",
+  "clearSearchInput": "Clear search input",
+  "@clearSearchInput": { "description": "Tooltip for the button that clears the search input and resets the search page" },
   "pasteFromClipboard": "Paste from clipboard",
   "searchEmptyTitle": "Start with a keyword or BV link",
   "searchEmptySubtitle": "Results, parsed video details, page selection and comments will appear here.",

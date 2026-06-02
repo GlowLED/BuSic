@@ -261,6 +261,7 @@
   "searchPageSubtitle": "搜索 B 站内容或粘贴 BV 链接，直接进入听歌流程。",
   "searchCommandTitle": "搜索或解析",
   "searching": "搜索中...",
+  "clearSearchInput": "清空搜索输入",
   "pasteFromClipboard": "从剪贴板粘贴",
   "searchEmptyTitle": "输入关键词或 BV 链接开始",
   "searchEmptySubtitle": "搜索结果、视频详情、分 P 选择和评论会显示在这里。",

@@ -35,6 +35,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
   List<BvidInfo> _searchResults = [];
   bool _isSearching = false;
   bool _isLoadingMore = false;
@@ -49,11 +50,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void initState() {
     super.initState();
     _controller.addListener(_handleInputTextChanged);
+    _focusNode.addListener(_handleInputFocusChanged);
   }
 
   @override
   void dispose() {
+    _focusNode.removeListener(_handleInputFocusChanged);
     _controller.removeListener(_handleInputTextChanged);
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -70,11 +74,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
   }
 
+  void _handleInputFocusChanged() {
+    if (_focusNode.hasFocus || _controller.text.trim().isNotEmpty) return;
+
+    _resetSearchSession(clearText: false);
+  }
+
   void _handleSubmit() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    FocusScope.of(context).unfocus();
     setState(() => _hasSubmittedInput = true);
 
     final bvid = Formatters.parseBvid(text);
@@ -92,6 +101,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
   }
 
+  void _handleClearSearchInput() {
+    FocusScope.of(context).unfocus();
+    _resetSearchSession(clearText: true);
+  }
+
+  void _resetSearchSession({required bool clearText}) {
+    if (clearText) {
+      _controller.clear();
+    }
+
+    ref.read(parseNotifierProvider.notifier).reset();
+
+    setState(() {
+      _currentKeyword = '';
+      _currentPage = 1;
+      _totalPages = 1;
+      _searchResults = [];
+      _isSearching = false;
+      _isLoadingMore = false;
+      _loadMoreErrorMessage = null;
+      _hasSubmittedInput = false;
+      _hasInputText = false;
+    });
+  }
+
   Future<void> _performSearch(String keyword, {int page = 1}) async {
     ref.read(parseNotifierProvider.notifier).reset();
     setState(() {
@@ -104,7 +138,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final searchResult = await ref
         .read(parseNotifierProvider.notifier)
         .searchVideos(keyword, page: page);
-    if (!mounted) return;
+    if (!mounted || keyword != _currentKeyword) return;
     setState(() {
       _searchResults = searchResult.results;
       _totalPages = searchResult.numPages;
@@ -121,6 +155,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
 
     final nextPage = _currentPage + 1;
+    final keyword = _currentKeyword;
     setState(() {
       _isLoadingMore = true;
       _loadMoreErrorMessage = null;
@@ -129,11 +164,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     try {
       final searchResult =
           await ref.read(parseNotifierProvider.notifier).searchVideos(
-                _currentKeyword,
+                keyword,
                 page: nextPage,
                 updateStateOnError: false,
               );
-      if (!mounted) return;
+      if (!mounted || keyword != _currentKeyword) return;
       setState(() {
         _searchResults = [..._searchResults, ...searchResult.results];
         _currentPage = nextPage;
@@ -141,7 +176,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _isLoadingMore = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || keyword != _currentKeyword) return;
       setState(() {
         _isLoadingMore = false;
         _loadMoreErrorMessage = context.l10n.searchLoadMoreFailed;
@@ -400,6 +435,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return _isSearching ||
         _searchResults.isNotEmpty ||
         hasActiveParseState ||
+        (_focusNode.hasFocus && _currentKeyword.isNotEmpty) ||
         (_hasSubmittedInput && _hasInputText);
   }
 
@@ -414,6 +450,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isParsing = parseState.whenOrNull(parsing: () => true) == true;
     final spacing = context.appSpacing;
     final palette = context.appPalette;
+    final showClearButton = _hasSubmittedInput && _hasInputText;
 
     final field = DecoratedBox(
       key: const ValueKey('search_input_surface'),
@@ -427,16 +464,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       child: TextField(
         controller: _controller,
+        focusNode: _focusNode,
         decoration: InputDecoration(
           hintText: l10n.parseInput,
           prefixIcon: Icon(
             Icons.manage_search_rounded,
             color: palette.textSecondary,
           ),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.content_paste_rounded),
-            tooltip: l10n.pasteFromClipboard,
-            onPressed: isParsing ? null : _onPaste,
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showClearButton)
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: l10n.clearSearchInput,
+                  onPressed: isParsing ? null : _handleClearSearchInput,
+                ),
+              IconButton(
+                icon: const Icon(Icons.content_paste_rounded),
+                tooltip: l10n.pasteFromClipboard,
+                onPressed: isParsing ? null : _onPaste,
+              ),
+            ],
           ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -448,6 +497,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
         ),
         textInputAction: TextInputAction.search,
+        onEditingComplete: () {},
         onSubmitted: (_) => _handleSubmit(),
         enabled: !isParsing,
       ),

@@ -1301,6 +1301,12 @@ abstract class AppLocalizations {
   /// **'Searching...'**
   String get searching;
 
+  /// Tooltip for the button that clears the search input and resets the search page
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search input'**
+  String get clearSearchInput;
+
   /// No description provided for @pasteFromClipboard.
   ///
   /// In en, this message translates to:
