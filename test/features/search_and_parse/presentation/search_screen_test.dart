@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -63,6 +65,136 @@ void main() {
       expect(inputRect.center.dy, lessThan(140));
     });
 
+    testWidgets('clears a submitted desktop search and recenters the input',
+        (tester) async {
+      _setDesktopViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
+
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      final inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(find.text('Night Drive'), findsNothing);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+      expect((inputRect.top - centeredRect.top).abs(), lessThan(1));
+      expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
+    });
+
+    testWidgets('clear keeps a pending search from restoring stale results',
+        (tester) async {
+      _setDesktopViewport(tester);
+      final searchGate = Completer<void>();
+      final notifier = _FakeParseNotifier(
+        searchDelay: searchGate.future,
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
+
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+      expect(find.text('Searching...'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+
+      searchGate.complete();
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      final inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(find.text('Night Drive'), findsNothing);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+      expect((inputRect.top - centeredRect.top).abs(), lessThan(1));
+      expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
+    });
+
+    testWidgets('keyboard search keeps input focused and manually editable',
+        (tester) async {
+      _setDesktopViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.tap(find.byType(TextField));
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(_inputHasFocus(tester), isTrue);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pump();
+
+      var input = tester.widget<TextField>(find.byType(TextField));
+      var inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(_inputHasFocus(tester), isTrue);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(inputRect.top, lessThan(80));
+
+      await tester.enterText(find.byType(TextField), 'next search');
+      await tester.pump();
+
+      input = tester.widget<TextField>(find.byType(TextField));
+      inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, 'next search');
+      expect(_inputHasFocus(tester), isTrue);
+      expect(inputRect.top, lessThan(80));
+    });
+
     testWidgets('keeps the input docked after an empty search result',
         (tester) async {
       _setDesktopViewport(tester);
@@ -81,6 +213,43 @@ void main() {
       final inputRect = _inputBarRect(tester);
       expect(inputRect.top, lessThan(80));
       expect(inputRect.center.dy, lessThan(140));
+    });
+
+    testWidgets('empty focused input stays docked until focus is lost',
+        (tester) async {
+      _setDesktopViewport(tester);
+      final notifier = _FakeParseNotifier();
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
+
+      await tester.enterText(find.byType(TextField), 'missing song');
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pump();
+
+      final emptiedFocusedRect = _inputBarRect(tester);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(emptiedFocusedRect.top, lessThan(80));
+      expect(emptiedFocusedRect.center.dy, lessThan(140));
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      final inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(find.text('No results found'), findsNothing);
+      expect(notifier.searchCalls.single, (keyword: 'missing song', page: 1));
+      expect((inputRect.top - centeredRect.top).abs(), lessThan(1));
+      expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
     testWidgets('mobile portrait centers input and hides search button',
@@ -129,6 +298,100 @@ void main() {
       expect(animatingRect.top, greaterThan(inputRect.top));
       expect(inputRect.top, lessThan(100));
       expect((inputRect.width - centeredRect.width).abs(), lessThan(1));
+    });
+
+    testWidgets('mobile clear button animates the input back to center',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
+
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      final dockedRect = _inputBarRect(tester);
+
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 130));
+      final animatingRect = _inputBarRect(tester);
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      final inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(find.text('Night Drive'), findsNothing);
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+      expect(animatingRect.top, greaterThan(dockedRect.top));
+      expect(animatingRect.top, lessThan(inputRect.top));
+      expect((inputRect.top - centeredRect.top).abs(), lessThan(1));
+      expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
+    });
+
+    testWidgets('mobile empty input blur animates the input back to center',
+        (tester) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
+
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pump();
+      final emptiedFocusedRect = _inputBarRect(tester);
+
+      expect(find.byIcon(Icons.close_rounded), findsNothing);
+      expect(emptiedFocusedRect.top, lessThan(100));
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 130));
+      final animatingRect = _inputBarRect(tester);
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      final inputRect = _inputBarRect(tester);
+
+      expect(input.controller?.text, isEmpty);
+      expect(find.text('Night Drive'), findsNothing);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+      expect(animatingRect.top, greaterThan(emptiedFocusedRect.top));
+      expect(animatingRect.top, lessThan(inputRect.top));
+      expect((inputRect.top - centeredRect.top).abs(), lessThan(1));
+      expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
     testWidgets('mobile portrait shows empty result state after no matches',
@@ -320,6 +583,11 @@ Rect _inputBarRect(WidgetTester tester) {
   return tester.getRect(find.byKey(const ValueKey('search_input_surface')));
 }
 
+bool _inputHasFocus(WidgetTester tester) {
+  return tester.widget<TextField>(find.byType(TextField)).focusNode?.hasFocus ??
+      false;
+}
+
 void _setDesktopViewport(WidgetTester tester) {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(1000, 800);
@@ -388,6 +656,7 @@ class _FakeParseNotifier extends ParseNotifier {
     this.searchResults = const [],
     this.searchResultsByPage,
     this.searchResultsByKeywordAndPage,
+    this.searchDelay,
     this.numPages = 1,
     this.numPagesByKeyword = const {},
     Set<int>? failPages,
@@ -396,6 +665,7 @@ class _FakeParseNotifier extends ParseNotifier {
   final List<BvidInfo> searchResults;
   final Map<int, List<BvidInfo>>? searchResultsByPage;
   final Map<String, Map<int, List<BvidInfo>>>? searchResultsByKeywordAndPage;
+  final Future<void>? searchDelay;
   final int numPages;
   final Map<String, int> numPagesByKeyword;
   final Set<int> failPages;
@@ -424,6 +694,10 @@ class _FakeParseNotifier extends ParseNotifier {
     bool updateStateOnError = true,
   }) async {
     searchCalls.add((keyword: keyword, page: page));
+    if (searchDelay != null) {
+      await searchDelay;
+    }
+
     if (failPages.contains(page)) {
       throw StateError('load more failed');
     }
