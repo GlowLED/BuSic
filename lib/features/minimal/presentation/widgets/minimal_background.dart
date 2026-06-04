@@ -1,7 +1,12 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
+const _minimalBackgroundCacheOversample = 1.5;
+const _minimalBackgroundMinCacheDimension = 256.0;
+const _minimalBackgroundMaxCacheDimension = 1024.0;
 
 /// 极简模式的毛玻璃呼吸背景。
 ///
@@ -62,6 +67,7 @@ class _MinimalBackgroundState extends State<MinimalBackground>
               opacity: _opacityAnimation.value,
               child: Transform.scale(
                 scale: _scaleAnimation.value,
+                filterQuality: FilterQuality.high,
                 child: _buildBackground(),
               ),
             ),
@@ -95,9 +101,13 @@ class _MinimalBackgroundState extends State<MinimalBackground>
   Widget _buildBackground() {
     final url = widget.coverUrl;
     if (url != null && url.isNotEmpty) {
+      final cacheSize = _backgroundCacheSize();
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
+        memCacheWidth: cacheSize?.width,
+        memCacheHeight: cacheSize?.height,
         // 加载中和失败时回退到渐变色
         placeholder: (_, __) => _gradientFallback(),
         errorWidget: (_, __, ___) => _gradientFallback(),
@@ -120,6 +130,30 @@ class _MinimalBackgroundState extends State<MinimalBackground>
           ],
         ),
       ),
+    );
+  }
+
+  ({int width, int height})? _backgroundCacheSize() {
+    final screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width <= 0 || screenSize.height <= 0) return null;
+
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final rawWidth =
+        screenSize.width * pixelRatio * _minimalBackgroundCacheOversample;
+    final rawHeight =
+        screenSize.height * pixelRatio * _minimalBackgroundCacheOversample;
+    final rawMax = math.max(rawWidth, rawHeight);
+    if (!rawMax.isFinite || rawMax <= 0) return null;
+
+    final scale = rawMax < _minimalBackgroundMinCacheDimension
+        ? _minimalBackgroundMinCacheDimension / rawMax
+        : rawMax > _minimalBackgroundMaxCacheDimension
+            ? _minimalBackgroundMaxCacheDimension / rawMax
+            : 1.0;
+
+    return (
+      width: math.max(1, (rawWidth * scale).ceil()),
+      height: math.max(1, (rawHeight * scale).ceil()),
     );
   }
 }

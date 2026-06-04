@@ -16,6 +16,7 @@ import 'package:busic/features/player/data/player_repository.dart';
 import 'package:busic/features/player/domain/models/audio_track.dart';
 import 'package:busic/features/player/domain/models/play_mode.dart';
 import 'package:busic/features/player/presentation/player_bar.dart';
+import 'package:busic/features/player/presentation/widgets/draggable_progress_bar.dart';
 import 'package:busic/features/search_and_parse/data/parse_repository.dart';
 import 'package:busic/features/search_and_parse/domain/models/audio_stream_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.dart';
@@ -108,12 +109,159 @@ void main() {
       expect(find.byIcon(Icons.favorite), findsNothing);
     });
   });
+
+  group('PlayerBar 移动端布局', () {
+    testWidgets('使用紧凑控制并移除可拖动进度条', (tester) async {
+      final songId = await _seedSong(
+        db,
+        bvid: 'BVmobilebar01',
+        cid: 2001,
+        title: '移动端标题',
+      );
+      await _seedPlayerPreferences(
+        track: _track(
+          songId: songId,
+          bvid: 'BVmobilebar01',
+          cid: 2001,
+          title: '移动端标题',
+          artist: '移动端作者',
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildSubject(
+          db: db,
+          fakeAudioHandler: fakeAudioHandler,
+          fakePlayerRepository: fakePlayerRepository,
+          width: 390,
+        ),
+      );
+      await _settle(tester);
+
+      expect(find.byType(DraggableProgressBar), findsNothing);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(Icons.queue_music), findsOneWidget);
+      expect(find.byIcon(Icons.favorite), findsNothing);
+      expect(find.byIcon(Icons.favorite_border), findsNothing);
+      expect(find.byIcon(Icons.comment_outlined), findsNothing);
+      expect(find.byIcon(Icons.skip_previous), findsNothing);
+      expect(find.byIcon(Icons.skip_next), findsNothing);
+      expect(find.byIcon(Icons.arrow_forward), findsNothing);
+      expect(find.byIcon(Icons.repeat), findsNothing);
+      expect(find.byIcon(Icons.repeat_one), findsNothing);
+      expect(find.byIcon(Icons.shuffle), findsNothing);
+
+      final trackText = tester.widget<Text>(
+        find.byKey(const ValueKey('player_bar_mobile_track_text')),
+      );
+      expect(trackText.textSpan?.toPlainText(), '移动端标题 - 移动端作者');
+      expect(trackText.maxLines, 1);
+      expect(trackText.overflow, TextOverflow.ellipsis);
+    });
+
+    testWidgets('队列按钮打开播放队列', (tester) async {
+      final songId = await _seedSong(
+        db,
+        bvid: 'BVmobilebar02',
+        cid: 2002,
+        title: '队列测试曲目',
+      );
+      await _seedPlayerPreferences(
+        track: _track(
+          songId: songId,
+          bvid: 'BVmobilebar02',
+          cid: 2002,
+          title: '队列测试曲目',
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildSubject(
+          db: db,
+          fakeAudioHandler: fakeAudioHandler,
+          fakePlayerRepository: fakePlayerRepository,
+          width: 390,
+        ),
+      );
+      await _settle(tester);
+
+      await tester.tap(find.byIcon(Icons.queue_music));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Queue'), findsOneWidget);
+      expect(find.text('(1)'), findsOneWidget);
+    });
+
+    testWidgets('record cover rotates only while playing', (tester) async {
+      final songId = await _seedSong(
+        db,
+        bvid: 'BVmobilebar03',
+        cid: 2003,
+        title: 'Record rotation',
+      );
+      await _seedPlayerPreferences(
+        track: _track(
+          songId: songId,
+          bvid: 'BVmobilebar03',
+          cid: 2003,
+          title: 'Record rotation',
+          artist: 'Rotation artist',
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildSubject(
+          db: db,
+          fakeAudioHandler: fakeAudioHandler,
+          fakePlayerRepository: fakePlayerRepository,
+          width: 390,
+        ),
+      );
+      await _settle(tester);
+
+      Transform recordTransform() {
+        return tester.widget<Transform>(
+          find.byKey(const ValueKey('player_bar_record_rotation')),
+        );
+      }
+
+      List<double> transformStorage() {
+        return List<double>.of(recordTransform().transform.storage);
+      }
+
+      expect(recordTransform().filterQuality, FilterQuality.high);
+      final initialStorage = transformStorage();
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final playingStorage = transformStorage();
+      expect(playingStorage, isNot(equals(initialStorage)));
+
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(transformStorage(), isNot(equals(playingStorage)));
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final pausedStorage = transformStorage();
+
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(transformStorage(), pausedStorage);
+    });
+  });
 }
 
 Widget _buildSubject({
   required AppDatabase db,
   required _FakeAudioHandler fakeAudioHandler,
   required _FakePlayerRepository fakePlayerRepository,
+  double width = 720,
 }) {
   return ProviderScope(
     overrides: [
@@ -124,9 +272,9 @@ Widget _buildSubject({
       playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
     ],
     child: buildTestApp(
-      const SizedBox(
-        width: 720,
-        child: PlayerBar(),
+      SizedBox(
+        width: width,
+        child: const PlayerBar(),
       ),
     ),
   );
@@ -188,13 +336,14 @@ AudioTrack _track({
   required String bvid,
   required int cid,
   required String title,
+  String artist = '测试歌手',
 }) {
   return AudioTrack(
     songId: songId,
     bvid: bvid,
     cid: cid,
     title: title,
-    artist: '测试歌手',
+    artist: artist,
     duration: const Duration(minutes: 3),
   );
 }
@@ -256,6 +405,11 @@ class _FakePlayerRepository implements PlayerRepository {
 }
 
 class _FakeParseRepository implements ParseRepository {
+  AudioStreamInfo streamInfo = const AudioStreamInfo(
+    url: 'https://example.com/audio.m4s',
+    quality: 30280,
+  );
+
   @override
   Future<({String imgKey, String subKey})> fetchWbiKeys() {
     throw UnimplementedError();
@@ -274,8 +428,8 @@ class _FakeParseRepository implements ParseRepository {
     String bvid,
     int cid, {
     int? quality,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    return streamInfo;
   }
 
   @override

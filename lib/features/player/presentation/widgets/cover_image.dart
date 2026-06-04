@@ -16,6 +16,11 @@ Widget buildCoverImage(
   String? coverUrl, {
   Color? colorOverlay,
   BlendMode? blendMode,
+  FilterQuality filterQuality = FilterQuality.high,
+  int? cacheSizePx,
+  Duration fadeInDuration = const Duration(milliseconds: 500),
+  Duration fadeOutDuration = const Duration(milliseconds: 1000),
+  bool useOldImageOnUrlChange = false,
 }) {
   if (coverUrl == null || coverUrl.isEmpty) {
     return Container(
@@ -24,7 +29,9 @@ Widget buildCoverImage(
     );
   }
 
-  final isLocal = coverUrl.startsWith('/') || coverUrl.startsWith('file://');
+  final isLocal = coverUrl.startsWith('/') ||
+      coverUrl.startsWith('file://') ||
+      RegExp(r'^[A-Za-z]:[/\\]').hasMatch(coverUrl);
   if (isLocal) {
     final path = coverUrl.startsWith('file://')
         ? Uri.parse(coverUrl).toFilePath()
@@ -34,6 +41,9 @@ Widget buildCoverImage(
       fit: BoxFit.cover,
       color: colorOverlay,
       colorBlendMode: blendMode,
+      filterQuality: filterQuality,
+      cacheWidth: cacheSizePx,
+      cacheHeight: cacheSizePx,
       errorBuilder: (_, __, ___) => Container(
         color: context.colorScheme.primaryContainer,
         child: const Icon(Icons.music_note, size: 24),
@@ -46,6 +56,12 @@ Widget buildCoverImage(
     fit: BoxFit.cover,
     color: colorOverlay,
     colorBlendMode: blendMode,
+    filterQuality: filterQuality,
+    memCacheWidth: cacheSizePx,
+    memCacheHeight: cacheSizePx,
+    fadeInDuration: fadeInDuration,
+    fadeOutDuration: fadeOutDuration,
+    useOldImageOnUrlChange: useOldImageOnUrlChange,
     errorWidget: (_, __, ___) => Container(
       color: context.colorScheme.primaryContainer,
       child: const Icon(Icons.music_note, size: 24),

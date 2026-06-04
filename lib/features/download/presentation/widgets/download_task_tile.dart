@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
+import '../../../../shared/widgets/media_cover.dart';
 import '../../domain/models/download_task.dart';
 
 /// Format bytes to human-readable string.
@@ -72,29 +72,12 @@ class DownloadTaskTile extends StatelessWidget {
         height: 48,
         child: Stack(
           children: [
-            // Cover art
-            task.coverUrl != null && task.coverUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: task.coverUrl!,
-                    fit: BoxFit.cover,
-                    width: 48,
-                    height: 48,
-                    placeholder: (_, __) => Container(
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Icon(Icons.music_note,
-                          color: colorScheme.onSurfaceVariant),
-                    ),
-                    errorWidget: (_, __, ___) => Container(
-                      color: colorScheme.surfaceContainerHighest,
-                      child: Icon(Icons.music_note,
-                          color: colorScheme.onSurfaceVariant),
-                    ),
-                  )
-                : Container(
-                    color: colorScheme.surfaceContainerHighest,
-                    child: Icon(Icons.music_note,
-                        color: colorScheme.onSurfaceVariant),
-                  ),
+            MediaCover(
+              coverUrl: task.coverUrl,
+              width: 48,
+              height: 48,
+              borderRadius: BorderRadius.zero,
+            ),
             // Status overlay for downloading
             if (task.status == DownloadStatus.downloading)
               Positioned.fill(
@@ -191,7 +174,9 @@ class DownloadTaskTile extends StatelessWidget {
           );
         }
         return Text(
-          [task.songArtist, l10n.pending].where((s) => s != null && s.isNotEmpty).join(' · '),
+          [task.songArtist, l10n.pending]
+              .where((s) => s != null && s.isNotEmpty)
+              .join(' · '),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );

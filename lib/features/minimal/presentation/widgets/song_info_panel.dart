@@ -97,6 +97,7 @@ class _CoverArt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double size = 220;
+    final cacheSize = _coverCacheSize(context, size);
 
     return Container(
       width: size,
@@ -113,17 +114,20 @@ class _CoverArt extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: _buildImage(),
+        child: _buildImage(cacheSize),
       ),
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(int cacheSize) {
     final url = coverUrl;
     if (url != null && url.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
+        memCacheWidth: cacheSize,
+        memCacheHeight: cacheSize,
         placeholder: (_, __) => _placeholder(),
         errorWidget: (_, __, ___) => _placeholder(),
       );
@@ -142,6 +146,11 @@ class _CoverArt extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  int _coverCacheSize(BuildContext context, double size) {
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    return (size * pixelRatio * 2).ceil().clamp(256, 1024).toInt();
   }
 }
 

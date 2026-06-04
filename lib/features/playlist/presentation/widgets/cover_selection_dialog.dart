@@ -1,11 +1,9 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
+import '../../../../shared/widgets/media_cover.dart';
 import '../../application/playlist_notifier.dart';
 import '../../domain/models/song_item.dart';
 
@@ -189,15 +187,12 @@ class _SongCoverItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return ListTile(
-      leading: ClipRRect(
+      leading: MediaCover(
+        coverUrl: song.coverUrl,
+        width: 48,
+        height: 48,
         borderRadius: BorderRadius.circular(6),
-        child: SizedBox(
-          width: 48,
-          height: 48,
-          child: _buildCoverImage(song.coverUrl, colorScheme),
-        ),
       ),
       title: Text(
         song.displayTitle,
@@ -210,45 +205,6 @@ class _SongCoverItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       onTap: onTap,
-    );
-  }
-
-  Widget _buildCoverImage(String? coverUrl, ColorScheme colorScheme) {
-    if (coverUrl == null || coverUrl.isEmpty) {
-      return Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: const Icon(Icons.music_note, size: 24),
-      );
-    }
-
-    final isLocal = coverUrl.startsWith('/') ||
-        coverUrl.startsWith('file://') ||
-        RegExp(r'^[A-Za-z]:[/\\]').hasMatch(coverUrl);
-    if (isLocal) {
-      final path = coverUrl.startsWith('file://')
-          ? Uri.parse(coverUrl).toFilePath()
-          : coverUrl;
-      return Image.file(
-        File(path),
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          color: colorScheme.surfaceContainerHighest,
-          child: const Icon(Icons.music_note, size: 24),
-        ),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: coverUrl,
-      fit: BoxFit.cover,
-      placeholder: (_, __) => Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: const Icon(Icons.music_note, size: 24),
-      ),
-      errorWidget: (_, __, ___) => Container(
-        color: colorScheme.surfaceContainerHighest,
-        child: const Icon(Icons.music_note, size: 24),
-      ),
     );
   }
 }
