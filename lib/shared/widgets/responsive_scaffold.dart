@@ -161,6 +161,7 @@ class _MobileShell extends StatelessWidget {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: _ShellBackdrop(
           child: isLandscape

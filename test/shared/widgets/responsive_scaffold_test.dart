@@ -111,6 +111,31 @@ void main() {
     expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
 
+  testWidgets('keeps mobile portrait bottom chrome fixed above keyboard',
+      (tester) async {
+    await _pumpShell(tester, const Size(390, 844));
+
+    await tester.tap(_navLabel('Search'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final playerBefore = tester.getRect(find.byType(PlayerBar));
+    final navBefore = tester.getRect(_navLabel('Search'));
+
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pump();
+
+    final playerAfter = tester.getRect(find.byType(PlayerBar));
+    final navAfter = tester.getRect(_navLabel('Search'));
+
+    expect(playerAfter.top, closeTo(playerBefore.top, 0.1));
+    expect(playerAfter.bottom, closeTo(playerBefore.bottom, 0.1));
+    expect(navAfter.top, closeTo(navBefore.top, 0.1));
+    expect(navAfter.bottom, closeTo(navBefore.bottom, 0.1));
+  });
+
   testWidgets('places mobile landscape content directly above the player bar',
       (tester) async {
     await _pumpShell(tester, const Size(700, 390));
@@ -135,6 +160,7 @@ Future<void> _pumpShell(WidgetTester tester, Size size) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetViewInsets);
 
   final db = AppDatabase.forTesting(NativeDatabase.memory());
   addTearDown(db.close);
