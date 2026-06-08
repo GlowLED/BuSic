@@ -1,7 +1,28 @@
 {
-  "latest": "0.4.2",
+  "latest": "0.4.3",
   "min_supported": "0.2.0",
   "versions": [
+    {
+      "version": "0.4.3",
+      "build": 18,
+      "date": "2026-06-08",
+      "changelog": "## BuSic 0.4.3\n\nBuSic 0.4.3 聚焦移动端搜索连续浏览、输入重置稳定性和播放界面细节。\n\n### 新功能与体验改进\n- 支持移动端搜索结果无限滚动，减少分页切换成本。\n- 优化播放器栏和媒体封面视觉细节。\n- 简化无歌单空状态。\n\n### 修复\n- 稳定搜索输入重置行为，避免清空或返回后残留状态。\n- 保持移动端键盘弹出时底部栏固定在可用区域。\n\n### 测试\n- 补充搜索输入重置流程回归测试。",
+      "force_update_below": "0.2.0",
+      "assets": {
+        "android": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.3/busic-android.apk"
+        },
+        "windows": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.3/busic-windows-x64.zip"
+        },
+        "linux": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.3/busic-linux-x64.deb"
+        },
+        "macos": {
+          "github": "https://github.com/GlowLED/BuSic/releases/download/v0.4.3/busic-macos.zip"
+        }
+      }
+    },
     {
       "version": "0.4.2",
       "build": 17,

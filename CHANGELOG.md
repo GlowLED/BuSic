@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.3] - 2026-06-08
+
+### Features
+- 支持移动端搜索结果无限滚动，减少分页切换成本。
+- 优化播放器栏和媒体封面视觉细节。
+
+### Bug Fixes
+- 稳定搜索输入重置行为，避免清空或返回后残留状态。
+- 保持移动端键盘弹出时底部栏固定在可用区域。
+- 简化无歌单空状态。
+
+### Tests
+- 补充搜索输入重置流程回归测试。
+
 ## [0.4.2] - 2026-05-17
 
 ### Bug Fixes
