@@ -477,19 +477,31 @@ class _PlayerBarSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(height / 2),
-      child: Container(
-        height: height,
-        decoration: BoxDecoration(
-          color: context.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(height / 2),
-          border: Border.all(
-            color: context.colorScheme.outlineVariant,
-            width: 0.5,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(height / 2),
+        boxShadow: [
+          BoxShadow(
+            color: context.appDepth.shadowSoft,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(height / 2),
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(
+            color: context.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(height / 2),
+            border: Border.all(
+              color: context.colorScheme.outlineVariant,
+              width: 0.5,
+            ),
+          ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }
