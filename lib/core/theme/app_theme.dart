@@ -54,11 +54,13 @@ class AppTheme {
     pill: 999,
   );
 
-  static const Color _darkBase = Color(0xFF090C12);
-  static const Color _darkSurface = Color(0xFF161D27);
-  static const Color _darkSurfaceRaised = Color(0xFF202A37);
-  static const Color _lightBase = Color(0xFFF5F0E8);
-  static const Color _lightSurface = Color(0xFFFFFBF7);
+  // Neutral charcoal ramp for dark mode (no blue tint).
+  static const Color _darkBase = Color(0xFF0E0E0E);
+  static const Color _darkSurface = Color(0xFF1A1A1A);
+  static const Color _darkSurfaceRaised = Color(0xFF242424);
+  // Pure white, flat surfaces for light mode (no warm/beige tint).
+  static const Color _lightBase = Color(0xFFFFFFFF);
+  static const Color _lightSurface = Color(0xFFFFFFFF);
   static const Color _lightSurfaceRaised = Color(0xFFFFFFFF);
 
   static ThemeData lightTheme({required Color seedColor}) {
@@ -481,40 +483,34 @@ class AppTheme {
     );
 
     final isDark = brightness == Brightness.dark;
-    final backgroundPrimary = isDark
-        ? _tintSurface(accentStrong, _darkBase, 0.10)
-        : _tintSurface(accentStrong, _lightBase, 0.05);
-    final backgroundSecondary = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF111722), 0.16)
-        : _tintSurface(accentStrong, const Color(0xFFEDE4D8), 0.08);
-    final surfacePrimary = isDark
-        ? _tintSurface(accentStrong, _darkSurface, 0.18)
-        : _tintSurface(accentStrong, _lightSurface, 0.10);
-    final surfaceSecondary = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF1B2430), 0.24)
-        : _tintSurface(accentStrong, const Color(0xFFFBF5ED), 0.16);
-    final surfaceElevated = isDark
-        ? _tintSurface(accentStrong, _darkSurfaceRaised, 0.30)
-        : _tintSurface(accentStrong, _lightSurfaceRaised, 0.22);
+    // Backgrounds and surfaces are kept neutral with no accent tint:
+    // light is flat pure white, dark is a neutral charcoal ramp.
+    final backgroundPrimary = isDark ? _darkBase : _lightBase;
+    final backgroundSecondary =
+        isDark ? const Color(0xFF131313) : _lightBase;
+    final surfacePrimary = isDark ? _darkSurface : _lightSurface;
+    final surfaceSecondary =
+        isDark ? const Color(0xFF1F1F1F) : _lightSurface;
+    final surfaceElevated = isDark ? _darkSurfaceRaised : _lightSurfaceRaised;
 
     final textPrimary =
-        isDark ? const Color(0xFFF4F7FB) : const Color(0xFF171C22);
+        isDark ? const Color(0xFFF5F5F5) : const Color(0xFF1A1A1A);
     final textSecondary =
-        isDark ? const Color(0xFFBEC7D3) : const Color(0xFF56606D);
+        isDark ? const Color(0xFFC2C2C2) : const Color(0xFF5A5A5A);
     final textMuted =
-        isDark ? const Color(0xFF909BA8) : const Color(0xFF7A8591);
-    final borderSubtle = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF293241), 0.18)
-        : _tintSurface(accentStrong, const Color(0xFFD9D0C5), 0.12);
-    final borderStrong = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF3A4558), 0.34)
-        : _tintSurface(accentStrong, const Color(0xFFC7BCB0), 0.20);
+        isDark ? const Color(0xFF8F8F8F) : const Color(0xFF8A8A8A);
+    // Neutral borders carry visual definition now that surfaces are flat.
+    final borderSubtle =
+        isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8EB);
+    final borderStrong =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFD4D4D8);
+    // Accent is intentionally retained for selected/active states.
     final accentSoft = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF172432), 0.34)
-        : _tintSurface(accentStrong, _lightSurfaceRaised, 0.16);
+        ? _tintSurface(accentStrong, _darkSurface, 0.28)
+        : _tintSurface(accentStrong, _lightSurfaceRaised, 0.12);
     final accentMuted = isDark
-        ? _tintSurface(accentStrong, const Color(0xFF121822), 0.20)
-        : _tintSurface(accentStrong, const Color(0xFFF5EEE5), 0.08);
+        ? _tintSurface(accentStrong, const Color(0xFF161616), 0.16)
+        : _tintSurface(accentStrong, _lightSurfaceRaised, 0.06);
 
     final palette = AppThemePalette(
       backgroundPrimary: backgroundPrimary,
