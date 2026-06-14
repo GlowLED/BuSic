@@ -553,22 +553,22 @@ class _CircularCoverState extends State<_CircularCover>
 
   @override
   Widget build(BuildContext context) {
-    final cover = AnimatedBuilder(
-      animation: _rotationController,
-      child: RepaintBoundary(
+    final cover = RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _rotationController,
         child: _RecordDisc(
           size: widget.size,
           coverUrl: widget.coverUrl,
         ),
+        builder: (context, child) {
+          return Transform.rotate(
+            key: const ValueKey('player_bar_record_rotation'),
+            angle: _rotationController.value * math.pi * 2,
+            filterQuality: FilterQuality.high,
+            child: child,
+          );
+        },
       ),
-      builder: (context, child) {
-        return Transform.rotate(
-          key: const ValueKey('player_bar_record_rotation'),
-          angle: _rotationController.value * math.pi * 2,
-          filterQuality: FilterQuality.high,
-          child: child,
-        );
-      },
     );
 
     if (widget.onTap == null) return cover;
