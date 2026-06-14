@@ -415,6 +415,11 @@ class _DesktopNavigationItem extends StatelessWidget {
       child: InkWell(
         borderRadius: context.appRadii.xLargeRadius,
         onTap: onTap,
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
         child: Container(
           constraints: const BoxConstraints(minHeight: 64),
           padding: EdgeInsets.symmetric(
