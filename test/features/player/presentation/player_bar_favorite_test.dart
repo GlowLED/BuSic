@@ -230,7 +230,7 @@ void main() {
         return List<double>.of(recordTransform().transform.storage);
       }
 
-      expect(recordTransform().filterQuality, FilterQuality.high);
+      expect(recordTransform().filterQuality, null);
       final initialStorage = transformStorage();
 
       await tester.tap(find.byIcon(Icons.play_arrow));

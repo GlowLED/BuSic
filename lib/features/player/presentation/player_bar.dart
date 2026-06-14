@@ -564,7 +564,6 @@ class _CircularCoverState extends State<_CircularCover>
           return Transform.rotate(
             key: const ValueKey('player_bar_record_rotation'),
             angle: _rotationController.value * math.pi * 2,
-            filterQuality: FilterQuality.high,
             child: child,
           );
         },
