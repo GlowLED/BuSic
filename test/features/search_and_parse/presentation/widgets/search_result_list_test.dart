@@ -7,11 +7,9 @@ import 'package:busic/features/search_and_parse/presentation/widgets/search_resu
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('renders results and triggers row and pagination callbacks',
-      (tester) async {
-    _setDesktopViewport(tester);
+  testWidgets('renders results and triggers row tap callback', (tester) async {
+    _setMobileViewport(tester);
     BvidInfo? tappedVideo;
-    int? changedPage;
 
     await tester.pumpWidget(
       buildTestApp(
@@ -27,7 +25,6 @@ void main() {
           currentPage: 2,
           totalPages: 5,
           onVideoTap: (video) => tappedVideo = video,
-          onPageChanged: (page) => changedPage = page,
         ),
       ),
     );
@@ -37,17 +34,9 @@ void main() {
     await tester.tap(find.text('Night Drive'));
     await tester.pump();
     expect(tappedVideo?.bvid, 'BV1xx411c7mD');
-
-    await tester.tap(find.byTooltip('Previous Page'));
-    await tester.pump();
-    expect(changedPage, 1);
-
-    await tester.tap(find.byTooltip('Next Page'));
-    await tester.pump();
-    expect(changedPage, 3);
   });
 
-  testWidgets('mobile hides pagination controls and loads more near the bottom',
+  testWidgets('has no pagination controls and loads more near the bottom',
       (tester) async {
     _setMobileViewport(tester);
     var loadMoreCount = 0;
@@ -63,9 +52,7 @@ void main() {
             currentPage: 1,
             totalPages: 8,
             onVideoTap: (_) {},
-            onPageChanged: (_) {},
             onLoadMore: () async => loadMoreCount++,
-            useInfiniteScroll: true,
           ),
         ),
       ),
@@ -81,7 +68,7 @@ void main() {
     expect(loadMoreCount, greaterThanOrEqualTo(1));
   });
 
-  testWidgets('mobile does not auto load while already loading or failed',
+  testWidgets('does not auto load while already loading or failed',
       (tester) async {
     _setMobileViewport(tester);
     var loadMoreCount = 0;
@@ -93,10 +80,8 @@ void main() {
           currentPage: 1,
           totalPages: 8,
           onVideoTap: (_) {},
-          onPageChanged: (_) {},
           onLoadMore: () async => loadMoreCount++,
           isLoadingMore: true,
-          useInfiniteScroll: true,
         ),
       ),
     );
@@ -112,10 +97,8 @@ void main() {
           currentPage: 1,
           totalPages: 8,
           onVideoTap: (_) {},
-          onPageChanged: (_) {},
           onLoadMore: () async => loadMoreCount++,
           loadMoreErrorMessage: 'Failed to load more',
-          useInfiniteScroll: true,
         ),
       ),
     );
@@ -125,7 +108,7 @@ void main() {
     expect(loadMoreCount, 0);
   });
 
-  testWidgets('mobile preserves scroll offset across load-more states',
+  testWidgets('preserves scroll offset across load-more states',
       (tester) async {
     _setMobileViewport(tester);
     const storageKey = 'mobile_search_results';
@@ -145,10 +128,8 @@ void main() {
             currentPage: currentPage,
             totalPages: totalPages,
             onVideoTap: (_) {},
-            onPageChanged: (_) {},
             onLoadMore: () async {},
             isLoadingMore: isLoadingMore,
-            useInfiniteScroll: true,
             listStorageKey: storageKey,
           ),
         ),
@@ -191,8 +172,7 @@ void main() {
     expect(scrollable.position.pixels, greaterThan(0));
   });
 
-  testWidgets('mobile footer shows loading, end, and retry states',
-      (tester) async {
+  testWidgets('footer shows loading, end, and retry states', (tester) async {
     _setMobileViewport(tester);
     var retryCount = 0;
 
@@ -203,9 +183,7 @@ void main() {
           currentPage: 1,
           totalPages: 8,
           onVideoTap: (_) {},
-          onPageChanged: (_) {},
           isLoadingMore: true,
-          useInfiniteScroll: true,
         ),
       ),
     );
@@ -219,8 +197,6 @@ void main() {
           currentPage: 8,
           totalPages: 8,
           onVideoTap: (_) {},
-          onPageChanged: (_) {},
-          useInfiniteScroll: true,
         ),
       ),
     );
@@ -234,10 +210,8 @@ void main() {
           currentPage: 1,
           totalPages: 8,
           onVideoTap: (_) {},
-          onPageChanged: (_) {},
           loadMoreErrorMessage: 'Failed to load more',
           onRetryLoadMore: () async => retryCount++,
-          useInfiniteScroll: true,
         ),
       ),
     );
@@ -313,13 +287,6 @@ ScrollableState _scrollableStateForStorageKey(
       matching: find.byType(Scrollable),
     ),
   );
-}
-
-void _setDesktopViewport(WidgetTester tester) {
-  tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = const Size(1000, 800);
-  addTearDown(tester.view.resetDevicePixelRatio);
-  addTearDown(tester.view.resetPhysicalSize);
 }
 
 void _setMobileViewport(WidgetTester tester) {

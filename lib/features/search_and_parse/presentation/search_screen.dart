@@ -184,12 +184,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
   }
 
-  void _goToPage(int page) {
-    if (_currentKeyword.isNotEmpty && page >= 1 && page <= _totalPages) {
-      _performSearch(_currentKeyword, page: page);
-    }
-  }
-
   void _onVideoTap(BvidInfo video) {
     ref.read(parseNotifierProvider.notifier).parseInput(video.bvid);
   }
@@ -278,7 +272,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       parseState: parseState,
                       showVideoDetail: null,
                       l10n: l10n,
-                      useMobileSearchResults: mobileLayout,
                     ),
                   ),
                 ),
@@ -325,7 +318,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     parseState: parseState,
                     showVideoDetail: null,
                     l10n: l10n,
-                    useMobileSearchResults: mobileLayout,
                   ),
                 ),
               ),
@@ -358,7 +350,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     required ParseState parseState,
     required BvidInfo? showVideoDetail,
     required AppLocalizations l10n,
-    bool useMobileSearchResults = false,
   }) {
     if (parseState.whenOrNull(parsing: () => true) == true) {
       return _SearchLoadingState(
@@ -402,12 +393,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         currentPage: _currentPage,
         totalPages: _totalPages,
         onVideoTap: _onVideoTap,
-        onPageChanged: _goToPage,
         onLoadMore: _loadNextSearchPage,
         isLoadingMore: _isLoadingMore,
         loadMoreErrorMessage: _loadMoreErrorMessage,
         onRetryLoadMore: _loadNextSearchPage,
-        useInfiniteScroll: useMobileSearchResults,
         listStorageKey: 'search_results_$_currentKeyword',
       );
     }
