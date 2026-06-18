@@ -406,6 +406,7 @@ class _MobilePlayerBar extends StatelessWidget {
 
     return _PlayerBarSurface(
       height: _mobilePlayerBarHeight,
+      bordered: false,
       child: Row(
         children: [
           _CircularCover(
@@ -470,10 +471,17 @@ class _PlayerBarSurface extends StatelessWidget {
   const _PlayerBarSurface({
     required this.height,
     required this.child,
+    this.bordered = true,
   });
 
   final double height;
   final Widget child;
+
+  /// Whether to draw a hairline outline around the surface.
+  ///
+  /// Mobile disables this so the bar reads as a white capsule lifted only by
+  /// its soft shadow, with no visible box outline.
+  final bool bordered;
 
   @override
   Widget build(BuildContext context) {
@@ -495,10 +503,12 @@ class _PlayerBarSurface extends StatelessWidget {
           decoration: BoxDecoration(
             color: context.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(height / 2),
-            border: Border.all(
-              color: context.colorScheme.outlineVariant,
-              width: 0.5,
-            ),
+            border: bordered
+                ? Border.all(
+                    color: context.colorScheme.outlineVariant,
+                    width: 0.5,
+                  )
+                : null,
           ),
           child: child,
         ),
