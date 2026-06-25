@@ -126,7 +126,7 @@ class _SearchResultsListViewState extends State<_SearchResultsListView> {
         widget.bottomPadding,
       ),
       itemCount: itemCount,
-      separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
+      separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
       itemBuilder: (context, index) {
         if (index >= widget.results.length) {
           return widget.footer!;
@@ -155,9 +155,6 @@ class _SearchResultsListViewState extends State<_SearchResultsListView> {
             style: context.textTheme.bodySmall?.copyWith(
               color: context.appPalette.textSecondary,
             ),
-          ),
-          trailing: _SearchResultTrailing(
-            onTap: () => widget.onVideoTap(video),
           ),
           onTap: () => widget.onVideoTap(video),
           embedded: true,
@@ -249,44 +246,5 @@ class _MobileLoadMoreFooter extends StatelessWidget {
     }
 
     return SizedBox(height: spacing.md);
-  }
-}
-
-class _SearchResultTrailing extends StatelessWidget {
-  const _SearchResultTrailing({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.appPalette;
-
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: Material(
-        color: palette.surfaceSecondary.withValues(alpha: 0.88),
-        borderRadius: context.appRadii.mediumRadius,
-        child: InkWell(
-          borderRadius: context.appRadii.mediumRadius,
-          onTap: onTap,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: context.appRadii.mediumRadius,
-              border: Border.all(
-                color: palette.borderSubtle.withValues(alpha: 0.88),
-                width: context.appDepth.outline,
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.chevron_right_rounded,
-                color: palette.textSecondary,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
