@@ -17,6 +17,7 @@ const _searchBarAnimationDuration = Duration(milliseconds: 260);
 const _contentSwitchDuration = Duration(milliseconds: 180);
 const _compactSearchBreakpoint = 560.0;
 const _centeredSearchMaxWidth = 720.0;
+const _dockedSearchBarHeight = 56.0;
 
 /// Main search screen with unified input for BV number parsing and keyword search.
 ///
@@ -249,13 +250,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: _buildInputBar(
             l10n,
             parseState,
+            docked: inputDocked,
             compact: compact,
             showSubmitButton: !mobileLayout,
           ),
         );
 
         if (mobileLayout) {
-          final reservedInputHeight = spacing.xxxl + spacing.xl + spacing.sm;
+          final dockedTopPadding = spacing.xs;
+          final reservedInputHeight =
+              dockedTopPadding + _dockedSearchBarHeight + spacing.xs;
 
           return Stack(
             children: [
@@ -287,7 +291,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     curve: Curves.easeInOutCubic,
                     padding: EdgeInsets.fromLTRB(
                       spacing.md,
-                      inputDocked ? spacing.sm : 0,
+                      inputDocked ? dockedTopPadding : 0,
                       spacing.md,
                       0,
                     ),
@@ -299,9 +303,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           );
         }
 
-        final reservedInputHeight = compact
-            ? spacing.xxxl + spacing.xxl + spacing.xl + spacing.lg
-            : spacing.xxxl + spacing.xl + spacing.md;
+        final dockedTopPadding = spacing.sm;
+        final reservedInputHeight =
+            dockedTopPadding + _dockedSearchBarHeight + spacing.xs;
 
         return Stack(
           children: [
@@ -332,7 +336,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   curve: Curves.easeInOutCubic,
                   padding: EdgeInsets.fromLTRB(
                     spacing.lg,
-                    inputDocked ? spacing.md : 0,
+                    inputDocked ? dockedTopPadding : 0,
                     spacing.lg,
                     0,
                   ),
@@ -433,22 +437,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildInputBar(
     AppLocalizations l10n,
     ParseState parseState, {
+    required bool docked,
     required bool compact,
     required bool showSubmitButton,
   }) {
     final isParsing = parseState.whenOrNull(parsing: () => true) == true;
     final spacing = context.appSpacing;
     final palette = context.appPalette;
+    final radii = context.appRadii;
+    final depth = context.appDepth;
     final showClearButton = _hasSubmittedInput && _hasInputText;
 
     final field = DecoratedBox(
       key: const ValueKey('search_input_surface'),
       decoration: BoxDecoration(
         color: palette.surfacePrimary.withValues(alpha: 0.58),
-        borderRadius: context.appRadii.largeRadius,
+        borderRadius: radii.largeRadius,
         border: Border.all(
           color: palette.borderSubtle.withValues(alpha: 0.78),
-          width: context.appDepth.outline,
+          width: depth.outline,
         ),
       ),
       child: TextField(
@@ -456,6 +463,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         focusNode: _focusNode,
         decoration: InputDecoration(
           hintText: l10n.parseInput,
+          filled: false,
           prefixIcon: Icon(
             Icons.manage_search_rounded,
             color: palette.textSecondary,
@@ -507,27 +515,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       label: Text(isParsing ? l10n.parsing : l10n.search),
     );
 
+    final content = !showSubmitButton
+        ? field
+        : compact
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  field,
+                  SizedBox(height: spacing.sm),
+                  SizedBox(width: double.infinity, child: submit),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: field),
+                  SizedBox(width: spacing.sm),
+                  submit,
+                ],
+              );
+
     return AppPanel(
-      padding: EdgeInsets.all(spacing.sm),
-      borderRadius: context.appRadii.largeRadius,
-      child: !showSubmitButton
-          ? field
-          : compact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    field,
-                    SizedBox(height: spacing.sm),
-                    SizedBox(width: double.infinity, child: submit),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(child: field),
-                    SizedBox(width: spacing.sm),
-                    submit,
-                  ],
-                ),
+      key: const ValueKey('search_bar_surface'),
+      padding: EdgeInsets.all(docked ? spacing.xxs : spacing.sm),
+      borderRadius: radii.largeRadius,
+      child: content,
     );
   }
 }

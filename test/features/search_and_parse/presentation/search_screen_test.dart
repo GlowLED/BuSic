@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:busic/core/theme/app_theme_tokens.dart';
 import 'package:busic/features/search_and_parse/application/parse_notifier.dart';
 import 'package:busic/features/search_and_parse/domain/models/bvid_info.dart';
 import 'package:busic/features/search_and_parse/presentation/search_screen.dart';
+import 'package:busic/shared/widgets/app_panel.dart';
 
 import '../../../test_helpers/test_app.dart';
 
@@ -61,8 +63,14 @@ void main() {
       expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
 
       final inputRect = _inputBarRect(tester);
+      final resultsRect = tester.getRect(
+        _searchResultsScrollableFinder('night drive'),
+      );
       expect(inputRect.top, lessThan(80));
       expect(inputRect.center.dy, lessThan(140));
+      expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
+      expect(resultsRect.top - inputRect.bottom, lessThan(24));
+      _expectDockedSearchBarSurface(tester);
     });
 
     testWidgets('clears a submitted desktop search and recenters the input',
@@ -294,10 +302,16 @@ void main() {
       expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
 
       final inputRect = _inputBarRect(tester);
+      final resultsRect = tester.getRect(
+        _searchResultsScrollableFinder('night drive'),
+      );
       expect(animatingRect.top, lessThan(centeredRect.top));
       expect(animatingRect.top, greaterThan(inputRect.top));
       expect(inputRect.top, lessThan(100));
-      expect((inputRect.width - centeredRect.width).abs(), lessThan(1));
+      expect(inputRect.width, greaterThanOrEqualTo(centeredRect.width));
+      expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
+      expect(resultsRect.top - inputRect.bottom, lessThan(24));
+      _expectDockedSearchBarSurface(tester);
     });
 
     testWidgets('mobile clear button animates the input back to center',
@@ -415,7 +429,7 @@ void main() {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResultsByPage: {
-          1: _pageResults('Page One', 8),
+          1: _pageResults('Page One', 16),
           2: const [
             BvidInfo(
               bvid: 'BVpage2001',
@@ -460,7 +474,7 @@ void main() {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResultsByPage: {
-          1: _pageResults('Page One', 8),
+          1: _pageResults('Page One', 16),
           2: const [
             BvidInfo(
               bvid: 'BVpage2001',
@@ -481,7 +495,12 @@ void main() {
 
       await _scrollSearchResultsToBottom(tester);
 
-      expect(find.text('Page One 1'), findsOneWidget);
+      expect(
+        _searchResultsScrollableState(tester, keyword: 'night drive')
+            .position
+            .pixels,
+        greaterThan(0),
+      );
       expect(find.text('Failed to load more'), findsOneWidget);
       expect(find.text('Page Two Result'), findsNothing);
 
@@ -508,7 +527,7 @@ void main() {
       final notifier = _FakeParseNotifier(
         searchResultsByKeywordAndPage: {
           'night drive': {
-            1: _pageResults('Old Page', 8),
+            1: _pageResults('Old Page', 16),
             2: const [
               BvidInfo(
                 bvid: 'BVold2001',
@@ -580,7 +599,36 @@ Future<void> _pumpSearchScreen(
 }
 
 Rect _inputBarRect(WidgetTester tester) {
-  return tester.getRect(find.byKey(const ValueKey('search_input_surface')));
+  return tester.getRect(find.byKey(const ValueKey('search_bar_surface')));
+}
+
+void _expectDockedSearchBarSurface(WidgetTester tester) {
+  final searchBarSurface = _searchBarSurface(tester);
+  final inputDecoration = _inputSurfaceDecoration(tester);
+
+  expect(searchBarSurface.borderRadius, _themeLargeRadius(tester));
+  expect(searchBarSurface.boxShadow, isNull);
+  expect(inputDecoration.borderRadius, _themeLargeRadius(tester));
+  expect(inputDecoration.border, isNotNull);
+  expect(inputDecoration.boxShadow, isNull);
+}
+
+AppPanel _searchBarSurface(WidgetTester tester) {
+  return tester.widget<AppPanel>(
+    find.byKey(const ValueKey('search_bar_surface')),
+  );
+}
+
+BoxDecoration _inputSurfaceDecoration(WidgetTester tester) {
+  final inputSurface = tester.widget<DecoratedBox>(
+    find.byKey(const ValueKey('search_input_surface')),
+  );
+  return inputSurface.decoration as BoxDecoration;
+}
+
+BorderRadius _themeLargeRadius(WidgetTester tester) {
+  final context = tester.element(find.byType(SearchScreen));
+  return Theme.of(context).extension<AppThemeRadii>()!.largeRadius;
 }
 
 bool _inputHasFocus(WidgetTester tester) {
