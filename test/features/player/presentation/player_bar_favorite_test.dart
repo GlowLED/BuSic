@@ -138,6 +138,7 @@ void main() {
       );
       await _settle(tester);
 
+      expect(tester.getRect(find.byType(PlayerBar)).height, closeTo(48, 0.1));
       expect(find.byType(DraggableProgressBar), findsNothing);
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       expect(find.byIcon(Icons.queue_music), findsOneWidget);

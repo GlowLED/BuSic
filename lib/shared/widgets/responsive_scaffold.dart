@@ -126,7 +126,7 @@ class _DesktopShell extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: spacing.md),
+              SizedBox(height: spacing.xs),
               const _ShellPlayerDock(),
             ],
           ),

@@ -97,6 +97,24 @@ void main() {
     expect(find.text('Settings'), findsNothing);
   });
 
+  testWidgets('keeps desktop content close to the compact player bar',
+      (tester) async {
+    await _pumpShell(tester, const Size(1000, 800));
+
+    await tester.tap(find.ancestor(
+      of: find.byIcon(Icons.search_outlined),
+      matching: find.byType(InkWell),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final searchRect = tester.getRect(find.byType(SearchScreen));
+    final playerRect = tester.getRect(find.byType(PlayerBar));
+
+    expect(playerRect.height, closeTo(64, 0.1));
+    expect(playerRect.top - searchRect.bottom, closeTo(8, 0.1));
+  });
+
   testWidgets('places mobile portrait content directly above the player bar',
       (tester) async {
     await _pumpShell(tester, const Size(390, 844));
@@ -108,6 +126,7 @@ void main() {
     final searchRect = tester.getRect(find.byType(SearchScreen));
     final playerRect = tester.getRect(find.byType(PlayerBar));
 
+    expect(playerRect.height, closeTo(48, 0.1));
     expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
 
@@ -150,6 +169,7 @@ void main() {
     final searchRect = tester.getRect(find.byType(SearchScreen));
     final playerRect = tester.getRect(find.byType(PlayerBar));
 
+    expect(playerRect.height, closeTo(64, 0.1));
     expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
 }

@@ -19,9 +19,9 @@ import 'widgets/player_favorite_button.dart';
 import 'widgets/play_queue_sheet.dart';
 import 'widgets/volume_button.dart';
 
-const _desktopPlayerBarHeight = 72.0;
-const _mobilePlayerBarHeight = 52.0;
-const _mobilePlayerButtonSize = 42.0;
+const _desktopPlayerBarHeight = 64.0;
+const _mobilePlayerBarHeight = 48.0;
+const _mobilePlayerButtonSize = 38.0;
 const _recordRotationDuration = Duration(seconds: 18);
 
 /// 底部播放控制栏，在所有主屏幕中显示。
@@ -211,7 +211,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 14, right: 12),
+                  padding: const EdgeInsets.only(top: 12, right: 12),
                   child: Row(
                     children: [
                       const SizedBox(width: 12),
@@ -436,16 +436,16 @@ class _MobilePlayerBar extends StatelessWidget {
                     ),
                   ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           _CircularProgressPlayButton(
             progress: hasTrack ? progress : 0,
             isPlaying: isPlaying,
             onPressed: hasTrack ? onPlayPause : null,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 2),
           SizedBox(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             child: IconButton(
               padding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
