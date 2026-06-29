@@ -219,9 +219,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                       key: ValueKey(song.id),
                       padding: EdgeInsets.fromLTRB(
                         context.appSpacing.md,
-                        index == 0 ? context.appSpacing.md : 0,
+                        index == 0 ? context.appSpacing.sm : 0,
                         context.appSpacing.md,
-                        context.appSpacing.sm,
+                        context.appSpacing.xxs,
                       ),
                       child: _buildReorderSongRow(
                         context: context,
@@ -244,9 +244,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                           ? Padding(
                               padding: EdgeInsets.fromLTRB(
                                 context.appSpacing.md,
-                                index == 0 ? context.appSpacing.md : 0,
+                                index == 0 ? context.appSpacing.sm : 0,
                                 context.appSpacing.md,
-                                context.appSpacing.sm,
+                                context.appSpacing.xxs,
                               ),
                               child: _buildBatchSelectSongRow(
                                 context: context,
@@ -259,9 +259,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                           : Padding(
                               padding: EdgeInsets.fromLTRB(
                                 context.appSpacing.md,
-                                index == 0 ? context.appSpacing.md : 0,
+                                index == 0 ? context.appSpacing.sm : 0,
                                 context.appSpacing.md,
-                                context.appSpacing.sm,
+                                context.appSpacing.xxs,
                               ),
                               child: SongTile(
                                 title: song.displayTitle,

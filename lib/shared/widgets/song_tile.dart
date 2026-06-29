@@ -144,39 +144,18 @@ class SongTile extends StatelessWidget {
                       ? l10n.removeFromFavorites
                       : l10n.addToFavorites,
                   onPressed: enabled ? onFavoritePressed : null,
-                  backgroundColor: isFavorited!
-                      ? palette.dangerSoft
-                      : palette.surfaceSecondary.withValues(alpha: 0.88),
-                  borderColor: isFavorited!
-                      ? palette.danger.withValues(alpha: 0.36)
-                      : palette.borderSubtle.withValues(alpha: 0.88),
                   iconColor:
                       isFavorited! ? palette.danger : palette.textSecondary,
                 ),
-                SizedBox(width: spacing.xs),
+                SizedBox(width: spacing.xxs),
               ],
-              _SongActionButton(
-                icon:
-                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                tooltip: isPlaying ? l10n.pause : l10n.play,
-                onPressed: enabled ? onTap : null,
-                backgroundColor: palette.accentStrong,
-                borderColor: palette.accentStrong.withValues(alpha: 0.7),
-                iconColor: context.colorScheme.onPrimary,
-                isPrimary: true,
-              ),
-              if (onMorePressed != null) ...[
-                SizedBox(width: spacing.xs),
+              if (onMorePressed != null)
                 _SongActionButton(
-                  icon: Icons.more_horiz_rounded,
+                  icon: Icons.more_vert_rounded,
                   tooltip: l10n.moreActions,
                   onPressed: enabled ? onMorePressed : null,
-                  backgroundColor:
-                      palette.surfaceSecondary.withValues(alpha: 0.88),
-                  borderColor: palette.borderSubtle.withValues(alpha: 0.88),
                   iconColor: palette.textSecondary,
                 ),
-              ],
             ],
           ),
         ],
@@ -186,6 +165,7 @@ class SongTile extends StatelessWidget {
       isActive: isPlaying,
       isSelected: isSelected,
       enabled: enabled,
+      embedded: true,
       padding: EdgeInsets.symmetric(
         horizontal: spacing.sm,
         vertical: spacing.sm,
@@ -242,24 +222,19 @@ class _SongMetaBadge extends StatelessWidget {
   }
 }
 
+/// Flat, borderless icon button used in a song row's trailing actions.
 class _SongActionButton extends StatelessWidget {
   const _SongActionButton({
     required this.icon,
     required this.tooltip,
     required this.onPressed,
-    required this.backgroundColor,
-    required this.borderColor,
     required this.iconColor,
-    this.isPrimary = false,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback? onPressed;
-  final Color backgroundColor;
-  final Color borderColor;
   final Color iconColor;
-  final bool isPrimary;
 
   @override
   Widget build(BuildContext context) {
@@ -268,30 +243,19 @@ class _SongActionButton extends StatelessWidget {
 
     return Tooltip(
       message: tooltip,
-      child: SizedBox(
-        width: isPrimary ? 38 : 34,
-        height: isPrimary ? 38 : 34,
-        child: Material(
-          color: enabled ? backgroundColor : palette.accentMuted,
-          borderRadius: context.appRadii.mediumRadius,
-          child: InkWell(
-            borderRadius: context.appRadii.mediumRadius,
-            onTap: onPressed,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: context.appRadii.mediumRadius,
-                border: Border.all(
-                  color: enabled ? borderColor : palette.borderSubtle,
-                  width: context.appDepth.outline,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
-                  size: isPrimary ? 22 : 18,
-                  color: enabled ? iconColor : palette.textMuted,
-                ),
-              ),
+      child: InkResponse(
+        onTap: onPressed,
+        radius: 22,
+        containedInkWell: true,
+        borderRadius: context.appRadii.pillRadius,
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child: Center(
+            child: Icon(
+              icon,
+              size: 20,
+              color: enabled ? iconColor : palette.textMuted,
             ),
           ),
         ),
