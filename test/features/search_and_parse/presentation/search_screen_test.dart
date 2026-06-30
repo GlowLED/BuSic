@@ -609,7 +609,7 @@ void _expectDockedSearchBarSurface(WidgetTester tester) {
   expect(searchBarSurface.borderRadius, _themeLargeRadius(tester));
   expect(searchBarSurface.boxShadow, isNull);
   expect(inputDecoration.borderRadius, _themeLargeRadius(tester));
-  expect(inputDecoration.border, isNotNull);
+  expect(inputDecoration.border, isNull);
   expect(inputDecoration.boxShadow, isNull);
 }
 

@@ -445,7 +445,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final spacing = context.appSpacing;
     final palette = context.appPalette;
     final radii = context.appRadii;
-    final depth = context.appDepth;
     final showClearButton = _hasSubmittedInput && _hasInputText;
 
     final field = DecoratedBox(
@@ -453,10 +452,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       decoration: BoxDecoration(
         color: palette.surfacePrimary.withValues(alpha: 0.58),
         borderRadius: radii.largeRadius,
-        border: Border.all(
-          color: palette.borderSubtle.withValues(alpha: 0.78),
-          width: depth.outline,
-        ),
       ),
       child: TextField(
         controller: _controller,
@@ -464,6 +459,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         decoration: InputDecoration(
           hintText: l10n.parseInput,
           filled: false,
+          fillColor: Colors.transparent,
           prefixIcon: Icon(
             Icons.manage_search_rounded,
             color: palette.textSecondary,
@@ -487,6 +483,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(
             horizontal: spacing.sm,
