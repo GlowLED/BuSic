@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:busic/core/theme/app_theme.dart';
 import 'package:busic/core/theme/app_theme_tokens.dart';
-import 'package:busic/shared/widgets/app_panel.dart';
 import 'package:busic/shared/widgets/song_tile.dart';
 
 import '../../test_helpers/test_app.dart';
@@ -36,9 +35,9 @@ void main() {
     expect(find.text('Test Artist'), findsOneWidget);
     expect(find.text('192kbps'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.tap(find.text('Test Song'));
     await tester.tap(find.byIcon(Icons.favorite_border_rounded));
-    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
+    await tester.tap(find.byIcon(Icons.more_vert_rounded));
     await tester.longPress(find.text('Test Song'));
     await tester.pump();
 
@@ -59,13 +58,20 @@ void main() {
       ),
     );
 
-    final panel = tester.widget<AppPanel>(find.byType(AppPanel).first);
     final theme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
     final palette = theme.extension<AppThemePalette>()!;
+    final expectedColor = palette.accentStrong.withValues(alpha: 0.58);
 
     expect(
-      panel.borderColor,
-      palette.accentStrong.withValues(alpha: 0.58),
+      find.byWidgetPredicate((w) {
+        if (w is! DecoratedBox) return false;
+        final dec = w.decoration;
+        if (dec is! BoxDecoration) return false;
+        final border = dec.border;
+        if (border is! Border) return false;
+        return border.top.color == expectedColor;
+      }),
+      findsWidgets,
     );
   });
 
@@ -83,7 +89,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.tap(find.text('Selected Song'));
     await tester.pump();
 
     expect(tapped, 0);

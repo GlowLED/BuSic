@@ -132,6 +132,12 @@ class _MediaRowState extends State<MediaRow> {
                           ? palette.overlaySoft
                           : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
+                  border: widget.isSelected
+                      ? Border.all(
+                          color: palette.accentStrong.withValues(alpha: 0.58),
+                          width: depth.outline,
+                        )
+                      : null,
                 ),
                 child: Padding(
                   padding: widget.padding ??
