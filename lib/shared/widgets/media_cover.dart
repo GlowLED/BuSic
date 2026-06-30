@@ -79,12 +79,21 @@ class MediaCover extends StatelessWidget {
     if (_isLocalPath(cover)) {
       final path =
           cover.startsWith('file://') ? Uri.parse(cover).toFilePath() : cover;
-      return Image.file(
-        File(path),
+      final fileProvider = FileImage(File(path));
+      // 用 ResizeImagePolicy.fit 在缓存上界内保持原始宽高比解码，避免长图被
+      // 压扁成正方形位图（默认 exact 策略会按精确尺寸解码导致变形）。
+      final ImageProvider provider = cacheSize == null
+          ? fileProvider
+          : ResizeImage(
+              fileProvider,
+              width: cacheSize.width,
+              height: cacheSize.height,
+              policy: ResizeImagePolicy.fit,
+            );
+      return Image(
+        image: provider,
         fit: fit,
         filterQuality: FilterQuality.high,
-        cacheWidth: cacheSize?.width,
-        cacheHeight: cacheSize?.height,
         errorBuilder: (_, __, ___) => _buildPlaceholder(context),
       );
     }
@@ -93,8 +102,9 @@ class MediaCover extends StatelessWidget {
       imageUrl: cover,
       fit: fit,
       filterQuality: FilterQuality.high,
+      // 只约束宽度以保持宽高比：CachedNetworkImage 不暴露 ResizeImagePolicy，
+      // 同时给定 memCacheWidth/Height 会按 exact 策略把长图压扁。
       memCacheWidth: cacheSize?.width,
-      memCacheHeight: cacheSize?.height,
       placeholder: (_, __) => _buildPlaceholder(context),
       errorWidget: (_, __, ___) => _buildPlaceholder(context),
     );
