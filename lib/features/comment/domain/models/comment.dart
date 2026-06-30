@@ -2,6 +2,18 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'comment.freezed.dart';
 
+class CommentImage {
+  final String url;
+  final int width;
+  final int height;
+
+  const CommentImage({
+    required this.url,
+    required this.width,
+    required this.height,
+  });
+}
+
 /// Domain model representing a single Bilibili comment.
 @freezed
 class Comment with _$Comment {
@@ -35,5 +47,8 @@ class Comment with _$Comment {
 
     /// Preview of child replies (usually 0-3 from the main list).
     @Default([]) List<Comment> replies,
+
+    /// Images attached to the comment.
+    @Default([]) List<CommentImage> images,
   }) = _Comment;
 }

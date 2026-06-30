@@ -177,6 +177,21 @@ class CommentRepositoryImpl implements CommentRepository {
     final content = raw['content'] as Map<String, dynamic>? ?? {};
     final childReplies = raw['replies'] as List? ?? [];
 
+    final pictures = (content['pictures'] as List?) ?? [];
+    final images = pictures
+        .whereType<Map<String, dynamic>>()
+        .map((p) {
+          var src = p['img_src'] as String? ?? '';
+          if (src.startsWith('//')) src = 'https:$src';
+          return CommentImage(
+            url: src,
+            width: (p['img_width'] as int?) ?? 0,
+            height: (p['img_height'] as int?) ?? 0,
+          );
+        })
+        .where((img) => img.url.isNotEmpty)
+        .toList();
+
     return Comment(
       rpid: raw['rpid'] as int,
       mid: raw['mid'] as int,
@@ -188,6 +203,7 @@ class CommentRepositoryImpl implements CommentRepository {
       replyCount: raw['rcount'] as int? ?? 0,
       isLiked: (raw['action'] as int? ?? 0) == 1,
       replies: childReplies.map((r) => _parseComment(r as Map<String, dynamic>)).toList(),
+      images: images,
     );
   }
 }

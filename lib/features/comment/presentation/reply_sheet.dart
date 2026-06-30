@@ -6,6 +6,7 @@ import '../../../shared/extensions/context_extensions.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../application/comment_notifier.dart';
 import '../domain/models/comment.dart';
+import 'widgets/comment_image_list.dart';
 import 'widgets/comment_input.dart';
 
 /// Bottom sheet that shows all replies (楼中楼) for a root comment.
@@ -174,6 +175,10 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                             style: textTheme.bodyMedium,
                           ),
                         ),
+                        if (widget.rootComment.images.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          CommentImageList(images: widget.rootComment.images),
+                        ],
                       ],
                     ),
                   ),
@@ -275,6 +280,10 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                   SelectionArea(
                     child: Text(reply.content, style: textTheme.bodySmall),
                   ),
+                  if (reply.images.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    CommentImageList(images: reply.images),
+                  ],
                   const SizedBox(height: 4),
                   Text(
                     _formatTime(reply.ctime),

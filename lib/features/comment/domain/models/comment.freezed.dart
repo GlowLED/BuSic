@@ -46,6 +46,9 @@ mixin _$Comment {
   /// Preview of child replies (usually 0-3 from the main list).
   List<Comment> get replies => throw _privateConstructorUsedError;
 
+  /// Images attached to the comment.
+  List<CommentImage> get images => throw _privateConstructorUsedError;
+
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -67,7 +70,8 @@ abstract class $CommentCopyWith<$Res> {
       int likeCount,
       int replyCount,
       bool isLiked,
-      List<Comment> replies});
+      List<Comment> replies,
+      List<CommentImage> images});
 }
 
 /// @nodoc
@@ -95,6 +99,7 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
     Object? replyCount = null,
     Object? isLiked = null,
     Object? replies = null,
+    Object? images = null,
   }) {
     return _then(_value.copyWith(
       rpid: null == rpid
@@ -137,6 +142,10 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
           ? _value.replies
           : replies // ignore: cast_nullable_to_non_nullable
               as List<Comment>,
+      images: null == images
+          ? _value.images
+          : images // ignore: cast_nullable_to_non_nullable
+              as List<CommentImage>,
     ) as $Val);
   }
 }
@@ -158,7 +167,8 @@ abstract class _$$CommentImplCopyWith<$Res> implements $CommentCopyWith<$Res> {
       int likeCount,
       int replyCount,
       bool isLiked,
-      List<Comment> replies});
+      List<Comment> replies,
+      List<CommentImage> images});
 }
 
 /// @nodoc
@@ -184,6 +194,7 @@ class __$$CommentImplCopyWithImpl<$Res>
     Object? replyCount = null,
     Object? isLiked = null,
     Object? replies = null,
+    Object? images = null,
   }) {
     return _then(_$CommentImpl(
       rpid: null == rpid
@@ -226,6 +237,10 @@ class __$$CommentImplCopyWithImpl<$Res>
           ? _value._replies
           : replies // ignore: cast_nullable_to_non_nullable
               as List<Comment>,
+      images: null == images
+          ? _value._images
+          : images // ignore: cast_nullable_to_non_nullable
+              as List<CommentImage>,
     ));
   }
 }
@@ -243,8 +258,10 @@ class _$CommentImpl implements _Comment {
       required this.likeCount,
       required this.replyCount,
       this.isLiked = false,
-      final List<Comment> replies = const []})
-      : _replies = replies;
+      final List<Comment> replies = const [],
+      final List<CommentImage> images = const []})
+      : _replies = replies,
+        _images = images;
 
   /// Comment ID (rpid).
   @override
@@ -295,9 +312,21 @@ class _$CommentImpl implements _Comment {
     return EqualUnmodifiableListView(_replies);
   }
 
+  /// Images attached to the comment.
+  final List<CommentImage> _images;
+
+  /// Images attached to the comment.
+  @override
+  @JsonKey()
+  List<CommentImage> get images {
+    if (_images is EqualUnmodifiableListView) return _images;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_images);
+  }
+
   @override
   String toString() {
-    return 'Comment(rpid: $rpid, mid: $mid, username: $username, avatarUrl: $avatarUrl, content: $content, ctime: $ctime, likeCount: $likeCount, replyCount: $replyCount, isLiked: $isLiked, replies: $replies)';
+    return 'Comment(rpid: $rpid, mid: $mid, username: $username, avatarUrl: $avatarUrl, content: $content, ctime: $ctime, likeCount: $likeCount, replyCount: $replyCount, isLiked: $isLiked, replies: $replies, images: $images)';
   }
 
   @override
@@ -318,7 +347,8 @@ class _$CommentImpl implements _Comment {
             (identical(other.replyCount, replyCount) ||
                 other.replyCount == replyCount) &&
             (identical(other.isLiked, isLiked) || other.isLiked == isLiked) &&
-            const DeepCollectionEquality().equals(other._replies, _replies));
+            const DeepCollectionEquality().equals(other._replies, _replies) &&
+            const DeepCollectionEquality().equals(other._images, _images));
   }
 
   @override
@@ -333,7 +363,8 @@ class _$CommentImpl implements _Comment {
       likeCount,
       replyCount,
       isLiked,
-      const DeepCollectionEquality().hash(_replies));
+      const DeepCollectionEquality().hash(_replies),
+      const DeepCollectionEquality().hash(_images));
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.
@@ -355,7 +386,8 @@ abstract class _Comment implements Comment {
       required final int likeCount,
       required final int replyCount,
       final bool isLiked,
-      final List<Comment> replies}) = _$CommentImpl;
+      final List<Comment> replies,
+      final List<CommentImage> images}) = _$CommentImpl;
 
   /// Comment ID (rpid).
   @override
@@ -396,6 +428,10 @@ abstract class _Comment implements Comment {
   /// Preview of child replies (usually 0-3 from the main list).
   @override
   List<Comment> get replies;
+
+  /// Images attached to the comment.
+  @override
+  List<CommentImage> get images;
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.

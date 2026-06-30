@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../domain/models/comment.dart';
+import 'comment_image_list.dart';
 
 /// Displays a single comment with avatar, username, content, and actions.
 class CommentTile extends StatelessWidget {
@@ -80,6 +81,10 @@ class CommentTile extends StatelessWidget {
                     style: textTheme.bodyMedium,
                   ),
                 ),
+                if (comment.images.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  CommentImageList(images: comment.images),
+                ],
                 const SizedBox(height: 8),
 
                 // Actions row
