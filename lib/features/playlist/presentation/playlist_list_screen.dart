@@ -31,6 +31,10 @@ class PlaylistListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      floatingActionButton: _CreatePlaylistFab(
+        onTap: () => _createPlaylist(context, ref),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: playlistsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -39,7 +43,6 @@ class PlaylistListScreen extends ConsumerWidget {
           ),
           data: (playlists) => _PlaylistHomeContent(
             playlists: playlists,
-            onCreatePlaylist: () => _createPlaylist(context, ref),
             onOpenPlaylist: (playlist) {
               context.go('/playlists/${playlist.id}');
             },
@@ -292,13 +295,11 @@ class PlaylistListScreen extends ConsumerWidget {
 class _PlaylistHomeContent extends StatelessWidget {
   const _PlaylistHomeContent({
     required this.playlists,
-    required this.onCreatePlaylist,
     required this.onOpenPlaylist,
     required this.onShowPlaylistMenu,
   });
 
   final List<Playlist> playlists;
-  final VoidCallback onCreatePlaylist;
   final ValueChanged<Playlist> onOpenPlaylist;
   final ValueChanged<Playlist> onShowPlaylistMenu;
 
@@ -308,19 +309,6 @@ class _PlaylistHomeContent extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            spacing.lg,
-            spacing.xs,
-            spacing.lg,
-            spacing.xxs,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: _PlaylistSectionHeader(
-              onCreatePlaylist: onCreatePlaylist,
-            ),
-          ),
-        ),
         if (playlists.isEmpty)
           SliverFillRemaining(
             hasScrollBody: false,
@@ -370,70 +358,34 @@ class _PlaylistHomeContent extends StatelessWidget {
   }
 }
 
-class _PlaylistSectionHeader extends StatelessWidget {
-  const _PlaylistSectionHeader({
-    required this.onCreatePlaylist,
-  });
-
-  final VoidCallback onCreatePlaylist;
-
-  @override
-  Widget build(BuildContext context) {
-    final spacing = context.appSpacing;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Wrap(
-          spacing: spacing.xs,
-          children: [
-            _PlaylistToolbarButton(
-              icon: Icons.add_rounded,
-              tooltip: context.l10n.createPlaylist,
-              onTap: onCreatePlaylist,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _PlaylistToolbarButton extends StatelessWidget {
-  const _PlaylistToolbarButton({
-    required this.icon,
-    required this.tooltip,
+class _CreatePlaylistFab extends StatelessWidget {
+  const _CreatePlaylistFab({
     required this.onTap,
   });
 
-  final IconData icon;
-  final String tooltip;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.appPalette;
+    const size = 56.0;
 
     return Tooltip(
-      message: tooltip,
+      message: context.l10n.createPlaylist,
       child: SizedBox(
-        width: 38,
-        height: 38,
+        width: size,
+        height: size,
         child: Material(
-          color: palette.surfaceSecondary.withValues(alpha: 0.72),
-          borderRadius: context.appRadii.mediumRadius,
+          color: palette.accentStrong,
+          borderRadius: context.appRadii.largeRadius,
+          elevation: 0,
           child: InkWell(
-            borderRadius: context.appRadii.mediumRadius,
+            borderRadius: context.appRadii.largeRadius,
             onTap: onTap,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: context.appRadii.mediumRadius,
-                border: Border.all(
-                  color: palette.borderSubtle.withValues(alpha: 0.78),
-                  width: context.appDepth.outline,
-                ),
-              ),
-              child: Icon(icon, size: 20, color: palette.accentStrong),
+            child: Icon(
+              Icons.add_rounded,
+              size: 28,
+              color: context.colorScheme.onPrimary,
             ),
           ),
         ),
