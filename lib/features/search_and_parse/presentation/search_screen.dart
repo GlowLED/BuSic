@@ -18,6 +18,7 @@ const _contentSwitchDuration = Duration(milliseconds: 180);
 const _compactSearchBreakpoint = 560.0;
 const _centeredSearchMaxWidth = 720.0;
 const _dockedSearchBarHeight = 56.0;
+const _searchInputHeight = 48.0;
 
 /// Main search screen with unified input for BV number parsing and keyword search.
 ///
@@ -447,53 +448,60 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final radii = context.appRadii;
     final showClearButton = _hasSubmittedInput && _hasInputText;
 
-    final field = DecoratedBox(
+    final field = SizedBox(
       key: const ValueKey('search_input_surface'),
-      decoration: BoxDecoration(
-        color: palette.surfacePrimary.withValues(alpha: 0.58),
-        borderRadius: radii.largeRadius,
-      ),
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        decoration: InputDecoration(
-          hintText: l10n.parseInput,
-          filled: false,
-          fillColor: Colors.transparent,
-          prefixIcon: Icon(
-            Icons.manage_search_rounded,
-            color: palette.textSecondary,
-          ),
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (showClearButton)
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  tooltip: l10n.clearSearchInput,
-                  onPressed: isParsing ? null : _handleClearSearchInput,
-                ),
-              IconButton(
-                icon: const Icon(Icons.content_paste_rounded),
-                tooltip: l10n.pasteFromClipboard,
-                onPressed: isParsing ? null : _onPaste,
-              ),
-            ],
-          ),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: spacing.sm,
-            vertical: spacing.xs,
-          ),
+      height: _searchInputHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: palette.surfacePrimary.withValues(alpha: 0.58),
+          borderRadius: radii.largeRadius,
         ),
-        textInputAction: TextInputAction.search,
-        onEditingComplete: () {},
-        onSubmitted: (_) => _handleSubmit(),
-        enabled: !isParsing,
+        child: TextField(
+          controller: _controller,
+          focusNode: _focusNode,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: InputDecoration(
+            hintText: l10n.parseInput,
+            filled: false,
+            fillColor: Colors.transparent,
+            prefixIcon: Icon(
+              Icons.manage_search_rounded,
+              color: palette.textSecondary,
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: _searchInputHeight,
+              minHeight: _searchInputHeight,
+            ),
+            suffixIcon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (showClearButton)
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    tooltip: l10n.clearSearchInput,
+                    onPressed: isParsing ? null : _handleClearSearchInput,
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.content_paste_rounded),
+                  tooltip: l10n.pasteFromClipboard,
+                  onPressed: isParsing ? null : _onPaste,
+                ),
+              ],
+            ),
+            suffixIconConstraints: const BoxConstraints(
+              minHeight: _searchInputHeight,
+            ),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(horizontal: spacing.sm),
+          ),
+          textInputAction: TextInputAction.search,
+          onEditingComplete: () {},
+          onSubmitted: (_) => _handleSubmit(),
+          enabled: !isParsing,
+        ),
       ),
     );
 
