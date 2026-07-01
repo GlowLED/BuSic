@@ -241,7 +241,6 @@ class _DesktopTitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.appPalette;
     final spacing = context.appSpacing;
     final textTheme = context.textTheme;
 
@@ -261,47 +260,25 @@ class _DesktopTitleBar extends StatelessWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: spacing.md),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              palette.accentStrong,
-                              palette.accentStrong.withValues(alpha: 0.68),
-                            ],
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.l10n.appTitle,
+                          style: textTheme.labelLarge?.copyWith(
+                            color: context.appPalette.textSecondary,
                           ),
-                          borderRadius: context.appRadii.largeRadius,
-                          boxShadow: context.appDepth.coverGlowShadow,
                         ),
-                        child: Icon(
-                          Icons.graphic_eq_rounded,
-                          color: context.colorScheme.onPrimary,
+                        SizedBox(height: spacing.xxs),
+                        Text(
+                          currentLabel,
+                          style: textTheme.titleLarge,
                         ),
-                      ),
-                      SizedBox(width: spacing.md),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.appTitle,
-                            style: textTheme.labelLarge?.copyWith(
-                              color: palette.textSecondary,
-                            ),
-                          ),
-                          SizedBox(height: spacing.xxs),
-                          Text(
-                            currentLabel,
-                            style: textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
