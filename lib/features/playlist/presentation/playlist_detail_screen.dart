@@ -141,6 +141,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
               SliverAppBar(
                 pinned: true,
                 expandedHeight: 160,
+                backgroundColor: context.appPalette.surfacePrimary,
+                surfaceTintColor: Colors.transparent,
+                scrolledUnderElevation: 0,
                 leading: _editMode != _EditMode.none
                     ? IconButton(
                         icon: const Icon(Icons.close),
