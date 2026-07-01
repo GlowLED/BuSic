@@ -170,6 +170,7 @@ void main() {
 
     testWidgets('updates tab bar colors when the theme changes',
         (tester) async {
+      final repository = _FakeVideoInteractionRepository();
       final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
       final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
       final lightPalette = lightTheme.extension<AppThemePalette>()!;
@@ -177,12 +178,13 @@ void main() {
 
       await _pumpVideoDetail(
         tester,
-        interactionRepository: _FakeVideoInteractionRepository(),
+        interactionRepository: repository,
         parseState: const ParseState.success(_video),
         theme: lightTheme,
       );
 
-      expect(_tabsSurface(tester).color, Colors.transparent);
+      expect(_tabsSurface(tester).color, lightPalette.backgroundPrimary);
+      expect(_tabsSurface(tester).color?.a, 1.0);
       expect(_tabsSurface(tester).surfaceTintColor, Colors.transparent);
       expect(_tabBar(tester).labelColor, lightPalette.accentStrong);
       expect(_tabBar(tester).unselectedLabelColor, lightPalette.textSecondary);
@@ -190,13 +192,45 @@ void main() {
 
       await _pumpVideoDetail(
         tester,
-        interactionRepository: _FakeVideoInteractionRepository(),
+        interactionRepository: repository,
         parseState: const ParseState.success(_video),
         theme: darkTheme,
       );
 
-      expect(_tabsSurface(tester).color, Colors.transparent);
+      expect(_tabsSurface(tester).color, darkPalette.backgroundPrimary);
+      expect(_tabsSurface(tester).color?.a, 1.0);
       expect(_tabsSurface(tester).surfaceTintColor, Colors.transparent);
+      expect(_tabBar(tester).labelColor, darkPalette.accentStrong);
+      expect(_tabBar(tester).unselectedLabelColor, darkPalette.textSecondary);
+      expect(_tabBar(tester).indicatorColor, darkPalette.accentStrong);
+    });
+
+    testWidgets('updates pinned tab bar colors without another scroll',
+        (tester) async {
+      final repository = _FakeVideoInteractionRepository();
+      final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
+      final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
+      final darkPalette = darkTheme.extension<AppThemePalette>()!;
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: repository,
+        parseState: const ParseState.success(_video),
+        theme: lightTheme,
+      );
+
+      await tester.drag(find.byType(NestedScrollView), const Offset(0, -420));
+      await tester.pumpAndSettle();
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: repository,
+        parseState: const ParseState.success(_video),
+        theme: darkTheme,
+      );
+
+      expect(_tabsSurface(tester).color, darkPalette.backgroundPrimary);
+      expect(_tabsSurface(tester).color?.a, 1.0);
       expect(_tabBar(tester).labelColor, darkPalette.accentStrong);
       expect(_tabBar(tester).unselectedLabelColor, darkPalette.textSecondary);
       expect(_tabBar(tester).indicatorColor, darkPalette.accentStrong);
