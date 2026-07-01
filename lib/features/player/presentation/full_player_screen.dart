@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
-import '../../comment/presentation/comment_section.dart';
 import '../../subtitle/presentation/widgets/lyrics_panel.dart';
 import '../application/player_notifier.dart';
 import 'widgets/cover_image.dart';
 import 'widgets/player_app_bar.dart';
+import 'widgets/player_comment_panel.dart';
 import 'widgets/player_controls.dart';
 import 'widgets/player_section_switcher.dart';
 import 'widgets/player_seek_bar.dart';
@@ -396,17 +396,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
         ),
       );
     }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: context.colorScheme.surface.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: CommentSection(bvid: bvid),
-      ),
-    );
+    return PlayerCommentPanel(bvid: bvid);
   }
 
   Widget _buildBackground(String coverUrl, bool isDark) {

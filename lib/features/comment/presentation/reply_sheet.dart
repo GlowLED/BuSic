@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
+import '../../../shared/widgets/app_panel.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../application/comment_notifier.dart';
 import '../domain/models/comment.dart';
+import 'comment_section_appearance.dart';
 import 'widgets/comment_image_list.dart';
 import 'widgets/comment_input.dart';
 
@@ -16,11 +18,13 @@ class ReplySheet extends ConsumerStatefulWidget {
     required this.rootComment,
     required this.oid,
     required this.bvid,
+    this.appearance = CommentSectionAppearance.standard,
   });
 
   final Comment rootComment;
   final int oid;
   final String bvid;
+  final CommentSectionAppearance appearance;
 
   @override
   ConsumerState<ReplySheet> createState() => _ReplySheetState();
@@ -99,18 +103,18 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
-    final textTheme = context.textTheme;
     final user = ref.watch(authNotifierProvider).valueOrNull;
     final isLoggedIn = user != null;
 
-    return DraggableScrollableSheet(
+    final sheet = DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.4,
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
-        return Column(
+        final colorScheme = context.colorScheme;
+        final textTheme = context.textTheme;
+        final content = Column(
           children: [
             // Handle
             Container(
@@ -238,7 +242,40 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
             ),
           ],
         );
+
+        if (widget.appearance == CommentSectionAppearance.standard) {
+          return content;
+        }
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            context.appSpacing.xs,
+            0,
+            context.appSpacing.xs,
+            context.appSpacing.xs,
+          ),
+          child: AppPanel(
+            key: const ValueKey('player-reply-panel'),
+            borderRadius: context.appRadii.xLargeRadius,
+            backgroundColors: [
+              Colors.black.withValues(alpha: 0.74),
+              Colors.black.withValues(alpha: 0.62),
+            ],
+            borderColor: Colors.white.withValues(alpha: 0.16),
+            borderWidth: context.appDepth.outline,
+            boxShadow: const [],
+            blurSigma: 24,
+            child: content,
+          ),
+        );
       },
+    );
+
+    if (widget.appearance == CommentSectionAppearance.standard) {
+      return sheet;
+    }
+    return Theme(
+      data: commentSectionTheme(context, widget.appearance),
+      child: sheet,
     );
   }
 
