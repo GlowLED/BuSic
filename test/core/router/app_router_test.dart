@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:busic/core/router/app_router.dart';
 
@@ -18,6 +20,51 @@ void main() {
         router.routeInformationProvider.value.uri.path,
         AppRoutes.home,
       );
+    });
+
+    test('player route uses a bottom-up transition', () {
+      final page = buildPlayerRoutePage(
+        key: const ValueKey('player'),
+        child: const SizedBox(),
+      );
+
+      expect(page, isA<CustomTransitionPage<void>>());
+
+      final transitionPage = page as CustomTransitionPage<void>;
+      expect(
+        transitionPage.transitionDuration,
+        const Duration(milliseconds: 280),
+      );
+      expect(
+        transitionPage.reverseTransitionDuration,
+        const Duration(milliseconds: 240),
+      );
+    });
+
+    testWidgets('player transition builds a slide from the bottom',
+        (tester) async {
+      final page = buildPlayerRoutePage(
+        key: const ValueKey('player'),
+        child: const SizedBox(),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return page.transitionsBuilder(
+                context,
+                const AlwaysStoppedAnimation<double>(1),
+                const AlwaysStoppedAnimation<double>(0),
+                const SizedBox(),
+              );
+            },
+          ),
+        ),
+      );
+
+      expect(find.byType(SlideTransition), findsOneWidget);
+      expect(find.byType(FadeTransition), findsOneWidget);
     });
   });
 }
