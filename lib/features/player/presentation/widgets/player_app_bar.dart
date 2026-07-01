@@ -114,7 +114,7 @@ class PlayerAppBar extends ConsumerWidget {
           ),
           if (showWindowControls) ...[
             _PlayerWindowButton(
-              icon: Icons.minimize_rounded,
+              icon: Icons.horizontal_rule_rounded,
               tooltip: l10n.windowMinimize,
               onPressed: _handleMinimize,
             ),

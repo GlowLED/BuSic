@@ -308,7 +308,7 @@ class _DesktopTitleBar extends StatelessWidget {
             ),
             if (PlatformUtils.isDesktop) ...[
               _WindowButton(
-                icon: Icons.minimize_rounded,
+                icon: Icons.horizontal_rule_rounded,
                 onPressed: () => windowManager.minimize(),
               ),
               _WindowButton(
