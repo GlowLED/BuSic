@@ -449,9 +449,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final showClearButton = _hasSubmittedInput && _hasInputText;
 
     final field = SizedBox(
-      key: const ValueKey('search_input_surface'),
       height: _searchInputHeight,
       child: DecoratedBox(
+        key: const ValueKey('search_input_surface'),
         decoration: BoxDecoration(
           color: palette.surfacePrimary.withValues(alpha: 0.58),
           borderRadius: radii.largeRadius,
