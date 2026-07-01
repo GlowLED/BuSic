@@ -30,13 +30,9 @@ void main() {
 
       expect(page, isA<CustomTransitionPage<void>>());
 
-      final transitionPage = page as CustomTransitionPage<void>;
+      expect(page.transitionDuration, const Duration(milliseconds: 280));
       expect(
-        transitionPage.transitionDuration,
-        const Duration(milliseconds: 280),
-      );
-      expect(
-        transitionPage.reverseTransitionDuration,
+        page.reverseTransitionDuration,
         const Duration(milliseconds: 240),
       );
     });

@@ -13,6 +13,9 @@ import 'widgets/player_controls.dart';
 import 'widgets/player_section_switcher.dart';
 import 'widgets/player_seek_bar.dart';
 
+const _backgroundBlurSigma = 50.0;
+const _backgroundImageScale = 1.16;
+
 /// Full-screen player view with large cover art, comments, and controls.
 ///
 /// Swipe left/right to switch between cover art and the comment section.
@@ -50,17 +53,32 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
     final track = playerState.currentTrack;
     final screenSize = MediaQuery.sizeOf(context);
     final isWide = screenSize.width > screenSize.height;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.black : const Color(0xFFF3F5F8),
       body: Stack(
         fit: StackFit.expand,
         children: [
+          _buildBackgroundFallback(isDark),
+
           // Blurred background
           if (track?.coverUrl != null)
-            ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-              child: _buildBackground(track!.coverUrl!),
+            ClipRect(
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(
+                  sigmaX: _backgroundBlurSigma,
+                  sigmaY: _backgroundBlurSigma,
+                ),
+                child: Transform.scale(
+                  scale: _backgroundImageScale,
+                  filterQuality: FilterQuality.high,
+                  child: _buildBackground(track!.coverUrl!, isDark),
+                ),
+              ),
             ),
+
+          _buildBackgroundScrim(isDark),
 
           // Content
           SafeArea(
@@ -391,12 +409,65 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
     );
   }
 
-  Widget _buildBackground(String coverUrl) {
-    return buildCoverImage(
-      context,
-      coverUrl,
-      colorOverlay: Colors.black54,
-      blendMode: BlendMode.darken,
+  Widget _buildBackground(String coverUrl, bool isDark) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        buildCoverImage(
+          context,
+          coverUrl,
+          fadeInDuration: Duration.zero,
+          fadeOutDuration: Duration.zero,
+          useOldImageOnUrlChange: true,
+        ),
+        ColoredBox(
+          color: Colors.black.withValues(alpha: isDark ? 0.54 : 0.22),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundFallback(bool isDark) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [
+                  Color(0xFF05070A),
+                  Color(0xFF0B1016),
+                  Color(0xFF030405),
+                ]
+              : const [
+                  Color(0xFFF7F9FC),
+                  Color(0xFFE9EEF6),
+                  Color(0xFFDCE6F1),
+                ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackgroundScrim(bool isDark) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? [
+                  Colors.black.withValues(alpha: 0.18),
+                  Colors.black.withValues(alpha: 0.44),
+                  Colors.black.withValues(alpha: 0.68),
+                ]
+              : [
+                  Colors.white.withValues(alpha: 0.24),
+                  Colors.white.withValues(alpha: 0.08),
+                  Colors.black.withValues(alpha: 0.34),
+                ],
+        ),
+      ),
     );
   }
 }
