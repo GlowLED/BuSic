@@ -107,13 +107,6 @@
   "noPlayingMusic": "No music playing",
   "noPlaylists": "No playlists yet",
   "playlistHomeSubtitle": "Shape your Bilibili finds into a focused listening library.",
-  "playlistLibraryCount": "{count} playlists",
-  "@playlistLibraryCount": {
-    "placeholders": {
-      "count": { "type": "int" }
-    }
-  },
-  "playlistSectionTitle": "Playlist List",
   "noPlaylistsHint": "Create a playlist or import one to start building your library.",
   "unknownArtist": "Unknown Artist",
   "unknownTitle": "Unknown Title",

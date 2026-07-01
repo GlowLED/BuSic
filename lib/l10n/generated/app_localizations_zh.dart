@@ -298,14 +298,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playlistHomeSubtitle => '把 B 站收藏与解析内容整理成专注的听歌资料库。';
 
   @override
-  String playlistLibraryCount(int count) {
-    return '$count 个歌单';
-  }
-
-  @override
-  String get playlistSectionTitle => '歌单列表';
-
-  @override
   String get noPlaylistsHint => '创建歌单或导入分享内容后，就可以开始整理音乐。';
 
   @override

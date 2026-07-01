@@ -311,13 +311,12 @@ class _PlaylistHomeContent extends StatelessWidget {
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             spacing.lg,
-            spacing.md,
+            spacing.xs,
             spacing.lg,
-            spacing.sm,
+            spacing.xxs,
           ),
           sliver: SliverToBoxAdapter(
             child: _PlaylistSectionHeader(
-              count: playlists.length,
               onCreatePlaylist: onCreatePlaylist,
             ),
           ),
@@ -373,40 +372,18 @@ class _PlaylistHomeContent extends StatelessWidget {
 
 class _PlaylistSectionHeader extends StatelessWidget {
   const _PlaylistSectionHeader({
-    required this.count,
     required this.onCreatePlaylist,
   });
 
-  final int count;
   final VoidCallback onCreatePlaylist;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final palette = context.appPalette;
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                context.l10n.playlistSectionTitle,
-                style: context.textTheme.titleMedium?.copyWith(
-                  color: palette.textPrimary,
-                ),
-              ),
-              SizedBox(height: spacing.xxs),
-              Text(
-                context.l10n.playlistLibraryCount(count),
-                style: context.textTheme.labelMedium?.copyWith(
-                  color: palette.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
         Wrap(
           spacing: spacing.xs,
           children: [
