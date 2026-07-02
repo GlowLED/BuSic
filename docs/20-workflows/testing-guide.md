@@ -242,7 +242,7 @@ group('备份导出不含下载路径', () {
 | `features/comment` | `presentation/comment_text_selection_test.dart` | 文本选择已覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
 | `features/player` | `application/player_notifier_test.dart` + `presentation/player_bar_favorite_test.dart` + `presentation/widgets/player_section_switcher_test.dart` + `presentation/widgets/draggable_progress_bar_test.dart` | 主链路状态、收藏显示和关键控件已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
-| `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` | 缓存、重试与状态映射已覆盖 | 后续补 `presentation/widgets/lyrics_panel.dart` 联动回归 |
+| `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` + `presentation/widgets/lyrics_panel_test.dart` | 缓存、重试、当前曲目终态和错误重试 UI 已覆盖 | 后续补播放器时间轴与歌词滚动联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 
 ## 7. 补测优先级

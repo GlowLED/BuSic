@@ -35,6 +35,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           subtitleRepositoryProvider.overrideWithValue(repository),
+          subtitleCurrentTrackKeyProvider.overrideWithValue(
+            (bvid: 'BVloaded', cid: 1),
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -78,6 +81,9 @@ void main() {
           subtitleRepositoryProvider.overrideWithValue(
             _FakeSubtitleRepository(result: null),
           ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue(
+            (bvid: 'BVempty', cid: 2),
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -103,6 +109,9 @@ void main() {
               error: const SubtitleLoginRequiredException(),
             ),
           ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue(
+            (bvid: 'BVlogin', cid: 3),
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -126,6 +135,9 @@ void main() {
           subtitleRepositoryProvider.overrideWithValue(
             _FakeSubtitleRepository(error: StateError('boom')),
           ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue(
+            (bvid: 'BVerror', cid: 4),
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -142,6 +154,112 @@ void main() {
       expect(state.status, SubtitleLoadStatus.error);
       expect(state.errorMessage, contains('boom'));
     });
+
+    test('同一曲目重新订阅时保留终态，切歌后允许重新获取', () async {
+      final repository = _FakeSubtitleRepository(result: null);
+      final currentTrackProvider = StateProvider<SubtitleTrackKey?>(
+        (ref) => (bvid: 'BVterminal', cid: 5),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          subtitleRepositoryProvider.overrideWithValue(repository),
+          subtitleCurrentTrackKeyProvider.overrideWith(
+            (ref) => ref.watch(currentTrackProvider),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      var subscription = container.listen(
+        subtitleNotifierProvider('BVterminal', 5),
+        (_, __) {},
+      );
+      await _settle();
+      expect(repository.callCount, 1);
+      expect(
+        container.read(subtitleNotifierProvider('BVterminal', 5)).status,
+        SubtitleLoadStatus.notFound,
+      );
+
+      subscription.close();
+      await _settle();
+      subscription = container.listen(
+        subtitleNotifierProvider('BVterminal', 5),
+        (_, __) {},
+      );
+      expect(repository.callCount, 1);
+      expect(
+        container.read(subtitleNotifierProvider('BVterminal', 5)).status,
+        SubtitleLoadStatus.notFound,
+      );
+
+      container.read(currentTrackProvider.notifier).state =
+          (bvid: 'BVother', cid: 6);
+      await _settle();
+      subscription.close();
+      await _settle();
+      container.read(currentTrackProvider.notifier).state =
+          (bvid: 'BVterminal', cid: 5);
+
+      subscription = container.listen(
+        subtitleNotifierProvider('BVterminal', 5),
+        (_, __) {},
+      );
+      addTearDown(subscription.close);
+      await _settle();
+      expect(repository.callCount, 2);
+    });
+
+    test('错误终态可显式重试并更新为成功状态', () async {
+      const data = SubtitleData(
+        lines: [
+          SubtitleLine(
+            startTime: 0,
+            endTime: 1,
+            content: '重试成功',
+            musicRatio: 0,
+          ),
+        ],
+        sourceType: 'cc',
+        language: 'zh-Hans',
+      );
+      final repository = _FakeSubtitleRepository(
+        outcomes: [StateError('first failure'), data],
+      );
+      final container = ProviderContainer(
+        overrides: [
+          subtitleRepositoryProvider.overrideWithValue(repository),
+          subtitleCurrentTrackKeyProvider.overrideWithValue(
+            (bvid: 'BVretry', cid: 7),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final subscription = container.listen(
+        subtitleNotifierProvider('BVretry', 7),
+        (_, __) {},
+      );
+      addTearDown(subscription.close);
+      await _settle();
+      expect(
+        container.read(subtitleNotifierProvider('BVretry', 7)).status,
+        SubtitleLoadStatus.error,
+      );
+
+      final retry = container
+          .read(subtitleNotifierProvider('BVretry', 7).notifier)
+          .retry();
+      expect(
+        container.read(subtitleNotifierProvider('BVretry', 7)).status,
+        SubtitleLoadStatus.loading,
+      );
+      await retry;
+
+      final state = container.read(subtitleNotifierProvider('BVretry', 7));
+      expect(state.status, SubtitleLoadStatus.loaded);
+      expect(state.subtitleData, data);
+      expect(repository.callCount, 2);
+    });
   });
 }
 
@@ -153,10 +271,13 @@ class _FakeSubtitleRepository implements SubtitleRepository {
   _FakeSubtitleRepository({
     this.result,
     this.error,
-  });
+    List<Object?>? outcomes,
+  }) : outcomes = outcomes == null ? [] : List<Object?>.of(outcomes);
 
   final SubtitleData? result;
   final Object? error;
+  final List<Object?> outcomes;
+  int callCount = 0;
 
   @override
   Future<void> cacheSubtitle({
@@ -187,6 +308,14 @@ class _FakeSubtitleRepository implements SubtitleRepository {
     required String bvid,
     required int cid,
   }) async {
+    callCount++;
+    if (outcomes.isNotEmpty) {
+      final outcome = outcomes.removeAt(0);
+      if (outcome is Exception || outcome is Error) {
+        throw outcome!;
+      }
+      return outcome as SubtitleData?;
+    }
     if (error != null) {
       throw error!;
     }

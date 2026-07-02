@@ -133,6 +133,30 @@ void main() {
       );
     });
 
+    test('字幕列表返回 -101 时立即抛出登录异常且不重试', () async {
+      adapter.register(
+        '/x/web-interface/view',
+        body: {
+          'code': 0,
+          'data': {'aid': 123},
+        },
+      );
+      adapter.register(
+        '/x/player/v2',
+        body: {'code': -101},
+      );
+
+      await expectLater(
+        repository.fetchSubtitleFromApi(
+          bvid: 'BVlogin02',
+          cid: 2,
+          maxRetries: 3,
+        ),
+        throwsA(isA<SubtitleLoginRequiredException>()),
+      );
+      expect(adapter.matchCount('/x/player/v2'), 1);
+    });
+
     test('AI 不可用时会回退到 CC，并过滤空行后按时间排序', () async {
       adapter.register(
         '/x/web-interface/view',

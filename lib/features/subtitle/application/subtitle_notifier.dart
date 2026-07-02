@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/api/bili_dio.dart';
 import '../../../core/utils/logger.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../player/application/player_notifier.dart';
 import '../data/subtitle_repository.dart';
 import '../data/subtitle_repository_impl.dart';
 import '../domain/models/subtitle_data.dart';
@@ -13,6 +14,21 @@ final subtitleRepositoryProvider = Provider<SubtitleRepository>((ref) {
   return SubtitleRepositoryImpl(
     biliDio: BiliDio(),
     db: ref.read(databaseProvider),
+  );
+});
+
+typedef SubtitleTrackKey = ({String bvid, int cid});
+
+/// Identity of the track that is currently active in the player.
+///
+/// Exposed separately so subtitle lifecycle behavior can be tested without
+/// constructing the full player stack.
+final subtitleCurrentTrackKeyProvider = Provider<SubtitleTrackKey?>((ref) {
+  return ref.watch(
+    playerNotifierProvider.select((state) {
+      final track = state.currentTrack;
+      return track == null ? null : (bvid: track.bvid, cid: track.cid);
+    }),
   );
 });
 
@@ -49,6 +65,17 @@ class SubtitleNotifier extends _$SubtitleNotifier {
     SubtitleLoadStatus status,
     String? errorMessage,
   }) build(String bvid, int cid) {
+    final ownTrackKey = (bvid: bvid, cid: cid);
+    final currentTrackKey = ref.read(subtitleCurrentTrackKeyProvider);
+    final terminalStateLink =
+        currentTrackKey == ownTrackKey ? ref.keepAlive() : null;
+
+    ref.listen<SubtitleTrackKey?>(subtitleCurrentTrackKeyProvider, (_, next) {
+      if (next != ownTrackKey) {
+        terminalStateLink?.close();
+      }
+    });
+
     // Trigger async loading
     _loadSubtitle();
     return (
@@ -59,9 +86,23 @@ class SubtitleNotifier extends _$SubtitleNotifier {
     );
   }
 
-  Future<void> _loadSubtitle() async {
+  Future<void> retry() async {
+    if (state.status == SubtitleLoadStatus.loading) return;
+    await _loadSubtitle(showLoading: true);
+  }
+
+  Future<void> _loadSubtitle({bool showLoading = false}) async {
     final link = ref.keepAlive();
     try {
+      if (showLoading) {
+        state = (
+          subtitleData: null,
+          currentLineIndex: -1,
+          status: SubtitleLoadStatus.loading,
+          errorMessage: null,
+        );
+      }
+
       final repo = ref.read(subtitleRepositoryProvider);
 
       final data = await repo.getSubtitle(bvid: bvid, cid: cid);

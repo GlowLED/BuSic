@@ -159,6 +159,8 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
           );
           return result;
         }
+      } on SubtitleLoginRequiredException {
+        rethrow;
       } catch (e) {
         AppLogger.warning(
           'Subtitle attempt $attempt failed: $e',
@@ -253,8 +255,8 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
   /// Validate that an AI subtitle URL path starts with `{aid}{cid}`.
   bool _validateAiSubtitleUrl(String url, int aid, int cid) {
     final parsed = Uri.parse(url.startsWith('//') ? 'https:$url' : url);
-    final match = RegExp(r'/bfs/ai_subtitle/prod/(\d+)')
-        .firstMatch(parsed.path);
+    final match =
+        RegExp(r'/bfs/ai_subtitle/prod/(\d+)').firstMatch(parsed.path);
     if (match == null) return false;
     final pathPrefix = match.group(1)!;
     final expected = '$aid$cid';

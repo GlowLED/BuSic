@@ -105,15 +105,30 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   }
 
   Widget _buildError(BuildContext context, String? message) {
-    final errorText =
-        message == SubtitleNotifier.loginRequiredErrorCode
-            ? context.l10n.pleaseLoginFirst
-            : context.l10n.lyricsError;
+    final errorText = message == SubtitleNotifier.loginRequiredErrorCode
+        ? context.l10n.pleaseLoginFirst
+        : context.l10n.lyricsError;
 
     return Center(
-      child: Text(
-        errorText,
-        style: const TextStyle(color: Colors.white38, fontSize: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            errorText,
+            style: const TextStyle(color: Colors.white38, fontSize: 16),
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: () => ref
+                .read(
+                  subtitleNotifierProvider(widget.bvid, widget.cid).notifier,
+                )
+                .retry(),
+            icon: const Icon(Icons.refresh_rounded),
+            label: Text(context.l10n.retry),
+            style: TextButton.styleFrom(foregroundColor: Colors.white70),
+          ),
+        ],
       ),
     );
   }
@@ -172,8 +187,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
                 style: TextStyle(
                   color: isCurrent ? Colors.white : Colors.white38,
                   fontSize: isCurrent ? 20 : 16,
-                  fontWeight:
-                      isCurrent ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,
