@@ -209,7 +209,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         actions: [
           if (PlatformUtils.isDesktop) ...[
             IconButton(
-              icon: const Icon(Icons.minimize, size: 18),
+              icon: const Icon(Icons.horizontal_rule_rounded, size: 18),
               onPressed: () => windowManager.minimize(),
             ),
             IconButton(

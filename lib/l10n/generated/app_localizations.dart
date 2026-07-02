@@ -665,18 +665,6 @@ abstract class AppLocalizations {
   /// **'Shape your Bilibili finds into a focused listening library.'**
   String get playlistHomeSubtitle;
 
-  /// No description provided for @playlistLibraryCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} playlists'**
-  String playlistLibraryCount(int count);
-
-  /// No description provided for @playlistSectionTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Playlist List'**
-  String get playlistSectionTitle;
-
   /// No description provided for @noPlaylistsHint.
   ///
   /// In en, this message translates to:

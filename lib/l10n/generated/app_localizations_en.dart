@@ -298,14 +298,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistHomeSubtitle => 'Shape your Bilibili finds into a focused listening library.';
 
   @override
-  String playlistLibraryCount(int count) {
-    return '$count playlists';
-  }
-
-  @override
-  String get playlistSectionTitle => 'Playlist List';
-
-  @override
   String get noPlaylistsHint => 'Create a playlist or import one to start building your library.';
 
   @override

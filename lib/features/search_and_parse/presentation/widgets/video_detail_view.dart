@@ -1178,7 +1178,7 @@ class _VideoDetailTabsDelegate extends SliverPersistentHeaderDelegate {
   ) {
     return Material(
       key: const ValueKey('video-detail-tabs-surface'),
-      color: Colors.transparent,
+      color: themeSignature.backgroundPrimary,
       surfaceTintColor: Colors.transparent,
       child: _VideoDetailTabs(videoInfo: videoInfo, maxWidth: maxWidth),
     );
@@ -1196,6 +1196,7 @@ class _VideoDetailTabsDelegate extends SliverPersistentHeaderDelegate {
 class _VideoDetailTabsThemeSignature {
   const _VideoDetailTabsThemeSignature({
     required this.brightness,
+    required this.backgroundPrimary,
     required this.accentStrong,
     required this.textSecondary,
     required this.borderSubtle,
@@ -1207,6 +1208,7 @@ class _VideoDetailTabsThemeSignature {
 
     return _VideoDetailTabsThemeSignature(
       brightness: Theme.of(context).brightness,
+      backgroundPrimary: palette.backgroundPrimary,
       accentStrong: palette.accentStrong,
       textSecondary: palette.textSecondary,
       borderSubtle: palette.borderSubtle,
@@ -1215,6 +1217,7 @@ class _VideoDetailTabsThemeSignature {
   }
 
   final Brightness brightness;
+  final Color backgroundPrimary;
   final Color accentStrong;
   final Color textSecondary;
   final Color borderSubtle;
@@ -1225,6 +1228,7 @@ class _VideoDetailTabsThemeSignature {
     return identical(this, other) ||
         other is _VideoDetailTabsThemeSignature &&
             other.brightness == brightness &&
+            other.backgroundPrimary == backgroundPrimary &&
             other.accentStrong == accentStrong &&
             other.textSecondary == textSecondary &&
             other.borderSubtle == borderSubtle &&
@@ -1234,6 +1238,7 @@ class _VideoDetailTabsThemeSignature {
   @override
   int get hashCode => Object.hash(
         brightness,
+        backgroundPrimary,
         accentStrong,
         textSecondary,
         borderSubtle,
