@@ -818,6 +818,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importFromBiliFavDesc => '登录后选择收藏夹一键导入';
 
   @override
+  String get myFavFolders => '我的收藏夹';
+
+  @override
+  String get collectedFavFolders => '收藏的收藏夹';
+
+  @override
+  String folderOwnerDesc(String owner) {
+    return '来自 $owner';
+  }
+
+  @override
   String get selectFavFolder => '选择收藏夹';
 
   @override

@@ -818,6 +818,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importFromBiliFavDesc => 'Sign in to import from your favorite folders';
 
   @override
+  String get myFavFolders => 'My Folders';
+
+  @override
+  String get collectedFavFolders => 'Collected Folders';
+
+  @override
+  String folderOwnerDesc(String owner) {
+    return 'by $owner';
+  }
+
+  @override
   String get selectFavFolder => 'Select Favorite Folder';
 
   @override

@@ -353,6 +353,14 @@
   "createPlaylistManualDesc": "Enter a name to create an empty playlist",
   "importFromBiliFav": "Import from Bilibili Favorites",
   "importFromBiliFavDesc": "Sign in to import from your favorite folders",
+  "myFavFolders": "My Folders",
+  "collectedFavFolders": "Collected Folders",
+  "folderOwnerDesc": "by {owner}",
+  "@folderOwnerDesc": {
+    "placeholders": {
+      "owner": { "type": "String" }
+    }
+  },
   "selectFavFolder": "Select Favorite Folder",
   "loadingFavItems": "Fetching favorites ({fetched}/{total})",
   "@loadingFavItems": {

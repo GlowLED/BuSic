@@ -529,6 +529,15 @@ class _FakeParseRepository implements ParseRepository {
   }
 
   @override
+  Future<List<BiliFavFolder>> getCollectedFavoriteFolders(
+    int mid, {
+    int page = 1,
+    int pageSize = 20,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<List<BiliFavItem>> getFavoriteFolderItems(
     int mediaId, {
     void Function(int fetched, int total)? onProgress,

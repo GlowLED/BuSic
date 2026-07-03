@@ -60,10 +60,20 @@ abstract class ParseRepository {
 
   // ── B 站收藏夹 ───────────────────────────────────────────────────────
 
-  /// 获取用户的所有收藏夹列表（需要登录）。
+  /// 获取用户创建的所有收藏夹列表（需要登录）。
   ///
   /// [mid] 为用户 UID，从已登录的 User 对象获取。
   Future<List<BiliFavFolder>> getFavoriteFolders(int mid);
+
+  /// 获取用户收藏的他人收藏夹列表（需要登录）。
+  ///
+  /// [mid] 为当前登录用户的 UID。
+  /// [page] 为页码（1-based），[pageSize] 为每页数量（默认 20）。
+  Future<List<BiliFavFolder>> getCollectedFavoriteFolders(
+    int mid, {
+    int page = 1,
+    int pageSize = 20,
+  });
 
   /// 获取收藏夹中的所有视频（自动分页拉取全量）。
   ///

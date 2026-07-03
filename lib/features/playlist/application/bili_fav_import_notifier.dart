@@ -29,7 +29,8 @@ class BiliFavImportState with _$BiliFavImportState {
 
   /// 已加载收藏夹列表，等待用户选择
   const factory BiliFavImportState.foldersLoaded(
-    List<BiliFavFolder> folders,
+    List<BiliFavFolder> createdFolders,
+    List<BiliFavFolder> collectedFolders,
   ) = _FoldersLoaded;
 
   /// 正在拉取收藏夹内容
@@ -81,7 +82,7 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
     return const BiliFavImportState.idle();
   }
 
-  /// 加载用户的 B 站收藏夹列表
+  /// 加载用户的 B 站收藏夹列表（包含自己创建的和收藏的他人收藏夹）
   Future<void> loadFolders() async {
     ref.keepAlive();
     state = const BiliFavImportState.loadingFolders();
@@ -96,8 +97,21 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
         state = const BiliFavImportState.error('pleaseLoginFirst');
         return;
       }
-      final folders = await _parseRepo.getFavoriteFolders(mid);
-      state = BiliFavImportState.foldersLoaded(folders);
+
+      // 并发加载创建的和收藏的收藏夹
+      final createdFolders = await _parseRepo.getFavoriteFolders(mid);
+      final collectedFolders =
+          await _parseRepo.getCollectedFavoriteFolders(mid);
+
+      AppLogger.info(
+        '收藏夹加载完成: 创建=${createdFolders.length}, 收藏=${collectedFolders.length}',
+        tag: 'BiliFavImport',
+      );
+
+      state = BiliFavImportState.foldersLoaded(
+        createdFolders,
+        collectedFolders,
+      );
     } catch (e) {
       AppLogger.error('加载收藏夹列表失败', tag: 'BiliFavImport', error: e);
       state = BiliFavImportState.error(e.toString());

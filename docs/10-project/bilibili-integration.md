@@ -88,6 +88,8 @@ WBI 相关真源：
 
 - 需要登录
 - 收藏夹 API 返回分页数据
+- 导入对话框支持标签切换："我的收藏夹"（调用 `/x/v3/fav/folder/created/list-all`）和"收藏的收藏夹"（调用 `/x/v3/fav/folder/collected/list`）
+- 收藏的他人收藏夹会展示 UP 主名称
 - 实际导入按 `bvid + cid` 去重
 - 多 P 视频并不是天然完整导入，必须结合具体 `cid`
 - 导入时会复用本地已有歌曲，不会盲目重复建 Song
