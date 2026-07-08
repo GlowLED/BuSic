@@ -6,7 +6,7 @@ part of 'subtitle_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$subtitleNotifierHash() => r'51fddd9c3530440e753ed2ba9ac87c39fa6c78f3';
+String _$subtitleNotifierHash() => r'9a614944d0472ee9534d5cae569e784db1a8dbf0';
 
 /// Copied from Dart SDK
 class _SystemHash {

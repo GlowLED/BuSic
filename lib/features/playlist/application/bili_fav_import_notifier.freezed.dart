@@ -20,7 +20,9 @@ mixin _$BiliFavImportState {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -36,7 +38,9 @@ mixin _$BiliFavImportState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -50,7 +54,9 @@ mixin _$BiliFavImportState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -163,7 +169,9 @@ class _$IdleImpl implements _Idle {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -182,7 +190,9 @@ class _$IdleImpl implements _Idle {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -199,7 +209,9 @@ class _$IdleImpl implements _Idle {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -312,7 +324,9 @@ class _$LoadingFoldersImpl implements _LoadingFolders {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -331,7 +345,9 @@ class _$LoadingFoldersImpl implements _LoadingFolders {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -348,7 +364,9 @@ class _$LoadingFoldersImpl implements _LoadingFolders {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -424,7 +442,9 @@ abstract class _$$FoldersLoadedImplCopyWith<$Res> {
           _$FoldersLoadedImpl value, $Res Function(_$FoldersLoadedImpl) then) =
       __$$FoldersLoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<BiliFavFolder> folders});
+  $Res call(
+      {List<BiliFavFolder> createdFolders,
+      List<BiliFavFolder> collectedFolders});
 }
 
 /// @nodoc
@@ -440,12 +460,17 @@ class __$$FoldersLoadedImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? folders = null,
+    Object? createdFolders = null,
+    Object? collectedFolders = null,
   }) {
     return _then(_$FoldersLoadedImpl(
-      null == folders
-          ? _value._folders
-          : folders // ignore: cast_nullable_to_non_nullable
+      null == createdFolders
+          ? _value._createdFolders
+          : createdFolders // ignore: cast_nullable_to_non_nullable
+              as List<BiliFavFolder>,
+      null == collectedFolders
+          ? _value._collectedFolders
+          : collectedFolders // ignore: cast_nullable_to_non_nullable
               as List<BiliFavFolder>,
     ));
   }
@@ -454,20 +479,31 @@ class __$$FoldersLoadedImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$FoldersLoadedImpl implements _FoldersLoaded {
-  const _$FoldersLoadedImpl(final List<BiliFavFolder> folders)
-      : _folders = folders;
+  const _$FoldersLoadedImpl(final List<BiliFavFolder> createdFolders,
+      final List<BiliFavFolder> collectedFolders)
+      : _createdFolders = createdFolders,
+        _collectedFolders = collectedFolders;
 
-  final List<BiliFavFolder> _folders;
+  final List<BiliFavFolder> _createdFolders;
   @override
-  List<BiliFavFolder> get folders {
-    if (_folders is EqualUnmodifiableListView) return _folders;
+  List<BiliFavFolder> get createdFolders {
+    if (_createdFolders is EqualUnmodifiableListView) return _createdFolders;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_folders);
+    return EqualUnmodifiableListView(_createdFolders);
+  }
+
+  final List<BiliFavFolder> _collectedFolders;
+  @override
+  List<BiliFavFolder> get collectedFolders {
+    if (_collectedFolders is EqualUnmodifiableListView)
+      return _collectedFolders;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_collectedFolders);
   }
 
   @override
   String toString() {
-    return 'BiliFavImportState.foldersLoaded(folders: $folders)';
+    return 'BiliFavImportState.foldersLoaded(createdFolders: $createdFolders, collectedFolders: $collectedFolders)';
   }
 
   @override
@@ -475,12 +511,17 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$FoldersLoadedImpl &&
-            const DeepCollectionEquality().equals(other._folders, _folders));
+            const DeepCollectionEquality()
+                .equals(other._createdFolders, _createdFolders) &&
+            const DeepCollectionEquality()
+                .equals(other._collectedFolders, _collectedFolders));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_folders));
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_createdFolders),
+      const DeepCollectionEquality().hash(_collectedFolders));
 
   /// Create a copy of BiliFavImportState
   /// with the given fields replaced by the non-null parameter values.
@@ -495,7 +536,9 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -506,7 +549,7 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
         completed,
     required TResult Function(String message) error,
   }) {
-    return foldersLoaded(folders);
+    return foldersLoaded(createdFolders, collectedFolders);
   }
 
   @override
@@ -514,7 +557,9 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -523,7 +568,7 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
         completed,
     TResult? Function(String message)? error,
   }) {
-    return foldersLoaded?.call(folders);
+    return foldersLoaded?.call(createdFolders, collectedFolders);
   }
 
   @override
@@ -531,7 +576,9 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -542,7 +589,7 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
     required TResult orElse(),
   }) {
     if (foldersLoaded != null) {
-      return foldersLoaded(folders);
+      return foldersLoaded(createdFolders, collectedFolders);
     }
     return orElse();
   }
@@ -598,10 +645,11 @@ class _$FoldersLoadedImpl implements _FoldersLoaded {
 }
 
 abstract class _FoldersLoaded implements BiliFavImportState {
-  const factory _FoldersLoaded(final List<BiliFavFolder> folders) =
-      _$FoldersLoadedImpl;
+  const factory _FoldersLoaded(final List<BiliFavFolder> createdFolders,
+      final List<BiliFavFolder> collectedFolders) = _$FoldersLoadedImpl;
 
-  List<BiliFavFolder> get folders;
+  List<BiliFavFolder> get createdFolders;
+  List<BiliFavFolder> get collectedFolders;
 
   /// Create a copy of BiliFavImportState
   /// with the given fields replaced by the non-null parameter values.
@@ -698,7 +746,9 @@ class _$LoadingItemsImpl implements _LoadingItems {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -717,7 +767,9 @@ class _$LoadingItemsImpl implements _LoadingItems {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -734,7 +786,9 @@ class _$LoadingItemsImpl implements _LoadingItems {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -904,7 +958,9 @@ class _$ItemsLoadedImpl implements _ItemsLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -923,7 +979,9 @@ class _$ItemsLoadedImpl implements _ItemsLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -940,7 +998,9 @@ class _$ItemsLoadedImpl implements _ItemsLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -1099,7 +1159,9 @@ class _$ImportingImpl implements _Importing {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -1118,7 +1180,9 @@ class _$ImportingImpl implements _Importing {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -1135,7 +1199,9 @@ class _$ImportingImpl implements _Importing {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -1337,7 +1403,9 @@ class _$CompletedImpl implements _Completed {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -1356,7 +1424,9 @@ class _$CompletedImpl implements _Completed {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -1373,7 +1443,9 @@ class _$CompletedImpl implements _Completed {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,
@@ -1530,7 +1602,9 @@ class _$ErrorImpl implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function() idle,
     required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> folders) foldersLoaded,
+    required TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)
+        foldersLoaded,
     required TResult Function(String folderName, int fetched, int total)
         loadingItems,
     required TResult Function(String folderName, List<BiliFavItem> items)
@@ -1549,7 +1623,9 @@ class _$ErrorImpl implements _Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? idle,
     TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult? Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult? Function(String folderName, int fetched, int total)? loadingItems,
     TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult? Function(int current, int total)? importing,
@@ -1566,7 +1642,9 @@ class _$ErrorImpl implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? idle,
     TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> folders)? foldersLoaded,
+    TResult Function(List<BiliFavFolder> createdFolders,
+            List<BiliFavFolder> collectedFolders)?
+        foldersLoaded,
     TResult Function(String folderName, int fetched, int total)? loadingItems,
     TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
     TResult Function(int current, int total)? importing,

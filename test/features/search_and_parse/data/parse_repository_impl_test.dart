@@ -141,6 +141,97 @@ void main() {
       expect(tags, isEmpty);
     });
   });
+
+  group('ParseRepositoryImpl.getCollectedFavoriteFolders', () {
+    test('返回收藏的收藏夹列表（含 owner 信息）', () async {
+      adapter.register(
+        '/x/v3/fav/folder/collected/list',
+        body: {
+          'code': 0,
+          'message': '0',
+          'data': {
+            'list': [
+              {
+                'id': 1001,
+                'title': '音乐收藏夹',
+                'media_count': 42,
+                'upper': {
+                  'mid': 888,
+                  'name': 'UP主A',
+                  'face': 'https://example.com/face.jpg',
+                },
+              },
+              {
+                'id': 1002,
+                'title': '视频收藏夹',
+                'media_count': 10,
+                'upper': {
+                  'mid': 999,
+                  'name': 'UP主B',
+                  'face': 'https://example.com/face2.jpg',
+                },
+              },
+            ],
+          },
+        },
+      );
+
+      final folders = await repository.getCollectedFavoriteFolders(888);
+
+      expect(folders, hasLength(2));
+
+      expect(folders[0].id, 1001);
+      expect(folders[0].title, '音乐收藏夹');
+      expect(folders[0].mediaCount, 42);
+      expect(folders[0].ownerName, 'UP主A');
+
+      expect(folders[1].id, 1002);
+      expect(folders[1].title, '视频收藏夹');
+      expect(folders[1].mediaCount, 10);
+      expect(folders[1].ownerName, 'UP主B');
+    });
+
+    test('列表为空时返回空数组', () async {
+      adapter.register(
+        '/x/v3/fav/folder/collected/list',
+        body: {
+          'code': 0,
+          'message': '0',
+          'data': {
+            'list': [],
+          },
+        },
+      );
+
+      final folders = await repository.getCollectedFavoriteFolders(888);
+
+      expect(folders, isEmpty);
+    });
+
+    test('不包含 upper 信息时 ownerName 为 null', () async {
+      adapter.register(
+        '/x/v3/fav/folder/collected/list',
+        body: {
+          'code': 0,
+          'message': '0',
+          'data': {
+            'list': [
+              {
+                'id': 1001,
+                'title': '无主收藏夹',
+                'media_count': 5,
+              },
+            ],
+          },
+        },
+      );
+
+      final folders = await repository.getCollectedFavoriteFolders(888);
+
+      expect(folders, hasLength(1));
+      expect(folders[0].ownerName, isNull);
+    });
+  });
 }
 
 class _QueuedHttpClientAdapter implements HttpClientAdapter {

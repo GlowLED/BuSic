@@ -423,6 +423,50 @@ class ParseRepositoryImpl implements ParseRepository {
   }
 
   @override
+  Future<List<BiliFavFolder>> getCollectedFavoriteFolders(
+    int mid, {
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final response = await _biliDio.get(
+      '/x/v3/fav/folder/collected/list',
+      queryParameters: {
+        'up_mid': mid,
+        'pn': page,
+        'ps': pageSize,
+      },
+    );
+    final code = _asInt(response.data['code']) ?? 0;
+    if (code != 0) {
+      AppLogger.warning(
+        'getCollectedFavoriteFolders 返回非零 code: $code, '
+        'message: ${response.data['message']}',
+        tag: 'Parse',
+      );
+      return [];
+    }
+    final data = response.data['data'];
+    if (data == null) {
+      AppLogger.warning(
+        'getCollectedFavoriteFolders: data is null, '
+        'full response: ${response.data}',
+        tag: 'Parse',
+      );
+      return [];
+    }
+    final list = data['list'] as List<dynamic>? ?? [];
+    return list
+        .map((item) => BiliFavFolder(
+              id: item['id'] as int,
+              title: item['title'] as String,
+              mediaCount: item['media_count'] as int,
+              ownerName:
+                  (item['upper'] as Map<String, dynamic>?)?['name'] as String?,
+            ))
+        .toList();
+  }
+
+  @override
   Future<List<BiliFavItem>> getFavoriteFolderItems(
     int mediaId, {
     void Function(int fetched, int total)? onProgress,

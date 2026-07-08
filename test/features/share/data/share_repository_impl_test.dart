@@ -75,6 +75,15 @@ class MockParseRepository implements ParseRepository {
   }
 
   @override
+  Future<List<BiliFavFolder>> getCollectedFavoriteFolders(
+    int mid, {
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    throw UnimplementedError('测试中不需要');
+  }
+
+  @override
   Future<List<BiliFavItem>> getFavoriteFolderItems(
     int mediaId, {
     void Function(int fetched, int total)? onProgress,

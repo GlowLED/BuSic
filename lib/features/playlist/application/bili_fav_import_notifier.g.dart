@@ -7,7 +7,7 @@ part of 'bili_fav_import_notifier.dart';
 // **************************************************************************
 
 String _$biliFavImportNotifierHash() =>
-    r'02f775156639bfb0bf075deccd5f966525ee5fc4';
+    r'0b2b9b4a893a53ba6442058d9eda8575e6aeea34';
 
 /// See also [BiliFavImportNotifier].
 @ProviderFor(BiliFavImportNotifier)

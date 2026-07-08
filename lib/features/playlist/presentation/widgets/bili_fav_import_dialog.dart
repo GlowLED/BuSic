@@ -11,10 +11,13 @@ import 'bili_fav_folder_list.dart';
 import 'bili_fav_preview.dart';
 import 'bili_fav_progress.dart';
 
+/// 收藏夹来源类型
+enum _FavSource { created, collected }
+
 /// B 站收藏夹导入一体化对话框。
 ///
 /// 内部管理三个阶段：
-/// 1. 收藏夹列表选择
+/// 1. 收藏夹列表选择（支持"我的收藏夹"和"收藏的收藏夹"标签切换）
 /// 2. 歌曲预览 + 勾选
 /// 3. 导入进度 / 结果
 ///
@@ -52,9 +55,11 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
   _Phase _phase = _Phase.folderList;
 
   // ── 收藏夹列表阶段 ──
-  List<BiliFavFolder>? _folders;
+  List<BiliFavFolder> _createdFolders = [];
+  List<BiliFavFolder> _collectedFolders = [];
   bool _foldersLoading = true;
   String? _foldersError;
+  _FavSource _selectedSource = _FavSource.created;
 
   // ── 加载内容阶段 ──
   String _currentFolderName = '';
@@ -93,6 +98,12 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
     super.dispose();
   }
 
+  /// 当前显示的收藏夹列表（根据选中标签）
+  List<BiliFavFolder> get _currentFolders =>
+      _selectedSource == _FavSource.created
+          ? _createdFolders
+          : _collectedFolders;
+
   // ── 业务方法 ──────────────────────────────────────────────────────────
 
   Future<void> _loadFolders() async {
@@ -111,15 +122,26 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
       state.when(
         idle: () {},
         loadingFolders: () {},
-        foldersLoaded: (folders) {
+        foldersLoaded: (createdFolders, collectedFolders) {
           AppLogger.info(
-            '收藏夹列表加载完成，共 ${folders.length} 个',
+            '收藏夹列表加载完成: 创建=${createdFolders.length}, 收藏=${collectedFolders.length}',
             tag: 'BiliFavUI',
           );
           if (!mounted) return;
           setState(() {
-            _folders = folders;
+            _createdFolders = createdFolders;
+            _collectedFolders = collectedFolders;
             _foldersLoading = false;
+            // 如果当前选中的来源没有数据且另一个来源有数据，自动切换
+            if (_createdFolders.isEmpty &&
+                _collectedFolders.isNotEmpty &&
+                _selectedSource == _FavSource.created) {
+              _selectedSource = _FavSource.collected;
+            } else if (_collectedFolders.isEmpty &&
+                _createdFolders.isNotEmpty &&
+                _selectedSource == _FavSource.collected) {
+              _selectedSource = _FavSource.created;
+            }
           });
         },
         loadingItems: (_, __, ___) {},
@@ -231,7 +253,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
       state.when(
         idle: () {},
         loadingFolders: () {},
-        foldersLoaded: (_) {},
+        foldersLoaded: (_, __) {},
         loadingItems: (_, __, ___) {},
         itemsLoaded: (_, __) {},
         importing: (current, total) {
@@ -320,7 +342,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
   @override
   Widget build(BuildContext context) {
     // 监听 notifier 状态变更以更新进度
-    ref.listen(biliFavImportNotifierProvider, (_, __) {
+    ref.listen<BiliFavImportState>(biliFavImportNotifierProvider, (_, __) {
       _listenImportProgress();
     });
 
@@ -406,13 +428,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
   Widget _buildBody(BuildContext context, dynamic l10n) {
     switch (_phase) {
       case _Phase.folderList:
-        return BiliFavFolderListView(
-          folders: _folders,
-          isLoading: _foldersLoading,
-          errorMessage: _foldersError,
-          onFolderTapped: _onFolderTapped,
-          onRetry: _loadFolders,
-        );
+        return _buildFolderListView(context, l10n);
       case _Phase.loadingItems:
         return _buildLoadingItems(context, l10n);
       case _Phase.preview:
@@ -449,6 +465,102 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
           },
         );
     }
+  }
+
+  // ── Phase 1: 收藏夹列表（带标签切换） ──────────────────────────────────
+
+  Widget _buildFolderListView(BuildContext context, dynamic l10n) {
+    if (_foldersLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_foldersError != null) {
+      return BiliFavErrorView(
+        message: _foldersError!,
+        onRetry: _loadFolders,
+      );
+    }
+
+    final hasCreated = _createdFolders.isNotEmpty;
+    final hasCollected = _collectedFolders.isNotEmpty;
+
+    if (!hasCreated && !hasCollected) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Text(
+            context.l10n.favFolderEmpty,
+            style: context.textTheme.bodyLarge?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
+    }
+
+    final currentFolders = _currentFolders;
+    final isEmptyList = currentFolders.isEmpty;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 始终显示标签切换（SegmentedButton）
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: SegmentedButton<_FavSource>(
+            segments: [
+              ButtonSegment(
+                value: _FavSource.created,
+                label: Text(l10n.myFavFolders),
+              ),
+              ButtonSegment(
+                value: _FavSource.collected,
+                label: Text(l10n.collectedFavFolders),
+              ),
+            ],
+            selected: {_selectedSource},
+            onSelectionChanged: (selected) {
+              setState(() {
+                _selectedSource = selected.first;
+              });
+            },
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              textStyle: WidgetStatePropertyAll(
+                context.textTheme.labelMedium,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 4),
+
+        // 收藏夹列表或空态
+        Expanded(
+          child: isEmptyList
+              ? Center(
+                  child: Text(
+                    context.l10n.favFolderEmpty,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                )
+              : BiliFavFolderListView(
+                  folders: currentFolders,
+                  isLoading: false,
+                  showOwnerName: _selectedSource == _FavSource.collected,
+                  onFolderTapped: _onFolderTapped,
+                  onRetry: _loadFolders,
+                ),
+        ),
+      ],
+    );
   }
 
   // ── Phase 1.5: 加载收藏夹内容 ──────────────────────────────────────────

@@ -345,6 +345,14 @@
   "createPlaylistManualDesc": "输入歌单名称创建空歌单",
   "importFromBiliFav": "从 B 站收藏夹导入",
   "importFromBiliFavDesc": "登录后选择收藏夹一键导入",
+  "myFavFolders": "我的收藏夹",
+  "collectedFavFolders": "收藏的收藏夹",
+  "folderOwnerDesc": "来自 {owner}",
+  "@folderOwnerDesc": {
+    "placeholders": {
+      "owner": { "type": "String" }
+    }
+  },
   "selectFavFolder": "选择收藏夹",
   "loadingFavItems": "正在拉取收藏夹内容 ({fetched}/{total})",
   "@loadingFavItems": {

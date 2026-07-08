@@ -1649,6 +1649,24 @@ abstract class AppLocalizations {
   /// **'Sign in to import from your favorite folders'**
   String get importFromBiliFavDesc;
 
+  /// No description provided for @myFavFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'My Folders'**
+  String get myFavFolders;
+
+  /// No description provided for @collectedFavFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected Folders'**
+  String get collectedFavFolders;
+
+  /// No description provided for @folderOwnerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'by {owner}'**
+  String folderOwnerDesc(String owner);
+
   /// No description provided for @selectFavFolder.
   ///
   /// In en, this message translates to:

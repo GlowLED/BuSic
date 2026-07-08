@@ -25,6 +25,9 @@ mixin _$BiliFavFolder {
   /// 收藏夹内视频数量
   int get mediaCount => throw _privateConstructorUsedError;
 
+  /// 收藏夹创建者名称（仅对收藏的收藏夹有效，自己的为 null）
+  String? get ownerName => throw _privateConstructorUsedError;
+
   /// Create a copy of BiliFavFolder
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -38,7 +41,7 @@ abstract class $BiliFavFolderCopyWith<$Res> {
           BiliFavFolder value, $Res Function(BiliFavFolder) then) =
       _$BiliFavFolderCopyWithImpl<$Res, BiliFavFolder>;
   @useResult
-  $Res call({int id, String title, int mediaCount});
+  $Res call({int id, String title, int mediaCount, String? ownerName});
 }
 
 /// @nodoc
@@ -59,6 +62,7 @@ class _$BiliFavFolderCopyWithImpl<$Res, $Val extends BiliFavFolder>
     Object? id = null,
     Object? title = null,
     Object? mediaCount = null,
+    Object? ownerName = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -73,6 +77,10 @@ class _$BiliFavFolderCopyWithImpl<$Res, $Val extends BiliFavFolder>
           ? _value.mediaCount
           : mediaCount // ignore: cast_nullable_to_non_nullable
               as int,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -85,7 +93,7 @@ abstract class _$$BiliFavFolderImplCopyWith<$Res>
       __$$BiliFavFolderImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String title, int mediaCount});
+  $Res call({int id, String title, int mediaCount, String? ownerName});
 }
 
 /// @nodoc
@@ -104,6 +112,7 @@ class __$$BiliFavFolderImplCopyWithImpl<$Res>
     Object? id = null,
     Object? title = null,
     Object? mediaCount = null,
+    Object? ownerName = freezed,
   }) {
     return _then(_$BiliFavFolderImpl(
       id: null == id
@@ -118,6 +127,10 @@ class __$$BiliFavFolderImplCopyWithImpl<$Res>
           ? _value.mediaCount
           : mediaCount // ignore: cast_nullable_to_non_nullable
               as int,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -126,7 +139,10 @@ class __$$BiliFavFolderImplCopyWithImpl<$Res>
 
 class _$BiliFavFolderImpl implements _BiliFavFolder {
   const _$BiliFavFolderImpl(
-      {required this.id, required this.title, required this.mediaCount});
+      {required this.id,
+      required this.title,
+      required this.mediaCount,
+      this.ownerName});
 
   /// 收藏夹 media_id（用于查询收藏夹内容）
   @override
@@ -140,9 +156,13 @@ class _$BiliFavFolderImpl implements _BiliFavFolder {
   @override
   final int mediaCount;
 
+  /// 收藏夹创建者名称（仅对收藏的收藏夹有效，自己的为 null）
+  @override
+  final String? ownerName;
+
   @override
   String toString() {
-    return 'BiliFavFolder(id: $id, title: $title, mediaCount: $mediaCount)';
+    return 'BiliFavFolder(id: $id, title: $title, mediaCount: $mediaCount, ownerName: $ownerName)';
   }
 
   @override
@@ -153,11 +173,14 @@ class _$BiliFavFolderImpl implements _BiliFavFolder {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.mediaCount, mediaCount) ||
-                other.mediaCount == mediaCount));
+                other.mediaCount == mediaCount) &&
+            (identical(other.ownerName, ownerName) ||
+                other.ownerName == ownerName));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, mediaCount);
+  int get hashCode =>
+      Object.hash(runtimeType, id, title, mediaCount, ownerName);
 
   /// Create a copy of BiliFavFolder
   /// with the given fields replaced by the non-null parameter values.
@@ -172,7 +195,8 @@ abstract class _BiliFavFolder implements BiliFavFolder {
   const factory _BiliFavFolder(
       {required final int id,
       required final String title,
-      required final int mediaCount}) = _$BiliFavFolderImpl;
+      required final int mediaCount,
+      final String? ownerName}) = _$BiliFavFolderImpl;
 
   /// 收藏夹 media_id（用于查询收藏夹内容）
   @override
@@ -185,6 +209,10 @@ abstract class _BiliFavFolder implements BiliFavFolder {
   /// 收藏夹内视频数量
   @override
   int get mediaCount;
+
+  /// 收藏夹创建者名称（仅对收藏的收藏夹有效，自己的为 null）
+  @override
+  String? get ownerName;
 
   /// Create a copy of BiliFavFolder
   /// with the given fields replaced by the non-null parameter values.

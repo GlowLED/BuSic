@@ -622,6 +622,7 @@ class AppTheme {
     AppThemePalette palette,
   ) {
     final isWindows = defaultTargetPlatform == TargetPlatform.windows;
+    final isLinux = defaultTargetPlatform == TargetPlatform.linux;
     final bodyWeight = isWindows ? FontWeight.w400 : FontWeight.w500;
 
     TextStyle tune(
@@ -640,18 +641,31 @@ class AppTheme {
         color: color ?? palette.textPrimary,
       );
 
-      if (!isWindows) {
-        return tuned;
+      if (isWindows) {
+        return tuned.copyWith(
+          fontFamily: 'Microsoft YaHei UI',
+          fontFamilyFallback: const [
+            'Microsoft YaHei',
+            'Segoe UI',
+            'Arial',
+          ],
+        );
       }
 
-      return tuned.copyWith(
-        fontFamily: 'Microsoft YaHei UI',
-        fontFamilyFallback: const [
-          'Microsoft YaHei',
-          'Segoe UI',
-          'Arial',
-        ],
-      );
+      if (isLinux) {
+        return tuned.copyWith(
+          fontFamilyFallback: const [
+            'Noto Sans CJK SC',
+            'Noto Sans SC',
+            'WenQuanYi Micro Hei',
+            'Source Han Sans SC',
+            'Noto Sans',
+            'sans-serif',
+          ],
+        );
+      }
+
+      return tuned;
     }
 
     return base.copyWith(
