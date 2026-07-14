@@ -63,7 +63,6 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
       mediaItem.add(null);
       return;
     }
-
     mediaItem.add(MediaItem(
       id: '${track.bvid}_${track.cid}',
       title: track.title,
@@ -71,6 +70,7 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
       artUri: track.coverUrl != null ? Uri.tryParse(track.coverUrl!) : null,
       duration: duration ?? track.duration,
     ));
+
   }
 
   /// Update the playback state shown in the media session.

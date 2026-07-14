@@ -60,7 +60,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webLoginTitle => 'Bilibili Web Login';
 
   @override
-  String get webLoginDesc => 'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.';
+  String get webLoginDesc =>
+      'Log in on the Bilibili page below. BuSic only reads cookies from this in-app window.';
 
   @override
   String get webLoginPreparing => 'Preparing web login...';
@@ -75,49 +76,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webLoginCookieMissing => 'Login cookies were not found yet';
 
   @override
-  String get webLoginUnsupportedTitle => 'Web login is unavailable on this platform';
+  String get webLoginUnsupportedTitle =>
+      'Web login is unavailable on this platform';
 
   @override
-  String get webLoginUnsupportedDesc => 'Use QR login or manual Cookie login on this device.';
+  String get webLoginUnsupportedDesc =>
+      'Use QR login or manual Cookie login on this device.';
 
   @override
   String get webLoginBrowserMissingTitle => 'No supported browser found';
 
   @override
-  String get webLoginBrowserMissingDesc => 'Install Chrome, Chromium, Edge, Brave, Vivaldi, or Firefox to use Linux web login, or use QR login / manual Cookie login.';
+  String get webLoginBrowserMissingDesc =>
+      'Install Chrome, Chromium, Edge, Brave, Vivaldi, or Firefox to use Linux web login, or use QR login / manual Cookie login.';
 
   @override
   String get webLoginWebView2MissingTitle => 'WebView2 Runtime is missing';
 
   @override
-  String get webLoginWebView2MissingDesc => 'This Windows device does not have Microsoft Edge WebView2 Runtime available. Install it, or use QR login or manual Cookie login.';
+  String get webLoginWebView2MissingDesc =>
+      'This Windows device does not have Microsoft Edge WebView2 Runtime available. Install it, or use QR login or manual Cookie login.';
 
   @override
   String get webLoginInitFailedTitle => 'Web login failed to start';
 
   @override
-  String get webLoginInitFailedDesc => 'The in-app WebView could not be started. Check that WebView2 Runtime is available, or use QR login or manual Cookie login.';
+  String get webLoginInitFailedDesc =>
+      'The in-app WebView could not be started. Check that WebView2 Runtime is available, or use QR login or manual Cookie login.';
 
   @override
-  String get webLoginPageLoadFailed => 'The login page failed to load. Check your network and try again.';
+  String get webLoginPageLoadFailed =>
+      'The login page failed to load. Check your network and try again.';
 
   @override
   String get webLoginLinuxTitle => 'Linux Web Login';
 
   @override
-  String get webLoginLinuxDesc => 'BuSic will open a temporary browser window and only read cookies from that isolated login session.';
+  String get webLoginLinuxDesc =>
+      'BuSic will open a temporary browser window and only read cookies from that isolated login session.';
 
   @override
   String get webLoginLinuxOpenBrowser => 'Open login window';
 
   @override
-  String get webLoginLinuxWaiting => 'Complete Bilibili login in the browser window, then return here to verify.';
+  String get webLoginLinuxWaiting =>
+      'Complete Bilibili login in the browser window, then return here to verify.';
 
   @override
   String get webLoginLinuxCancel => 'Cancel';
 
   @override
-  String get webLoginLinuxStartFailed => 'The temporary browser login could not start. Use QR login or manual Cookie login.';
+  String get webLoginLinuxStartFailed =>
+      'The temporary browser login could not start. Use QR login or manual Cookie login.';
 
   @override
   String webLoginFailedWithError(String error) {
@@ -128,7 +138,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cookieLoginTitle => 'Cookie Login';
 
   @override
-  String get cookieLoginDesc => 'Paste the Bilibili cookies from your browser. Find them on bilibili.com in DevTools > Application > Cookies.';
+  String get cookieLoginDesc =>
+      'Paste the Bilibili cookies from your browser. Find them on bilibili.com in DevTools > Application > Cookies.';
 
   @override
   String get cookieRequired => 'Fill in all Cookie fields';
@@ -295,10 +306,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPlaylists => 'No playlists yet';
 
   @override
-  String get playlistHomeSubtitle => 'Shape your Bilibili finds into a focused listening library.';
+  String get playlistHomeSubtitle =>
+      'Shape your Bilibili finds into a focused listening library.';
 
   @override
-  String get noPlaylistsHint => 'Create a playlist or import one to start building your library.';
+  String get noPlaylistsHint =>
+      'Create a playlist or import one to start building your library.';
 
   @override
   String get unknownArtist => 'Unknown Artist';
@@ -328,7 +341,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteDownload => 'Delete Download';
 
   @override
-  String get deleteDownloadConfirm => 'Are you sure you want to delete the downloaded file?';
+  String get deleteDownloadConfirm =>
+      'Are you sure you want to delete the downloaded file?';
 
   @override
   String get activeDownloads => 'Active Downloads';
@@ -453,7 +467,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overwriteConfirmTitle => 'Confirm Overwrite';
 
   @override
-  String get overwriteConfirmMessage => 'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
+  String get overwriteConfirmMessage =>
+      'Overwriting will clear all existing playlists and associations. This cannot be undone. Continue?';
 
   @override
   String get exportSuccess => 'Export successful';
@@ -617,7 +632,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importingPlaylist => 'Importing playlist...';
 
   @override
-  String get searchPageSubtitle => 'Search Bilibili or paste a BV link without leaving your music flow.';
+  String get searchPageSubtitle =>
+      'Search Bilibili or paste a BV link without leaving your music flow.';
 
   @override
   String get searchCommandTitle => 'Search or parse';
@@ -635,13 +651,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchEmptyTitle => 'Start with a keyword or BV link';
 
   @override
-  String get searchEmptySubtitle => 'Results, parsed video details, page selection and comments will appear here.';
+  String get searchEmptySubtitle =>
+      'Results, parsed video details, page selection and comments will appear here.';
 
   @override
   String get searchNoResultsTitle => 'No results found';
 
   @override
-  String get searchNoResultsSubtitle => 'Try another keyword or paste a BV link.';
+  String get searchNoResultsSubtitle =>
+      'Try another keyword or paste a BV link.';
 
   @override
   String get searchLoadingMore => 'Loading more...';
@@ -719,7 +737,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdateTitle => 'Required update';
 
   @override
-  String get forceUpdateMessage => 'This version is no longer supported. Please update to continue using BuSic.';
+  String get forceUpdateMessage =>
+      'This version is no longer supported. Please update to continue using BuSic.';
 
   @override
   String get downloadLatestVersion => 'Download latest version';
@@ -776,7 +795,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryDownload => 'Retry download';
 
   @override
-  String get linuxReadOnlyInstallDir => 'Linux system-installed apps cannot auto-update. Please download the new version manually.';
+  String get linuxReadOnlyInstallDir =>
+      'Linux system-installed apps cannot auto-update. Please download the new version manually.';
 
   @override
   String get openDownloadPage => 'Open download page';
@@ -809,13 +829,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createPlaylistManual => 'Create Custom Playlist';
 
   @override
-  String get createPlaylistManualDesc => 'Enter a name to create an empty playlist';
+  String get createPlaylistManualDesc =>
+      'Enter a name to create an empty playlist';
 
   @override
   String get importFromBiliFav => 'Import from Bilibili Favorites';
 
   @override
-  String get importFromBiliFavDesc => 'Sign in to import from your favorite folders';
+  String get importFromBiliFavDesc =>
+      'Sign in to import from your favorite folders';
 
   @override
   String get myFavFolders => 'My Folders';
@@ -854,7 +876,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseLoginFirst => 'Please sign in to Bilibili first';
 
   @override
-  String get biliSessionInvalid => 'Bilibili login has expired. Please sign in again.';
+  String get biliSessionInvalid =>
+      'Bilibili login has expired. Please sign in again.';
 
   @override
   String biliFavSongCount(int count) {
@@ -943,7 +966,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get videoNoReprint => 'Reposting without the creator\'s permission is prohibited';
+  String get videoNoReprint =>
+      'Reposting without the creator\'s permission is prohibited';
 
   @override
   String get videoDescriptionEmpty => 'No description';
@@ -978,7 +1002,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get videoShare => 'Share';
 
   @override
-  String get videoCoinsAlreadyMaxed => 'You have already given the maximum coins';
+  String get videoCoinsAlreadyMaxed =>
+      'You have already given the maximum coins';
 
   @override
   String videoCoinAdded(int count) {
@@ -1036,7 +1061,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorScheme => 'Color Scheme';
 
   @override
-  String get settingsPageSubtitle => 'Tune playback, account, storage and maintenance controls.';
+  String get settingsPageSubtitle =>
+      'Tune playback, account, storage and maintenance controls.';
 
   @override
   String get appearanceSettings => 'Appearance';
