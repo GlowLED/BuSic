@@ -556,12 +556,18 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// Set the playback mode (sequential, repeat, shuffle).
   void setMode(PlayMode mode) {
     state = state.copyWith(playMode: mode);
+    if (Platform.isLinux) {
+      _mprisService.updateLoopStatus(mode);
+    }
   }
 
   /// Set the volume level (0.0 to 1.0).
   Future<void> setVolume(double volume) async {
     await _repository.setVolume(volume);
     state = state.copyWith(volume: volume);
+    if (Platform.isLinux) {
+      _mprisService.updateVolume(volume);
+    }
   }
 
   /// Update the songId of the current track and its queue entry.

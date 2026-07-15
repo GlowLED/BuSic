@@ -1,6 +1,8 @@
 // This file was generated using the following command and may be overwritten.
 // dart-dbus generate-object ../mpris.xml
 
+import 'dart:async';
+
 import 'package:busic/features/player/domain/models/play_mode.dart';
 import 'package:dbus/dbus.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +15,7 @@ class MprisServiceDbus extends DBusObject {
   // --- Standard MPRIS Player properties ---
   late Map<String, DBusValue> metadata = {};
   late String playbackState = 'Stopped';
-  late String loopStatus = '';
+  late String loopStatus = 'None';
   late double maximumRate = 1.0;
   late double minimumRate = 1.0;
   late int position = 0; // Stored in microseconds.
@@ -23,29 +25,6 @@ class MprisServiceDbus extends DBusObject {
   late bool canQuit, canRaise = true;
   late bool hasTrackList = false;
   late bool canControl, canGoNext, canGoPrevious, canPause, canPlay, canSeek;
-
-  /// Sets up static capability properties indicating what features the player supports.
-  init() {
-    canQuit = true;
-    canRaise = true;
-    hasTrackList = false;
-    canControl = true;
-    canGoNext = true;
-    canGoPrevious = true;
-    canPause = true;
-    canPlay = true;
-    canSeek = true;
-
-    DBusBoolean bTrue = const DBusBoolean(true);
-    updatePlayerProperties({
-      'CanControl': bTrue,
-      'CanGoNext': bTrue,
-      'CanGoPrevious': bTrue,
-      'CanPause': bTrue,
-      'CanPlay': bTrue,
-      'CanSeek': bTrue,
-    });
-  }
 
   // --- External control callbacks injected by the service coordinator ---
   VoidCallback? onPlay;
@@ -58,17 +37,33 @@ class MprisServiceDbus extends DBusObject {
   ValueSetter<PlayMode>? setMode;
 
   /// Broadcasts property changes over the D-Bus bus to keep system clients in sync.
-  Future<void> updatePlayerProperties(Map<String, DBusValue> properties) async {
-    await emitPropertiesChanged(
-      'org.mpris.MediaPlayer2.Player', // Target interface holding these properties.
+  void updatePlayerProperties(Map<String, DBusValue> properties) {
+    emitPropertiesChanged(
+      'org.mpris.MediaPlayer2.Player',
       changedProperties: properties,
       invalidatedProperties: [],
-    );
+    ).catchError((err) {
+        if (kDebugMode) {
+          print(err);
+        }
+    });
   }
 
   /// Creates a new object to expose on [path].
+  /// Sets up static capability properties indicating what features the player supports.
+
   MprisServiceDbus({DBusObjectPath path = const DBusObjectPath.unchecked('/')})
-      : super(path);
+      : super(path) {
+    canQuit = true;
+    canRaise = true;
+    hasTrackList = false;
+    canControl = true;
+    canGoNext = true;
+    canGoPrevious = true;
+    canPause = true;
+    canPlay = true;
+    canSeek = true;
+  }
 
   /// Gets value of property org.mpris.MediaPlayer2.CanQuit
   Future<DBusMethodResponse> getCanQuit() async {
@@ -133,7 +128,7 @@ class MprisServiceDbus extends DBusObject {
     if (loopStatus == value) return DBusMethodSuccessResponse();
 
     loopStatus = value;
-    await updatePlayerProperties({'LoopStatus': DBusString(value)});
+    updatePlayerProperties({'LoopStatus': DBusString(value)});
 
     switch(value) {
       case 'Playlist':
@@ -143,7 +138,6 @@ class MprisServiceDbus extends DBusObject {
       case 'None':
         setMode?.call(PlayMode.sequential);
     }
-
     if (shuffle) {
       await setShuffle(false);
     }
@@ -172,7 +166,7 @@ class MprisServiceDbus extends DBusObject {
     if (shuffle == value) return DBusMethodSuccessResponse();
 
     shuffle = value;
-    await updatePlayerProperties({'Shuffle': DBusBoolean(value)});
+    updatePlayerProperties({'Shuffle': DBusBoolean(value)});
 
     if (shuffle) {
       setMode?.call(PlayMode.shuffle);
@@ -302,10 +296,13 @@ class MprisServiceDbus extends DBusObject {
     if ((this.volume - volume).abs() < 0.01) {
       return DBusMethodSuccessResponse();
     }
+    if (volume < 0.0 || volume > 1.0) {
+      return DBusMethodErrorResponse.failed('Volume in 0.0 to 1.0');
+    }
 
     this.volume = volume;
     setVolume?.call(volume); // 安全调用
-    await updatePlayerProperties({'Volume': DBusDouble(volume)});
+    updatePlayerProperties({'Volume': DBusDouble(volume)});
     return DBusMethodSuccessResponse();
   }
 

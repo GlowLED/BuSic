@@ -73,9 +73,18 @@ class MprisService {
       _dbusClient!.registerObject(_mprisObject!);
 
       // 4. Request the well-known name corresponding to this media player.
-      _dbusClient!.requestName('org.mpris.MediaPlayer2.busic');
-      _bindSystemCommands();
-      _mprisObject!.init();
+      _dbusClient!.requestName('org.mpris.MediaPlayer2.busic').then((_) {
+        _bindSystemCommands();
+        DBusBoolean bTrue = const DBusBoolean(true);
+        _mprisObject?.updatePlayerProperties({
+          'CanControl': bTrue,
+          'CanGoNext': bTrue,
+          'CanGoPrevious': bTrue,
+          'CanPause': bTrue,
+          'CanPlay': bTrue,
+          'CanSeek': bTrue,
+        });
+      });
     } catch (e) {
       debugPrint('Failed to initialize MPRIS Service: $e');
     }
@@ -107,13 +116,13 @@ class MprisService {
 
   /// Packs raw song metadata into the standard MPRIS Dict format (a{sv})
   /// and notifies the D-Bus daemon of property updates.
-  Future<void> updateMetadata({
+  void updateMetadata({
     required String title,
     required String artist,
     String? album,
     String? artUrl,
     Duration? duration,
-  }) async {
+  }) {
     if (_mprisObject == null) return;
 
     // MPRIS specification expects metadata as a string-variant dictionary.
@@ -126,30 +135,47 @@ class MprisService {
       'mpris:artUrl': DBusString(artUrl ?? ''),
     };
 
-    await _mprisObject!.updatePlayerProperties({
+    _mprisObject?.updatePlayerProperties({
       'Metadata': DBusDict.stringVariant(_mprisObject!.metadata)
     });
   }
 
   /// Updates the player's playback state (Playing / Paused / Stopped) on D-Bus.
-  Future<void> updatePlaybackStatus(bool isPlaying) async {
+  void updatePlaybackStatus(bool isPlaying) {
     if (_mprisObject == null) return;
     String status = isPlaying ? 'Playing' : 'Paused';
     _mprisObject!.playbackState = status;
-    await _mprisObject!.updatePlayerProperties({
+    _mprisObject?.updatePlayerProperties({
       'PlaybackStatus': DBusString(status)
     });
   }
 
   /// Synchronizes the current playback position (in microseconds) with D-Bus.
-  Future<void> updatePosition(Duration position) async {
+  void updatePosition(Duration position)  {
     if (_mprisObject == null) return;
     _mprisObject!.position = position.inMicroseconds;
-    // await _mprisObject!.updatePlayerProperties({
-    //   'Position': DBusInt64(_mprisObject!.position)
-    // });
   }
-
+  /// Synchronizes the player's loop status (enum PlayMode)on D-Bus.
+  void updateLoopStatus(PlayMode mode) {
+    String status = switch(mode){
+     PlayMode.sequential => 'None',
+     PlayMode.repeatOne=>  'Track',
+     PlayMode.shuffle =>  'Shuffle',
+     PlayMode.repeatAll =>  'Playlist'
+    };
+    if (status == 'Shuffle') {
+      _mprisObject?.shuffle = true;
+      _mprisObject?.updatePlayerProperties({'Shuffle' : const DBusBoolean(true)});
+    } else {
+      _mprisObject?.loopStatus = status;
+      _mprisObject?.updatePlayerProperties({'LoopStatus': DBusString(status)});
+    }
+  }
+  /// Synchronizes the player's volume (0.0 to 1.0) with D-Bus.
+  void updateVolume(double volume) {
+    _mprisObject?.volume = volume > 1.0 ? 1.0 : volume < 0.0 ? 0.0 : volume;
+    _mprisObject?.updatePlayerProperties({'Volume': DBusDouble(volume)});
+  }
   /// Closes active D-Bus connections and frees resources when stopping.
   void dispose() {
     _dbusClient?.close();
