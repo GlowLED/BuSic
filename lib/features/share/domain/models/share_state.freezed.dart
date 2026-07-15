@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,1708 +9,1172 @@ part of 'share_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
 /// @nodoc
 mixin _$ShareState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ShareState()';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ShareStateCopyWith<$Res> {
-  factory $ShareStateCopyWith(
-          ShareState value, $Res Function(ShareState) then) =
-      _$ShareStateCopyWithImpl<$Res, ShareState>;
+class $ShareStateCopyWith<$Res>  {
+$ShareStateCopyWith(ShareState _, $Res Function(ShareState) __);
 }
 
-/// @nodoc
-class _$ShareStateCopyWithImpl<$Res, $Val extends ShareState>
-    implements $ShareStateCopyWith<$Res> {
-  _$ShareStateCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+/// Adds pattern-matching-related methods to [ShareState].
+extension ShareStatePatterns on ShareState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ShareIdle value)?  idle,TResult Function( ShareExporting value)?  exporting,TResult Function( ShareExported value)?  exported,TResult Function( ShareImporting value)?  importing,TResult Function( SharePreview value)?  preview,TResult Function( ShareImportSuccess value)?  importSuccess,TResult Function( ShareError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case ShareIdle() when idle != null:
+return idle(_that);case ShareExporting() when exporting != null:
+return exporting(_that);case ShareExported() when exported != null:
+return exported(_that);case ShareImporting() when importing != null:
+return importing(_that);case SharePreview() when preview != null:
+return preview(_that);case ShareImportSuccess() when importSuccess != null:
+return importSuccess(_that);case ShareError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ShareIdle value)  idle,required TResult Function( ShareExporting value)  exporting,required TResult Function( ShareExported value)  exported,required TResult Function( ShareImporting value)  importing,required TResult Function( SharePreview value)  preview,required TResult Function( ShareImportSuccess value)  importSuccess,required TResult Function( ShareError value)  error,}){
+final _that = this;
+switch (_that) {
+case ShareIdle():
+return idle(_that);case ShareExporting():
+return exporting(_that);case ShareExported():
+return exported(_that);case ShareImporting():
+return importing(_that);case SharePreview():
+return preview(_that);case ShareImportSuccess():
+return importSuccess(_that);case ShareError():
+return error(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ShareIdle value)?  idle,TResult? Function( ShareExporting value)?  exporting,TResult? Function( ShareExported value)?  exported,TResult? Function( ShareImporting value)?  importing,TResult? Function( SharePreview value)?  preview,TResult? Function( ShareImportSuccess value)?  importSuccess,TResult? Function( ShareError value)?  error,}){
+final _that = this;
+switch (_that) {
+case ShareIdle() when idle != null:
+return idle(_that);case ShareExporting() when exporting != null:
+return exporting(_that);case ShareExported() when exported != null:
+return exported(_that);case ShareImporting() when importing != null:
+return importing(_that);case SharePreview() when preview != null:
+return preview(_that);case ShareImportSuccess() when importSuccess != null:
+return importSuccess(_that);case ShareError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  exporting,TResult Function( String data)?  exported,TResult Function( int current,  int total)?  importing,TResult Function( SharedPlaylistPreview preview)?  preview,TResult Function( ShareImportResult result)?  importSuccess,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case ShareIdle() when idle != null:
+return idle();case ShareExporting() when exporting != null:
+return exporting();case ShareExported() when exported != null:
+return exported(_that.data);case ShareImporting() when importing != null:
+return importing(_that.current,_that.total);case SharePreview() when preview != null:
+return preview(_that.preview);case ShareImportSuccess() when importSuccess != null:
+return importSuccess(_that.result);case ShareError() when error != null:
+return error(_that.message);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  exporting,required TResult Function( String data)  exported,required TResult Function( int current,  int total)  importing,required TResult Function( SharedPlaylistPreview preview)  preview,required TResult Function( ShareImportResult result)  importSuccess,required TResult Function( String message)  error,}) {final _that = this;
+switch (_that) {
+case ShareIdle():
+return idle();case ShareExporting():
+return exporting();case ShareExported():
+return exported(_that.data);case ShareImporting():
+return importing(_that.current,_that.total);case SharePreview():
+return preview(_that.preview);case ShareImportSuccess():
+return importSuccess(_that.result);case ShareError():
+return error(_that.message);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  exporting,TResult? Function( String data)?  exported,TResult? Function( int current,  int total)?  importing,TResult? Function( SharedPlaylistPreview preview)?  preview,TResult? Function( ShareImportResult result)?  importSuccess,TResult? Function( String message)?  error,}) {final _that = this;
+switch (_that) {
+case ShareIdle() when idle != null:
+return idle();case ShareExporting() when exporting != null:
+return exporting();case ShareExported() when exported != null:
+return exported(_that.data);case ShareImporting() when importing != null:
+return importing(_that.current,_that.total);case SharePreview() when preview != null:
+return preview(_that.preview);case ShareImportSuccess() when importSuccess != null:
+return importSuccess(_that.result);case ShareError() when error != null:
+return error(_that.message);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-abstract class _$$ShareIdleImplCopyWith<$Res> {
-  factory _$$ShareIdleImplCopyWith(
-          _$ShareIdleImpl value, $Res Function(_$ShareIdleImpl) then) =
-      __$$ShareIdleImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$ShareIdleImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareIdleImpl>
-    implements _$$ShareIdleImplCopyWith<$Res> {
-  __$$ShareIdleImplCopyWithImpl(
-      _$ShareIdleImpl _value, $Res Function(_$ShareIdleImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$ShareIdleImpl implements ShareIdle {
-  const _$ShareIdleImpl();
-
-  @override
-  String toString() {
-    return 'ShareState.idle()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ShareIdleImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return idle();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return idle?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return idle(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return idle?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class ShareIdle implements ShareState {
-  const factory ShareIdle() = _$ShareIdleImpl;
-}
-
-/// @nodoc
-abstract class _$$ShareExportingImplCopyWith<$Res> {
-  factory _$$ShareExportingImplCopyWith(_$ShareExportingImpl value,
-          $Res Function(_$ShareExportingImpl) then) =
-      __$$ShareExportingImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$ShareExportingImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareExportingImpl>
-    implements _$$ShareExportingImplCopyWith<$Res> {
-  __$$ShareExportingImplCopyWithImpl(
-      _$ShareExportingImpl _value, $Res Function(_$ShareExportingImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 
-class _$ShareExportingImpl implements ShareExporting {
-  const _$ShareExportingImpl();
 
-  @override
-  String toString() {
-    return 'ShareState.exporting()';
-  }
+class ShareIdle implements ShareState {
+  const ShareIdle();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$ShareExportingImpl);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return exporting();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return exporting?.call();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (exporting != null) {
-      return exporting();
-    }
-    return orElse();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return exporting(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return exporting?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (exporting != null) {
-      return exporting(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareIdle);
 }
 
-abstract class ShareExporting implements ShareState {
-  const factory ShareExporting() = _$ShareExportingImpl;
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ShareState.idle()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ShareExporting implements ShareState {
+  const ShareExporting();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareExporting);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ShareState.exporting()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class ShareExported implements ShareState {
+  const ShareExported(this.data);
+  
+
+ final  String data;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ShareExportedCopyWith<ShareExported> get copyWith => _$ShareExportedCopyWithImpl<ShareExported>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareExported&&(identical(other.data, data) || other.data == data));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,data);
+
+@override
+String toString() {
+  return 'ShareState.exported(data: $data)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ShareExportedImplCopyWith<$Res> {
-  factory _$$ShareExportedImplCopyWith(
-          _$ShareExportedImpl value, $Res Function(_$ShareExportedImpl) then) =
-      __$$ShareExportedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String data});
+abstract mixin class $ShareExportedCopyWith<$Res> implements $ShareStateCopyWith<$Res> {
+  factory $ShareExportedCopyWith(ShareExported value, $Res Function(ShareExported) _then) = _$ShareExportedCopyWithImpl;
+@useResult
+$Res call({
+ String data
+});
+
+
+
+
+}
+/// @nodoc
+class _$ShareExportedCopyWithImpl<$Res>
+    implements $ShareExportedCopyWith<$Res> {
+  _$ShareExportedCopyWithImpl(this._self, this._then);
+
+  final ShareExported _self;
+  final $Res Function(ShareExported) _then;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? data = null,}) {
+  return _then(ShareExported(
+null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
-class __$$ShareExportedImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareExportedImpl>
-    implements _$$ShareExportedImplCopyWith<$Res> {
-  __$$ShareExportedImplCopyWithImpl(
-      _$ShareExportedImpl _value, $Res Function(_$ShareExportedImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-  }) {
-    return _then(_$ShareExportedImpl(
-      null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$ShareExportedImpl implements ShareExported {
-  const _$ShareExportedImpl(this.data);
 
-  @override
-  final String data;
+class ShareImporting implements ShareState {
+  const ShareImporting({this.current = 0, this.total = 0});
+  
 
-  @override
-  String toString() {
-    return 'ShareState.exported(data: $data)';
-  }
+@JsonKey() final  int current;
+@JsonKey() final  int total;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ShareExportedImpl &&
-            (identical(other.data, data) || other.data == data));
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ShareImportingCopyWith<ShareImporting> get copyWith => _$ShareImportingCopyWithImpl<ShareImporting>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(runtimeType, data);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ShareExportedImplCopyWith<_$ShareExportedImpl> get copyWith =>
-      __$$ShareExportedImplCopyWithImpl<_$ShareExportedImpl>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return exported(data);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return exported?.call(data);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (exported != null) {
-      return exported(data);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return exported(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return exported?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (exported != null) {
-      return exported(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareImporting&&(identical(other.current, current) || other.current == current)&&(identical(other.total, total) || other.total == total));
 }
 
-abstract class ShareExported implements ShareState {
-  const factory ShareExported(final String data) = _$ShareExportedImpl;
 
-  String get data;
+@override
+int get hashCode => Object.hash(runtimeType,current,total);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ShareExportedImplCopyWith<_$ShareExportedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'ShareState.importing(current: $current, total: $total)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ShareImportingImplCopyWith<$Res> {
-  factory _$$ShareImportingImplCopyWith(_$ShareImportingImpl value,
-          $Res Function(_$ShareImportingImpl) then) =
-      __$$ShareImportingImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({int current, int total});
+abstract mixin class $ShareImportingCopyWith<$Res> implements $ShareStateCopyWith<$Res> {
+  factory $ShareImportingCopyWith(ShareImporting value, $Res Function(ShareImporting) _then) = _$ShareImportingCopyWithImpl;
+@useResult
+$Res call({
+ int current, int total
+});
+
+
+
+
+}
+/// @nodoc
+class _$ShareImportingCopyWithImpl<$Res>
+    implements $ShareImportingCopyWith<$Res> {
+  _$ShareImportingCopyWithImpl(this._self, this._then);
+
+  final ShareImporting _self;
+  final $Res Function(ShareImporting) _then;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? current = null,Object? total = null,}) {
+  return _then(ShareImporting(
+current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-class __$$ShareImportingImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareImportingImpl>
-    implements _$$ShareImportingImplCopyWith<$Res> {
-  __$$ShareImportingImplCopyWithImpl(
-      _$ShareImportingImpl _value, $Res Function(_$ShareImportingImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? current = null,
-    Object? total = null,
-  }) {
-    return _then(_$ShareImportingImpl(
-      current: null == current
-          ? _value.current
-          : current // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$ShareImportingImpl implements ShareImporting {
-  const _$ShareImportingImpl({this.current = 0, this.total = 0});
 
-  @override
-  @JsonKey()
-  final int current;
-  @override
-  @JsonKey()
-  final int total;
+class SharePreview implements ShareState {
+  const SharePreview(this.preview);
+  
 
-  @override
-  String toString() {
-    return 'ShareState.importing(current: $current, total: $total)';
-  }
+ final  SharedPlaylistPreview preview;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ShareImportingImpl &&
-            (identical(other.current, current) || other.current == current) &&
-            (identical(other.total, total) || other.total == total));
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SharePreviewCopyWith<SharePreview> get copyWith => _$SharePreviewCopyWithImpl<SharePreview>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(runtimeType, current, total);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ShareImportingImplCopyWith<_$ShareImportingImpl> get copyWith =>
-      __$$ShareImportingImplCopyWithImpl<_$ShareImportingImpl>(
-          this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return importing(current, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return importing?.call(current, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (importing != null) {
-      return importing(current, total);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return importing(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return importing?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (importing != null) {
-      return importing(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SharePreview&&(identical(other.preview, preview) || other.preview == preview));
 }
 
-abstract class ShareImporting implements ShareState {
-  const factory ShareImporting({final int current, final int total}) =
-      _$ShareImportingImpl;
 
-  int get current;
-  int get total;
+@override
+int get hashCode => Object.hash(runtimeType,preview);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ShareImportingImplCopyWith<_$ShareImportingImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'ShareState.preview(preview: $preview)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$SharePreviewImplCopyWith<$Res> {
-  factory _$$SharePreviewImplCopyWith(
-          _$SharePreviewImpl value, $Res Function(_$SharePreviewImpl) then) =
-      __$$SharePreviewImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({SharedPlaylistPreview preview});
+abstract mixin class $SharePreviewCopyWith<$Res> implements $ShareStateCopyWith<$Res> {
+  factory $SharePreviewCopyWith(SharePreview value, $Res Function(SharePreview) _then) = _$SharePreviewCopyWithImpl;
+@useResult
+$Res call({
+ SharedPlaylistPreview preview
+});
 
-  $SharedPlaylistPreviewCopyWith<$Res> get preview;
+
+$SharedPlaylistPreviewCopyWith<$Res> get preview;
+
+}
+/// @nodoc
+class _$SharePreviewCopyWithImpl<$Res>
+    implements $SharePreviewCopyWith<$Res> {
+  _$SharePreviewCopyWithImpl(this._self, this._then);
+
+  final SharePreview _self;
+  final $Res Function(SharePreview) _then;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? preview = null,}) {
+  return _then(SharePreview(
+null == preview ? _self.preview : preview // ignore: cast_nullable_to_non_nullable
+as SharedPlaylistPreview,
+  ));
 }
 
-/// @nodoc
-class __$$SharePreviewImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$SharePreviewImpl>
-    implements _$$SharePreviewImplCopyWith<$Res> {
-  __$$SharePreviewImplCopyWithImpl(
-      _$SharePreviewImpl _value, $Res Function(_$SharePreviewImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? preview = null,
-  }) {
-    return _then(_$SharePreviewImpl(
-      null == preview
-          ? _value.preview
-          : preview // ignore: cast_nullable_to_non_nullable
-              as SharedPlaylistPreview,
-    ));
-  }
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $SharedPlaylistPreviewCopyWith<$Res> get preview {
-    return $SharedPlaylistPreviewCopyWith<$Res>(_value.preview, (value) {
-      return _then(_value.copyWith(preview: value));
-    });
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SharedPlaylistPreviewCopyWith<$Res> get preview {
+  
+  return $SharedPlaylistPreviewCopyWith<$Res>(_self.preview, (value) {
+    return _then(_self.copyWith(preview: value));
+  });
+}
 }
 
 /// @nodoc
 
-class _$SharePreviewImpl implements SharePreview {
-  const _$SharePreviewImpl(this.preview);
 
-  @override
-  final SharedPlaylistPreview preview;
+class ShareImportSuccess implements ShareState {
+  const ShareImportSuccess(this.result);
+  
 
-  @override
-  String toString() {
-    return 'ShareState.preview(preview: $preview)';
-  }
+ final  ShareImportResult result;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SharePreviewImpl &&
-            (identical(other.preview, preview) || other.preview == preview));
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ShareImportSuccessCopyWith<ShareImportSuccess> get copyWith => _$ShareImportSuccessCopyWithImpl<ShareImportSuccess>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(runtimeType, preview);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$SharePreviewImplCopyWith<_$SharePreviewImpl> get copyWith =>
-      __$$SharePreviewImplCopyWithImpl<_$SharePreviewImpl>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return preview(this.preview);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return preview?.call(this.preview);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (preview != null) {
-      return preview(this.preview);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return preview(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return preview?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (preview != null) {
-      return preview(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareImportSuccess&&(identical(other.result, result) || other.result == result));
 }
 
-abstract class SharePreview implements ShareState {
-  const factory SharePreview(final SharedPlaylistPreview preview) =
-      _$SharePreviewImpl;
 
-  SharedPlaylistPreview get preview;
+@override
+int get hashCode => Object.hash(runtimeType,result);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SharePreviewImplCopyWith<_$SharePreviewImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'ShareState.importSuccess(result: $result)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ShareImportSuccessImplCopyWith<$Res> {
-  factory _$$ShareImportSuccessImplCopyWith(_$ShareImportSuccessImpl value,
-          $Res Function(_$ShareImportSuccessImpl) then) =
-      __$$ShareImportSuccessImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({ShareImportResult result});
+abstract mixin class $ShareImportSuccessCopyWith<$Res> implements $ShareStateCopyWith<$Res> {
+  factory $ShareImportSuccessCopyWith(ShareImportSuccess value, $Res Function(ShareImportSuccess) _then) = _$ShareImportSuccessCopyWithImpl;
+@useResult
+$Res call({
+ ShareImportResult result
+});
 
-  $ShareImportResultCopyWith<$Res> get result;
+
+$ShareImportResultCopyWith<$Res> get result;
+
+}
+/// @nodoc
+class _$ShareImportSuccessCopyWithImpl<$Res>
+    implements $ShareImportSuccessCopyWith<$Res> {
+  _$ShareImportSuccessCopyWithImpl(this._self, this._then);
+
+  final ShareImportSuccess _self;
+  final $Res Function(ShareImportSuccess) _then;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? result = null,}) {
+  return _then(ShareImportSuccess(
+null == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+as ShareImportResult,
+  ));
 }
 
-/// @nodoc
-class __$$ShareImportSuccessImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareImportSuccessImpl>
-    implements _$$ShareImportSuccessImplCopyWith<$Res> {
-  __$$ShareImportSuccessImplCopyWithImpl(_$ShareImportSuccessImpl _value,
-      $Res Function(_$ShareImportSuccessImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? result = null,
-  }) {
-    return _then(_$ShareImportSuccessImpl(
-      null == result
-          ? _value.result
-          : result // ignore: cast_nullable_to_non_nullable
-              as ShareImportResult,
-    ));
-  }
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ShareImportResultCopyWith<$Res> get result {
-    return $ShareImportResultCopyWith<$Res>(_value.result, (value) {
-      return _then(_value.copyWith(result: value));
-    });
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ShareImportResultCopyWith<$Res> get result {
+  
+  return $ShareImportResultCopyWith<$Res>(_self.result, (value) {
+    return _then(_self.copyWith(result: value));
+  });
+}
 }
 
 /// @nodoc
 
-class _$ShareImportSuccessImpl implements ShareImportSuccess {
-  const _$ShareImportSuccessImpl(this.result);
 
-  @override
-  final ShareImportResult result;
+class ShareError implements ShareState {
+  const ShareError(this.message);
+  
 
-  @override
-  String toString() {
-    return 'ShareState.importSuccess(result: $result)';
-  }
+ final  String message;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ShareImportSuccessImpl &&
-            (identical(other.result, result) || other.result == result));
-  }
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ShareErrorCopyWith<ShareError> get copyWith => _$ShareErrorCopyWithImpl<ShareError>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(runtimeType, result);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ShareImportSuccessImplCopyWith<_$ShareImportSuccessImpl> get copyWith =>
-      __$$ShareImportSuccessImplCopyWithImpl<_$ShareImportSuccessImpl>(
-          this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return importSuccess(result);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return importSuccess?.call(result);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (importSuccess != null) {
-      return importSuccess(result);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return importSuccess(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return importSuccess?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (importSuccess != null) {
-      return importSuccess(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareError&&(identical(other.message, message) || other.message == message));
 }
 
-abstract class ShareImportSuccess implements ShareState {
-  const factory ShareImportSuccess(final ShareImportResult result) =
-      _$ShareImportSuccessImpl;
 
-  ShareImportResult get result;
+@override
+int get hashCode => Object.hash(runtimeType,message);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ShareImportSuccessImplCopyWith<_$ShareImportSuccessImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'ShareState.error(message: $message)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ShareErrorImplCopyWith<$Res> {
-  factory _$$ShareErrorImplCopyWith(
-          _$ShareErrorImpl value, $Res Function(_$ShareErrorImpl) then) =
-      __$$ShareErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String message});
-}
+abstract mixin class $ShareErrorCopyWith<$Res> implements $ShareStateCopyWith<$Res> {
+  factory $ShareErrorCopyWith(ShareError value, $Res Function(ShareError) _then) = _$ShareErrorCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
 
+
+
+
+}
 /// @nodoc
-class __$$ShareErrorImplCopyWithImpl<$Res>
-    extends _$ShareStateCopyWithImpl<$Res, _$ShareErrorImpl>
-    implements _$$ShareErrorImplCopyWith<$Res> {
-  __$$ShareErrorImplCopyWithImpl(
-      _$ShareErrorImpl _value, $Res Function(_$ShareErrorImpl) _then)
-      : super(_value, _then);
+class _$ShareErrorCopyWithImpl<$Res>
+    implements $ShareErrorCopyWith<$Res> {
+  _$ShareErrorCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(_$ShareErrorImpl(
-      null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
+  final ShareError _self;
+  final $Res Function(ShareError) _then;
+
+/// Create a copy of ShareState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(ShareError(
+null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
 
-class _$ShareErrorImpl implements ShareError {
-  const _$ShareErrorImpl(this.message);
-
-  @override
-  final String message;
-
-  @override
-  String toString() {
-    return 'ShareState.error(message: $message)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ShareErrorImpl &&
-            (identical(other.message, message) || other.message == message));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, message);
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ShareErrorImplCopyWith<_$ShareErrorImpl> get copyWith =>
-      __$$ShareErrorImplCopyWithImpl<_$ShareErrorImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() exporting,
-    required TResult Function(String data) exported,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(SharedPlaylistPreview preview) preview,
-    required TResult Function(ShareImportResult result) importSuccess,
-    required TResult Function(String message) error,
-  }) {
-    return error(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? exporting,
-    TResult? Function(String data)? exported,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(SharedPlaylistPreview preview)? preview,
-    TResult? Function(ShareImportResult result)? importSuccess,
-    TResult? Function(String message)? error,
-  }) {
-    return error?.call(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? exporting,
-    TResult Function(String data)? exported,
-    TResult Function(int current, int total)? importing,
-    TResult Function(SharedPlaylistPreview preview)? preview,
-    TResult Function(ShareImportResult result)? importSuccess,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ShareIdle value) idle,
-    required TResult Function(ShareExporting value) exporting,
-    required TResult Function(ShareExported value) exported,
-    required TResult Function(ShareImporting value) importing,
-    required TResult Function(SharePreview value) preview,
-    required TResult Function(ShareImportSuccess value) importSuccess,
-    required TResult Function(ShareError value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ShareIdle value)? idle,
-    TResult? Function(ShareExporting value)? exporting,
-    TResult? Function(ShareExported value)? exported,
-    TResult? Function(ShareImporting value)? importing,
-    TResult? Function(SharePreview value)? preview,
-    TResult? Function(ShareImportSuccess value)? importSuccess,
-    TResult? Function(ShareError value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ShareIdle value)? idle,
-    TResult Function(ShareExporting value)? exporting,
-    TResult Function(ShareExported value)? exported,
-    TResult Function(ShareImporting value)? importing,
-    TResult Function(SharePreview value)? preview,
-    TResult Function(ShareImportSuccess value)? importSuccess,
-    TResult Function(ShareError value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class ShareError implements ShareState {
-  const factory ShareError(final String message) = _$ShareErrorImpl;
-
-  String get message;
-
-  /// Create a copy of ShareState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ShareErrorImplCopyWith<_$ShareErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 mixin _$ShareImportResult {
-  /// 新建歌单 ID
-  int get playlistId => throw _privateConstructorUsedError;
 
-  /// 成功导入的歌曲数
-  int get imported => throw _privateConstructorUsedError;
+/// 新建歌单 ID
+ int get playlistId;/// 成功导入的歌曲数
+ int get imported;/// 本地已存在的歌曲数（直接复用）
+ int get reused;/// 拉取元数据失败的歌曲数
+ int get failed;/// 失败的 bvid 列表（供用户排查）
+ List<String> get failedBvids;
+/// Create a copy of ShareImportResult
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ShareImportResultCopyWith<ShareImportResult> get copyWith => _$ShareImportResultCopyWithImpl<ShareImportResult>(this as ShareImportResult, _$identity);
 
-  /// 本地已存在的歌曲数（直接复用）
-  int get reused => throw _privateConstructorUsedError;
 
-  /// 拉取元数据失败的歌曲数
-  int get failed => throw _privateConstructorUsedError;
 
-  /// 失败的 bvid 列表（供用户排查）
-  List<String> get failedBvids => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShareImportResult&&(identical(other.playlistId, playlistId) || other.playlistId == playlistId)&&(identical(other.imported, imported) || other.imported == imported)&&(identical(other.reused, reused) || other.reused == reused)&&(identical(other.failed, failed) || other.failed == failed)&&const DeepCollectionEquality().equals(other.failedBvids, failedBvids));
+}
 
-  /// Create a copy of ShareImportResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ShareImportResultCopyWith<ShareImportResult> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+int get hashCode => Object.hash(runtimeType,playlistId,imported,reused,failed,const DeepCollectionEquality().hash(failedBvids));
+
+@override
+String toString() {
+  return 'ShareImportResult(playlistId: $playlistId, imported: $imported, reused: $reused, failed: $failed, failedBvids: $failedBvids)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ShareImportResultCopyWith<$Res> {
-  factory $ShareImportResultCopyWith(
-          ShareImportResult value, $Res Function(ShareImportResult) then) =
-      _$ShareImportResultCopyWithImpl<$Res, ShareImportResult>;
-  @useResult
-  $Res call(
-      {int playlistId,
-      int imported,
-      int reused,
-      int failed,
-      List<String> failedBvids});
-}
+abstract mixin class $ShareImportResultCopyWith<$Res>  {
+  factory $ShareImportResultCopyWith(ShareImportResult value, $Res Function(ShareImportResult) _then) = _$ShareImportResultCopyWithImpl;
+@useResult
+$Res call({
+ int playlistId, int imported, int reused, int failed, List<String> failedBvids
+});
 
+
+
+
+}
 /// @nodoc
-class _$ShareImportResultCopyWithImpl<$Res, $Val extends ShareImportResult>
+class _$ShareImportResultCopyWithImpl<$Res>
     implements $ShareImportResultCopyWith<$Res> {
-  _$ShareImportResultCopyWithImpl(this._value, this._then);
+  _$ShareImportResultCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ShareImportResult _self;
+  final $Res Function(ShareImportResult) _then;
 
-  /// Create a copy of ShareImportResult
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? playlistId = null,
-    Object? imported = null,
-    Object? reused = null,
-    Object? failed = null,
-    Object? failedBvids = null,
-  }) {
-    return _then(_value.copyWith(
-      playlistId: null == playlistId
-          ? _value.playlistId
-          : playlistId // ignore: cast_nullable_to_non_nullable
-              as int,
-      imported: null == imported
-          ? _value.imported
-          : imported // ignore: cast_nullable_to_non_nullable
-              as int,
-      reused: null == reused
-          ? _value.reused
-          : reused // ignore: cast_nullable_to_non_nullable
-              as int,
-      failed: null == failed
-          ? _value.failed
-          : failed // ignore: cast_nullable_to_non_nullable
-              as int,
-      failedBvids: null == failedBvids
-          ? _value.failedBvids
-          : failedBvids // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
-  }
+/// Create a copy of ShareImportResult
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? playlistId = null,Object? imported = null,Object? reused = null,Object? failed = null,Object? failedBvids = null,}) {
+  return _then(_self.copyWith(
+playlistId: null == playlistId ? _self.playlistId : playlistId // ignore: cast_nullable_to_non_nullable
+as int,imported: null == imported ? _self.imported : imported // ignore: cast_nullable_to_non_nullable
+as int,reused: null == reused ? _self.reused : reused // ignore: cast_nullable_to_non_nullable
+as int,failed: null == failed ? _self.failed : failed // ignore: cast_nullable_to_non_nullable
+as int,failedBvids: null == failedBvids ? _self.failedBvids : failedBvids // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ShareImportResult].
+extension ShareImportResultPatterns on ShareImportResult {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ShareImportResult value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ShareImportResult() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ShareImportResult value)  $default,){
+final _that = this;
+switch (_that) {
+case _ShareImportResult():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ShareImportResult value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ShareImportResult() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ShareImportResult() when $default != null:
+return $default(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)  $default,) {final _that = this;
+switch (_that) {
+case _ShareImportResult():
+return $default(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)?  $default,) {final _that = this;
+switch (_that) {
+case _ShareImportResult() when $default != null:
+return $default(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
-abstract class _$$ShareImportResultImplCopyWith<$Res>
-    implements $ShareImportResultCopyWith<$Res> {
-  factory _$$ShareImportResultImplCopyWith(_$ShareImportResultImpl value,
-          $Res Function(_$ShareImportResultImpl) then) =
-      __$$ShareImportResultImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int playlistId,
-      int imported,
-      int reused,
-      int failed,
-      List<String> failedBvids});
+
+
+class _ShareImportResult implements ShareImportResult {
+  const _ShareImportResult({required this.playlistId, required this.imported, required this.reused, required this.failed, final  List<String> failedBvids = const []}): _failedBvids = failedBvids;
+  
+
+/// 新建歌单 ID
+@override final  int playlistId;
+/// 成功导入的歌曲数
+@override final  int imported;
+/// 本地已存在的歌曲数（直接复用）
+@override final  int reused;
+/// 拉取元数据失败的歌曲数
+@override final  int failed;
+/// 失败的 bvid 列表（供用户排查）
+ final  List<String> _failedBvids;
+/// 失败的 bvid 列表（供用户排查）
+@override@JsonKey() List<String> get failedBvids {
+  if (_failedBvids is EqualUnmodifiableListView) return _failedBvids;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_failedBvids);
+}
+
+
+/// Create a copy of ShareImportResult
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ShareImportResultCopyWith<_ShareImportResult> get copyWith => __$ShareImportResultCopyWithImpl<_ShareImportResult>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ShareImportResult&&(identical(other.playlistId, playlistId) || other.playlistId == playlistId)&&(identical(other.imported, imported) || other.imported == imported)&&(identical(other.reused, reused) || other.reused == reused)&&(identical(other.failed, failed) || other.failed == failed)&&const DeepCollectionEquality().equals(other._failedBvids, _failedBvids));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,playlistId,imported,reused,failed,const DeepCollectionEquality().hash(_failedBvids));
+
+@override
+String toString() {
+  return 'ShareImportResult(playlistId: $playlistId, imported: $imported, reused: $reused, failed: $failed, failedBvids: $failedBvids)';
+}
+
+
 }
 
 /// @nodoc
-class __$$ShareImportResultImplCopyWithImpl<$Res>
-    extends _$ShareImportResultCopyWithImpl<$Res, _$ShareImportResultImpl>
-    implements _$$ShareImportResultImplCopyWith<$Res> {
-  __$$ShareImportResultImplCopyWithImpl(_$ShareImportResultImpl _value,
-      $Res Function(_$ShareImportResultImpl) _then)
-      : super(_value, _then);
+abstract mixin class _$ShareImportResultCopyWith<$Res> implements $ShareImportResultCopyWith<$Res> {
+  factory _$ShareImportResultCopyWith(_ShareImportResult value, $Res Function(_ShareImportResult) _then) = __$ShareImportResultCopyWithImpl;
+@override @useResult
+$Res call({
+ int playlistId, int imported, int reused, int failed, List<String> failedBvids
+});
 
-  /// Create a copy of ShareImportResult
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? playlistId = null,
-    Object? imported = null,
-    Object? reused = null,
-    Object? failed = null,
-    Object? failedBvids = null,
-  }) {
-    return _then(_$ShareImportResultImpl(
-      playlistId: null == playlistId
-          ? _value.playlistId
-          : playlistId // ignore: cast_nullable_to_non_nullable
-              as int,
-      imported: null == imported
-          ? _value.imported
-          : imported // ignore: cast_nullable_to_non_nullable
-              as int,
-      reused: null == reused
-          ? _value.reused
-          : reused // ignore: cast_nullable_to_non_nullable
-              as int,
-      failed: null == failed
-          ? _value.failed
-          : failed // ignore: cast_nullable_to_non_nullable
-              as int,
-      failedBvids: null == failedBvids
-          ? _value._failedBvids
-          : failedBvids // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
-  }
+
+
+
 }
-
 /// @nodoc
+class __$ShareImportResultCopyWithImpl<$Res>
+    implements _$ShareImportResultCopyWith<$Res> {
+  __$ShareImportResultCopyWithImpl(this._self, this._then);
 
-class _$ShareImportResultImpl implements _ShareImportResult {
-  const _$ShareImportResultImpl(
-      {required this.playlistId,
-      required this.imported,
-      required this.reused,
-      required this.failed,
-      final List<String> failedBvids = const []})
-      : _failedBvids = failedBvids;
+  final _ShareImportResult _self;
+  final $Res Function(_ShareImportResult) _then;
 
-  /// 新建歌单 ID
-  @override
-  final int playlistId;
-
-  /// 成功导入的歌曲数
-  @override
-  final int imported;
-
-  /// 本地已存在的歌曲数（直接复用）
-  @override
-  final int reused;
-
-  /// 拉取元数据失败的歌曲数
-  @override
-  final int failed;
-
-  /// 失败的 bvid 列表（供用户排查）
-  final List<String> _failedBvids;
-
-  /// 失败的 bvid 列表（供用户排查）
-  @override
-  @JsonKey()
-  List<String> get failedBvids {
-    if (_failedBvids is EqualUnmodifiableListView) return _failedBvids;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_failedBvids);
-  }
-
-  @override
-  String toString() {
-    return 'ShareImportResult(playlistId: $playlistId, imported: $imported, reused: $reused, failed: $failed, failedBvids: $failedBvids)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ShareImportResultImpl &&
-            (identical(other.playlistId, playlistId) ||
-                other.playlistId == playlistId) &&
-            (identical(other.imported, imported) ||
-                other.imported == imported) &&
-            (identical(other.reused, reused) || other.reused == reused) &&
-            (identical(other.failed, failed) || other.failed == failed) &&
-            const DeepCollectionEquality()
-                .equals(other._failedBvids, _failedBvids));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, playlistId, imported, reused,
-      failed, const DeepCollectionEquality().hash(_failedBvids));
-
-  /// Create a copy of ShareImportResult
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ShareImportResultImplCopyWith<_$ShareImportResultImpl> get copyWith =>
-      __$$ShareImportResultImplCopyWithImpl<_$ShareImportResultImpl>(
-          this, _$identity);
+/// Create a copy of ShareImportResult
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? playlistId = null,Object? imported = null,Object? reused = null,Object? failed = null,Object? failedBvids = null,}) {
+  return _then(_ShareImportResult(
+playlistId: null == playlistId ? _self.playlistId : playlistId // ignore: cast_nullable_to_non_nullable
+as int,imported: null == imported ? _self.imported : imported // ignore: cast_nullable_to_non_nullable
+as int,reused: null == reused ? _self.reused : reused // ignore: cast_nullable_to_non_nullable
+as int,failed: null == failed ? _self.failed : failed // ignore: cast_nullable_to_non_nullable
+as int,failedBvids: null == failedBvids ? _self._failedBvids : failedBvids // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
 }
 
-abstract class _ShareImportResult implements ShareImportResult {
-  const factory _ShareImportResult(
-      {required final int playlistId,
-      required final int imported,
-      required final int reused,
-      required final int failed,
-      final List<String> failedBvids}) = _$ShareImportResultImpl;
 
-  /// 新建歌单 ID
-  @override
-  int get playlistId;
-
-  /// 成功导入的歌曲数
-  @override
-  int get imported;
-
-  /// 本地已存在的歌曲数（直接复用）
-  @override
-  int get reused;
-
-  /// 拉取元数据失败的歌曲数
-  @override
-  int get failed;
-
-  /// 失败的 bvid 列表（供用户排查）
-  @override
-  List<String> get failedBvids;
-
-  /// Create a copy of ShareImportResult
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ShareImportResultImplCopyWith<_$ShareImportResultImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 mixin _$SharedPlaylistPreview {
-  /// 歌单名称
-  String get name => throw _privateConstructorUsedError;
 
-  /// 歌曲数量
-  int get songCount => throw _privateConstructorUsedError;
+/// 歌单名称
+ String get name;/// 歌曲数量
+ int get songCount;/// BV 号列表（预览用）
+ List<String> get bvids;
+/// Create a copy of SharedPlaylistPreview
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SharedPlaylistPreviewCopyWith<SharedPlaylistPreview> get copyWith => _$SharedPlaylistPreviewCopyWithImpl<SharedPlaylistPreview>(this as SharedPlaylistPreview, _$identity);
 
-  /// BV 号列表（预览用）
-  List<String> get bvids => throw _privateConstructorUsedError;
 
-  /// Create a copy of SharedPlaylistPreview
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SharedPlaylistPreviewCopyWith<SharedPlaylistPreview> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SharedPlaylistPreview&&(identical(other.name, name) || other.name == name)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&const DeepCollectionEquality().equals(other.bvids, bvids));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,name,songCount,const DeepCollectionEquality().hash(bvids));
+
+@override
+String toString() {
+  return 'SharedPlaylistPreview(name: $name, songCount: $songCount, bvids: $bvids)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $SharedPlaylistPreviewCopyWith<$Res> {
-  factory $SharedPlaylistPreviewCopyWith(SharedPlaylistPreview value,
-          $Res Function(SharedPlaylistPreview) then) =
-      _$SharedPlaylistPreviewCopyWithImpl<$Res, SharedPlaylistPreview>;
-  @useResult
-  $Res call({String name, int songCount, List<String> bvids});
-}
+abstract mixin class $SharedPlaylistPreviewCopyWith<$Res>  {
+  factory $SharedPlaylistPreviewCopyWith(SharedPlaylistPreview value, $Res Function(SharedPlaylistPreview) _then) = _$SharedPlaylistPreviewCopyWithImpl;
+@useResult
+$Res call({
+ String name, int songCount, List<String> bvids
+});
 
+
+
+
+}
 /// @nodoc
-class _$SharedPlaylistPreviewCopyWithImpl<$Res,
-        $Val extends SharedPlaylistPreview>
+class _$SharedPlaylistPreviewCopyWithImpl<$Res>
     implements $SharedPlaylistPreviewCopyWith<$Res> {
-  _$SharedPlaylistPreviewCopyWithImpl(this._value, this._then);
+  _$SharedPlaylistPreviewCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SharedPlaylistPreview _self;
+  final $Res Function(SharedPlaylistPreview) _then;
 
-  /// Create a copy of SharedPlaylistPreview
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? songCount = null,
-    Object? bvids = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      songCount: null == songCount
-          ? _value.songCount
-          : songCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      bvids: null == bvids
-          ? _value.bvids
-          : bvids // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
-  }
+/// Create a copy of SharedPlaylistPreview
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? songCount = null,Object? bvids = null,}) {
+  return _then(_self.copyWith(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,songCount: null == songCount ? _self.songCount : songCount // ignore: cast_nullable_to_non_nullable
+as int,bvids: null == bvids ? _self.bvids : bvids // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SharedPlaylistPreview].
+extension SharedPlaylistPreviewPatterns on SharedPlaylistPreview {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SharedPlaylistPreview value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SharedPlaylistPreview value)  $default,){
+final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SharedPlaylistPreview value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  int songCount,  List<String> bvids)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview() when $default != null:
+return $default(_that.name,_that.songCount,_that.bvids);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  int songCount,  List<String> bvids)  $default,) {final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview():
+return $default(_that.name,_that.songCount,_that.bvids);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  int songCount,  List<String> bvids)?  $default,) {final _that = this;
+switch (_that) {
+case _SharedPlaylistPreview() when $default != null:
+return $default(_that.name,_that.songCount,_that.bvids);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
-abstract class _$$SharedPlaylistPreviewImplCopyWith<$Res>
-    implements $SharedPlaylistPreviewCopyWith<$Res> {
-  factory _$$SharedPlaylistPreviewImplCopyWith(
-          _$SharedPlaylistPreviewImpl value,
-          $Res Function(_$SharedPlaylistPreviewImpl) then) =
-      __$$SharedPlaylistPreviewImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String name, int songCount, List<String> bvids});
+
+
+class _SharedPlaylistPreview implements SharedPlaylistPreview {
+  const _SharedPlaylistPreview({required this.name, required this.songCount, required final  List<String> bvids}): _bvids = bvids;
+  
+
+/// 歌单名称
+@override final  String name;
+/// 歌曲数量
+@override final  int songCount;
+/// BV 号列表（预览用）
+ final  List<String> _bvids;
+/// BV 号列表（预览用）
+@override List<String> get bvids {
+  if (_bvids is EqualUnmodifiableListView) return _bvids;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_bvids);
+}
+
+
+/// Create a copy of SharedPlaylistPreview
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SharedPlaylistPreviewCopyWith<_SharedPlaylistPreview> get copyWith => __$SharedPlaylistPreviewCopyWithImpl<_SharedPlaylistPreview>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SharedPlaylistPreview&&(identical(other.name, name) || other.name == name)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&const DeepCollectionEquality().equals(other._bvids, _bvids));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,name,songCount,const DeepCollectionEquality().hash(_bvids));
+
+@override
+String toString() {
+  return 'SharedPlaylistPreview(name: $name, songCount: $songCount, bvids: $bvids)';
+}
+
+
 }
 
 /// @nodoc
-class __$$SharedPlaylistPreviewImplCopyWithImpl<$Res>
-    extends _$SharedPlaylistPreviewCopyWithImpl<$Res,
-        _$SharedPlaylistPreviewImpl>
-    implements _$$SharedPlaylistPreviewImplCopyWith<$Res> {
-  __$$SharedPlaylistPreviewImplCopyWithImpl(_$SharedPlaylistPreviewImpl _value,
-      $Res Function(_$SharedPlaylistPreviewImpl) _then)
-      : super(_value, _then);
+abstract mixin class _$SharedPlaylistPreviewCopyWith<$Res> implements $SharedPlaylistPreviewCopyWith<$Res> {
+  factory _$SharedPlaylistPreviewCopyWith(_SharedPlaylistPreview value, $Res Function(_SharedPlaylistPreview) _then) = __$SharedPlaylistPreviewCopyWithImpl;
+@override @useResult
+$Res call({
+ String name, int songCount, List<String> bvids
+});
 
-  /// Create a copy of SharedPlaylistPreview
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? songCount = null,
-    Object? bvids = null,
-  }) {
-    return _then(_$SharedPlaylistPreviewImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      songCount: null == songCount
-          ? _value.songCount
-          : songCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      bvids: null == bvids
-          ? _value._bvids
-          : bvids // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
-  }
+
+
+
 }
-
 /// @nodoc
+class __$SharedPlaylistPreviewCopyWithImpl<$Res>
+    implements _$SharedPlaylistPreviewCopyWith<$Res> {
+  __$SharedPlaylistPreviewCopyWithImpl(this._self, this._then);
 
-class _$SharedPlaylistPreviewImpl implements _SharedPlaylistPreview {
-  const _$SharedPlaylistPreviewImpl(
-      {required this.name,
-      required this.songCount,
-      required final List<String> bvids})
-      : _bvids = bvids;
+  final _SharedPlaylistPreview _self;
+  final $Res Function(_SharedPlaylistPreview) _then;
 
-  /// 歌单名称
-  @override
-  final String name;
-
-  /// 歌曲数量
-  @override
-  final int songCount;
-
-  /// BV 号列表（预览用）
-  final List<String> _bvids;
-
-  /// BV 号列表（预览用）
-  @override
-  List<String> get bvids {
-    if (_bvids is EqualUnmodifiableListView) return _bvids;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_bvids);
-  }
-
-  @override
-  String toString() {
-    return 'SharedPlaylistPreview(name: $name, songCount: $songCount, bvids: $bvids)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SharedPlaylistPreviewImpl &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.songCount, songCount) ||
-                other.songCount == songCount) &&
-            const DeepCollectionEquality().equals(other._bvids, _bvids));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, name, songCount,
-      const DeepCollectionEquality().hash(_bvids));
-
-  /// Create a copy of SharedPlaylistPreview
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$SharedPlaylistPreviewImplCopyWith<_$SharedPlaylistPreviewImpl>
-      get copyWith => __$$SharedPlaylistPreviewImplCopyWithImpl<
-          _$SharedPlaylistPreviewImpl>(this, _$identity);
+/// Create a copy of SharedPlaylistPreview
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? songCount = null,Object? bvids = null,}) {
+  return _then(_SharedPlaylistPreview(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,songCount: null == songCount ? _self.songCount : songCount // ignore: cast_nullable_to_non_nullable
+as int,bvids: null == bvids ? _self._bvids : bvids // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
 }
 
-abstract class _SharedPlaylistPreview implements SharedPlaylistPreview {
-  const factory _SharedPlaylistPreview(
-      {required final String name,
-      required final int songCount,
-      required final List<String> bvids}) = _$SharedPlaylistPreviewImpl;
 
-  /// 歌单名称
-  @override
-  String get name;
-
-  /// 歌曲数量
-  @override
-  int get songCount;
-
-  /// BV 号列表（预览用）
-  @override
-  List<String> get bvids;
-
-  /// Create a copy of SharedPlaylistPreview
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SharedPlaylistPreviewImplCopyWith<_$SharedPlaylistPreviewImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
+
+// dart format on

@@ -7,7 +7,7 @@ part 'update_info.freezed.dart';
 
 /// Information about an available update.
 @freezed
-class UpdateInfo with _$UpdateInfo {
+abstract class UpdateInfo with _$UpdateInfo {
   const factory UpdateInfo({
     /// The latest version available on GitHub.
     required AppVersion latestVersion,

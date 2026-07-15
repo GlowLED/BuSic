@@ -107,10 +107,7 @@ class BiliFavPreviewView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                onPressed: onCancel,
-                child: Text(l10n.cancel),
-              ),
+              TextButton(onPressed: onCancel, child: Text(l10n.cancel)),
               const SizedBox(width: 8),
               FilledButton(
                 onPressed: onStartImport,

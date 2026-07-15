@@ -18,7 +18,7 @@ part 'sync_notifier.g.dart';
 /// 数据同步功能的状态管理 Notifier
 ///
 /// 管理完整数据的文件导出和导入流程。
-@riverpod
+@Riverpod(name: 'syncNotifierProvider')
 class SyncNotifier extends _$SyncNotifier {
   late final SyncRepository _syncRepo;
 
@@ -36,7 +36,9 @@ class SyncNotifier extends _$SyncNotifier {
     state = const SyncState.exporting();
     try {
       final backup = await _syncRepo.exportFullBackup();
-      final jsonStr = const JsonEncoder.withIndent('  ').convert(backup.toJson());
+      final jsonStr = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(backup.toJson());
       final bytes = Uint8List.fromList(utf8.encode(jsonStr));
 
       // 生成文件名

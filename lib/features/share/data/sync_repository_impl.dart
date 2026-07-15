@@ -21,9 +21,9 @@ class SyncRepositoryImpl implements SyncRepository {
   @override
   Future<AppBackup> exportFullBackup() async {
     // 导出所有歌单
-    final playlistRows = await (_db.select(_db.playlists)
-          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-        .get();
+    final playlistRows = await (_db.select(
+      _db.playlists,
+    )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
 
     final backupPlaylists = playlistRows.map((row) {
       return BackupPlaylist(
@@ -59,12 +59,14 @@ class SyncRepositoryImpl implements SyncRepository {
     for (final ps in psRows) {
       final songInfo = songMap[ps.songId];
       if (songInfo != null) {
-        backupPlaylistSongs.add(BackupPlaylistSong(
-          playlistId: ps.playlistId,
-          bvid: songInfo.bvid,
-          cid: songInfo.cid,
-          sortOrder: ps.sortOrder,
-        ));
+        backupPlaylistSongs.add(
+          BackupPlaylistSong(
+            playlistId: ps.playlistId,
+            bvid: songInfo.bvid,
+            cid: songInfo.cid,
+            sortOrder: ps.sortOrder,
+          ),
+        );
       }
     }
 
@@ -93,17 +95,20 @@ class SyncRepositoryImpl implements SyncRepository {
     for (final song in backup.songs) {
       final key = '${song.bvid}:${song.cid}';
       try {
-        final existing = await (_db.select(_db.songs)
-              ..where(
-                  (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid)))
-            .getSingleOrNull();
+        final existing =
+            await (_db.select(_db.songs)..where(
+                  (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid),
+                ))
+                .getSingleOrNull();
 
         if (existing != null) {
           songIdMap[key] = existing.id;
           songsSkipped++;
         } else {
           // 新歌曲：因为备份中不含完整元数据，使用占位信息
-          final songId = await _db.into(_db.songs).insert(
+          final songId = await _db
+              .into(_db.songs)
+              .insert(
                 SongsCompanion.insert(
                   bvid: song.bvid,
                   cid: song.cid,
@@ -128,15 +133,17 @@ class SyncRepositoryImpl implements SyncRepository {
 
     for (final bp in backup.playlists) {
       try {
-        final existing = await (_db.select(_db.playlists)
-              ..where((t) => t.name.equals(bp.name)))
-            .getSingleOrNull();
+        final existing = await (_db.select(
+          _db.playlists,
+        )..where((t) => t.name.equals(bp.name))).getSingleOrNull();
 
         if (existing != null) {
           playlistIdMap[bp.originalId] = existing.id;
           playlistsMerged++;
         } else {
-          final newId = await _db.into(_db.playlists).insert(
+          final newId = await _db
+              .into(_db.playlists)
+              .insert(
                 PlaylistsCompanion.insert(
                   name: bp.name,
                   coverUrl: Value(bp.coverUrl),
@@ -161,7 +168,9 @@ class SyncRepositoryImpl implements SyncRepository {
 
       if (localPlaylistId != null && localSongId != null) {
         try {
-          await _db.into(_db.playlistSongs).insert(
+          await _db
+              .into(_db.playlistSongs)
+              .insert(
                 PlaylistSongsCompanion.insert(
                   playlistId: localPlaylistId,
                   songId: localSongId,
@@ -203,16 +212,19 @@ class SyncRepositoryImpl implements SyncRepository {
     for (final song in backup.songs) {
       final key = '${song.bvid}:${song.cid}';
       try {
-        final existing = await (_db.select(_db.songs)
-              ..where(
-                  (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid)))
-            .getSingleOrNull();
+        final existing =
+            await (_db.select(_db.songs)..where(
+                  (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid),
+                ))
+                .getSingleOrNull();
 
         if (existing != null) {
           songIdMap[key] = existing.id;
           songsSkipped++;
         } else {
-          final songId = await _db.into(_db.songs).insert(
+          final songId = await _db
+              .into(_db.songs)
+              .insert(
                 SongsCompanion.insert(
                   bvid: song.bvid,
                   cid: song.cid,
@@ -236,7 +248,9 @@ class SyncRepositoryImpl implements SyncRepository {
 
     for (final bp in backup.playlists) {
       try {
-        final newId = await _db.into(_db.playlists).insert(
+        final newId = await _db
+            .into(_db.playlists)
+            .insert(
               PlaylistsCompanion.insert(
                 name: bp.name,
                 coverUrl: Value(bp.coverUrl),
@@ -259,7 +273,9 @@ class SyncRepositoryImpl implements SyncRepository {
 
       if (localPlaylistId != null && localSongId != null) {
         try {
-          await _db.into(_db.playlistSongs).insert(
+          await _db
+              .into(_db.playlistSongs)
+              .insert(
                 PlaylistSongsCompanion.insert(
                   playlistId: localPlaylistId,
                   songId: localSongId,

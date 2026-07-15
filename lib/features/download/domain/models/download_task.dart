@@ -20,7 +20,7 @@ enum DownloadStatus {
 
 /// Domain model representing a media download task.
 @freezed
-class DownloadTask with _$DownloadTask {
+abstract class DownloadTask with _$DownloadTask {
   const factory DownloadTask({
     /// Database primary key.
     required int id,

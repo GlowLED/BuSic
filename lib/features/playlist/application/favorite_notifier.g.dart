@@ -6,27 +6,70 @@ part of 'favorite_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$favoriteNotifierHash() => r'6eec1ee851ad2e416dec960228d05e9f702eea28';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Manages the set of song IDs that are in the user's favorites playlist.
+///
+/// UI widgets watch this provider to render the heart icon state.
+/// Call [loadFavoriteStatus] after loading a page's song list,
+/// then [toggleFavorite] when the user taps the heart button.
+
+@ProviderFor(FavoriteNotifier)
+final favoriteNotifierProvider = FavoriteNotifierProvider._();
 
 /// Manages the set of song IDs that are in the user's favorites playlist.
 ///
 /// UI widgets watch this provider to render the heart icon state.
 /// Call [loadFavoriteStatus] after loading a page's song list,
 /// then [toggleFavorite] when the user taps the heart button.
-///
-/// Copied from [FavoriteNotifier].
-@ProviderFor(FavoriteNotifier)
-final favoriteNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<FavoriteNotifier, Set<int>>.internal(
-  FavoriteNotifier.new,
-  name: r'favoriteNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$favoriteNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class FavoriteNotifierProvider
+    extends $AsyncNotifierProvider<FavoriteNotifier, Set<int>> {
+  /// Manages the set of song IDs that are in the user's favorites playlist.
+  ///
+  /// UI widgets watch this provider to render the heart icon state.
+  /// Call [loadFavoriteStatus] after loading a page's song list,
+  /// then [toggleFavorite] when the user taps the heart button.
+  FavoriteNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'favoriteNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-typedef _$FavoriteNotifier = AutoDisposeAsyncNotifier<Set<int>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$favoriteNotifierHash();
+
+  @$internal
+  @override
+  FavoriteNotifier create() => FavoriteNotifier();
+}
+
+String _$favoriteNotifierHash() => r'2a4b6fdccdd7c63e19fe74156095401a702c1e68';
+
+/// Manages the set of song IDs that are in the user's favorites playlist.
+///
+/// UI widgets watch this provider to render the heart icon state.
+/// Call [loadFavoriteStatus] after loading a page's song list,
+/// then [toggleFavorite] when the user taps the heart button.
+
+abstract class _$FavoriteNotifier extends $AsyncNotifier<Set<int>> {
+  FutureOr<Set<int>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<Set<int>>, Set<int>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<Set<int>>, Set<int>>,
+              AsyncValue<Set<int>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

@@ -21,62 +21,62 @@ final audioHandlerProvider = Provider<BusicAudioHandler>((ref) {
 });
 
 Future<void> main() async {
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-    // Catch Flutter framework errors
-    FlutterError.onError = (details) {
-      FlutterError.presentError(details);
-      AppLogger.error(
-        'FlutterError: ${details.exceptionAsString()}',
-        tag: 'Main',
+      // Catch Flutter framework errors
+      FlutterError.onError = (details) {
+        FlutterError.presentError(details);
+        AppLogger.error(
+          'FlutterError: ${details.exceptionAsString()}',
+          tag: 'Main',
+        );
+      };
+
+      // Initialize media_kit engine
+      MediaKit.ensureInitialized();
+
+      // Initialize local database
+      final database = AppDatabase();
+
+      // Initialize cookie storage for HTTP client
+      await BiliDio.initCookieStorage();
+
+      // Initialize audio_service for background playback and media session.
+      // On desktop platforms this is a no-op but remains safe to call.
+      final audioHandler = await AudioService.init(
+        builder: () => BusicAudioHandler(),
+        config: const AudioServiceConfig(
+          androidNotificationChannelId: 'com.github.busic.audio',
+          androidNotificationChannelName: 'BuSic 音乐播放',
+          androidNotificationOngoing: true,
+          androidStopForegroundOnPause: true,
+        ),
       );
-    };
 
-    // Initialize media_kit engine
-    MediaKit.ensureInitialized();
+      // Desktop-specific: initialize window manager and system tray
+      if (PlatformUtils.isDesktop) {
+        await WindowService.initialize();
+        await TrayService.instance.initialize(
+          showLabel: () => '显示 BuSic',
+          quitLabel: () => '退出',
+        );
+      }
 
-    // Initialize local database
-    final database = AppDatabase();
-
-    // Initialize cookie storage for HTTP client
-    await BiliDio.initCookieStorage();
-
-    // Initialize audio_service for background playback and media session.
-    // On desktop platforms this is a no-op but remains safe to call.
-    final audioHandler = await AudioService.init(
-      builder: () => BusicAudioHandler(),
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.github.busic.audio',
-        androidNotificationChannelName: 'BuSic 音乐播放',
-        androidNotificationOngoing: true,
-        androidStopForegroundOnPause: true,
-      ),
-    );
-
-    // Desktop-specific: initialize window manager and system tray
-    if (PlatformUtils.isDesktop) {
-      await WindowService.initialize();
-      await TrayService.instance.initialize(
-        showLabel: () => '显示 BuSic',
-        quitLabel: () => '退出',
+      // 读取极简模式标志
+      runApp(
+        ProviderScope(
+          overrides: [
+            databaseProvider.overrideWithValue(database),
+            audioHandlerProvider.overrideWithValue(audioHandler),
+          ],
+          child: const App(),
+        ),
       );
-    }
-
-    // 读取极简模式标志
-    runApp(
-      ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(database),
-          audioHandlerProvider.overrideWithValue(audioHandler),
-        ],
-        child: const App(),
-      ),
-    );
-  }, (error, stackTrace) {
-    AppLogger.error(
-      'Unhandled error: $error\n$stackTrace',
-      tag: 'Main',
-    );
-  });
+    },
+    (error, stackTrace) {
+      AppLogger.error('Unhandled error: $error\n$stackTrace', tag: 'Main');
+    },
+  );
 }

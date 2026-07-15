@@ -119,9 +119,11 @@ class _FakeDownloadRepository implements DownloadRepository {
   @override
   Future<List<DownloadTask>> getActiveTasks() async {
     return tasks
-        .where((task) =>
-            task.status == DownloadStatus.pending ||
-            task.status == DownloadStatus.downloading)
+        .where(
+          (task) =>
+              task.status == DownloadStatus.pending ||
+              task.status == DownloadStatus.downloading,
+        )
         .toList();
   }
 

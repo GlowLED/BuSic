@@ -43,7 +43,7 @@ Agent 执行发布脚本时，脚本内会触发构建、写入型 Git、tag 和
 ## 发布前最低检查
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 
@@ -52,7 +52,7 @@ Agent 执行时，`flutter ...` 通常需要提权到沙箱外。
 如果改了 codegen：
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 `dart run ...` 在 agent 沙箱中也按通常需提权处理。

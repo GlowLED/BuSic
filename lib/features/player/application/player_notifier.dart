@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -41,7 +42,7 @@ final playerResumeSeekDelayProvider = Provider<Duration>((ref) {
 /// Controls playback, queue management, and mode switching.
 /// Listens to the [PlayerRepository] streams and updates [PlayerState] accordingly.
 /// Persists playback state (track, queue, position) for restore on next launch.
-@Riverpod(keepAlive: true)
+@Riverpod(name: 'playerNotifierProvider', keepAlive: true)
 class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
@@ -148,9 +149,9 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// Query the database for the latest localPath of a song.
   /// Returns the path only if it exists on disk; otherwise returns null.
   Future<String?> _getFreshLocalPath(int songId) async {
-    final song = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(songId)))
-        .getSingleOrNull();
+    final song = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(songId))).getSingleOrNull();
     final path = song?.localPath;
     if (path == null) return null;
     if (await _localFileExists(path)) return path;
@@ -186,8 +187,10 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
           ? updatedQueue[state.currentIndex]
           : state.currentTrack;
       state = state.copyWith(queue: updatedQueue, currentTrack: currentTrack);
-      AppLogger.info('Refreshed queue local paths after download',
-          tag: 'Player');
+      AppLogger.info(
+        'Refreshed queue local paths after download',
+        tag: 'Player',
+      );
     }
   }
 
@@ -228,10 +231,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// Update the platform media session (notification, lock screen controls).
   void _updateMediaSession(AudioTrack track) {
     _audioHandler.setCurrentTrack(track);
-    _audioHandler.updatePlaybackState(
-      playing: true,
-      position: Duration.zero,
-    );
+    _audioHandler.updatePlaybackState(playing: true, position: Duration.zero);
   }
 
   /// Play a specific track, optionally replacing the queue.
@@ -302,8 +302,11 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         streamUrl = streamInfo.url;
         quality = streamInfo.quality;
       } catch (e) {
-        AppLogger.error('Failed to resolve stream for ${song.bvid}',
-            tag: 'Player', error: e);
+        AppLogger.error(
+          'Failed to resolve stream for ${song.bvid}',
+          tag: 'Player',
+          error: e,
+        );
         rethrow;
       }
     }
@@ -335,18 +338,20 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
     // Build queue with placeholder tracks (will resolve on play)
     final queue = songs
-        .map((s) => AudioTrack(
-              songId: s.id,
-              bvid: s.bvid,
-              cid: s.cid,
-              title: s.displayTitle,
-              artist: s.displayArtist,
-              coverUrl: s.coverUrl,
-              duration: Duration(seconds: s.duration),
-              streamUrl: s.id == song.id ? track.streamUrl : null,
-              localPath: s.localPath,
-              quality: s.audioQuality,
-            ))
+        .map(
+          (s) => AudioTrack(
+            songId: s.id,
+            bvid: s.bvid,
+            cid: s.cid,
+            title: s.displayTitle,
+            artist: s.displayArtist,
+            coverUrl: s.coverUrl,
+            duration: Duration(seconds: s.duration),
+            streamUrl: s.id == song.id ? track.streamUrl : null,
+            localPath: s.localPath,
+            quality: s.audioQuality,
+          ),
+        )
         .toList();
 
     // Update the resolved track in queue
@@ -389,8 +394,11 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       try {
         playableTrack = await _ensurePlayable(track);
       } catch (e) {
-        AppLogger.error('Failed to resolve stream for resume',
-            tag: 'Player', error: e);
+        AppLogger.error(
+          'Failed to resolve stream for resume',
+          tag: 'Player',
+          error: e,
+        );
         return;
       }
 
@@ -399,10 +407,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       if (state.currentIndex < updatedQueue.length) {
         updatedQueue[state.currentIndex] = playableTrack;
       }
-      state = state.copyWith(
-        currentTrack: playableTrack,
-        queue: updatedQueue,
-      );
+      state = state.copyWith(currentTrack: playableTrack, queue: updatedQueue);
 
       final savedPosition = state.position;
       await _repository.play(playableTrack);
@@ -442,8 +447,10 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         position: Duration.zero,
       );
       if (firstTrack != null) {
-        _audioHandler.setCurrentTrack(firstTrack,
-            duration: firstTrack.duration);
+        _audioHandler.setCurrentTrack(
+          firstTrack,
+          duration: firstTrack.duration,
+        );
       }
       persistState();
       return;
@@ -512,10 +519,11 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     if (state.currentTrack == null) return;
 
     final durationMs = state.duration.inMilliseconds;
-    final targetMs = (durationMs > 0
-            ? position.inMilliseconds.clamp(0, durationMs)
-            : max(0, position.inMilliseconds))
-        .toInt();
+    final targetMs =
+        (durationMs > 0
+                ? position.inMilliseconds.clamp(0, durationMs)
+                : max(0, position.inMilliseconds))
+            .toInt();
     final target = Duration(milliseconds: targetMs);
 
     state = state.copyWith(position: target);

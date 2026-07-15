@@ -5,7 +5,7 @@ part 'video_tag.g.dart';
 
 /// Bilibili video tag.
 @freezed
-class VideoTag with _$VideoTag {
+abstract class VideoTag with _$VideoTag {
   const factory VideoTag({
     /// Tag identifier from Bilibili.
     required int id,

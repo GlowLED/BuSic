@@ -59,7 +59,9 @@ class _VolumeButtonState extends State<VolumeButton> {
                   color: colorScheme.surfaceContainerHighest,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 8),
+                      vertical: 12,
+                      horizontal: 8,
+                    ),
                     child: SizedBox(
                       height: 120,
                       width: 36,
@@ -68,15 +70,16 @@ class _VolumeButtonState extends State<VolumeButton> {
                         child: SliderTheme(
                           data: SliderThemeData(
                             trackHeight: 3,
-                            thumbShape:
-                                const RoundSliderThumbShape(
-                                    enabledThumbRadius: 6),
-                            overlayShape:
-                                const RoundSliderOverlayShape(
-                                    overlayRadius: 12),
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 12,
+                            ),
                             activeTrackColor: colorScheme.primary,
-                            inactiveTrackColor: colorScheme.primary
-                                .withValues(alpha: 0.2),
+                            inactiveTrackColor: colorScheme.primary.withValues(
+                              alpha: 0.2,
+                            ),
                             thumbColor: colorScheme.primary,
                           ),
                           child: Slider(

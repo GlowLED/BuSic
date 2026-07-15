@@ -101,7 +101,9 @@ void main() {
       addTearDown(subscription.close);
 
       await container.read(authNotifierProvider.future);
-      await container.read(authNotifierProvider.notifier).loginWithCookie(
+      await container
+          .read(authNotifierProvider.notifier)
+          .loginWithCookie(
             sessdata: 'sess-cookie',
             biliJct: 'csrf-cookie',
             dedeUserId: '42',
@@ -109,10 +111,7 @@ void main() {
 
       expect(repository.savedSessions, hasLength(1));
       expect(repository.savedSessions.single.userId, '42');
-      expect(
-        container.read(authNotifierProvider).valueOrNull?.nickname,
-        '刷新成功',
-      );
+      expect(container.read(authNotifierProvider).value?.nickname, '刷新成功');
     });
 
     test('loginWithCookie 失败时会清理会话并抛错', () async {
@@ -128,7 +127,9 @@ void main() {
       await container.read(authNotifierProvider.future);
 
       await expectLater(
-        () => container.read(authNotifierProvider.notifier).loginWithCookie(
+        () => container
+            .read(authNotifierProvider.notifier)
+            .loginWithCookie(
               sessdata: 'bad-sess',
               biliJct: 'bad-csrf',
               dedeUserId: '404',
@@ -157,7 +158,9 @@ void main() {
       addTearDown(subscription.close);
 
       await container.read(authNotifierProvider.future);
-      await container.read(authNotifierProvider.notifier).loginWithWebCookies(
+      await container
+          .read(authNotifierProvider.notifier)
+          .loginWithWebCookies(
             sessdata: 'web-sess',
             biliJct: 'web-csrf',
             dedeUserId: '88',
@@ -165,10 +168,7 @@ void main() {
 
       expect(repository.loginCookieCalls, hasLength(1));
       expect(repository.loginCookieCalls.single.dedeUserId, '88');
-      expect(
-        container.read(authNotifierProvider).valueOrNull?.nickname,
-        '网页登录成功',
-      );
+      expect(container.read(authNotifierProvider).value?.nickname, '网页登录成功');
     });
 
     test('login 轮询到 86090 和 86038 时会触发扫码与过期回调', () async {
@@ -188,7 +188,9 @@ void main() {
 
       var scannedCount = 0;
       var expiredCount = 0;
-      final qrUrl = await container.read(authNotifierProvider.notifier).login(
+      final qrUrl = await container
+          .read(authNotifierProvider.notifier)
+          .login(
             onScanned: () => scannedCount++,
             onExpired: () => expiredCount++,
           );
@@ -197,7 +199,7 @@ void main() {
       expect(qrUrl, 'https://example.com/qr');
       expect(scannedCount, 1);
       expect(expiredCount, 1);
-      expect(container.read(authNotifierProvider).valueOrNull, isNull);
+      expect(container.read(authNotifierProvider).value, isNull);
     });
 
     test('login 轮询成功后会解析 URL、保存会话并更新状态', () async {
@@ -233,10 +235,7 @@ void main() {
       expect(repository.savedSessions, hasLength(1));
       expect(repository.savedSessions.single.userId, '99');
       expect(repository.savedSessions.single.sessdata, 'saved-sess');
-      expect(
-        container.read(authNotifierProvider).valueOrNull?.nickname,
-        '扫码登录成功',
-      );
+      expect(container.read(authNotifierProvider).value?.nickname, '扫码登录成功');
     });
 
     test('logout 会清理仓储并把状态重置为 null', () async {
@@ -267,7 +266,7 @@ void main() {
       await container.read(authNotifierProvider.notifier).logout();
 
       expect(repository.clearSessionCallCount, 1);
-      expect(container.read(authNotifierProvider).valueOrNull, isNull);
+      expect(container.read(authNotifierProvider).value, isNull);
     });
 
     test('checkSession 刷新成功时会更新当前用户', () async {
@@ -305,7 +304,7 @@ void main() {
       await container.read(authNotifierProvider.notifier).checkSession();
 
       expect(
-        container.read(authNotifierProvider).valueOrNull?.nickname,
+        container.read(authNotifierProvider).value?.nickname,
         'checkSession 刷新',
       );
     });
@@ -338,7 +337,7 @@ void main() {
       await container.read(authNotifierProvider.future);
       await container.read(authNotifierProvider.notifier).checkSession();
 
-      expect(container.read(authNotifierProvider).valueOrNull, isNull);
+      expect(container.read(authNotifierProvider).value, isNull);
       expect(repository.clearSessionCallCount, 1);
     });
   });
@@ -382,12 +381,8 @@ class _FakeAuthRepository implements AuthRepository {
   int refreshSessionCallCount = 0;
   int clearSessionCallCount = 0;
   final List<User> savedSessions = [];
-  final List<
-      ({
-        String sessdata,
-        String biliJct,
-        String? dedeUserId,
-      })> loginCookieCalls = [];
+  final List<({String sessdata, String biliJct, String? dedeUserId})>
+  loginCookieCalls = [];
   late final List<User?> _loginCookieResults = List.of(loginCookieResults);
 
   @override
@@ -397,10 +392,7 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<({String qrUrl, String qrKey})> generateQrCode() async {
-    return (
-      qrUrl: 'https://example.com/qr',
-      qrKey: 'qr-key',
-    );
+    return (qrUrl: 'https://example.com/qr', qrKey: 'qr-key');
   }
 
   @override

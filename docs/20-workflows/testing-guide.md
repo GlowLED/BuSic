@@ -17,10 +17,11 @@
 - `test/test_helpers/test_app.dart`
 - `lib/core/database/app_database.dart`
 
-最近一次已记录的本地基线（2026-05-02）：
+最近一次已记录的本地基线（2026-07-15，Flutter 3.44.6 / Dart 3.12.2）：
 
-- `flutter analyze --no-fatal-infos` 通过
-- `flutter test -r expanded` 通过
+- `dart run build_runner build` 无兼容性 warning
+- `flutter analyze` 输出 `No issues found!`
+- `flutter test` 全量通过
 
 测试数量不要在本文长期固定；实际数量以最新一次 `flutter test -r expanded` 输出为准。维护覆盖矩阵时先用 `find test -type f -name '*_test.dart'` 重新核对测试文件。
 
@@ -28,8 +29,8 @@ CI 当前执行顺序与本地保持一致：
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
-flutter analyze --no-fatal-infos
+dart run build_runner build
+flutter analyze
 flutter test
 ```
 
@@ -45,7 +46,7 @@ flutter test
 ### 2.1 常规开发
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 
@@ -59,9 +60,9 @@ flutter test
 - `lib/l10n/*.arb`
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 

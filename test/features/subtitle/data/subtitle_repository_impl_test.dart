@@ -42,10 +42,7 @@ void main() {
         data: cached,
       );
 
-      final result = await repository.getSubtitle(
-        bvid: 'BVcache01',
-        cid: 1001,
-      );
+      final result = await repository.getSubtitle(bvid: 'BVcache01', cid: 1001);
 
       expect(result, cached);
       expect(adapter.requests, isEmpty);
@@ -118,10 +115,7 @@ void main() {
     });
 
     test('接口返回 -101 时抛出登录异常', () async {
-      adapter.register(
-        '/x/web-interface/view',
-        body: {'code': -101},
-      );
+      adapter.register('/x/web-interface/view', body: {'code': -101});
 
       expect(
         () => repository.fetchSubtitleFromApi(
@@ -211,12 +205,7 @@ void main() {
 class _SubtitleFixture {
   static const data = SubtitleData(
     lines: [
-      SubtitleLine(
-        startTime: 0,
-        endTime: 1,
-        content: '缓存歌词',
-        musicRatio: 0,
-      ),
+      SubtitleLine(startTime: 0, endTime: 1, content: '缓存歌词', musicRatio: 0),
     ],
     sourceType: 'ai',
     language: 'ai-zh',
@@ -228,13 +217,9 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
   final Map<String, List<_MockHttpResponse>> _responses = {};
   final Map<String, int> _matchCounts = {};
 
-  void register(
-    String pattern, {
-    required Object body,
-    int statusCode = 200,
-  }) {
+  void register(String pattern, {required Object body, int statusCode = 200}) {
     _responses[pattern] = [
-      _MockHttpResponse(body: body, statusCode: statusCode)
+      _MockHttpResponse(body: body, statusCode: statusCode),
     ];
   }
 
@@ -266,8 +251,9 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
       if (!url.contains(entry.key)) continue;
 
       final responses = entry.value;
-      final response =
-          responses.length > 1 ? responses.removeAt(0) : responses.first;
+      final response = responses.length > 1
+          ? responses.removeAt(0)
+          : responses.first;
       _matchCounts.update(entry.key, (count) => count + 1, ifAbsent: () => 1);
 
       return ResponseBody.fromString(
@@ -288,10 +274,7 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
 }
 
 class _MockHttpResponse {
-  _MockHttpResponse({
-    required this.body,
-    required this.statusCode,
-  });
+  _MockHttpResponse({required this.body, required this.statusCode});
 
   final Object body;
   final int statusCode;

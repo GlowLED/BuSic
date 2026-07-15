@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart' show StateProvider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -12,19 +13,14 @@ import '../domain/models/user.dart';
 part 'auth_notifier.g.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(
-    biliDio: BiliDio(),
-    db: ref.read(databaseProvider),
-  );
+  return AuthRepositoryImpl(biliDio: BiliDio(), db: ref.read(databaseProvider));
 });
 
 final authQrPollIntervalProvider = Provider<Duration>((ref) {
   return const Duration(seconds: 2);
 });
 
-enum AuthSessionNotice {
-  sessionInvalid,
-}
+enum AuthSessionNotice { sessionInvalid }
 
 final authSessionNoticeProvider = StateProvider<AuthSessionNotice?>((ref) {
   return null;
@@ -34,7 +30,7 @@ final authSessionNoticeProvider = StateProvider<AuthSessionNotice?>((ref) {
 ///
 /// Provides the current [User] session state and exposes methods
 /// for login, logout, and session validation.
-@riverpod
+@Riverpod(name: 'authNotifierProvider')
 class AuthNotifier extends _$AuthNotifier {
   late AuthRepository _repository;
   Timer? _pollTimer;
@@ -189,7 +185,7 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// Check if the current session is still valid.
   Future<void> checkSession() async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
     final refreshed = await _repository.refreshSession();
     if (refreshed != null) {

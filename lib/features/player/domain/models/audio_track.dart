@@ -8,7 +8,7 @@ part 'audio_track.g.dart';
 /// Contains all metadata needed for playback and display,
 /// with resolved stream URL or local file path.
 @freezed
-class AudioTrack with _$AudioTrack {
+abstract class AudioTrack with _$AudioTrack {
   const factory AudioTrack({
     /// Database song ID.
     required int songId,

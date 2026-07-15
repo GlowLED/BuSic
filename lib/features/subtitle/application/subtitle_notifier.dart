@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -54,7 +55,7 @@ enum SubtitleLoadStatus {
 ///
 /// Uses family parameters `(bvid, cid)` so each video gets its own
 /// independent subtitle instance with automatic disposal.
-@riverpod
+@Riverpod(name: 'subtitleNotifierProvider')
 class SubtitleNotifier extends _$SubtitleNotifier {
   static const String loginRequiredErrorCode = 'login_required';
 
@@ -64,11 +65,13 @@ class SubtitleNotifier extends _$SubtitleNotifier {
     int currentLineIndex,
     SubtitleLoadStatus status,
     String? errorMessage,
-  }) build(String bvid, int cid) {
+  })
+  build(String bvid, int cid) {
     final ownTrackKey = (bvid: bvid, cid: cid);
     final currentTrackKey = ref.read(subtitleCurrentTrackKeyProvider);
-    final terminalStateLink =
-        currentTrackKey == ownTrackKey ? ref.keepAlive() : null;
+    final terminalStateLink = currentTrackKey == ownTrackKey
+        ? ref.keepAlive()
+        : null;
 
     ref.listen<SubtitleTrackKey?>(subtitleCurrentTrackKeyProvider, (_, next) {
       if (next != ownTrackKey) {

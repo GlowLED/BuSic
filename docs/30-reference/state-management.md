@@ -2,6 +2,10 @@
 
 本项目使用 **Riverpod codegen**（`riverpod_annotation`）进行状态管理。所有业务 Notifier 均使用注解式代码生成。
 
+当前基线是 Riverpod 3。Notifier 类名以 `Notifier` 结尾时，注解必须用
+`@Riverpod(name: 'xxxNotifierProvider')` 显式保持既有 provider 名；轻量
+`StateProvider` 从 `package:flutter_riverpod/legacy.dart` 导入。
+
 ## Provider 分类
 
 ### 注解式 Notifier（主要模式）
@@ -14,7 +18,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'xxx_notifier.g.dart';
 
 // 异步 Notifier（返回 Future）
-@riverpod
+@Riverpod(name: 'authNotifierProvider')
 class AuthNotifier extends _$AuthNotifier {
   @override
   Future<User?> build() async {
@@ -24,7 +28,7 @@ class AuthNotifier extends _$AuthNotifier {
 }
 
 // 同步 Notifier
-@riverpod
+@Riverpod(name: 'playerNotifierProvider')
 class PlayerNotifier extends _$PlayerNotifier {
   @override
   PlayerState build() {
@@ -34,7 +38,7 @@ class PlayerNotifier extends _$PlayerNotifier {
 }
 
 // Family Provider（参数化）
-@riverpod
+@Riverpod(name: 'playlistDetailNotifierProvider')
 class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
   @override
   Future<List<SongItem>> build(int playlistId) async {

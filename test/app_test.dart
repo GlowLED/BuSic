@@ -18,8 +18,9 @@ import 'package:busic/features/player/domain/models/player_state.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('startup probes saved auth session and notifies when invalid',
-      (tester) async {
+  testWidgets('startup probes saved auth session and notifies when invalid', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     final authRepository = _FakeAuthRepository(
@@ -46,10 +47,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ),
+      UncontrolledProviderScope(container: container, child: const App()),
     );
     for (var i = 0; i < 5; i++) {
       await tester.pump(const Duration(milliseconds: 10));

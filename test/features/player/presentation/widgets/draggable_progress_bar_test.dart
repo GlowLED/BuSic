@@ -8,10 +8,7 @@ import 'package:busic/features/player/presentation/widgets/draggable_progress_ba
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  Widget buildSubject({
-    double progress = 0.5,
-    ValueChanged<Duration>? onSeek,
-  }) {
+  Widget buildSubject({double progress = 0.5, ValueChanged<Duration>? onSeek}) {
     return buildTestApp(
       Center(
         child: SizedBox(
@@ -46,9 +43,7 @@ void main() {
     Duration? seekPosition;
 
     await tester.pumpWidget(
-      buildSubject(
-        onSeek: (position) => seekPosition = position,
-      ),
+      buildSubject(onSeek: (position) => seekPosition = position),
     );
 
     final topLeft = tester.getTopLeft(find.byType(DraggableProgressBar));
@@ -58,8 +53,9 @@ void main() {
     expect(seekPosition, const Duration(seconds: 60));
   });
 
-  testWidgets('paints active progress with a default endpoint marker',
-      (tester) async {
+  testWidgets('paints active progress with a default endpoint marker', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildSubject());
 
     expect(
@@ -80,9 +76,7 @@ void main() {
     expect(mouseRegion.cursor, SystemMouseCursors.click);
     expect(findEmphasisAnimation(tester).tween.end, 0);
 
-    final gesture = await tester.createGesture(
-      kind: PointerDeviceKind.mouse,
-    );
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(() async {
       await gesture.removePointer();
     });

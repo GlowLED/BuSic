@@ -46,18 +46,12 @@ class _BackupOverviewDialogState extends State<BackupOverviewDialog> {
               label: l10n.backupTime,
               value: dateFormat.format(backup.createdAt),
             ),
-            _InfoRow(
-              label: l10n.appVersionLabel,
-              value: backup.appVersion,
-            ),
+            _InfoRow(label: l10n.appVersionLabel, value: backup.appVersion),
             _InfoRow(
               label: l10n.playlistCount,
               value: '${backup.playlists.length}',
             ),
-            _InfoRow(
-              label: l10n.songCount,
-              value: '${backup.songs.length}',
-            ),
+            _InfoRow(label: l10n.songCount, value: '${backup.songs.length}'),
             const SizedBox(height: 16),
 
             // 导入策略选择

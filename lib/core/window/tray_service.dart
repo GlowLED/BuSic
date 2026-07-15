@@ -51,11 +51,13 @@ class TrayService with TrayListener {
     final show = _showLabel?.call() ?? 'Show';
     final quit = _quitLabel?.call() ?? 'Quit';
 
-    final menu = Menu(items: [
-      MenuItem(key: 'show', label: show),
-      MenuItem.separator(),
-      MenuItem(key: 'quit', label: quit),
-    ]);
+    final menu = Menu(
+      items: [
+        MenuItem(key: 'show', label: show),
+        MenuItem.separator(),
+        MenuItem(key: 'quit', label: quit),
+      ],
+    );
     await trayManager.setContextMenu(menu);
   }
 
@@ -67,8 +69,14 @@ class TrayService with TrayListener {
     if (Platform.isWindows) {
       // In a packaged Windows app the .exe sits next to data/
       final exeDir = p.dirname(Platform.resolvedExecutable);
-      final ico = p.join(exeDir, 'data', 'flutter_assets', 'assets',
-          'images', 'app_icon.png');
+      final ico = p.join(
+        exeDir,
+        'data',
+        'flutter_assets',
+        'assets',
+        'images',
+        'app_icon.png',
+      );
       if (await File(ico).exists()) return ico;
       // Fallback: runner resources
       return p.join(exeDir, 'runner', 'resources', 'app_icon.ico');
@@ -77,13 +85,24 @@ class TrayService with TrayListener {
     // Linux / macOS
     final exeDir = p.dirname(Platform.resolvedExecutable);
     final bundled = p.join(
-        exeDir, 'data', 'flutter_assets', 'assets', 'images', 'app_icon.png');
+      exeDir,
+      'data',
+      'flutter_assets',
+      'assets',
+      'images',
+      'app_icon.png',
+    );
     if (await File(bundled).exists()) return bundled;
 
     // Development fallback
-    final fallbackBundled =  p.join(Directory.current.path, 'assets', 'images', 'app_icon.png');
+    final fallbackBundled = p.join(
+      Directory.current.path,
+      'assets',
+      'images',
+      'app_icon.png',
+    );
     if (await File(fallbackBundled).exists()) {
-      return fallbackBundled; 
+      return fallbackBundled;
     }
     return null;
   }

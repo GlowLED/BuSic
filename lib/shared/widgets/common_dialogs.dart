@@ -86,7 +86,10 @@ class CommonDialogs {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+        icon: Icon(
+          Icons.error_outline,
+          color: Theme.of(context).colorScheme.error,
+        ),
         title: Text(title),
         content: Text(message),
         actions: [

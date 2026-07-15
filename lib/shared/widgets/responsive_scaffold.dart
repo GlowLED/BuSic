@@ -104,9 +104,7 @@ class _DesktopShell extends StatelessWidget {
           padding: EdgeInsets.all(spacing.md),
           child: Column(
             children: [
-              _DesktopTitleBar(
-                currentLabel: destinations[currentIndex].label,
-              ),
+              _DesktopTitleBar(currentLabel: destinations[currentIndex].label),
               SizedBox(height: spacing.md),
               Expanded(
                 child: Row(
@@ -120,9 +118,7 @@ class _DesktopShell extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: spacing.md),
-                    Expanded(
-                      child: _ShellContentFrame(child: navigationShell),
-                    ),
+                    Expanded(child: _ShellContentFrame(child: navigationShell)),
                   ],
                 ),
               ),
@@ -273,10 +269,7 @@ class _DesktopTitleBar extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: spacing.xxs),
-                        Text(
-                          currentLabel,
-                          style: textTheme.titleLarge,
-                        ),
+                        Text(currentLabel, style: textTheme.titleLarge),
                       ],
                     ),
                   ),
@@ -363,10 +356,7 @@ class _DesktopSidebar extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          width: 1,
-          color: palette.borderSubtle.withValues(alpha: 0.5),
-        ),
+        Container(width: 1, color: palette.borderSubtle.withValues(alpha: 0.5)),
       ],
     );
   }
@@ -426,9 +416,7 @@ class _DesktopSidebarStatusCard extends ConsumerWidget {
 
     return Container(
       padding: EdgeInsets.all(spacing.sm),
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: const UserAvatarWidget(),
     );
   }
@@ -567,10 +555,7 @@ class _MobileLandscapeNavRail extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          width: 1,
-          color: palette.borderSubtle.withValues(alpha: 0.5),
-        ),
+        Container(width: 1, color: palette.borderSubtle.withValues(alpha: 0.5)),
       ],
     );
   }
@@ -626,10 +611,7 @@ class _ShellPlayerDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child: const PlayerBar(),
-    );
+    return Container(color: Colors.transparent, child: const PlayerBar());
   }
 }
 
@@ -640,10 +622,7 @@ class _ShellContentFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child: child,
-    );
+    return Container(color: Colors.transparent, child: child);
   }
 }
 
@@ -661,18 +640,10 @@ class _ShellBackdrop extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            palette.backgroundPrimary,
-            palette.backgroundSecondary,
-          ],
+          colors: [palette.backgroundPrimary, palette.backgroundSecondary],
         ),
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          child,
-        ],
-      ),
+      child: Stack(fit: StackFit.expand, children: [child]),
     );
   }
 }
@@ -760,11 +731,7 @@ class _WindowButton extends StatelessWidget {
               ? Colors.red.withValues(alpha: 0.82)
               : palette.overlayMedium,
           child: Center(
-            child: Icon(
-              icon,
-              size: 18,
-              color: palette.textPrimary,
-            ),
+            child: Icon(icon, size: 18, color: palette.textPrimary),
           ),
         ),
       ),

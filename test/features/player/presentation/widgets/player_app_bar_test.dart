@@ -58,9 +58,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        child: buildTestApp(
-          const PlayerAppBar(isDesktopOverride: false),
-        ),
+        child: buildTestApp(const PlayerAppBar(isDesktopOverride: false)),
       ),
     );
 

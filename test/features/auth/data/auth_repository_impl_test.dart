@@ -33,11 +33,7 @@ void main() {
     authAdapter = _RecordingAdapter();
     authDio.httpClientAdapter = authAdapter;
 
-    repository = AuthRepositoryImpl(
-      biliDio: biliDio,
-      db: db,
-      authDio: authDio,
-    );
+    repository = AuthRepositoryImpl(biliDio: biliDio, db: db, authDio: authDio);
   });
 
   tearDown(() async {
@@ -90,7 +86,9 @@ void main() {
     });
 
     test('loadSession 会返回最近一次会话并恢复 cookies', () async {
-      await db.into(db.userSessions).insert(
+      await db
+          .into(db.userSessions)
+          .insert(
             UserSessionsCompanion.insert(
               sessdata: 'older-sess',
               biliJct: 'older-csrf',
@@ -98,7 +96,9 @@ void main() {
               nickname: const Value('旧会话'),
             ),
           );
-      await db.into(db.userSessions).insert(
+      await db
+          .into(db.userSessions)
+          .insert(
             UserSessionsCompanion.insert(
               sessdata: 'latest-sess',
               biliJct: 'latest-csrf',
@@ -126,13 +126,15 @@ void main() {
     test('clearSession 会清空数据库和内存 cookies', () async {
       biliAdapter.register('/probe', body: {'ok': true});
 
-      await repository.saveSession(const User(
-        userId: '3',
-        nickname: '待退出',
-        sessdata: 'logout-sess',
-        biliJct: 'logout-csrf',
-        isLoggedIn: true,
-      ));
+      await repository.saveSession(
+        const User(
+          userId: '3',
+          nickname: '待退出',
+          sessdata: 'logout-sess',
+          biliJct: 'logout-csrf',
+          isLoggedIn: true,
+        ),
+      );
       await repository.clearSession();
       await biliDio.get('/probe');
 
@@ -142,21 +144,20 @@ void main() {
     });
 
     test('refreshSession 在 nav 未确认登录时返回 null', () async {
-      await repository.saveSession(const User(
-        userId: '4',
-        nickname: '失效用户',
-        sessdata: 'bad-sess',
-        biliJct: 'bad-csrf',
-        isLoggedIn: true,
-      ));
+      await repository.saveSession(
+        const User(
+          userId: '4',
+          nickname: '失效用户',
+          sessdata: 'bad-sess',
+          biliJct: 'bad-csrf',
+          isLoggedIn: true,
+        ),
+      );
       biliAdapter.register(
         '/x/web-interface/nav',
         body: {
           'code': 0,
-          'data': {
-            'isLogin': false,
-            'uname': '',
-          },
+          'data': {'isLogin': false, 'uname': ''},
         },
       );
 
@@ -166,13 +167,15 @@ void main() {
     });
 
     test('refreshSession 失败时返回 null，不向外抛异常', () async {
-      await repository.saveSession(const User(
-        userId: '5',
-        nickname: '失效用户',
-        sessdata: 'bad-sess',
-        biliJct: 'bad-csrf',
-        isLoggedIn: true,
-      ));
+      await repository.saveSession(
+        const User(
+          userId: '5',
+          nickname: '失效用户',
+          sessdata: 'bad-sess',
+          biliJct: 'bad-csrf',
+          isLoggedIn: true,
+        ),
+      );
       biliAdapter.registerError('/x/web-interface/nav');
 
       final result = await repository.refreshSession();
@@ -229,10 +232,7 @@ void main() {
           '/x/web-interface/nav',
           body: {
             'code': 0,
-            'data': {
-              'isLogin': false,
-              'mid': 404,
-            },
+            'data': {'isLogin': false, 'mid': 404},
           },
         )
         ..register('/probe', body: {'ok': true});
@@ -254,10 +254,7 @@ void main() {
       authAdapter.register(
         'qrcode/generate',
         body: {
-          'data': {
-            'url': 'https://example.com/qr',
-            'qrcode_key': 'qr-key',
-          },
+          'data': {'url': 'https://example.com/qr', 'qrcode_key': 'qr-key'},
         },
       );
       authAdapter.register(
@@ -279,7 +276,9 @@ void main() {
       expect(poll.code, 86090);
       expect(poll.message, '已扫码');
       expect(
-          authAdapter.lastRequest?.uri.queryParameters['qrcode_key'], 'qr-key');
+        authAdapter.lastRequest?.uri.queryParameters['qrcode_key'],
+        'qr-key',
+      );
     });
   });
 }
@@ -337,10 +336,7 @@ class _RecordingAdapter implements HttpClientAdapter {
 }
 
 class _AdapterResponse {
-  const _AdapterResponse({
-    this.body,
-    this.error = false,
-  });
+  const _AdapterResponse({this.body, this.error = false});
 
   final Object? body;
   final bool error;

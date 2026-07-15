@@ -91,7 +91,7 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
   }
 
   Future<void> _handleSubmit(String message) async {
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) {
       if (mounted) {
         context.showSnackBar(context.l10n.pleaseLoginFirst);
@@ -113,8 +113,7 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
   }
 
   void _showReplySheet(Comment comment) {
-    final commentState =
-        ref.read(commentNotifierProvider(widget.bvid)).valueOrNull;
+    final commentState = ref.read(commentNotifierProvider(widget.bvid)).value;
     if (commentState == null) return;
 
     showModalBottomSheet(
@@ -122,8 +121,8 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
       isScrollControlled: true,
       backgroundColor:
           widget.appearance == CommentSectionAppearance.playerOverlay
-              ? Colors.transparent
-              : null,
+          ? Colors.transparent
+          : null,
       barrierColor: widget.appearance == CommentSectionAppearance.playerOverlay
           ? Colors.black.withValues(alpha: 0.56)
           : null,
@@ -139,7 +138,7 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
   @override
   Widget build(BuildContext context) {
     final commentAsync = ref.watch(commentNotifierProvider(widget.bvid));
-    final user = ref.watch(authNotifierProvider).valueOrNull;
+    final user = ref.watch(authNotifierProvider).value;
     final isLoggedIn = user != null;
 
     final content = Builder(
@@ -160,8 +159,11 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.error_outline,
-                            size: 48, color: colorScheme.error),
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: colorScheme.error,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           l10n.loadCommentsFailed,
@@ -169,8 +171,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                         ),
                         const SizedBox(height: 8),
                         FilledButton.tonal(
-                          onPressed: () => ref
-                              .invalidate(commentNotifierProvider(widget.bvid)),
+                          onPressed: () => ref.invalidate(
+                            commentNotifierProvider(widget.bvid),
+                          ),
                           child: Text(l10n.retry),
                         ),
                       ],
@@ -191,7 +194,8 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                             Text(
                               l10n.noComments,
                               style: TextStyle(
-                                  color: colorScheme.onSurfaceVariant),
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),
@@ -220,8 +224,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                                   isSelected: state.sortMode == 3,
                                   onTap: () => ref
                                       .read(
-                                        commentNotifierProvider(widget.bvid)
-                                            .notifier,
+                                        commentNotifierProvider(
+                                          widget.bvid,
+                                        ).notifier,
                                       )
                                       .changeSortMode(3),
                                 ),
@@ -231,8 +236,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                                   isSelected: state.sortMode == 2,
                                   onTap: () => ref
                                       .read(
-                                        commentNotifierProvider(widget.bvid)
-                                            .notifier,
+                                        commentNotifierProvider(
+                                          widget.bvid,
+                                        ).notifier,
                                       )
                                       .changeSortMode(2),
                                 ),
@@ -254,8 +260,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                                         '— ${l10n.allCommentsLoaded} —',
                                         style: context.textTheme.labelSmall
                                             ?.copyWith(
-                                          color: colorScheme.onSurfaceVariant,
-                                        ),
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
+                                            ),
                                       ),
                                     ),
                                   );
@@ -279,8 +286,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                                   }
                                   ref
                                       .read(
-                                        commentNotifierProvider(widget.bvid)
-                                            .notifier,
+                                        commentNotifierProvider(
+                                          widget.bvid,
+                                        ).notifier,
                                       )
                                       .toggleLike(comment.rpid);
                                 },
@@ -294,7 +302,8 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                                 onViewReplies: () => _showReplySheet(comment),
                               );
                             },
-                            childCount: state.comments.length +
+                            childCount:
+                                state.comments.length +
                                 (state.isLoadingMore || !state.isEnd ? 1 : 0),
                           ),
                         ),

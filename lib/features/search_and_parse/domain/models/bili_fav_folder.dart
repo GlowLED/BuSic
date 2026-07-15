@@ -8,7 +8,7 @@ part 'bili_fav_folder.freezed.dart';
 /// - `/x/v3/fav/folder/created/list-all`（自己的收藏夹，ownerName 为 null）
 /// - `/x/v3/fav/folder/collected/list`（收藏的收藏夹，ownerName 为 UP 主名称）
 @freezed
-class BiliFavFolder with _$BiliFavFolder {
+abstract class BiliFavFolder with _$BiliFavFolder {
   const factory BiliFavFolder({
     /// 收藏夹 media_id（用于查询收藏夹内容）
     required int id,

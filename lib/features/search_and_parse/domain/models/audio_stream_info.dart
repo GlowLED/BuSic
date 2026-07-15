@@ -5,7 +5,7 @@ part 'audio_stream_info.g.dart';
 
 /// Information about a resolved audio stream URL from Bilibili.
 @freezed
-class AudioStreamInfo with _$AudioStreamInfo {
+abstract class AudioStreamInfo with _$AudioStreamInfo {
   const factory AudioStreamInfo({
     /// Direct audio stream URL (m4s format).
     required String url,

@@ -54,8 +54,11 @@ mixin PlayerStatePersistence {
         }
       }
     } catch (e) {
-      AppLogger.error('Failed to persist player state',
-          tag: 'Player', error: e);
+      AppLogger.error(
+        'Failed to persist player state',
+        tag: 'Player',
+        error: e,
+      );
     }
   }
 
@@ -68,18 +71,20 @@ mixin PlayerStatePersistence {
       final trackJson = prefs.getString(_keyCurrentTrack);
       if (trackJson == null) return null;
 
-      final track = _stripTransientPlaybackSource(AudioTrack.fromJson(
-        jsonDecode(trackJson) as Map<String, dynamic>,
-      ));
+      final track = _stripTransientPlaybackSource(
+        AudioTrack.fromJson(jsonDecode(trackJson) as Map<String, dynamic>),
+      );
 
       final queueJson = prefs.getString(_keyQueue);
       List<AudioTrack> queue = [track];
       if (queueJson != null) {
         final queueList = jsonDecode(queueJson) as List;
         queue = queueList
-            .map((e) => _stripTransientPlaybackSource(
-                  AudioTrack.fromJson(e as Map<String, dynamic>),
-                ))
+            .map(
+              (e) => _stripTransientPlaybackSource(
+                AudioTrack.fromJson(e as Map<String, dynamic>),
+              ),
+            )
             .toList();
       }
 
@@ -104,8 +109,11 @@ mixin PlayerStatePersistence {
         playlistId: playlistId,
       );
     } catch (e) {
-      AppLogger.error('Failed to restore player state',
-          tag: 'Player', error: e);
+      AppLogger.error(
+        'Failed to restore player state',
+        tag: 'Player',
+        error: e,
+      );
       return null;
     }
   }

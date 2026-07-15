@@ -16,32 +16,35 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('SearchScreen', () {
-    testWidgets('centers the input on the default state without the empty card',
-        (tester) async {
-      _setDesktopViewport(tester);
+    testWidgets(
+      'centers the input on the default state without the empty card',
+      (tester) async {
+        _setDesktopViewport(tester);
 
-      await _pumpSearchScreen(tester);
-      await tester.pumpAndSettle();
+        await _pumpSearchScreen(tester);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Start with a keyword or BV link'), findsNothing);
-      expect(find.text('输入关键词或 BV 链接开始'), findsNothing);
-      expect(
-        find.text(
-          'Results, parsed video details, page selection and comments will '
-          'appear here.',
-        ),
-        findsNothing,
-      );
-      expect(find.text('搜索结果、视频详情、分 P 选择和评论会显示在这里。'), findsNothing);
+        expect(find.text('Start with a keyword or BV link'), findsNothing);
+        expect(find.text('输入关键词或 BV 链接开始'), findsNothing);
+        expect(
+          find.text(
+            'Results, parsed video details, page selection and comments will '
+            'appear here.',
+          ),
+          findsNothing,
+        );
+        expect(find.text('搜索结果、视频详情、分 P 选择和评论会显示在这里。'), findsNothing);
 
-      final inputRect = _inputBarRect(tester);
+        final inputRect = _inputBarRect(tester);
 
-      expect(inputRect.top, greaterThan(200));
-      expect((inputRect.center.dy - 400).abs(), lessThan(80));
-    });
+        expect(inputRect.top, greaterThan(200));
+        expect((inputRect.center.dy - 400).abs(), lessThan(80));
+      },
+    );
 
-    testWidgets('moves the input to the top after submitting a search',
-        (tester) async {
+    testWidgets('moves the input to the top after submitting a search', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -73,8 +76,9 @@ void main() {
       _expectDockedSearchBarSurface(tester);
     });
 
-    testWidgets('clears a submitted desktop search and recenters the input',
-        (tester) async {
+    testWidgets('clears a submitted desktop search and recenters the input', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -112,8 +116,9 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('clear keeps a pending search from restoring stale results',
-        (tester) async {
+    testWidgets('clear keeps a pending search from restoring stale results', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final searchGate = Completer<void>();
       final notifier = _FakeParseNotifier(
@@ -156,8 +161,9 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('keyboard search keeps input focused and manually editable',
-        (tester) async {
+    testWidgets('keyboard search keeps input focused and manually editable', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -203,8 +209,9 @@ void main() {
       expect(inputRect.top, lessThan(80));
     });
 
-    testWidgets('keeps the input docked after an empty search result',
-        (tester) async {
+    testWidgets('keeps the input docked after an empty search result', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final notifier = _FakeParseNotifier();
 
@@ -223,8 +230,9 @@ void main() {
       expect(inputRect.center.dy, lessThan(140));
     });
 
-    testWidgets('empty focused input stays docked until focus is lost',
-        (tester) async {
+    testWidgets('empty focused input stays docked until focus is lost', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
       final notifier = _FakeParseNotifier();
 
@@ -260,8 +268,9 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('mobile portrait centers input and hides search button',
-        (tester) async {
+    testWidgets('mobile portrait centers input and hides search button', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
 
       await _pumpSearchScreen(tester);
@@ -274,8 +283,9 @@ void main() {
       expect((inputRect.center.dy - 422).abs(), lessThan(100));
     });
 
-    testWidgets('mobile portrait submits with keyboard search action',
-        (tester) async {
+    testWidgets('mobile portrait submits with keyboard search action', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -314,8 +324,9 @@ void main() {
       _expectDockedSearchBarSurface(tester);
     });
 
-    testWidgets('mobile clear button animates the input back to center',
-        (tester) async {
+    testWidgets('mobile clear button animates the input back to center', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -359,8 +370,9 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('mobile empty input blur animates the input back to center',
-        (tester) async {
+    testWidgets('mobile empty input blur animates the input back to center', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResults: const [
@@ -408,8 +420,9 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('mobile portrait shows empty result state after no matches',
-        (tester) async {
+    testWidgets('mobile portrait shows empty result state after no matches', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier();
 
@@ -420,57 +433,60 @@ void main() {
 
       expect(find.text('No results found'), findsOneWidget);
       expect(
-          find.text('Try another keyword or paste a BV link.'), findsOneWidget);
+        find.text('Try another keyword or paste a BV link.'),
+        findsOneWidget,
+      );
       expect(notifier.searchCalls.single, (keyword: 'missing song', page: 1));
     });
 
-    testWidgets('mobile portrait appends next search page when scrolling down',
-        (tester) async {
-      _setMobilePortraitViewport(tester);
-      final notifier = _FakeParseNotifier(
-        searchResultsByPage: {
-          1: _pageResults('Page One', 16),
-          2: const [
-            BvidInfo(
-              bvid: 'BVpage2001',
-              title: 'Page Two Result',
-              owner: 'BuSic',
-              duration: 245,
-            ),
-          ],
-        },
-        numPages: 2,
-      );
+    testWidgets(
+      'mobile portrait appends next search page when scrolling down',
+      (tester) async {
+        _setMobilePortraitViewport(tester);
+        final notifier = _FakeParseNotifier(
+          searchResultsByPage: {
+            1: _pageResults('Page One', 16),
+            2: const [
+              BvidInfo(
+                bvid: 'BVpage2001',
+                title: 'Page Two Result',
+                owner: 'BuSic',
+                duration: 245,
+              ),
+            ],
+          },
+          numPages: 2,
+        );
 
-      await _pumpSearchScreen(tester, notifier: notifier);
-      await tester.enterText(find.byType(TextField), 'night drive');
-      await tester.testTextInput.receiveAction(TextInputAction.search);
-      await tester.pumpAndSettle();
+        await _pumpSearchScreen(tester, notifier: notifier);
+        await tester.enterText(find.byType(TextField), 'night drive');
+        await tester.testTextInput.receiveAction(TextInputAction.search);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Page One 1'), findsOneWidget);
-      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+        expect(find.text('Page One 1'), findsOneWidget);
+        expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
 
-      await _scrollSearchResultsToBottom(tester);
+        await _scrollSearchResultsToBottom(tester);
 
-      expect(notifier.searchCalls, [
-        (keyword: 'night drive', page: 1),
-        (keyword: 'night drive', page: 2),
-      ]);
-      expect(
-        _searchResultsScrollableState(tester, keyword: 'night drive')
-            .position
-            .pixels,
-        greaterThan(0),
-      );
-      await _scrollSearchResultsUntilVisible(
-        tester,
-        'Page Two Result',
-      );
-      expect(find.text('Page Two Result'), findsOneWidget);
-    });
+        expect(notifier.searchCalls, [
+          (keyword: 'night drive', page: 1),
+          (keyword: 'night drive', page: 2),
+        ]);
+        expect(
+          _searchResultsScrollableState(
+            tester,
+            keyword: 'night drive',
+          ).position.pixels,
+          greaterThan(0),
+        );
+        await _scrollSearchResultsUntilVisible(tester, 'Page Two Result');
+        expect(find.text('Page Two Result'), findsOneWidget);
+      },
+    );
 
-    testWidgets('mobile load-more failure keeps existing results and retries',
-        (tester) async {
+    testWidgets('mobile load-more failure keeps existing results and retries', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResultsByPage: {
@@ -496,9 +512,10 @@ void main() {
       await _scrollSearchResultsToBottom(tester);
 
       expect(
-        _searchResultsScrollableState(tester, keyword: 'night drive')
-            .position
-            .pixels,
+        _searchResultsScrollableState(
+          tester,
+          keyword: 'night drive',
+        ).position.pixels,
         greaterThan(0),
       );
       expect(find.text('Failed to load more'), findsOneWidget);
@@ -514,15 +531,13 @@ void main() {
         (keyword: 'night drive', page: 2),
         (keyword: 'night drive', page: 2),
       ]);
-      await _scrollSearchResultsUntilVisible(
-        tester,
-        'Page Two Result',
-      );
+      await _scrollSearchResultsUntilVisible(tester, 'Page Two Result');
       expect(find.text('Page Two Result'), findsOneWidget);
     });
 
-    testWidgets('new mobile search resets previously appended results',
-        (tester) async {
+    testWidgets('new mobile search resets previously appended results', (
+      tester,
+    ) async {
       _setMobilePortraitViewport(tester);
       final notifier = _FakeParseNotifier(
         searchResultsByKeywordAndPage: {
@@ -548,10 +563,7 @@ void main() {
             ],
           },
         },
-        numPagesByKeyword: const {
-          'night drive': 2,
-          'new song': 1,
-        },
+        numPagesByKeyword: const {'night drive': 2, 'new song': 1},
       );
 
       await _pumpSearchScreen(tester, notifier: notifier);
@@ -564,10 +576,7 @@ void main() {
         (keyword: 'night drive', page: 1),
         (keyword: 'night drive', page: 2),
       ]);
-      await _scrollSearchResultsUntilVisible(
-        tester,
-        'Old Page Two Result',
-      );
+      await _scrollSearchResultsUntilVisible(tester, 'Old Page Two Result');
       expect(find.text('Old Page Two Result'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'new song');

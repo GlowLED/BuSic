@@ -64,13 +64,15 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
       return;
     }
 
-    mediaItem.add(MediaItem(
-      id: '${track.bvid}_${track.cid}',
-      title: track.title,
-      artist: track.artist,
-      artUri: track.coverUrl != null ? Uri.tryParse(track.coverUrl!) : null,
-      duration: duration ?? track.duration,
-    ));
+    mediaItem.add(
+      MediaItem(
+        id: '${track.bvid}_${track.cid}',
+        title: track.title,
+        artist: track.artist,
+        artUri: track.coverUrl != null ? Uri.tryParse(track.coverUrl!) : null,
+        duration: duration ?? track.duration,
+      ),
+    );
   }
 
   /// Update the playback state shown in the media session.
@@ -79,22 +81,24 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
     required Duration position,
     Duration? bufferedPosition,
   }) {
-    playbackState.add(PlaybackState(
-      controls: [
-        MediaControl.skipToPrevious,
-        playing ? MediaControl.pause : MediaControl.play,
-        MediaControl.skipToNext,
-      ],
-      systemActions: const {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-      },
-      androidCompactActionIndices: const [0, 1, 2],
-      processingState: AudioProcessingState.ready,
-      playing: playing,
-      updatePosition: position,
-      bufferedPosition: bufferedPosition ?? Duration.zero,
-    ));
+    playbackState.add(
+      PlaybackState(
+        controls: [
+          MediaControl.skipToPrevious,
+          playing ? MediaControl.pause : MediaControl.play,
+          MediaControl.skipToNext,
+        ],
+        systemActions: const {
+          MediaAction.seek,
+          MediaAction.seekForward,
+          MediaAction.seekBackward,
+        },
+        androidCompactActionIndices: const [0, 1, 2],
+        processingState: AudioProcessingState.ready,
+        playing: playing,
+        updatePosition: position,
+        bufferedPosition: bufferedPosition ?? Duration.zero,
+      ),
+    );
   }
 }

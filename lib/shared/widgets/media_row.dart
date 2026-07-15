@@ -81,10 +81,10 @@ class _MediaRowState extends State<MediaRow> {
 
     final borderColor = widget.enabled
         ? widget.isActive
-            ? palette.accentStrong.withValues(alpha: 0.82)
-            : widget.isSelected
-                ? palette.accentStrong.withValues(alpha: 0.58)
-                : palette.borderSubtle.withValues(alpha: _isHovered ? 1 : 0.9)
+              ? palette.accentStrong.withValues(alpha: 0.82)
+              : widget.isSelected
+              ? palette.accentStrong.withValues(alpha: 0.58)
+              : palette.borderSubtle.withValues(alpha: _isHovered ? 1 : 0.9)
         : palette.borderSubtle.withValues(alpha: 0.52);
 
     final glowShadow = BoxShadow(
@@ -129,8 +129,8 @@ class _MediaRowState extends State<MediaRow> {
                   color: widget.isActive
                       ? palette.accentSoft.withValues(alpha: 0.15)
                       : _isHovered
-                          ? palette.overlaySoft
-                          : Colors.transparent,
+                      ? palette.overlaySoft
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   border: widget.isSelected
                       ? Border.all(
@@ -140,7 +140,8 @@ class _MediaRowState extends State<MediaRow> {
                       : null,
                 ),
                 child: Padding(
-                  padding: widget.padding ??
+                  padding:
+                      widget.padding ??
                       EdgeInsets.symmetric(
                         horizontal: spacing.sm,
                         vertical: spacing.sm,
@@ -206,8 +207,9 @@ class _MediaRowState extends State<MediaRow> {
           backgroundColors: [topColor, bottomColor],
           borderColor: borderColor,
           borderWidth: widget.isActive ? depth.outlineStrong : depth.outline,
-          boxShadow:
-              widget.isActive ? [...depth.panelShadow, glowShadow] : null,
+          boxShadow: widget.isActive
+              ? [...depth.panelShadow, glowShadow]
+              : null,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -231,7 +233,8 @@ class _MediaRowState extends State<MediaRow> {
                   : null,
               borderRadius: radii.largeRadius,
               child: Padding(
-                padding: widget.padding ??
+                padding:
+                    widget.padding ??
                     EdgeInsets.symmetric(
                       horizontal: spacing.sm,
                       vertical: spacing.sm,
@@ -284,10 +287,7 @@ class _MediaRowState extends State<MediaRow> {
 }
 
 class _MediaCoverFrame extends StatelessWidget {
-  const _MediaCoverFrame({
-    required this.child,
-    required this.isActive,
-  });
+  const _MediaCoverFrame({required this.child, required this.isActive});
 
   final Widget child;
   final bool isActive;

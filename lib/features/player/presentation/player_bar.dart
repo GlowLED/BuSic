@@ -88,9 +88,9 @@ class PlayerBar extends ConsumerWidget {
 
     final progress = playerState.duration.inMilliseconds > 0
         ? (playerState.position.inMilliseconds /
-                playerState.duration.inMilliseconds)
-            .clamp(0.0, 1.0)
-            .toDouble()
+                  playerState.duration.inMilliseconds)
+              .clamp(0.0, 1.0)
+              .toDouble()
         : 0.0;
 
     return LayoutBuilder(
@@ -277,7 +277,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
                             style: context.textTheme.labelSmall?.copyWith(
                               color: context.colorScheme.onSurfaceVariant,
                               fontFeatures: [
-                                const FontFeature.tabularFigures()
+                                const FontFeature.tabularFigures(),
                               ],
                             ),
                           ),
@@ -453,8 +453,9 @@ class _MobilePlayerBar extends StatelessWidget {
                 Icons.queue_music,
                 color: hasTrack
                     ? context.colorScheme.onSurfaceVariant
-                    : context.colorScheme.onSurfaceVariant
-                        .withValues(alpha: 0.38),
+                    : context.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.38,
+                      ),
               ),
               tooltip: context.l10n.queue,
               onPressed: onShowQueue,
@@ -578,10 +579,7 @@ class _CircularCoverState extends State<_CircularCover>
     final cover = RepaintBoundary(
       child: AnimatedBuilder(
         animation: _rotationController,
-        child: _RecordDisc(
-          size: widget.size,
-          coverUrl: widget.coverUrl,
-        ),
+        child: _RecordDisc(size: widget.size, coverUrl: widget.coverUrl),
         builder: (context, child) {
           return Transform.rotate(
             key: const ValueKey('player_bar_record_rotation'),
@@ -604,10 +602,7 @@ class _CircularCoverState extends State<_CircularCover>
 }
 
 class _RecordDisc extends StatelessWidget {
-  const _RecordDisc({
-    required this.size,
-    required this.coverUrl,
-  });
+  const _RecordDisc({required this.size, required this.coverUrl});
 
   final double size;
   final String? coverUrl;
@@ -758,10 +753,7 @@ class _RecordDiscPainter extends CustomPainter {
 }
 
 class _MobileTrackLine extends StatelessWidget {
-  const _MobileTrackLine({
-    required this.title,
-    required this.artist,
-  });
+  const _MobileTrackLine({required this.title, required this.artist});
 
   final String title;
   final String artist;
@@ -819,8 +811,9 @@ class _CircularProgressPlayButton extends StatelessWidget {
       child: CustomPaint(
         painter: _CircularProgressPainter(
           progress: progress,
-          trackColor:
-              context.colorScheme.outlineVariant.withValues(alpha: 0.56),
+          trackColor: context.colorScheme.outlineVariant.withValues(
+            alpha: 0.56,
+          ),
           progressColor: context.colorScheme.primary,
           strokeWidth: 3,
         ),

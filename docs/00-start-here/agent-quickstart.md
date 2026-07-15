@@ -6,6 +6,7 @@
 
 - 仓库：Bilibili 音乐播放器，重点能力是播放、歌单、下载、分享/备份、字幕歌词、评论、应用更新。
 - 当前版本：`pubspec.yaml` 中 `version: 0.4.3+18`
+- 开发工具链：Flutter `3.44.6` / Dart `3.12.2`
 - 更新系统真源：`versions-manifest.json`
 - 架构：`core / features / shared / l10n`
 - 路由：`StatefulShellRoute.indexedStack`
@@ -83,7 +84,7 @@
 ## 最常用验证命令
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 flutter run -d windows
 flutter devices
@@ -92,17 +93,19 @@ flutter devices
 如果改了 `@riverpod`、`@freezed`、Drift 或 ARB：
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
+
+当前 `build_runner 2.15` 已移除 `--delete-conflicting-outputs`，不要继续使用旧参数。
 
 ## Agent 沙箱与提权
 
 当前 agent 环境的经验结论：
 
 - 可先在沙箱内尝试：`git status`、`git log`、`git diff`
-- 通常需要提权到沙箱外：`flutter ...` 命令，包括 `flutter pub get`、`flutter analyze --no-fatal-infos`、`flutter test`、`flutter run -d <device_id>`、`flutter devices`、`flutter gen-l10n`
-- 通常需要提权到沙箱外：文档里常见的 `dart ...` 包装入口，尤其 `dart run build_runner build --delete-conflicting-outputs` 和 `dart format`
+- 通常需要提权到沙箱外：`flutter ...` 命令，包括 `flutter pub get`、`flutter analyze`、`flutter test`、`flutter run -d <device_id>`、`flutter devices`、`flutter gen-l10n`
+- 通常需要提权到沙箱外：文档里常见的 `dart ...` 包装入口，尤其 `dart run build_runner build` 和 `dart format`
 - 预期需要提权：远程 Git 和写入型 Git，例如 `git ls-remote`、`git fetch`、`git pull`、`git push`、`git add`、`git commit`、切分支、改 tag、改 ref
 - 不要把这条规则写成跨平台绝对结论；这里只描述当前仓库在当前 agent 环境里的经验值
 

@@ -7,7 +7,7 @@ part 'update_state.freezed.dart';
 
 /// State machine for the app update flow.
 @freezed
-class UpdateState with _$UpdateState {
+sealed class UpdateState with _$UpdateState {
   /// Idle — not checked yet or already up-to-date.
   const factory UpdateState.idle() = UpdateStateIdle;
 

@@ -6,8 +6,8 @@ part of 'download_task.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DownloadTaskImpl _$$DownloadTaskImplFromJson(Map<String, dynamic> json) =>
-    _$DownloadTaskImpl(
+_DownloadTask _$DownloadTaskFromJson(Map<String, dynamic> json) =>
+    _DownloadTask(
       id: (json['id'] as num).toInt(),
       songId: (json['songId'] as num).toInt(),
       status: $enumDecode(_$DownloadStatusEnumMap, json['status']),
@@ -24,7 +24,7 @@ _$DownloadTaskImpl _$$DownloadTaskImplFromJson(Map<String, dynamic> json) =>
       fileSize: (json['fileSize'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$$DownloadTaskImplToJson(_$DownloadTaskImpl instance) =>
+Map<String, dynamic> _$DownloadTaskToJson(_DownloadTask instance) =>
     <String, dynamic>{
       'id': instance.id,
       'songId': instance.songId,

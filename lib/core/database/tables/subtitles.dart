@@ -19,8 +19,7 @@ class Subtitles extends Table {
   TextColumn get subtitleJson => text()();
 
   /// Source type: 'ai' or 'cc'.
-  TextColumn get sourceType =>
-      text().withDefault(const Constant('ai'))();
+  TextColumn get sourceType => text().withDefault(const Constant('ai'))();
 
   /// Creation timestamp (Unix milliseconds).
   IntColumn get createdAt => integer()();
@@ -28,6 +27,6 @@ class Subtitles extends Table {
   /// Unique constraint: one subtitle record per video page.
   @override
   List<Set<Column>> get uniqueKeys => [
-        {bvid, cid},
-      ];
+    {bvid, cid},
+  ];
 }

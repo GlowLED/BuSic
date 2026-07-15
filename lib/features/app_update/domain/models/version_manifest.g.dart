@@ -6,9 +6,8 @@ part of 'version_manifest.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$VersionManifestImpl _$$VersionManifestImplFromJson(
-        Map<String, dynamic> json) =>
-    _$VersionManifestImpl(
+_VersionManifest _$VersionManifestFromJson(Map<String, dynamic> json) =>
+    _VersionManifest(
       latest: json['latest'] as String,
       minSupported: json['min_supported'] as String,
       versions: (json['versions'] as List<dynamic>)
@@ -16,16 +15,15 @@ _$VersionManifestImpl _$$VersionManifestImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$VersionManifestImplToJson(
-        _$VersionManifestImpl instance) =>
+Map<String, dynamic> _$VersionManifestToJson(_VersionManifest instance) =>
     <String, dynamic>{
       'latest': instance.latest,
       'min_supported': instance.minSupported,
       'versions': instance.versions,
     };
 
-_$VersionEntryImpl _$$VersionEntryImplFromJson(Map<String, dynamic> json) =>
-    _$VersionEntryImpl(
+_VersionEntry _$VersionEntryFromJson(Map<String, dynamic> json) =>
+    _VersionEntry(
       version: json['version'] as String,
       build: (json['build'] as num).toInt(),
       date: json['date'] as String,
@@ -35,13 +33,14 @@ _$VersionEntryImpl _$$VersionEntryImplFromJson(Map<String, dynamic> json) =>
         (k, e) =>
             MapEntry(k, PlatformAssets.fromJson(e as Map<String, dynamic>)),
       ),
-      checksums: (json['checksums'] as Map<String, dynamic>?)?.map(
+      checksums:
+          (json['checksums'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, e as String),
           ) ??
           const {},
     );
 
-Map<String, dynamic> _$$VersionEntryImplToJson(_$VersionEntryImpl instance) =>
+Map<String, dynamic> _$VersionEntryToJson(_VersionEntry instance) =>
     <String, dynamic>{
       'version': instance.version,
       'build': instance.build,
@@ -52,29 +51,21 @@ Map<String, dynamic> _$$VersionEntryImplToJson(_$VersionEntryImpl instance) =>
       'checksums': instance.checksums,
     };
 
-_$PlatformAssetsImpl _$$PlatformAssetsImplFromJson(Map<String, dynamic> json) =>
-    _$PlatformAssetsImpl(
+_PlatformAssets _$PlatformAssetsFromJson(Map<String, dynamic> json) =>
+    _PlatformAssets(
       github: json['github'] as String?,
       lanzou: json['lanzou'] == null
           ? null
           : LanzouAsset.fromJson(json['lanzou'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$PlatformAssetsImplToJson(
-        _$PlatformAssetsImpl instance) =>
-    <String, dynamic>{
-      'github': instance.github,
-      'lanzou': instance.lanzou,
-    };
+Map<String, dynamic> _$PlatformAssetsToJson(_PlatformAssets instance) =>
+    <String, dynamic>{'github': instance.github, 'lanzou': instance.lanzou};
 
-_$LanzouAssetImpl _$$LanzouAssetImplFromJson(Map<String, dynamic> json) =>
-    _$LanzouAssetImpl(
-      url: json['url'] as String,
-      password: json['password'] as String?,
-    );
+_LanzouAsset _$LanzouAssetFromJson(Map<String, dynamic> json) => _LanzouAsset(
+  url: json['url'] as String,
+  password: json['password'] as String?,
+);
 
-Map<String, dynamic> _$$LanzouAssetImplToJson(_$LanzouAssetImpl instance) =>
-    <String, dynamic>{
-      'url': instance.url,
-      'password': instance.password,
-    };
+Map<String, dynamic> _$LanzouAssetToJson(_LanzouAsset instance) =>
+    <String, dynamic>{'url': instance.url, 'password': instance.password};

@@ -66,9 +66,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (aid != null) {
       final provider = videoInteractionNotifierProvider(videoInfo.bvid, aid);
       ref.listen<AsyncValue<VideoInteractionState>>(provider, (previous, next) {
-        final message = next.valueOrNull?.lastError;
+        final message = next.value?.lastError;
         if (message == null ||
-            message == previous?.valueOrNull?.lastError ||
+            message == previous?.value?.lastError ||
             !context.mounted) {
           return;
         }
@@ -145,11 +145,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       return Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: mediaMaxWidth),
-          child: _buildMediaHeader(
-            videoInfo,
-            selectedPages,
-            isMultiPage,
-          ),
+          child: _buildMediaHeader(videoInfo, selectedPages, isMultiPage),
         ),
       );
     }
@@ -168,8 +164,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableWidth = constraints.maxWidth;
-        final coverMaxWidth =
-            mediaMaxWidth.isFinite ? mediaMaxWidth : availableWidth;
+        final coverMaxWidth = mediaMaxWidth.isFinite
+            ? mediaMaxWidth
+            : availableWidth;
         final coverWidth = coverMaxWidth.clamp(0.0, availableWidth).toDouble();
         final sideGutterWidth = (availableWidth - coverWidth) / 2;
         const buttonExtent = _HeaderBackButton.dimension;
@@ -190,11 +187,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           clipBehavior: Clip.none,
           children: [
             mediaHeader(),
-            Positioned(
-              left: 0,
-              top: 0,
-              child: backButton(),
-            ),
+            Positioned(left: 0, top: 0, child: backButton()),
           ],
         );
       },
@@ -250,11 +243,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: canPlay
-                    ? () => _playParsedVideo(
-                          context,
-                          videoInfo,
-                          selectedPages,
-                        )
+                    ? () => _playParsedVideo(context, videoInfo, selectedPages)
                     : null,
                 child: Padding(
                   padding: EdgeInsets.all(spacing.md),
@@ -271,9 +260,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
             Positioned(
               right: spacing.sm,
               bottom: spacing.sm,
-              child: _OverlayBadge(
-                label: Formatters.formatDuration(duration),
-              ),
+              child: _OverlayBadge(label: Formatters.formatDuration(duration)),
             ),
           ],
         ),
@@ -294,7 +281,11 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       slivers: [
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
-              spacing.lg, spacing.md, spacing.lg, spacing.lg),
+            spacing.lg,
+            spacing.md,
+            spacing.lg,
+            spacing.lg,
+          ),
           sliver: SliverToBoxAdapter(
             child: Center(
               child: ConstrainedBox(
@@ -492,8 +483,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final spacing = context.appSpacing;
 
     return Container(
-      padding:
-          EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.sm,
+        vertical: spacing.xs,
+      ),
       decoration: BoxDecoration(
         color: palette.warningSoft.withValues(alpha: 0.72),
         borderRadius: context.appRadii.largeRadius,
@@ -523,8 +516,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final palette = context.appPalette;
     final spacing = context.appSpacing;
     final description = videoInfo.description.trim();
-    final displayText =
-        description.isEmpty ? context.l10n.videoDescriptionEmpty : description;
+    final displayText = description.isEmpty
+        ? context.l10n.videoDescriptionEmpty
+        : description;
     final showToggle = description.length > 120 || description.contains('\n');
 
     return AppPanel(
@@ -537,8 +531,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           SelectionArea(
             child: Text(
               displayText,
-              maxLines:
-                  _isDescriptionExpanded || description.isEmpty ? null : 4,
+              maxLines: _isDescriptionExpanded || description.isEmpty
+                  ? null
+                  : 4,
               overflow: _isDescriptionExpanded || description.isEmpty
                   ? null
                   : TextOverflow.ellipsis,
@@ -579,10 +574,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       runSpacing: context.appSpacing.xs,
       children: [
         for (final tag in videoInfo.tags)
-          Chip(
-            visualDensity: VisualDensity.compact,
-            label: Text(tag.name),
-          ),
+          Chip(visualDensity: VisualDensity.compact, label: Text(tag.name)),
       ],
     );
   }
@@ -591,9 +583,10 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final aid = videoInfo.aid;
     if (aid == null) return const SizedBox.shrink();
 
-    final asyncState =
-        ref.watch(videoInteractionNotifierProvider(videoInfo.bvid, aid));
-    final state = asyncState.valueOrNull ?? const VideoInteractionState();
+    final asyncState = ref.watch(
+      videoInteractionNotifierProvider(videoInfo.bvid, aid),
+    );
+    final state = asyncState.value ?? const VideoInteractionState();
     final isBusy = state.isBusy || asyncState.isLoading;
     final spacing = context.appSpacing;
 
@@ -679,11 +672,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
         final download = OutlinedButton.icon(
           onPressed: disabled
               ? null
-              : () => _downloadParsedVideo(
-                    context,
-                    videoInfo,
-                    selectedPages,
-                  ),
+              : () => _downloadParsedVideo(context, videoInfo, selectedPages),
           icon: const Icon(Icons.download_rounded),
           label: Text(context.l10n.downloads),
         );
@@ -714,10 +703,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     );
   }
 
-  Widget _buildPageSelection(
-    BvidInfo videoInfo,
-    List<PageInfo> selectedPages,
-  ) {
+  Widget _buildPageSelection(BvidInfo videoInfo, List<PageInfo> selectedPages) {
     final notifier = ref.read(parseNotifierProvider.notifier);
     final allSelected = selectedPages.length == videoInfo.pages.length;
     final spacing = context.appSpacing;
@@ -734,8 +720,8 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                 value: allSelected
                     ? true
                     : selectedPages.isEmpty
-                        ? false
-                        : null,
+                    ? false
+                    : null,
                 tristate: true,
                 onChanged: (value) {
                   if (value == true) {
@@ -794,10 +780,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     );
   }
 
-  Future<void> _handleLike(
-    BuildContext context,
-    BvidInfo videoInfo,
-  ) async {
+  Future<void> _handleLike(BuildContext context, BvidInfo videoInfo) async {
     final aid = videoInfo.aid;
     if (aid == null) return;
     final isLoggedIn = await _ensureLoggedIn(context);
@@ -828,19 +811,13 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
 
     final success = await ref
         .read(videoInteractionNotifierProvider(videoInfo.bvid, aid).notifier)
-        .addCoin(
-          multiply: selection.multiply,
-          alsoLike: selection.alsoLike,
-        );
+        .addCoin(multiply: selection.multiply, alsoLike: selection.alsoLike);
     if (success && context.mounted) {
       context.showSnackBar(context.l10n.videoCoinAdded(selection.multiply));
     }
   }
 
-  Future<void> _handleFavorite(
-    BuildContext context,
-    BvidInfo videoInfo,
-  ) async {
+  Future<void> _handleFavorite(BuildContext context, BvidInfo videoInfo) async {
     final aid = videoInfo.aid;
     if (aid == null) return;
     final isLoggedIn = await _ensureLoggedIn(context);
@@ -861,10 +838,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     }
   }
 
-  Future<void> _handleShare(
-    BuildContext context,
-    BvidInfo videoInfo,
-  ) async {
+  Future<void> _handleShare(BuildContext context, BvidInfo videoInfo) async {
     final aid = videoInfo.aid;
     if (aid != null) {
       await ref
@@ -874,9 +848,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
 
     try {
       await Clipboard.setData(
-        ClipboardData(
-          text: 'https://www.bilibili.com/video/${videoInfo.bvid}',
-        ),
+        ClipboardData(text: 'https://www.bilibili.com/video/${videoInfo.bvid}'),
       );
       if (context.mounted) {
         context.showSnackBar(context.l10n.copiedToClipboard);
@@ -906,25 +878,26 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  RadioListTile<int>(
-                    value: 1,
+                  RadioGroup<int>(
                     groupValue: multiply,
                     onChanged: (value) {
                       if (value == null) return;
                       setDialogState(() => multiply = value);
                     },
-                    title: Text(context.l10n.videoCoinOne),
-                  ),
-                  RadioListTile<int>(
-                    value: 2,
-                    groupValue: multiply,
-                    onChanged: remainingCoins >= 2
-                        ? (value) {
-                            if (value == null) return;
-                            setDialogState(() => multiply = value);
-                          }
-                        : null,
-                    title: Text(context.l10n.videoCoinTwo),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RadioListTile<int>(
+                          value: 1,
+                          title: Text(context.l10n.videoCoinOne),
+                        ),
+                        RadioListTile<int>(
+                          value: 2,
+                          enabled: remainingCoins >= 2,
+                          title: Text(context.l10n.videoCoinTwo),
+                        ),
+                      ],
+                    ),
                   ),
                   CheckboxListTile(
                     value: alsoLike,
@@ -942,9 +915,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                   child: Text(context.l10n.cancel),
                 ),
                 FilledButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(
-                    (multiply: multiply, alsoLike: alsoLike),
-                  ),
+                  onPressed: () => Navigator.of(
+                    dialogContext,
+                  ).pop((multiply: multiply, alsoLike: alsoLike)),
                   child: Text(context.l10n.confirm),
                 ),
               ],
@@ -1010,8 +983,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     if (pagesToDownload.isEmpty) return;
 
     try {
-      final songIds =
-          await ref.read(parseNotifierProvider.notifier).confirmSelection();
+      final songIds = await ref
+          .read(parseNotifierProvider.notifier)
+          .confirmSelection();
 
       ref.read(parseNotifierProvider.notifier).parseInput(videoInfo.bvid);
 
@@ -1046,8 +1020,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
             for (var i = 0; i < pagesToDownload.length; i++) {
               final page = pagesToDownload[i];
               final songId = i < songIds.length ? songIds[i] : songIds.last;
-              final title =
-                  pagesToDownload.length > 1 ? page.partTitle : videoInfo.title;
+              final title = pagesToDownload.length > 1
+                  ? page.partTitle
+                  : videoInfo.title;
               final started = await ref
                   .read(downloadNotifierProvider.notifier)
                   .downloadSongWithQuality(
@@ -1063,11 +1038,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
               SnackBar(
                 content: Text(l10n.downloadStartedCount(startedCount)),
                 behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.only(
-                  bottom: 80,
-                  left: 16,
-                  right: 16,
-                ),
+                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
               ),
             );
           },
@@ -1237,20 +1208,17 @@ class _VideoDetailTabsThemeSignature {
 
   @override
   int get hashCode => Object.hash(
-        brightness,
-        backgroundPrimary,
-        accentStrong,
-        textSecondary,
-        borderSubtle,
-        outline,
-      );
+    brightness,
+    backgroundPrimary,
+    accentStrong,
+    textSecondary,
+    borderSubtle,
+    outline,
+  );
 }
 
 class _VideoDetailTabs extends StatelessWidget {
-  const _VideoDetailTabs({
-    required this.videoInfo,
-    required this.maxWidth,
-  });
+  const _VideoDetailTabs({required this.videoInfo, required this.maxWidth});
 
   final BvidInfo videoInfo;
   final double maxWidth;
@@ -1301,8 +1269,12 @@ class _FavoriteFolderPicker extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding:
-                  EdgeInsets.fromLTRB(spacing.lg, 0, spacing.lg, spacing.sm),
+              padding: EdgeInsets.fromLTRB(
+                spacing.lg,
+                0,
+                spacing.lg,
+                spacing.sm,
+              ),
               child: Text(
                 context.l10n.selectFavFolder,
                 style: context.textTheme.titleMedium?.copyWith(
@@ -1368,10 +1340,7 @@ class _FavoriteFolderPicker extends ConsumerWidget {
 }
 
 class _FolderPickerMessage extends StatelessWidget {
-  const _FolderPickerMessage({
-    required this.message,
-    required this.onRetry,
-  });
+  const _FolderPickerMessage({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -1487,10 +1456,7 @@ class _InteractionActionButton extends StatelessWidget {
 }
 
 class _HeaderBackButton extends StatelessWidget {
-  const _HeaderBackButton({
-    required this.tooltip,
-    required this.onPressed,
-  });
+  const _HeaderBackButton({required this.tooltip, required this.onPressed});
 
   static const double dimension = 44;
 
@@ -1520,10 +1486,7 @@ class _HeaderBackButton extends StatelessWidget {
             tooltip: tooltip,
             padding: EdgeInsets.zero,
             onPressed: onPressed,
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: palette.textPrimary,
-            ),
+            icon: Icon(Icons.arrow_back_rounded, color: palette.textPrimary),
           ),
         ),
       ),
@@ -1588,11 +1551,7 @@ class _TinyLabel extends StatelessWidget {
 }
 
 class _VideoBadge extends StatelessWidget {
-  const _VideoBadge({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
+  const _VideoBadge({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
@@ -1633,11 +1592,7 @@ class _VideoBadge extends StatelessWidget {
 }
 
 class _BadgeText extends StatelessWidget {
-  const _BadgeText(
-    this.label, {
-    required this.style,
-    this.onTap,
-  });
+  const _BadgeText(this.label, {required this.style, this.onTap});
 
   final String label;
   final TextStyle? style;
@@ -1698,10 +1653,7 @@ class _PageSelectionRow extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Checkbox(
-                  value: isSelected,
-                  onChanged: (_) => onTap(),
-                ),
+                Checkbox(value: isSelected, onChanged: (_) => onTap()),
                 SizedBox(width: spacing.xs),
                 Expanded(
                   child: Column(

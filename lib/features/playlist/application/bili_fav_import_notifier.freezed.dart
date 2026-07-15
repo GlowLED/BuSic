@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,1715 +9,710 @@ part of 'bili_fav_import_notifier.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
 /// @nodoc
 mixin _$BiliFavImportState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BiliFavImportState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'BiliFavImportState()';
+}
+
+
 }
 
 /// @nodoc
-abstract class $BiliFavImportStateCopyWith<$Res> {
-  factory $BiliFavImportStateCopyWith(
-          BiliFavImportState value, $Res Function(BiliFavImportState) then) =
-      _$BiliFavImportStateCopyWithImpl<$Res, BiliFavImportState>;
+class $BiliFavImportStateCopyWith<$Res>  {
+$BiliFavImportStateCopyWith(BiliFavImportState _, $Res Function(BiliFavImportState) __);
 }
 
-/// @nodoc
-class _$BiliFavImportStateCopyWithImpl<$Res, $Val extends BiliFavImportState>
-    implements $BiliFavImportStateCopyWith<$Res> {
-  _$BiliFavImportStateCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+/// Adds pattern-matching-related methods to [BiliFavImportState].
+extension BiliFavImportStatePatterns on BiliFavImportState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Idle value)?  idle,TResult Function( _LoadingFolders value)?  loadingFolders,TResult Function( _FoldersLoaded value)?  foldersLoaded,TResult Function( _LoadingItems value)?  loadingItems,TResult Function( _ItemsLoaded value)?  itemsLoaded,TResult Function( _Importing value)?  importing,TResult Function( _Completed value)?  completed,TResult Function( _Error value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Idle() when idle != null:
+return idle(_that);case _LoadingFolders() when loadingFolders != null:
+return loadingFolders(_that);case _FoldersLoaded() when foldersLoaded != null:
+return foldersLoaded(_that);case _LoadingItems() when loadingItems != null:
+return loadingItems(_that);case _ItemsLoaded() when itemsLoaded != null:
+return itemsLoaded(_that);case _Importing() when importing != null:
+return importing(_that);case _Completed() when completed != null:
+return completed(_that);case _Error() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Idle value)  idle,required TResult Function( _LoadingFolders value)  loadingFolders,required TResult Function( _FoldersLoaded value)  foldersLoaded,required TResult Function( _LoadingItems value)  loadingItems,required TResult Function( _ItemsLoaded value)  itemsLoaded,required TResult Function( _Importing value)  importing,required TResult Function( _Completed value)  completed,required TResult Function( _Error value)  error,}){
+final _that = this;
+switch (_that) {
+case _Idle():
+return idle(_that);case _LoadingFolders():
+return loadingFolders(_that);case _FoldersLoaded():
+return foldersLoaded(_that);case _LoadingItems():
+return loadingItems(_that);case _ItemsLoaded():
+return itemsLoaded(_that);case _Importing():
+return importing(_that);case _Completed():
+return completed(_that);case _Error():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Idle value)?  idle,TResult? Function( _LoadingFolders value)?  loadingFolders,TResult? Function( _FoldersLoaded value)?  foldersLoaded,TResult? Function( _LoadingItems value)?  loadingItems,TResult? Function( _ItemsLoaded value)?  itemsLoaded,TResult? Function( _Importing value)?  importing,TResult? Function( _Completed value)?  completed,TResult? Function( _Error value)?  error,}){
+final _that = this;
+switch (_that) {
+case _Idle() when idle != null:
+return idle(_that);case _LoadingFolders() when loadingFolders != null:
+return loadingFolders(_that);case _FoldersLoaded() when foldersLoaded != null:
+return foldersLoaded(_that);case _LoadingItems() when loadingItems != null:
+return loadingItems(_that);case _ItemsLoaded() when itemsLoaded != null:
+return itemsLoaded(_that);case _Importing() when importing != null:
+return importing(_that);case _Completed() when completed != null:
+return completed(_that);case _Error() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  loadingFolders,TResult Function( List<BiliFavFolder> createdFolders,  List<BiliFavFolder> collectedFolders)?  foldersLoaded,TResult Function( String folderName,  int fetched,  int total)?  loadingItems,TResult Function( String folderName,  List<BiliFavItem> items)?  itemsLoaded,TResult Function( int current,  int total)?  importing,TResult Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)?  completed,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Idle() when idle != null:
+return idle();case _LoadingFolders() when loadingFolders != null:
+return loadingFolders();case _FoldersLoaded() when foldersLoaded != null:
+return foldersLoaded(_that.createdFolders,_that.collectedFolders);case _LoadingItems() when loadingItems != null:
+return loadingItems(_that.folderName,_that.fetched,_that.total);case _ItemsLoaded() when itemsLoaded != null:
+return itemsLoaded(_that.folderName,_that.items);case _Importing() when importing != null:
+return importing(_that.current,_that.total);case _Completed() when completed != null:
+return completed(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _Error() when error != null:
+return error(_that.message);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  loadingFolders,required TResult Function( List<BiliFavFolder> createdFolders,  List<BiliFavFolder> collectedFolders)  foldersLoaded,required TResult Function( String folderName,  int fetched,  int total)  loadingItems,required TResult Function( String folderName,  List<BiliFavItem> items)  itemsLoaded,required TResult Function( int current,  int total)  importing,required TResult Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)  completed,required TResult Function( String message)  error,}) {final _that = this;
+switch (_that) {
+case _Idle():
+return idle();case _LoadingFolders():
+return loadingFolders();case _FoldersLoaded():
+return foldersLoaded(_that.createdFolders,_that.collectedFolders);case _LoadingItems():
+return loadingItems(_that.folderName,_that.fetched,_that.total);case _ItemsLoaded():
+return itemsLoaded(_that.folderName,_that.items);case _Importing():
+return importing(_that.current,_that.total);case _Completed():
+return completed(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _Error():
+return error(_that.message);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  loadingFolders,TResult? Function( List<BiliFavFolder> createdFolders,  List<BiliFavFolder> collectedFolders)?  foldersLoaded,TResult? Function( String folderName,  int fetched,  int total)?  loadingItems,TResult? Function( String folderName,  List<BiliFavItem> items)?  itemsLoaded,TResult? Function( int current,  int total)?  importing,TResult? Function( int playlistId,  int imported,  int reused,  int failed,  List<String> failedBvids)?  completed,TResult? Function( String message)?  error,}) {final _that = this;
+switch (_that) {
+case _Idle() when idle != null:
+return idle();case _LoadingFolders() when loadingFolders != null:
+return loadingFolders();case _FoldersLoaded() when foldersLoaded != null:
+return foldersLoaded(_that.createdFolders,_that.collectedFolders);case _LoadingItems() when loadingItems != null:
+return loadingItems(_that.folderName,_that.fetched,_that.total);case _ItemsLoaded() when itemsLoaded != null:
+return itemsLoaded(_that.folderName,_that.items);case _Importing() when importing != null:
+return importing(_that.current,_that.total);case _Completed() when completed != null:
+return completed(_that.playlistId,_that.imported,_that.reused,_that.failed,_that.failedBvids);case _Error() when error != null:
+return error(_that.message);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-abstract class _$$IdleImplCopyWith<$Res> {
-  factory _$$IdleImplCopyWith(
-          _$IdleImpl value, $Res Function(_$IdleImpl) then) =
-      __$$IdleImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$IdleImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$IdleImpl>
-    implements _$$IdleImplCopyWith<$Res> {
-  __$$IdleImplCopyWithImpl(_$IdleImpl _value, $Res Function(_$IdleImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-
-class _$IdleImpl implements _Idle {
-  const _$IdleImpl();
-
-  @override
-  String toString() {
-    return 'BiliFavImportState.idle()';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$IdleImpl);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return idle();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return idle?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return idle(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return idle?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (idle != null) {
-      return idle(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Idle implements BiliFavImportState {
-  const factory _Idle() = _$IdleImpl;
-}
-
-/// @nodoc
-abstract class _$$LoadingFoldersImplCopyWith<$Res> {
-  factory _$$LoadingFoldersImplCopyWith(_$LoadingFoldersImpl value,
-          $Res Function(_$LoadingFoldersImpl) then) =
-      __$$LoadingFoldersImplCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$LoadingFoldersImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$LoadingFoldersImpl>
-    implements _$$LoadingFoldersImplCopyWith<$Res> {
-  __$$LoadingFoldersImplCopyWithImpl(
-      _$LoadingFoldersImpl _value, $Res Function(_$LoadingFoldersImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 
-class _$LoadingFoldersImpl implements _LoadingFolders {
-  const _$LoadingFoldersImpl();
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.loadingFolders()';
-  }
+class _Idle implements BiliFavImportState {
+  const _Idle();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$LoadingFoldersImpl);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return loadingFolders();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return loadingFolders?.call();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loadingFolders != null) {
-      return loadingFolders();
-    }
-    return orElse();
-  }
 
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return loadingFolders(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return loadingFolders?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (loadingFolders != null) {
-      return loadingFolders(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Idle);
 }
 
-abstract class _LoadingFolders implements BiliFavImportState {
-  const factory _LoadingFolders() = _$LoadingFoldersImpl;
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'BiliFavImportState.idle()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _LoadingFolders implements BiliFavImportState {
+  const _LoadingFolders();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoadingFolders);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'BiliFavImportState.loadingFolders()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _FoldersLoaded implements BiliFavImportState {
+  const _FoldersLoaded(final  List<BiliFavFolder> createdFolders, final  List<BiliFavFolder> collectedFolders): _createdFolders = createdFolders,_collectedFolders = collectedFolders;
+  
+
+ final  List<BiliFavFolder> _createdFolders;
+ List<BiliFavFolder> get createdFolders {
+  if (_createdFolders is EqualUnmodifiableListView) return _createdFolders;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_createdFolders);
+}
+
+ final  List<BiliFavFolder> _collectedFolders;
+ List<BiliFavFolder> get collectedFolders {
+  if (_collectedFolders is EqualUnmodifiableListView) return _collectedFolders;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_collectedFolders);
+}
+
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FoldersLoadedCopyWith<_FoldersLoaded> get copyWith => __$FoldersLoadedCopyWithImpl<_FoldersLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FoldersLoaded&&const DeepCollectionEquality().equals(other._createdFolders, _createdFolders)&&const DeepCollectionEquality().equals(other._collectedFolders, _collectedFolders));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_createdFolders),const DeepCollectionEquality().hash(_collectedFolders));
+
+@override
+String toString() {
+  return 'BiliFavImportState.foldersLoaded(createdFolders: $createdFolders, collectedFolders: $collectedFolders)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$FoldersLoadedImplCopyWith<$Res> {
-  factory _$$FoldersLoadedImplCopyWith(
-          _$FoldersLoadedImpl value, $Res Function(_$FoldersLoadedImpl) then) =
-      __$$FoldersLoadedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call(
-      {List<BiliFavFolder> createdFolders,
-      List<BiliFavFolder> collectedFolders});
+abstract mixin class _$FoldersLoadedCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$FoldersLoadedCopyWith(_FoldersLoaded value, $Res Function(_FoldersLoaded) _then) = __$FoldersLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<BiliFavFolder> createdFolders, List<BiliFavFolder> collectedFolders
+});
+
+
+
+
+}
+/// @nodoc
+class __$FoldersLoadedCopyWithImpl<$Res>
+    implements _$FoldersLoadedCopyWith<$Res> {
+  __$FoldersLoadedCopyWithImpl(this._self, this._then);
+
+  final _FoldersLoaded _self;
+  final $Res Function(_FoldersLoaded) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? createdFolders = null,Object? collectedFolders = null,}) {
+  return _then(_FoldersLoaded(
+null == createdFolders ? _self._createdFolders : createdFolders // ignore: cast_nullable_to_non_nullable
+as List<BiliFavFolder>,null == collectedFolders ? _self._collectedFolders : collectedFolders // ignore: cast_nullable_to_non_nullable
+as List<BiliFavFolder>,
+  ));
 }
 
-/// @nodoc
-class __$$FoldersLoadedImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$FoldersLoadedImpl>
-    implements _$$FoldersLoadedImplCopyWith<$Res> {
-  __$$FoldersLoadedImplCopyWithImpl(
-      _$FoldersLoadedImpl _value, $Res Function(_$FoldersLoadedImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? createdFolders = null,
-    Object? collectedFolders = null,
-  }) {
-    return _then(_$FoldersLoadedImpl(
-      null == createdFolders
-          ? _value._createdFolders
-          : createdFolders // ignore: cast_nullable_to_non_nullable
-              as List<BiliFavFolder>,
-      null == collectedFolders
-          ? _value._collectedFolders
-          : collectedFolders // ignore: cast_nullable_to_non_nullable
-              as List<BiliFavFolder>,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$FoldersLoadedImpl implements _FoldersLoaded {
-  const _$FoldersLoadedImpl(final List<BiliFavFolder> createdFolders,
-      final List<BiliFavFolder> collectedFolders)
-      : _createdFolders = createdFolders,
-        _collectedFolders = collectedFolders;
 
-  final List<BiliFavFolder> _createdFolders;
-  @override
-  List<BiliFavFolder> get createdFolders {
-    if (_createdFolders is EqualUnmodifiableListView) return _createdFolders;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_createdFolders);
-  }
+class _LoadingItems implements BiliFavImportState {
+  const _LoadingItems({required this.folderName, required this.fetched, required this.total});
+  
 
-  final List<BiliFavFolder> _collectedFolders;
-  @override
-  List<BiliFavFolder> get collectedFolders {
-    if (_collectedFolders is EqualUnmodifiableListView)
-      return _collectedFolders;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_collectedFolders);
-  }
+ final  String folderName;
+ final  int fetched;
+ final  int total;
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.foldersLoaded(createdFolders: $createdFolders, collectedFolders: $collectedFolders)';
-  }
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$LoadingItemsCopyWith<_LoadingItems> get copyWith => __$LoadingItemsCopyWithImpl<_LoadingItems>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$FoldersLoadedImpl &&
-            const DeepCollectionEquality()
-                .equals(other._createdFolders, _createdFolders) &&
-            const DeepCollectionEquality()
-                .equals(other._collectedFolders, _collectedFolders));
-  }
 
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_createdFolders),
-      const DeepCollectionEquality().hash(_collectedFolders));
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$FoldersLoadedImplCopyWith<_$FoldersLoadedImpl> get copyWith =>
-      __$$FoldersLoadedImplCopyWithImpl<_$FoldersLoadedImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return foldersLoaded(createdFolders, collectedFolders);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return foldersLoaded?.call(createdFolders, collectedFolders);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (foldersLoaded != null) {
-      return foldersLoaded(createdFolders, collectedFolders);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return foldersLoaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return foldersLoaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (foldersLoaded != null) {
-      return foldersLoaded(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoadingItems&&(identical(other.folderName, folderName) || other.folderName == folderName)&&(identical(other.fetched, fetched) || other.fetched == fetched)&&(identical(other.total, total) || other.total == total));
 }
 
-abstract class _FoldersLoaded implements BiliFavImportState {
-  const factory _FoldersLoaded(final List<BiliFavFolder> createdFolders,
-      final List<BiliFavFolder> collectedFolders) = _$FoldersLoadedImpl;
 
-  List<BiliFavFolder> get createdFolders;
-  List<BiliFavFolder> get collectedFolders;
+@override
+int get hashCode => Object.hash(runtimeType,folderName,fetched,total);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$FoldersLoadedImplCopyWith<_$FoldersLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'BiliFavImportState.loadingItems(folderName: $folderName, fetched: $fetched, total: $total)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$LoadingItemsImplCopyWith<$Res> {
-  factory _$$LoadingItemsImplCopyWith(
-          _$LoadingItemsImpl value, $Res Function(_$LoadingItemsImpl) then) =
-      __$$LoadingItemsImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String folderName, int fetched, int total});
+abstract mixin class _$LoadingItemsCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$LoadingItemsCopyWith(_LoadingItems value, $Res Function(_LoadingItems) _then) = __$LoadingItemsCopyWithImpl;
+@useResult
+$Res call({
+ String folderName, int fetched, int total
+});
+
+
+
+
+}
+/// @nodoc
+class __$LoadingItemsCopyWithImpl<$Res>
+    implements _$LoadingItemsCopyWith<$Res> {
+  __$LoadingItemsCopyWithImpl(this._self, this._then);
+
+  final _LoadingItems _self;
+  final $Res Function(_LoadingItems) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? folderName = null,Object? fetched = null,Object? total = null,}) {
+  return _then(_LoadingItems(
+folderName: null == folderName ? _self.folderName : folderName // ignore: cast_nullable_to_non_nullable
+as String,fetched: null == fetched ? _self.fetched : fetched // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-class __$$LoadingItemsImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$LoadingItemsImpl>
-    implements _$$LoadingItemsImplCopyWith<$Res> {
-  __$$LoadingItemsImplCopyWithImpl(
-      _$LoadingItemsImpl _value, $Res Function(_$LoadingItemsImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? folderName = null,
-    Object? fetched = null,
-    Object? total = null,
-  }) {
-    return _then(_$LoadingItemsImpl(
-      folderName: null == folderName
-          ? _value.folderName
-          : folderName // ignore: cast_nullable_to_non_nullable
-              as String,
-      fetched: null == fetched
-          ? _value.fetched
-          : fetched // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$LoadingItemsImpl implements _LoadingItems {
-  const _$LoadingItemsImpl(
-      {required this.folderName, required this.fetched, required this.total});
 
-  @override
-  final String folderName;
-  @override
-  final int fetched;
-  @override
-  final int total;
+class _ItemsLoaded implements BiliFavImportState {
+  const _ItemsLoaded({required this.folderName, required final  List<BiliFavItem> items}): _items = items;
+  
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.loadingItems(folderName: $folderName, fetched: $fetched, total: $total)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$LoadingItemsImpl &&
-            (identical(other.folderName, folderName) ||
-                other.folderName == folderName) &&
-            (identical(other.fetched, fetched) || other.fetched == fetched) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, folderName, fetched, total);
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LoadingItemsImplCopyWith<_$LoadingItemsImpl> get copyWith =>
-      __$$LoadingItemsImplCopyWithImpl<_$LoadingItemsImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return loadingItems(folderName, fetched, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return loadingItems?.call(folderName, fetched, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loadingItems != null) {
-      return loadingItems(folderName, fetched, total);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return loadingItems(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return loadingItems?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (loadingItems != null) {
-      return loadingItems(this);
-    }
-    return orElse();
-  }
+ final  String folderName;
+ final  List<BiliFavItem> _items;
+ List<BiliFavItem> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
 }
 
-abstract class _LoadingItems implements BiliFavImportState {
-  const factory _LoadingItems(
-      {required final String folderName,
-      required final int fetched,
-      required final int total}) = _$LoadingItemsImpl;
 
-  String get folderName;
-  int get fetched;
-  int get total;
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ItemsLoadedCopyWith<_ItemsLoaded> get copyWith => __$ItemsLoadedCopyWithImpl<_ItemsLoaded>(this, _$identity);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LoadingItemsImplCopyWith<_$LoadingItemsImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemsLoaded&&(identical(other.folderName, folderName) || other.folderName == folderName)&&const DeepCollectionEquality().equals(other._items, _items));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,folderName,const DeepCollectionEquality().hash(_items));
+
+@override
+String toString() {
+  return 'BiliFavImportState.itemsLoaded(folderName: $folderName, items: $items)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ItemsLoadedImplCopyWith<$Res> {
-  factory _$$ItemsLoadedImplCopyWith(
-          _$ItemsLoadedImpl value, $Res Function(_$ItemsLoadedImpl) then) =
-      __$$ItemsLoadedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String folderName, List<BiliFavItem> items});
+abstract mixin class _$ItemsLoadedCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$ItemsLoadedCopyWith(_ItemsLoaded value, $Res Function(_ItemsLoaded) _then) = __$ItemsLoadedCopyWithImpl;
+@useResult
+$Res call({
+ String folderName, List<BiliFavItem> items
+});
+
+
+
+
+}
+/// @nodoc
+class __$ItemsLoadedCopyWithImpl<$Res>
+    implements _$ItemsLoadedCopyWith<$Res> {
+  __$ItemsLoadedCopyWithImpl(this._self, this._then);
+
+  final _ItemsLoaded _self;
+  final $Res Function(_ItemsLoaded) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? folderName = null,Object? items = null,}) {
+  return _then(_ItemsLoaded(
+folderName: null == folderName ? _self.folderName : folderName // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<BiliFavItem>,
+  ));
 }
 
-/// @nodoc
-class __$$ItemsLoadedImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$ItemsLoadedImpl>
-    implements _$$ItemsLoadedImplCopyWith<$Res> {
-  __$$ItemsLoadedImplCopyWithImpl(
-      _$ItemsLoadedImpl _value, $Res Function(_$ItemsLoadedImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? folderName = null,
-    Object? items = null,
-  }) {
-    return _then(_$ItemsLoadedImpl(
-      folderName: null == folderName
-          ? _value.folderName
-          : folderName // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<BiliFavItem>,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$ItemsLoadedImpl implements _ItemsLoaded {
-  const _$ItemsLoadedImpl(
-      {required this.folderName, required final List<BiliFavItem> items})
-      : _items = items;
 
-  @override
-  final String folderName;
-  final List<BiliFavItem> _items;
-  @override
-  List<BiliFavItem> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
+class _Importing implements BiliFavImportState {
+  const _Importing({required this.current, required this.total});
+  
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.itemsLoaded(folderName: $folderName, items: $items)';
-  }
+ final  int current;
+ final  int total;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ItemsLoadedImpl &&
-            (identical(other.folderName, folderName) ||
-                other.folderName == folderName) &&
-            const DeepCollectionEquality().equals(other._items, _items));
-  }
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ImportingCopyWith<_Importing> get copyWith => __$ImportingCopyWithImpl<_Importing>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, folderName, const DeepCollectionEquality().hash(_items));
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ItemsLoadedImplCopyWith<_$ItemsLoadedImpl> get copyWith =>
-      __$$ItemsLoadedImplCopyWithImpl<_$ItemsLoadedImpl>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return itemsLoaded(folderName, items);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return itemsLoaded?.call(folderName, items);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (itemsLoaded != null) {
-      return itemsLoaded(folderName, items);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return itemsLoaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return itemsLoaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (itemsLoaded != null) {
-      return itemsLoaded(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Importing&&(identical(other.current, current) || other.current == current)&&(identical(other.total, total) || other.total == total));
 }
 
-abstract class _ItemsLoaded implements BiliFavImportState {
-  const factory _ItemsLoaded(
-      {required final String folderName,
-      required final List<BiliFavItem> items}) = _$ItemsLoadedImpl;
 
-  String get folderName;
-  List<BiliFavItem> get items;
+@override
+int get hashCode => Object.hash(runtimeType,current,total);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItemsLoadedImplCopyWith<_$ItemsLoadedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'BiliFavImportState.importing(current: $current, total: $total)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ImportingImplCopyWith<$Res> {
-  factory _$$ImportingImplCopyWith(
-          _$ImportingImpl value, $Res Function(_$ImportingImpl) then) =
-      __$$ImportingImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({int current, int total});
+abstract mixin class _$ImportingCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$ImportingCopyWith(_Importing value, $Res Function(_Importing) _then) = __$ImportingCopyWithImpl;
+@useResult
+$Res call({
+ int current, int total
+});
+
+
+
+
+}
+/// @nodoc
+class __$ImportingCopyWithImpl<$Res>
+    implements _$ImportingCopyWith<$Res> {
+  __$ImportingCopyWithImpl(this._self, this._then);
+
+  final _Importing _self;
+  final $Res Function(_Importing) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? current = null,Object? total = null,}) {
+  return _then(_Importing(
+current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-class __$$ImportingImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$ImportingImpl>
-    implements _$$ImportingImplCopyWith<$Res> {
-  __$$ImportingImplCopyWithImpl(
-      _$ImportingImpl _value, $Res Function(_$ImportingImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? current = null,
-    Object? total = null,
-  }) {
-    return _then(_$ImportingImpl(
-      current: null == current
-          ? _value.current
-          : current // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$ImportingImpl implements _Importing {
-  const _$ImportingImpl({required this.current, required this.total});
 
-  @override
-  final int current;
-  @override
-  final int total;
+class _Completed implements BiliFavImportState {
+  const _Completed({required this.playlistId, required this.imported, required this.reused, required this.failed, required final  List<String> failedBvids}): _failedBvids = failedBvids;
+  
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.importing(current: $current, total: $total)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ImportingImpl &&
-            (identical(other.current, current) || other.current == current) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, current, total);
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ImportingImplCopyWith<_$ImportingImpl> get copyWith =>
-      __$$ImportingImplCopyWithImpl<_$ImportingImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return importing(current, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return importing?.call(current, total);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (importing != null) {
-      return importing(current, total);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return importing(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return importing?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (importing != null) {
-      return importing(this);
-    }
-    return orElse();
-  }
+ final  int playlistId;
+ final  int imported;
+ final  int reused;
+ final  int failed;
+ final  List<String> _failedBvids;
+ List<String> get failedBvids {
+  if (_failedBvids is EqualUnmodifiableListView) return _failedBvids;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_failedBvids);
 }
 
-abstract class _Importing implements BiliFavImportState {
-  const factory _Importing(
-      {required final int current, required final int total}) = _$ImportingImpl;
 
-  int get current;
-  int get total;
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CompletedCopyWith<_Completed> get copyWith => __$CompletedCopyWithImpl<_Completed>(this, _$identity);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ImportingImplCopyWith<_$ImportingImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Completed&&(identical(other.playlistId, playlistId) || other.playlistId == playlistId)&&(identical(other.imported, imported) || other.imported == imported)&&(identical(other.reused, reused) || other.reused == reused)&&(identical(other.failed, failed) || other.failed == failed)&&const DeepCollectionEquality().equals(other._failedBvids, _failedBvids));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,playlistId,imported,reused,failed,const DeepCollectionEquality().hash(_failedBvids));
+
+@override
+String toString() {
+  return 'BiliFavImportState.completed(playlistId: $playlistId, imported: $imported, reused: $reused, failed: $failed, failedBvids: $failedBvids)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$CompletedImplCopyWith<$Res> {
-  factory _$$CompletedImplCopyWith(
-          _$CompletedImpl value, $Res Function(_$CompletedImpl) then) =
-      __$$CompletedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call(
-      {int playlistId,
-      int imported,
-      int reused,
-      int failed,
-      List<String> failedBvids});
+abstract mixin class _$CompletedCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$CompletedCopyWith(_Completed value, $Res Function(_Completed) _then) = __$CompletedCopyWithImpl;
+@useResult
+$Res call({
+ int playlistId, int imported, int reused, int failed, List<String> failedBvids
+});
+
+
+
+
+}
+/// @nodoc
+class __$CompletedCopyWithImpl<$Res>
+    implements _$CompletedCopyWith<$Res> {
+  __$CompletedCopyWithImpl(this._self, this._then);
+
+  final _Completed _self;
+  final $Res Function(_Completed) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? playlistId = null,Object? imported = null,Object? reused = null,Object? failed = null,Object? failedBvids = null,}) {
+  return _then(_Completed(
+playlistId: null == playlistId ? _self.playlistId : playlistId // ignore: cast_nullable_to_non_nullable
+as int,imported: null == imported ? _self.imported : imported // ignore: cast_nullable_to_non_nullable
+as int,reused: null == reused ? _self.reused : reused // ignore: cast_nullable_to_non_nullable
+as int,failed: null == failed ? _self.failed : failed // ignore: cast_nullable_to_non_nullable
+as int,failedBvids: null == failedBvids ? _self._failedBvids : failedBvids // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
 }
 
-/// @nodoc
-class __$$CompletedImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$CompletedImpl>
-    implements _$$CompletedImplCopyWith<$Res> {
-  __$$CompletedImplCopyWithImpl(
-      _$CompletedImpl _value, $Res Function(_$CompletedImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? playlistId = null,
-    Object? imported = null,
-    Object? reused = null,
-    Object? failed = null,
-    Object? failedBvids = null,
-  }) {
-    return _then(_$CompletedImpl(
-      playlistId: null == playlistId
-          ? _value.playlistId
-          : playlistId // ignore: cast_nullable_to_non_nullable
-              as int,
-      imported: null == imported
-          ? _value.imported
-          : imported // ignore: cast_nullable_to_non_nullable
-              as int,
-      reused: null == reused
-          ? _value.reused
-          : reused // ignore: cast_nullable_to_non_nullable
-              as int,
-      failed: null == failed
-          ? _value.failed
-          : failed // ignore: cast_nullable_to_non_nullable
-              as int,
-      failedBvids: null == failedBvids
-          ? _value._failedBvids
-          : failedBvids // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
-  }
 }
 
 /// @nodoc
 
-class _$CompletedImpl implements _Completed {
-  const _$CompletedImpl(
-      {required this.playlistId,
-      required this.imported,
-      required this.reused,
-      required this.failed,
-      required final List<String> failedBvids})
-      : _failedBvids = failedBvids;
 
-  @override
-  final int playlistId;
-  @override
-  final int imported;
-  @override
-  final int reused;
-  @override
-  final int failed;
-  final List<String> _failedBvids;
-  @override
-  List<String> get failedBvids {
-    if (_failedBvids is EqualUnmodifiableListView) return _failedBvids;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_failedBvids);
-  }
+class _Error implements BiliFavImportState {
+  const _Error(this.message);
+  
 
-  @override
-  String toString() {
-    return 'BiliFavImportState.completed(playlistId: $playlistId, imported: $imported, reused: $reused, failed: $failed, failedBvids: $failedBvids)';
-  }
+ final  String message;
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CompletedImpl &&
-            (identical(other.playlistId, playlistId) ||
-                other.playlistId == playlistId) &&
-            (identical(other.imported, imported) ||
-                other.imported == imported) &&
-            (identical(other.reused, reused) || other.reused == reused) &&
-            (identical(other.failed, failed) || other.failed == failed) &&
-            const DeepCollectionEquality()
-                .equals(other._failedBvids, _failedBvids));
-  }
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$identity);
 
-  @override
-  int get hashCode => Object.hash(runtimeType, playlistId, imported, reused,
-      failed, const DeepCollectionEquality().hash(_failedBvids));
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CompletedImplCopyWith<_$CompletedImpl> get copyWith =>
-      __$$CompletedImplCopyWithImpl<_$CompletedImpl>(this, _$identity);
 
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return completed(playlistId, imported, reused, failed, failedBvids);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return completed?.call(playlistId, imported, reused, failed, failedBvids);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (completed != null) {
-      return completed(playlistId, imported, reused, failed, failedBvids);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return completed(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return completed?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (completed != null) {
-      return completed(this);
-    }
-    return orElse();
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
 }
 
-abstract class _Completed implements BiliFavImportState {
-  const factory _Completed(
-      {required final int playlistId,
-      required final int imported,
-      required final int reused,
-      required final int failed,
-      required final List<String> failedBvids}) = _$CompletedImpl;
 
-  int get playlistId;
-  int get imported;
-  int get reused;
-  int get failed;
-  List<String> get failedBvids;
+@override
+int get hashCode => Object.hash(runtimeType,message);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CompletedImplCopyWith<_$CompletedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+String toString() {
+  return 'BiliFavImportState.error(message: $message)';
+}
+
+
 }
 
 /// @nodoc
-abstract class _$$ErrorImplCopyWith<$Res> {
-  factory _$$ErrorImplCopyWith(
-          _$ErrorImpl value, $Res Function(_$ErrorImpl) then) =
-      __$$ErrorImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String message});
-}
+abstract mixin class _$ErrorCopyWith<$Res> implements $BiliFavImportStateCopyWith<$Res> {
+  factory _$ErrorCopyWith(_Error value, $Res Function(_Error) _then) = __$ErrorCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
 
+
+
+
+}
 /// @nodoc
-class __$$ErrorImplCopyWithImpl<$Res>
-    extends _$BiliFavImportStateCopyWithImpl<$Res, _$ErrorImpl>
-    implements _$$ErrorImplCopyWith<$Res> {
-  __$$ErrorImplCopyWithImpl(
-      _$ErrorImpl _value, $Res Function(_$ErrorImpl) _then)
-      : super(_value, _then);
+class __$ErrorCopyWithImpl<$Res>
+    implements _$ErrorCopyWith<$Res> {
+  __$ErrorCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(_$ErrorImpl(
-      null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
+  final _Error _self;
+  final $Res Function(_Error) _then;
+
+/// Create a copy of BiliFavImportState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(_Error(
+null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
 
-class _$ErrorImpl implements _Error {
-  const _$ErrorImpl(this.message);
-
-  @override
-  final String message;
-
-  @override
-  String toString() {
-    return 'BiliFavImportState.error(message: $message)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ErrorImpl &&
-            (identical(other.message, message) || other.message == message));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, message);
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ErrorImplCopyWith<_$ErrorImpl> get copyWith =>
-      __$$ErrorImplCopyWithImpl<_$ErrorImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() idle,
-    required TResult Function() loadingFolders,
-    required TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)
-        foldersLoaded,
-    required TResult Function(String folderName, int fetched, int total)
-        loadingItems,
-    required TResult Function(String folderName, List<BiliFavItem> items)
-        itemsLoaded,
-    required TResult Function(int current, int total) importing,
-    required TResult Function(int playlistId, int imported, int reused,
-            int failed, List<String> failedBvids)
-        completed,
-    required TResult Function(String message) error,
-  }) {
-    return error(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? idle,
-    TResult? Function()? loadingFolders,
-    TResult? Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult? Function(String folderName, int fetched, int total)? loadingItems,
-    TResult? Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult? Function(int current, int total)? importing,
-    TResult? Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult? Function(String message)? error,
-  }) {
-    return error?.call(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? idle,
-    TResult Function()? loadingFolders,
-    TResult Function(List<BiliFavFolder> createdFolders,
-            List<BiliFavFolder> collectedFolders)?
-        foldersLoaded,
-    TResult Function(String folderName, int fetched, int total)? loadingItems,
-    TResult Function(String folderName, List<BiliFavItem> items)? itemsLoaded,
-    TResult Function(int current, int total)? importing,
-    TResult Function(int playlistId, int imported, int reused, int failed,
-            List<String> failedBvids)?
-        completed,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Idle value) idle,
-    required TResult Function(_LoadingFolders value) loadingFolders,
-    required TResult Function(_FoldersLoaded value) foldersLoaded,
-    required TResult Function(_LoadingItems value) loadingItems,
-    required TResult Function(_ItemsLoaded value) itemsLoaded,
-    required TResult Function(_Importing value) importing,
-    required TResult Function(_Completed value) completed,
-    required TResult Function(_Error value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Idle value)? idle,
-    TResult? Function(_LoadingFolders value)? loadingFolders,
-    TResult? Function(_FoldersLoaded value)? foldersLoaded,
-    TResult? Function(_LoadingItems value)? loadingItems,
-    TResult? Function(_ItemsLoaded value)? itemsLoaded,
-    TResult? Function(_Importing value)? importing,
-    TResult? Function(_Completed value)? completed,
-    TResult? Function(_Error value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Idle value)? idle,
-    TResult Function(_LoadingFolders value)? loadingFolders,
-    TResult Function(_FoldersLoaded value)? foldersLoaded,
-    TResult Function(_LoadingItems value)? loadingItems,
-    TResult Function(_ItemsLoaded value)? itemsLoaded,
-    TResult Function(_Importing value)? importing,
-    TResult Function(_Completed value)? completed,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
-  }
 }
 
-abstract class _Error implements BiliFavImportState {
-  const factory _Error(final String message) = _$ErrorImpl;
-
-  String get message;
-
-  /// Create a copy of BiliFavImportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ErrorImplCopyWith<_$ErrorImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

@@ -26,7 +26,7 @@ class AuthRepositoryImpl implements AuthRepository {
         headers: {
           'User-Agent':
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                  '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Referer': 'https://www.bilibili.com',
         },
       ),
@@ -37,9 +37,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required BiliDio biliDio,
     required AppDatabase db,
     Dio? authDio,
-  })  : _biliDio = biliDio,
-        _db = db,
-        _authDio = authDio ?? _createAuthDio();
+  }) : _biliDio = biliDio,
+       _db = db,
+       _authDio = authDio ?? _createAuthDio();
 
   @override
   Future<({String qrUrl, String qrKey})> generateQrCode() async {
@@ -47,10 +47,7 @@ class AuthRepositoryImpl implements AuthRepository {
       'https://passport.bilibili.com/x/passport-login/web/qrcode/generate',
     );
     final data = response.data['data'];
-    return (
-      qrUrl: data['url'] as String,
-      qrKey: data['qrcode_key'] as String,
-    );
+    return (qrUrl: data['url'] as String, qrKey: data['qrcode_key'] as String);
   }
 
   @override
@@ -70,7 +67,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> saveSession(User user) async {
     await _db.delete(_db.userSessions).go();
-    await _db.into(_db.userSessions).insert(
+    await _db
+        .into(_db.userSessions)
+        .insert(
           UserSessionsCompanion.insert(
             sessdata: user.sessdata,
             biliJct: user.biliJct,
@@ -122,8 +121,9 @@ class AuthRepositoryImpl implements AuthRepository {
         return rejectCookies();
       }
 
-      final resolvedUserId =
-          dedeUserId?.isNotEmpty == true ? dedeUserId! : '${userData['mid']}';
+      final resolvedUserId = dedeUserId?.isNotEmpty == true
+          ? dedeUserId!
+          : '${userData['mid']}';
       if (resolvedUserId.isEmpty || resolvedUserId == 'null') {
         return rejectCookies();
       }
@@ -146,10 +146,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User?> loadSession() async {
-    final sessions = await (_db.select(_db.userSessions)
-          ..orderBy([(t) => OrderingTerm.desc(t.id)])
-          ..limit(1))
-        .get();
+    final sessions =
+        await (_db.select(_db.userSessions)
+              ..orderBy([(t) => OrderingTerm.desc(t.id)])
+              ..limit(1))
+            .get();
 
     if (sessions.isEmpty) return null;
 
@@ -182,9 +183,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<User?> refreshSession() async {
     try {
       // Try to fetch user info to validate session
-      final response = await _biliDio.get(
-        '/x/web-interface/nav',
-      );
+      final response = await _biliDio.get('/x/web-interface/nav');
       final data = response.data;
       if (data is! Map || data['code'] != 0) return null;
 

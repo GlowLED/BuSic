@@ -34,17 +34,17 @@ class PlaylistPickerDialog extends ConsumerWidget {
           error: (e, _) => Center(child: Text(e.toString())),
           data: (playlists) {
             final filtered = excludePlaylistId != null
-                ? playlists
-                    .where((p) => p.id != excludePlaylistId)
-                    .toList()
+                ? playlists.where((p) => p.id != excludePlaylistId).toList()
                 : playlists;
 
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.add_circle_outline,
-                      color: colorScheme.primary),
+                  leading: Icon(
+                    Icons.add_circle_outline,
+                    color: colorScheme.primary,
+                  ),
                   title: Text(l10n.createPlaylist),
                   onTap: () => _createAndSelect(context, ref, l10n),
                 ),
@@ -54,8 +54,7 @@ class PlaylistPickerDialog extends ConsumerWidget {
                     child: Center(
                       child: Text(
                         l10n.noPlaylists,
-                        style:
-                            TextStyle(color: colorScheme.onSurfaceVariant),
+                        style: TextStyle(color: colorScheme.onSurfaceVariant),
                       ),
                     ),
                   )
@@ -66,15 +65,18 @@ class PlaylistPickerDialog extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         final playlist = filtered[index];
                         return ListTile(
-                          leading: Icon(playlist.isFavorite
-                              ? Icons.favorite
-                              : Icons.library_music),
-                          title: Text(playlist.isFavorite
-                              ? l10n.myFavorites
-                              : playlist.name),
+                          leading: Icon(
+                            playlist.isFavorite
+                                ? Icons.favorite
+                                : Icons.library_music,
+                          ),
+                          title: Text(
+                            playlist.isFavorite
+                                ? l10n.myFavorites
+                                : playlist.name,
+                          ),
                           subtitle: Text('${playlist.songCount} 首歌曲'),
-                          onTap: () =>
-                              Navigator.of(context).pop(playlist.id),
+                          onTap: () => Navigator.of(context).pop(playlist.id),
                         );
                       },
                     ),
@@ -94,7 +96,10 @@ class PlaylistPickerDialog extends ConsumerWidget {
   }
 
   Future<void> _createAndSelect(
-      BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final name = await CommonDialogs.showInputDialog(
       context,
       title: l10n.createPlaylist,

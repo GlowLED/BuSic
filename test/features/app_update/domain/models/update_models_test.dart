@@ -196,15 +196,17 @@ void main() {
         const UpdateState.error('err'),
       ];
 
-      final results = states.map((s) => s.when(
-            idle: () => 'idle',
-            checking: () => 'checking',
-            available: (_) => 'available',
-            downloading: (_, __, ___, ____, _____, ______) => 'downloading',
-            paused: (_, __, ___, ____, _____, ______) => 'paused',
-            readyToInstall: (_, __) => 'readyToInstall',
-            error: (_) => 'error',
-          ));
+      final results = states.map(
+        (state) => switch (state) {
+          UpdateStateIdle() => 'idle',
+          UpdateStateChecking() => 'checking',
+          UpdateStateAvailable() => 'available',
+          UpdateStateDownloading() => 'downloading',
+          UpdateStatePaused() => 'paused',
+          UpdateStateReadyToInstall() => 'readyToInstall',
+          UpdateStateError() => 'error',
+        },
+      );
 
       expect(results.toList(), [
         'idle',
@@ -222,17 +224,11 @@ void main() {
 
   group('UpdateState 相等性', () {
     test('相同 idle 状态相等', () {
-      expect(
-        const UpdateState.idle(),
-        const UpdateState.idle(),
-      );
+      expect(const UpdateState.idle(), const UpdateState.idle());
     });
 
     test('相同 error 消息相等', () {
-      expect(
-        const UpdateState.error('fail'),
-        const UpdateState.error('fail'),
-      );
+      expect(const UpdateState.error('fail'), const UpdateState.error('fail'));
     });
 
     test('不同 error 消息不相等', () {
@@ -243,10 +239,7 @@ void main() {
     });
 
     test('不同状态类型不相等', () {
-      expect(
-        const UpdateState.idle() == const UpdateState.checking(),
-        false,
-      );
+      expect(const UpdateState.idle() == const UpdateState.checking(), false);
     });
   });
 }

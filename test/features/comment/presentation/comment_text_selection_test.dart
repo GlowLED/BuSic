@@ -17,8 +17,9 @@ import '../../../test_helpers/test_app.dart';
 
 void main() {
   group('comment text selection', () {
-    testWidgets('makes main comment and preview reply content selectable',
-        (tester) async {
+    testWidgets('makes main comment and preview reply content selectable', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         buildTestApp(
           CommentTile(
@@ -35,8 +36,9 @@ void main() {
       _expectTextInSelectionAreaContaining(_previewReply.content);
     });
 
-    testWidgets('makes reply sheet root and child reply content selectable',
-        (tester) async {
+    testWidgets('makes reply sheet root and child reply content selectable', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -67,10 +69,7 @@ void _expectTextInSelectionArea(String text) {
 
   expect(textFinder, findsOneWidget);
   expect(
-    find.ancestor(
-      of: textFinder,
-      matching: find.byType(SelectionArea),
-    ),
+    find.ancestor(of: textFinder, matching: find.byType(SelectionArea)),
     findsOneWidget,
   );
 }
@@ -80,10 +79,7 @@ void _expectTextInSelectionAreaContaining(String text) {
 
   expect(textFinder, findsOneWidget);
   expect(
-    find.ancestor(
-      of: textFinder,
-      matching: find.byType(SelectionArea),
-    ),
+    find.ancestor(of: textFinder, matching: find.byType(SelectionArea)),
     findsOneWidget,
   );
 }
@@ -195,12 +191,7 @@ class _FakeCommentRepository implements CommentRepository {
     int next = 0,
     int ps = 20,
   }) async {
-    return const CommentPage(
-      totalCount: 0,
-      next: 0,
-      isEnd: true,
-      replies: [],
-    );
+    return const CommentPage(totalCount: 0, next: 0, isEnd: true, replies: []);
   }
 
   @override

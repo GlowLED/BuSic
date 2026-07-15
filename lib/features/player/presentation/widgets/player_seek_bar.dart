@@ -32,23 +32,20 @@ class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 3,
-              thumbShape:
-                  const RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape:
-                  const RoundSliderOverlayShape(overlayRadius: 14),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
               activeTrackColor: Colors.white,
               inactiveTrackColor: Colors.white24,
               thumbColor: Colors.white,
             ),
             child: Slider(
-              value: _dragValue ??
+              value:
+                  _dragValue ??
                   (playerState.duration.inMilliseconds > 0
-                      ? playerState.position.inMilliseconds
-                          .toDouble()
-                          .clamp(
-                              0,
-                              playerState.duration.inMilliseconds
-                                  .toDouble())
+                      ? playerState.position.inMilliseconds.toDouble().clamp(
+                          0,
+                          playerState.duration.inMilliseconds.toDouble(),
+                        )
                       : 0),
               max: playerState.duration.inMilliseconds > 0
                   ? playerState.duration.inMilliseconds.toDouble()
@@ -78,13 +75,11 @@ class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
                         ? Duration(milliseconds: _dragValue!.toInt())
                         : playerState.position,
                   ),
-                  style:
-                      const TextStyle(color: Colors.white70, fontSize: 12),
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
                 Text(
                   Formatters.formatDuration(playerState.duration),
-                  style:
-                      const TextStyle(color: Colors.white70, fontSize: 12),
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),

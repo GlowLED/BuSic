@@ -6,10 +6,7 @@ import '../../../comment/presentation/comment_section.dart';
 import '../../../comment/presentation/comment_section_appearance.dart';
 
 class PlayerCommentPanel extends StatelessWidget {
-  const PlayerCommentPanel({
-    super.key,
-    required this.bvid,
-  });
+  const PlayerCommentPanel({super.key, required this.bvid});
 
   final String bvid;
 

@@ -84,19 +84,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get webLoginBrowserMissingTitle => '未找到支持的浏览器';
 
   @override
-  String get webLoginBrowserMissingDesc => '请安装 Chrome、Chromium、Edge、Brave、Vivaldi 或 Firefox 后使用 Linux 网页登录，或改用扫码登录 / 手动 Cookie 登录。';
+  String get webLoginBrowserMissingDesc =>
+      '请安装 Chrome、Chromium、Edge、Brave、Vivaldi 或 Firefox 后使用 Linux 网页登录，或改用扫码登录 / 手动 Cookie 登录。';
 
   @override
   String get webLoginWebView2MissingTitle => '缺少 WebView2 运行时';
 
   @override
-  String get webLoginWebView2MissingDesc => '当前 Windows 设备缺少 Microsoft Edge WebView2 Runtime。请安装后重试，或使用扫码登录 / 手动 Cookie 登录。';
+  String get webLoginWebView2MissingDesc =>
+      '当前 Windows 设备缺少 Microsoft Edge WebView2 Runtime。请安装后重试，或使用扫码登录 / 手动 Cookie 登录。';
 
   @override
   String get webLoginInitFailedTitle => '网页登录启动失败';
 
   @override
-  String get webLoginInitFailedDesc => '内置 WebView 无法启动。请确认 WebView2 Runtime 可用，或改用扫码登录 / 手动 Cookie 登录。';
+  String get webLoginInitFailedDesc =>
+      '内置 WebView 无法启动。请确认 WebView2 Runtime 可用，或改用扫码登录 / 手动 Cookie 登录。';
 
   @override
   String get webLoginPageLoadFailed => '登录页面加载失败，请检查网络后重试。';
@@ -128,7 +131,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cookieLoginTitle => 'Cookie登录';
 
   @override
-  String get cookieLoginDesc => '从浏览器中获取 B 站 Cookie 后填入以下字段。在 bilibili.com 按 F12 → 应用 → Cookie → 找到对应值。';
+  String get cookieLoginDesc =>
+      '从浏览器中获取 B 站 Cookie 后填入以下字段。在 bilibili.com 按 F12 → 应用 → Cookie → 找到对应值。';
 
   @override
   String get cookieRequired => '请填写所有 Cookie 字段';

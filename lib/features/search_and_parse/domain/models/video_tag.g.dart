@@ -6,14 +6,10 @@ part of 'video_tag.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$VideoTagImpl _$$VideoTagImplFromJson(Map<String, dynamic> json) =>
-    _$VideoTagImpl(
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
-    );
+_VideoTag _$VideoTagFromJson(Map<String, dynamic> json) =>
+    _VideoTag(id: (json['id'] as num).toInt(), name: json['name'] as String);
 
-Map<String, dynamic> _$$VideoTagImplToJson(_$VideoTagImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-    };
+Map<String, dynamic> _$VideoTagToJson(_VideoTag instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+};

@@ -75,7 +75,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
   }
 
   Future<void> _handleReplySubmit(String message) async {
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) {
       if (mounted) {
         context.showSnackBar(context.l10n.pleaseLoginFirst);
@@ -103,7 +103,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authNotifierProvider).valueOrNull;
+    final user = ref.watch(authNotifierProvider).value;
     final isLoggedIn = user != null;
 
     final sheet = DraggableScrollableSheet(
@@ -158,7 +158,8 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                     radius: 18,
                     backgroundImage: widget.rootComment.avatarUrl.isNotEmpty
                         ? CachedNetworkImageProvider(
-                            widget.rootComment.avatarUrl)
+                            widget.rootComment.avatarUrl,
+                          )
                         : null,
                   ),
                   const SizedBox(width: 12),
@@ -218,7 +219,11 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
 
                           final reply = _replies[index];
                           return _buildReplyTile(
-                              context, reply, colorScheme, textTheme);
+                            context,
+                            reply,
+                            colorScheme,
+                            textTheme,
+                          );
                         },
                       ),
                     ),
@@ -279,8 +284,12 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
     );
   }
 
-  Widget _buildReplyTile(BuildContext context, Comment reply,
-      ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildReplyTile(
+    BuildContext context,
+    Comment reply,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return InkWell(
       onTap: () {
         setState(() {

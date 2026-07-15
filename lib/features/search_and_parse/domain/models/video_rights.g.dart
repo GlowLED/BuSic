@@ -6,12 +6,8 @@ part of 'video_rights.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$VideoRightsImpl _$$VideoRightsImplFromJson(Map<String, dynamic> json) =>
-    _$VideoRightsImpl(
-      noReprint: json['noReprint'] as bool? ?? false,
-    );
+_VideoRights _$VideoRightsFromJson(Map<String, dynamic> json) =>
+    _VideoRights(noReprint: json['noReprint'] as bool? ?? false);
 
-Map<String, dynamic> _$$VideoRightsImplToJson(_$VideoRightsImpl instance) =>
-    <String, dynamic>{
-      'noReprint': instance.noReprint,
-    };
+Map<String, dynamic> _$VideoRightsToJson(_VideoRights instance) =>
+    <String, dynamic>{'noReprint': instance.noReprint};

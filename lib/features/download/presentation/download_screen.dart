@@ -31,8 +31,9 @@ class DownloadScreen extends ConsumerWidget {
                   Icon(
                     Icons.download_outlined,
                     size: 64,
-                    color: context.colorScheme.onSurfaceVariant
-                        .withValues(alpha: 0.5),
+                    color: context.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -49,14 +50,19 @@ class DownloadScreen extends ConsumerWidget {
           final downloadingTasks = tasks
               .where((t) => t.status == DownloadStatus.downloading)
               .toList();
-          final pendingTasks =
-              tasks.where((t) => t.status == DownloadStatus.pending).toList();
-          final cachedTasks =
-              tasks.where((t) => t.status == DownloadStatus.completed).toList();
-          final failedTasks =
-              tasks.where((t) => t.status == DownloadStatus.failed).toList();
-          final totalCacheSize =
-              cachedTasks.fold<int>(0, (sum, t) => sum + t.fileSize);
+          final pendingTasks = tasks
+              .where((t) => t.status == DownloadStatus.pending)
+              .toList();
+          final cachedTasks = tasks
+              .where((t) => t.status == DownloadStatus.completed)
+              .toList();
+          final failedTasks = tasks
+              .where((t) => t.status == DownloadStatus.failed)
+              .toList();
+          final totalCacheSize = cachedTasks.fold<int>(
+            0,
+            (sum, t) => sum + t.fileSize,
+          );
 
           return CustomScrollView(
             slivers: [
@@ -64,24 +70,21 @@ class DownloadScreen extends ConsumerWidget {
               if (downloadingTasks.isNotEmpty) ...[
                 _SectionHeader(title: l10n.downloadingQueue),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final task = downloadingTasks[index];
-                      return DownloadTaskTile(
-                        task: task,
-                        onPause: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .pauseDownload(task.id),
-                        onCancel: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .cancelDownload(task.id),
-                        onDelete: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .deleteTask(task.id),
-                      );
-                    },
-                    childCount: downloadingTasks.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final task = downloadingTasks[index];
+                    return DownloadTaskTile(
+                      task: task,
+                      onPause: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .pauseDownload(task.id),
+                      onCancel: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .cancelDownload(task.id),
+                      onDelete: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .deleteTask(task.id),
+                    );
+                  }, childCount: downloadingTasks.length),
                 ),
               ],
 
@@ -89,21 +92,18 @@ class DownloadScreen extends ConsumerWidget {
               if (pendingTasks.isNotEmpty) ...[
                 _SectionHeader(title: l10n.pendingQueue),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final task = pendingTasks[index];
-                      return DownloadTaskTile(
-                        task: task,
-                        onRetry: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .retryDownload(task.id),
-                        onDelete: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .deleteTask(task.id),
-                      );
-                    },
-                    childCount: pendingTasks.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final task = pendingTasks[index];
+                    return DownloadTaskTile(
+                      task: task,
+                      onRetry: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .retryDownload(task.id),
+                      onDelete: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .deleteTask(task.id),
+                    );
+                  }, childCount: pendingTasks.length),
                 ),
               ],
 
@@ -123,21 +123,18 @@ class DownloadScreen extends ConsumerWidget {
                   ),
                 ),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final task = failedTasks[index];
-                      return DownloadTaskTile(
-                        task: task,
-                        onRetry: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .retryDownload(task.id),
-                        onDelete: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .deleteTask(task.id, deleteFile: true),
-                      );
-                    },
-                    childCount: failedTasks.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final task = failedTasks[index];
+                    return DownloadTaskTile(
+                      task: task,
+                      onRetry: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .retryDownload(task.id),
+                      onDelete: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .deleteTask(task.id, deleteFile: true),
+                    );
+                  }, childCount: failedTasks.length),
                 ),
               ],
 
@@ -149,20 +146,17 @@ class DownloadScreen extends ConsumerWidget {
                       : l10n.localCache,
                 ),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final task = cachedTasks[index];
-                      return DownloadTaskTile(
-                        task: task,
-                        onDelete: () => ref
-                            .read(downloadNotifierProvider.notifier)
-                            .deleteTask(task.id, deleteFile: true),
-                        onAddToPlaylist: () =>
-                            _showPlaylistPicker(context, ref, task),
-                      );
-                    },
-                    childCount: cachedTasks.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final task = cachedTasks[index];
+                    return DownloadTaskTile(
+                      task: task,
+                      onDelete: () => ref
+                          .read(downloadNotifierProvider.notifier)
+                          .deleteTask(task.id, deleteFile: true),
+                      onAddToPlaylist: () =>
+                          _showPlaylistPicker(context, ref, task),
+                    );
+                  }, childCount: cachedTasks.length),
                 ),
               ],
             ],
@@ -222,8 +216,10 @@ class _PlaylistPickerDialog extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading:
-                    Icon(Icons.add_circle_outline, color: colorScheme.primary),
+                leading: Icon(
+                  Icons.add_circle_outline,
+                  color: colorScheme.primary,
+                ),
                 title: Text(l10n.createPlaylist),
                 onTap: () => _createAndSelect(context, ref, l10n),
               ),
@@ -231,8 +227,10 @@ class _PlaylistPickerDialog extends ConsumerWidget {
               if (playlists.isEmpty)
                 Expanded(
                   child: Center(
-                    child: Text(l10n.noPlaylists,
-                        style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    child: Text(
+                      l10n.noPlaylists,
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
                   ),
                 )
               else
@@ -242,12 +240,16 @@ class _PlaylistPickerDialog extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final playlist = playlists[index];
                       return ListTile(
-                        leading: Icon(playlist.isFavorite
-                            ? Icons.favorite
-                            : Icons.library_music),
-                        title: Text(playlist.isFavorite
-                            ? l10n.myFavorites
-                            : playlist.name),
+                        leading: Icon(
+                          playlist.isFavorite
+                              ? Icons.favorite
+                              : Icons.library_music,
+                        ),
+                        title: Text(
+                          playlist.isFavorite
+                              ? l10n.myFavorites
+                              : playlist.name,
+                        ),
                         subtitle: Text('${playlist.songCount} 首歌曲'),
                         onTap: () => Navigator.of(context).pop(playlist.id),
                       );
@@ -268,7 +270,10 @@ class _PlaylistPickerDialog extends ConsumerWidget {
   }
 
   Future<void> _createAndSelect(
-      BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final controller = TextEditingController();
     final name = await showDialog<String>(
       context: context,

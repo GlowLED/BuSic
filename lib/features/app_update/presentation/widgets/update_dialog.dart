@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/update_notifier.dart';
 import '../../domain/models/download_channel.dart';
+import '../../domain/models/update_state.dart';
 
 /// Dialog that shows update information (passive notification).
 ///
@@ -28,9 +29,9 @@ class UpdateDialog extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
-    return state.when(
-      idle: () => const SizedBox.shrink(),
-      checking: () => AlertDialog(
+    return switch (state) {
+      UpdateStateIdle() => const SizedBox.shrink(),
+      UpdateStateChecking() => AlertDialog(
         content: Row(
           children: [
             const CircularProgressIndicator(),
@@ -39,19 +40,14 @@ class UpdateDialog extends ConsumerWidget {
           ],
         ),
       ),
-      available: (info) => AlertDialog(
-        title: Text(
-          '${l10n.updateAvailable} v${info.latestVersion.semver}',
-        ),
+      UpdateStateAvailable(:final info) => AlertDialog(
+        title: Text('${l10n.updateAvailable} v${info.latestVersion.semver}'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.updateChangelog,
-                style: theme.textTheme.titleSmall,
-              ),
+              Text(l10n.updateChangelog, style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
               Container(
                 width: double.infinity,
@@ -61,9 +57,7 @@ class UpdateDialog extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  info.changelog.isNotEmpty
-                      ? info.changelog
-                      : '-',
+                  info.changelog.isNotEmpty ? info.changelog : '-',
                   style: theme.textTheme.bodyMedium,
                 ),
               ),
@@ -107,36 +101,35 @@ class UpdateDialog extends ConsumerWidget {
             ),
         ],
       ),
-      downloading: (info, progress, speed, channel, downloadedBytes, totalBytes) =>
-          AlertDialog(
-        title: Text(l10n.downloading),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LinearProgressIndicator(value: progress),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('${(progress * 100).toStringAsFixed(0)}%'),
-                Text(_formatSpeed(speed)),
-              ],
-            ),
+      UpdateStateDownloading(:final info, :final progress, :final speed) =>
+        AlertDialog(
+          title: Text(l10n.downloading),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LinearProgressIndicator(value: progress),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('${(progress * 100).toStringAsFixed(0)}%'),
+                  Text(_formatSpeed(speed)),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            if (!info.isForceUpdate)
+              TextButton(
+                onPressed: () {
+                  ref.read(updateNotifierProvider.notifier).cancelDownload();
+                  Navigator.of(context).pop();
+                },
+                child: Text(l10n.cancel),
+              ),
           ],
         ),
-        actions: [
-          if (!info.isForceUpdate)
-            TextButton(
-              onPressed: () {
-                ref.read(updateNotifierProvider.notifier).cancelDownload();
-                Navigator.of(context).pop();
-              },
-              child: Text(l10n.cancel),
-            ),
-        ],
-      ),
-      paused: (info, progress, channel, downloadedBytes, totalBytes, localPath) =>
-          AlertDialog(
+      UpdateStatePaused(:final progress) => AlertDialog(
         title: Text(l10n.downloadPaused),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -162,7 +155,7 @@ class UpdateDialog extends ConsumerWidget {
           ),
         ],
       ),
-      readyToInstall: (info, localPath) => AlertDialog(
+      UpdateStateReadyToInstall() => AlertDialog(
         title: Text(l10n.downloadComplete),
         content: Text(l10n.installing),
         actions: [
@@ -174,7 +167,7 @@ class UpdateDialog extends ConsumerWidget {
           ),
         ],
       ),
-      error: (message) {
+      UpdateStateError(:final message) => () {
         if (message.startsWith('INSTALL_READ_ONLY:')) {
           final url = message.substring('INSTALL_READ_ONLY:'.length);
           return AlertDialog(
@@ -186,7 +179,10 @@ class UpdateDialog extends ConsumerWidget {
                 child: Text(l10n.cancel),
               ),
               FilledButton(
-                onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+                onPressed: () => launchUrl(
+                  Uri.parse(url),
+                  mode: LaunchMode.externalApplication,
+                ),
                 child: Text(l10n.openDownloadPage),
               ),
             ],
@@ -202,8 +198,8 @@ class UpdateDialog extends ConsumerWidget {
             ),
           ],
         );
-      },
-    );
+      }(),
+    };
   }
 
   String _formatSpeed(double bytesPerSec) {

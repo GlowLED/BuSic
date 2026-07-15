@@ -9,10 +9,7 @@ import '../../application/settings_notifier.dart';
 import 'settings_panel.dart';
 
 /// Pick a directory using zenity (Linux) or text input fallback.
-Future<String?> pickDirectory({
-  String? title,
-  String? initialDirectory,
-}) async {
+Future<String?> pickDirectory({String? title, String? initialDirectory}) async {
   if (Platform.isLinux) {
     try {
       final result = await Process.run('zenity', [
@@ -44,9 +41,7 @@ class StorageSection extends ConsumerWidget {
     return SettingsSectionPanel(
       title: l10n.storageSettings,
       icon: Icons.folder_rounded,
-      children: [
-        _CachePathTile(settings: settings, ref: ref),
-      ],
+      children: [_CachePathTile(settings: settings, ref: ref)],
     );
   }
 }
@@ -136,9 +131,7 @@ class _CachePathTileState extends State<_CachePathTile> {
             content: TextField(
               controller: controller,
               autofocus: true,
-              decoration: const InputDecoration(
-                hintText: '/home/user/Music',
-              ),
+              decoration: const InputDecoration(hintText: '/home/user/Music'),
               onSubmitted: (v) => Navigator.of(ctx).pop(v),
             ),
             actions: [
@@ -165,8 +158,9 @@ class _CachePathTileState extends State<_CachePathTile> {
         await dir.create(recursive: true);
       } catch (e) {
         if (context.mounted) {
-          context
-              .showSnackBar(context.l10n.createDirectoryFailed(e.toString()));
+          context.showSnackBar(
+            context.l10n.createDirectoryFailed(e.toString()),
+          );
         }
         return;
       }

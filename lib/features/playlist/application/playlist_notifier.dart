@@ -10,15 +10,13 @@ import '../domain/models/song_item.dart';
 part 'playlist_notifier.g.dart';
 
 /// State notifier managing playlist list and CRUD operations.
-@riverpod
+@Riverpod(name: 'playlistListNotifierProvider')
 class PlaylistListNotifier extends _$PlaylistListNotifier {
   late PlaylistRepository _repository;
 
   @override
   Future<List<Playlist>> build() async {
-    _repository = PlaylistRepositoryImpl(
-      db: ref.read(databaseProvider),
-    );
+    _repository = PlaylistRepositoryImpl(db: ref.read(databaseProvider));
     return _repository.getAllPlaylists();
   }
 
@@ -32,7 +30,7 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
   /// Delete a playlist by [id]. Favorites playlist cannot be deleted.
   Future<void> deletePlaylist(int id) async {
     // Guard: check if this is the favorites playlist
-    final playlists = state.valueOrNull;
+    final playlists = state.value;
     if (playlists != null) {
       final target = playlists.where((p) => p.id == id);
       if (target.isNotEmpty && target.first.isFavorite) {
@@ -46,7 +44,7 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
   /// Rename a playlist. Favorites playlist cannot be renamed.
   Future<void> renamePlaylist(int id, String name) async {
     // Guard: check if this is the favorites playlist
-    final playlists = state.valueOrNull;
+    final playlists = state.value;
     if (playlists != null) {
       final target = playlists.where((p) => p.id == id);
       if (target.isNotEmpty && target.first.isFavorite) {
@@ -65,15 +63,13 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
 }
 
 /// State notifier managing songs within a specific playlist.
-@riverpod
+@Riverpod(name: 'playlistDetailNotifierProvider')
 class PlaylistDetailNotifier extends _$PlaylistDetailNotifier {
   late PlaylistRepository _repository;
 
   @override
   Future<List<SongItem>> build(int playlistId) async {
-    _repository = PlaylistRepositoryImpl(
-      db: ref.read(databaseProvider),
-    );
+    _repository = PlaylistRepositoryImpl(db: ref.read(databaseProvider));
     // Watch download change signal so the list refreshes when
     // songs are downloaded or their cache files are deleted.
     ref.watch(downloadChangeSignalProvider);

@@ -6,10 +6,10 @@ part of 'user_preferences.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserPreferencesImpl _$$UserPreferencesImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UserPreferencesImpl(
-      themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
+_UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
+    _UserPreferences(
+      themeMode:
+          $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
           ThemeMode.system,
       locale: json['locale'] as String?,
       cachePath: json['cachePath'] as String?,
@@ -17,8 +17,7 @@ _$UserPreferencesImpl _$$UserPreferencesImplFromJson(
       themeSeedColor: (json['themeSeedColor'] as num?)?.toInt() ?? 0xFF4CAF50,
     );
 
-Map<String, dynamic> _$$UserPreferencesImplToJson(
-        _$UserPreferencesImpl instance) =>
+Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
     <String, dynamic>{
       'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
       'locale': instance.locale,

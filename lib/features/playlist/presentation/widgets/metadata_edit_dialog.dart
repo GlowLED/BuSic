@@ -53,12 +53,13 @@ class _MetadataEditDialogState extends ConsumerState<MetadataEditDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.song.customTitle ?? '');
-    _artistController =
-        TextEditingController(text: widget.song.customArtist ?? '');
-    _coverController =
-        TextEditingController(text: widget.song.coverUrl ?? '');
+    _titleController = TextEditingController(
+      text: widget.song.customTitle ?? '',
+    );
+    _artistController = TextEditingController(
+      text: widget.song.customArtist ?? '',
+    );
+    _coverController = TextEditingController(text: widget.song.coverUrl ?? '');
   }
 
   @override
@@ -138,7 +139,9 @@ class _MetadataEditDialogState extends ConsumerState<MetadataEditDialog> {
             final cover = _coverController.text.trim();
 
             ref
-                .read(playlistDetailNotifierProvider(widget.playlistId).notifier)
+                .read(
+                  playlistDetailNotifierProvider(widget.playlistId).notifier,
+                )
                 .updateMetadata(
                   widget.song.id,
                   title: title.isEmpty ? null : title,

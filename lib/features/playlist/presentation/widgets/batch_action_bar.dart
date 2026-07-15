@@ -40,8 +40,11 @@ class BatchActionBar extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           TextButton.icon(
-            icon: Icon(Icons.delete_outline,
-                size: 18, color: colorScheme.error),
+            icon: Icon(
+              Icons.delete_outline,
+              size: 18,
+              color: colorScheme.error,
+            ),
             label: Text('删除', style: TextStyle(color: colorScheme.error)),
             onPressed: () => _deleteSongs(context, ref, colorScheme),
           ),
@@ -57,8 +60,9 @@ class BatchActionBar extends ConsumerWidget {
     );
     if (targetPlaylistId == null || !context.mounted) return;
     final ids = selectedSongIds.toList();
-    final notifier =
-        ref.read(playlistDetailNotifierProvider(targetPlaylistId).notifier);
+    final notifier = ref.read(
+      playlistDetailNotifierProvider(targetPlaylistId).notifier,
+    );
     for (final songId in ids) {
       await notifier.addSong(songId);
     }
@@ -86,8 +90,7 @@ class BatchActionBar extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child:
-                Text('删除', style: TextStyle(color: colorScheme.error)),
+            child: Text('删除', style: TextStyle(color: colorScheme.error)),
           ),
         ],
       ),

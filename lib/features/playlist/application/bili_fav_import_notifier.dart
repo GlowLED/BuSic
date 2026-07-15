@@ -20,7 +20,7 @@ part 'bili_fav_import_notifier.g.dart';
 // ── State ────────────────────────────────────────────────────────────────
 
 @freezed
-class BiliFavImportState with _$BiliFavImportState {
+abstract class BiliFavImportState with _$BiliFavImportState {
   /// 初始/空闲状态
   const factory BiliFavImportState.idle() = _Idle;
 
@@ -67,7 +67,7 @@ class BiliFavImportState with _$BiliFavImportState {
 
 // ── Notifier ─────────────────────────────────────────────────────────────
 
-@riverpod
+@Riverpod(name: 'biliFavImportNotifierProvider')
 class BiliFavImportNotifier extends _$BiliFavImportNotifier {
   late final ParseRepository _parseRepo;
   late final AppDatabase _db;
@@ -100,8 +100,9 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
 
       // 并发加载创建的和收藏的收藏夹
       final createdFolders = await _parseRepo.getFavoriteFolders(mid);
-      final collectedFolders =
-          await _parseRepo.getCollectedFavoriteFolders(mid);
+      final collectedFolders = await _parseRepo.getCollectedFavoriteFolders(
+        mid,
+      );
 
       AppLogger.info(
         '收藏夹加载完成: 创建=${createdFolders.length}, 收藏=${collectedFolders.length}',
@@ -167,9 +168,9 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
 
     try {
       // 1. 创建歌单
-      final playlistId = await _db.into(_db.playlists).insert(
-            PlaylistsCompanion.insert(name: playlistName),
-          );
+      final playlistId = await _db
+          .into(_db.playlists)
+          .insert(PlaylistsCompanion.insert(name: playlistName));
 
       // 2. 并发处理每首歌曲（信号量控制）
       final semaphore = _Semaphore(_maxConcurrency);
@@ -243,10 +244,11 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
       await semaphore.acquire();
 
       // 检查本地是否已有该歌曲 (bvid + firstCid)
-      final existing = await (_db.select(_db.songs)
-            ..where(
-                (t) => t.bvid.equals(item.bvid) & t.cid.equals(item.firstCid)))
-          .getSingleOrNull();
+      final existing =
+          await (_db.select(_db.songs)..where(
+                (t) => t.bvid.equals(item.bvid) & t.cid.equals(item.firstCid),
+              ))
+              .getSingleOrNull();
 
       if (existing != null) {
         semaphore.release();
@@ -263,7 +265,9 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
               : throw StateError('No pages found for ${item.bvid}'),
         );
 
-        final songId = await _db.into(_db.songs).insert(
+        final songId = await _db
+            .into(_db.songs)
+            .insert(
               SongsCompanion.insert(
                 bvid: item.bvid,
                 cid: page.cid,
@@ -279,19 +283,12 @@ class BiliFavImportNotifier extends _$BiliFavImportNotifier {
         semaphore.release();
         return _SongResult(_SongStatus.imported, songId);
       } catch (e) {
-        AppLogger.warning(
-          '拉取元数据失败: ${item.bvid}',
-          tag: 'BiliFavImport',
-        );
+        AppLogger.warning('拉取元数据失败: ${item.bvid}', tag: 'BiliFavImport');
         semaphore.release();
         return _SongResult(_SongStatus.failed, null);
       }
     } catch (e) {
-      AppLogger.error(
-        '处理歌曲失败: ${item.bvid}',
-        tag: 'BiliFavImport',
-        error: e,
-      );
+      AppLogger.error('处理歌曲失败: ${item.bvid}', tag: 'BiliFavImport', error: e);
       semaphore.release();
       return _SongResult(_SongStatus.failed, null);
     }

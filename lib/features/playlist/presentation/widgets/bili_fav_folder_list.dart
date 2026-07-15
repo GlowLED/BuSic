@@ -38,10 +38,7 @@ class BiliFavFolderListView extends StatelessWidget {
     }
 
     if (errorMessage != null) {
-      return BiliFavErrorView(
-        message: errorMessage!,
-        onRetry: onRetry,
-      );
+      return BiliFavErrorView(message: errorMessage!, onRetry: onRetry);
     }
 
     if (folders.isEmpty) {

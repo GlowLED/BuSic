@@ -59,10 +59,7 @@ void main() {
   group('PlayerNotifier 可测试性回归', () {
     test('恢复持久化状态后会同步音量到播放器仓储', () async {
       final track = _track(songId: 7, title: '恢复曲目');
-      final queue = [
-        track,
-        _track(songId: 8, title: '队列第二首'),
-      ];
+      final queue = [track, _track(songId: 8, title: '队列第二首')];
       await _seedPlayerPreferences(
         track: track,
         queue: queue,
@@ -93,7 +90,9 @@ void main() {
       final localFile = File('${tempDir.path}/cached_track.m4s');
       await localFile.writeAsString('cached');
 
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BVresume01',
               cid: 456,
@@ -128,9 +127,12 @@ void main() {
       expect(fakeParseRepository.getAudioStreamCalls, 0);
       expect(fakePlayerRepository.playedTracks, hasLength(1));
       expect(
-          fakePlayerRepository.playedTracks.single.localPath, localFile.path);
-      expect(
-          fakePlayerRepository.seekCalls, [const Duration(milliseconds: 2500)]);
+        fakePlayerRepository.playedTracks.single.localPath,
+        localFile.path,
+      );
+      expect(fakePlayerRepository.seekCalls, [
+        const Duration(milliseconds: 2500),
+      ]);
 
       final state = container.read(playerNotifierProvider);
       expect(state.currentTrack?.localPath, localFile.path);
@@ -249,8 +251,9 @@ void main() {
     });
 
     test('resume 会忽略不存在的本地路径并重新解析远端流', () async {
-      final tempDir =
-          await Directory.systemTemp.createTemp('player_missing_local_');
+      final tempDir = await Directory.systemTemp.createTemp(
+        'player_missing_local_',
+      );
       final missingPath = '${tempDir.path}/missing_track.m4s';
       await tempDir.delete(recursive: true);
 
@@ -289,10 +292,9 @@ void main() {
         fakePlayerRepository.playedTracks.single.streamUrl,
         'https://example.com/fresh-after-missing-local.m4s',
       );
-      expect(
-        fakePlayerRepository.seekCalls,
-        [const Duration(milliseconds: 3500)],
-      );
+      expect(fakePlayerRepository.seekCalls, [
+        const Duration(milliseconds: 3500),
+      ]);
     });
 
     test('下载完成信号会刷新队列中的最新 localPath', () async {
@@ -300,7 +302,9 @@ void main() {
       final localFile = File('${tempDir.path}/fresh_track.m4s');
       await localFile.writeAsString('fresh');
 
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BVrefresh01',
               cid: 5001,
@@ -501,10 +505,7 @@ class _FakeParseRepository implements ParseRepository {
   }
 
   @override
-  Future<List<AudioStreamInfo>> getAvailableQualities(
-    String bvid,
-    int cid,
-  ) {
+  Future<List<AudioStreamInfo>> getAvailableQualities(String bvid, int cid) {
     throw UnimplementedError();
   }
 

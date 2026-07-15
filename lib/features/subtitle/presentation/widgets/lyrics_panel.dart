@@ -18,11 +18,7 @@ class LyricsPanel extends ConsumerStatefulWidget {
   final String bvid;
   final int cid;
 
-  const LyricsPanel({
-    required this.bvid,
-    required this.cid,
-    super.key,
-  });
+  const LyricsPanel({required this.bvid, required this.cid, super.key});
 
   @override
   ConsumerState<LyricsPanel> createState() => _LyricsPanelState();
@@ -60,17 +56,17 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref
-          .read(
-            subtitleNotifierProvider(widget.bvid, widget.cid).notifier,
-          )
+          .read(subtitleNotifierProvider(widget.bvid, widget.cid).notifier)
           .updatePosition(position);
     });
 
     return switch (subtitleState.status) {
       SubtitleLoadStatus.loading => _buildLoading(context),
       SubtitleLoadStatus.notFound => _buildNoLyrics(context),
-      SubtitleLoadStatus.error =>
-        _buildError(context, subtitleState.errorMessage),
+      SubtitleLoadStatus.error => _buildError(
+        context,
+        subtitleState.errorMessage,
+      ),
       SubtitleLoadStatus.loaded => _buildLyrics(context, subtitleState),
       SubtitleLoadStatus.idle => const SizedBox.shrink(),
     };
@@ -140,7 +136,8 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
       int currentLineIndex,
       SubtitleLoadStatus status,
       String? errorMessage,
-    }) state,
+    })
+    state,
   ) {
     final lines = state.subtitleData!.lines;
     final currentIndex = state.currentLineIndex;
@@ -178,10 +175,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
           return GestureDetector(
             onTap: () => _seekToLine(line.startTime),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               child: Text(
                 line.content,
                 style: TextStyle(
@@ -200,9 +194,9 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
   }
 
   void _seekToLine(double startTime) {
-    ref.read(playerNotifierProvider.notifier).seekTo(
-          Duration(milliseconds: (startTime * 1000).round()),
-        );
+    ref
+        .read(playerNotifierProvider.notifier)
+        .seekTo(Duration(milliseconds: (startTime * 1000).round()));
   }
 
   void _scrollToIndex(int index) {
@@ -213,10 +207,7 @@ class _LyricsPanelState extends ConsumerState<LyricsPanel> {
     final centeredOffset = targetOffset - viewportHeight / 2 + _itemHeight / 2;
 
     _scrollController.animateTo(
-      centeredOffset.clamp(
-        0.0,
-        _scrollController.position.maxScrollExtent,
-      ),
+      centeredOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );

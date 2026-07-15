@@ -11,7 +11,11 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   PlaylistRepositoryImpl({required AppDatabase db}) : _db = db;
 
-  domain.Playlist _mapPlaylist(Playlist row, {int songCount = 0, String? effectiveCoverUrl}) {
+  domain.Playlist _mapPlaylist(
+    Playlist row, {
+    int songCount = 0,
+    String? effectiveCoverUrl,
+  }) {
     return domain.Playlist(
       id: row.id,
       name: row.name,
@@ -23,16 +27,17 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   }
 
   Future<String?> _getFirstSongCover(int playlistId) async {
-    final row = await (_db.select(_db.songs).join([
-      innerJoin(
-        _db.playlistSongs,
-        _db.playlistSongs.songId.equalsExp(_db.songs.id),
-      ),
-    ])
-          ..where(_db.playlistSongs.playlistId.equals(playlistId))
-          ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)])
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.songs).join([
+                innerJoin(
+                  _db.playlistSongs,
+                  _db.playlistSongs.songId.equalsExp(_db.songs.id),
+                ),
+              ])
+              ..where(_db.playlistSongs.playlistId.equals(playlistId))
+              ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)])
+              ..limit(1))
+            .getSingleOrNull();
 
     if (row == null) return null;
     return row.readTable(_db.songs).coverUrl;
@@ -56,39 +61,44 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<List<domain.Playlist>> getAllPlaylists() async {
-    final rows = await (_db.select(_db.playlists)
-          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-        .get();
+    final rows = await (_db.select(
+      _db.playlists,
+    )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
 
     final result = <domain.Playlist>[];
     for (final row in rows) {
-      final count = await (_db.selectOnly(_db.playlistSongs)
-            ..addColumns([_db.playlistSongs.songId.count()])
-            ..where(_db.playlistSongs.playlistId.equals(row.id)))
-          .map((r) => r.read(_db.playlistSongs.songId.count()))
-          .getSingle();
-      final effectiveCoverUrl = row.coverUrl ?? await _getFirstSongCover(row.id);
-      result.add(_mapPlaylist(
-        row,
-        songCount: count ?? 0,
-        effectiveCoverUrl: effectiveCoverUrl,
-      ));
+      final count =
+          await (_db.selectOnly(_db.playlistSongs)
+                ..addColumns([_db.playlistSongs.songId.count()])
+                ..where(_db.playlistSongs.playlistId.equals(row.id)))
+              .map((r) => r.read(_db.playlistSongs.songId.count()))
+              .getSingle();
+      final effectiveCoverUrl =
+          row.coverUrl ?? await _getFirstSongCover(row.id);
+      result.add(
+        _mapPlaylist(
+          row,
+          songCount: count ?? 0,
+          effectiveCoverUrl: effectiveCoverUrl,
+        ),
+      );
     }
     return result;
   }
 
   @override
   Future<domain.Playlist?> getPlaylistById(int id) async {
-    final row = await (_db.select(_db.playlists)
-          ..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.playlists,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) return null;
 
-    final count = await (_db.selectOnly(_db.playlistSongs)
-          ..addColumns([_db.playlistSongs.songId.count()])
-          ..where(_db.playlistSongs.playlistId.equals(id)))
-        .map((r) => r.read(_db.playlistSongs.songId.count()))
-        .getSingle();
+    final count =
+        await (_db.selectOnly(_db.playlistSongs)
+              ..addColumns([_db.playlistSongs.songId.count()])
+              ..where(_db.playlistSongs.playlistId.equals(id)))
+            .map((r) => r.read(_db.playlistSongs.songId.count()))
+            .getSingle();
     final effectiveCoverUrl = row.coverUrl ?? await _getFirstSongCover(row.id);
     return _mapPlaylist(
       row,
@@ -99,9 +109,9 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<domain.Playlist> createPlaylist(String name) async {
-    final id = await _db.into(_db.playlists).insert(
-          PlaylistsCompanion.insert(name: name),
-        );
+    final id = await _db
+        .into(_db.playlists)
+        .insert(PlaylistsCompanion.insert(name: name));
     return domain.Playlist(
       id: id,
       name: name,
@@ -112,34 +122,37 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<void> deletePlaylist(int id) async {
-    await (_db.delete(_db.playlistSongs)
-          ..where((t) => t.playlistId.equals(id)))
-        .go();
+    await (_db.delete(
+      _db.playlistSongs,
+    )..where((t) => t.playlistId.equals(id))).go();
     await (_db.delete(_db.playlists)..where((t) => t.id.equals(id))).go();
   }
 
   @override
   Future<void> renamePlaylist(int id, String name) async {
-    await (_db.update(_db.playlists)..where((t) => t.id.equals(id)))
-        .write(PlaylistsCompanion(name: Value(name)));
+    await (_db.update(_db.playlists)..where((t) => t.id.equals(id))).write(
+      PlaylistsCompanion(name: Value(name)),
+    );
   }
 
   @override
   Future<void> updatePlaylistCover(int id, String? coverUrl) async {
-    await (_db.update(_db.playlists)..where((t) => t.id.equals(id)))
-        .write(PlaylistsCompanion(coverUrl: Value(coverUrl)));
+    await (_db.update(_db.playlists)..where((t) => t.id.equals(id))).write(
+      PlaylistsCompanion(coverUrl: Value(coverUrl)),
+    );
   }
 
   @override
   Future<List<SongItem>> getSongsInPlaylist(int playlistId) async {
-    final query = _db.select(_db.songs).join([
-      innerJoin(
-        _db.playlistSongs,
-        _db.playlistSongs.songId.equalsExp(_db.songs.id),
-      ),
-    ])
-      ..where(_db.playlistSongs.playlistId.equals(playlistId))
-      ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)]);
+    final query =
+        _db.select(_db.songs).join([
+            innerJoin(
+              _db.playlistSongs,
+              _db.playlistSongs.songId.equalsExp(_db.songs.id),
+            ),
+          ])
+          ..where(_db.playlistSongs.playlistId.equals(playlistId))
+          ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)]);
 
     final rows = await query.get();
     return rows.map((row) => _mapSong(row.readTable(_db.songs))).toList();
@@ -148,13 +161,16 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   @override
   Future<void> addSongToPlaylist(int playlistId, int songId) async {
     // Get max sort order
-    final maxOrder = await (_db.selectOnly(_db.playlistSongs)
-          ..addColumns([_db.playlistSongs.sortOrder.max()])
-          ..where(_db.playlistSongs.playlistId.equals(playlistId)))
-        .map((r) => r.read(_db.playlistSongs.sortOrder.max()))
-        .getSingle();
+    final maxOrder =
+        await (_db.selectOnly(_db.playlistSongs)
+              ..addColumns([_db.playlistSongs.sortOrder.max()])
+              ..where(_db.playlistSongs.playlistId.equals(playlistId)))
+            .map((r) => r.read(_db.playlistSongs.sortOrder.max()))
+            .getSingle();
 
-    await _db.into(_db.playlistSongs).insert(
+    await _db
+        .into(_db.playlistSongs)
+        .insert(
           PlaylistSongsCompanion.insert(
             playlistId: playlistId,
             songId: songId,
@@ -182,9 +198,9 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<void> removeSongFromPlaylist(int playlistId, int songId) async {
-    await (_db.delete(_db.playlistSongs)
-          ..where((t) =>
-              t.playlistId.equals(playlistId) & t.songId.equals(songId)))
+    await (_db.delete(_db.playlistSongs)..where(
+          (t) => t.playlistId.equals(playlistId) & t.songId.equals(songId),
+        ))
         .go();
   }
 
@@ -203,8 +219,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
           _db.playlistSongs,
           PlaylistSongsCompanion(sortOrder: Value(i)),
           where: (t) =>
-              t.playlistId.equals(playlistId) &
-              t.songId.equals(songs[i].id),
+              t.playlistId.equals(playlistId) & t.songId.equals(songs[i].id),
         );
       }
     });
@@ -221,15 +236,17 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
     int audioQuality = 0,
   }) async {
     // Check if song with same bvid+cid exists
-    final existing = await (_db.select(_db.songs)
-          ..where((t) => t.bvid.equals(bvid) & t.cid.equals(cid)))
-        .getSingleOrNull();
+    final existing = await (_db.select(
+      _db.songs,
+    )..where((t) => t.bvid.equals(bvid) & t.cid.equals(cid))).getSingleOrNull();
 
     if (existing != null) {
       return existing.id;
     }
 
-    return await _db.into(_db.songs).insert(
+    return await _db
+        .into(_db.songs)
+        .insert(
           SongsCompanion.insert(
             bvid: bvid,
             cid: cid,
@@ -249,38 +266,42 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
     String? customArtist,
     String? coverUrl,
   }) async {
-    await (_db.update(_db.songs)..where((t) => t.id.equals(songId)))
-        .write(SongsCompanion(
-      customTitle: Value(customTitle),
-      customArtist: Value(customArtist),
-      coverUrl: Value(coverUrl),
-    ));
+    await (_db.update(_db.songs)..where((t) => t.id.equals(songId))).write(
+      SongsCompanion(
+        customTitle: Value(customTitle),
+        customArtist: Value(customArtist),
+        coverUrl: Value(coverUrl),
+      ),
+    );
   }
 
   @override
   Future<void> updateSongLocalPath(int songId, String? localPath) async {
-    await (_db.update(_db.songs)..where((t) => t.id.equals(songId)))
-        .write(SongsCompanion(localPath: Value(localPath)));
+    await (_db.update(_db.songs)..where((t) => t.id.equals(songId))).write(
+      SongsCompanion(localPath: Value(localPath)),
+    );
   }
 
   @override
   Future<SongItem?> getSongById(int id) async {
-    final row = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row != null ? _mapSong(row) : null;
   }
 
   @override
   Future<List<SongItem>> searchSongs(String keyword) async {
     final pattern = '%$keyword%';
-    final rows = await (_db.select(_db.songs)
-          ..where((t) =>
-              t.originTitle.like(pattern) |
-              t.originArtist.like(pattern) |
-              t.customTitle.like(pattern) |
-              t.customArtist.like(pattern)))
-        .get();
+    final rows =
+        await (_db.select(_db.songs)..where(
+              (t) =>
+                  t.originTitle.like(pattern) |
+                  t.originArtist.like(pattern) |
+                  t.customTitle.like(pattern) |
+                  t.customArtist.like(pattern),
+            ))
+            .get();
     return rows.map(_mapSong).toList();
   }
 
@@ -288,16 +309,17 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<domain.Playlist> getOrCreateFavorites() async {
-    final row = await (_db.select(_db.playlists)
-          ..where((t) => t.isFavorite.equals(true)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.playlists,
+    )..where((t) => t.isFavorite.equals(true))).getSingleOrNull();
 
     if (row != null) {
-      final count = await (_db.selectOnly(_db.playlistSongs)
-            ..addColumns([_db.playlistSongs.songId.count()])
-            ..where(_db.playlistSongs.playlistId.equals(row.id)))
-          .map((r) => r.read(_db.playlistSongs.songId.count()))
-          .getSingle();
+      final count =
+          await (_db.selectOnly(_db.playlistSongs)
+                ..addColumns([_db.playlistSongs.songId.count()])
+                ..where(_db.playlistSongs.playlistId.equals(row.id)))
+              .map((r) => r.read(_db.playlistSongs.songId.count()))
+              .getSingle();
       final effectiveCoverUrl =
           row.coverUrl ?? await _getFirstSongCover(row.id);
       return _mapPlaylist(
@@ -308,7 +330,9 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
     }
 
     // First time — create the system favorites playlist.
-    final id = await _db.into(_db.playlists).insert(
+    final id = await _db
+        .into(_db.playlists)
+        .insert(
           PlaylistsCompanion.insert(
             name: '@@favorites@@',
             isFavorite: const Value(true),
@@ -340,11 +364,12 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   @override
   Future<bool> isFavorited(int songId) async {
     final favPlaylist = await getOrCreateFavorites();
-    final row = await (_db.select(_db.playlistSongs)
-          ..where((t) =>
-              t.playlistId.equals(favPlaylist.id) &
-              t.songId.equals(songId)))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.playlistSongs)..where(
+              (t) =>
+                  t.playlistId.equals(favPlaylist.id) & t.songId.equals(songId),
+            ))
+            .getSingleOrNull();
     return row != null;
   }
 
@@ -352,11 +377,12 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   Future<Set<int>> getFavoritedSongIds(List<int> songIds) async {
     if (songIds.isEmpty) return {};
     final favPlaylist = await getOrCreateFavorites();
-    final rows = await (_db.select(_db.playlistSongs)
-          ..where((t) =>
-              t.playlistId.equals(favPlaylist.id) &
-              t.songId.isIn(songIds)))
-        .get();
+    final rows =
+        await (_db.select(_db.playlistSongs)..where(
+              (t) =>
+                  t.playlistId.equals(favPlaylist.id) & t.songId.isIn(songIds),
+            ))
+            .get();
     return rows.map((r) => r.songId).toSet();
   }
 }

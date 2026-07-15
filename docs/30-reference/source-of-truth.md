@@ -9,6 +9,10 @@
   - 核心依赖
   - `x_update` fallback 元数据
 
+- `pubspec.lock`
+  - Flutter 3.44.6 下已验证的依赖解析结果
+  - CI 与本地构建的可复现依赖版本
+
 - `CHANGELOG.md`
   - 面向人的版本变更记录
 

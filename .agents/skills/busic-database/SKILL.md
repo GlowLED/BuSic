@@ -30,7 +30,7 @@ compatibility: opencode
 命令：
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 Agent 执行时，`dart run ...` 通常需要提权到沙箱外；完整分类见 [`busic-harness-workflow`](../busic-harness-workflow/SKILL.md)。

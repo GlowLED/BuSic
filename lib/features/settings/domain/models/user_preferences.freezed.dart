@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,279 +9,293 @@ part of 'user_preferences.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) {
-  return _UserPreferences.fromJson(json);
-}
 
 /// @nodoc
 mixin _$UserPreferences {
-  /// Theme mode: system, light, or dark.
-  ThemeMode get themeMode => throw _privateConstructorUsedError;
 
-  /// App locale: 'en', 'zh', or null for system default.
-  String? get locale => throw _privateConstructorUsedError;
-
-  /// Custom cache directory path (null = default platform path).
-  String? get cachePath => throw _privateConstructorUsedError;
-
-  /// Preferred audio quality identifier.
-  /// 0 = auto (best available), or specific quality code.
-  int get preferredQuality => throw _privateConstructorUsedError;
-
-  /// Theme seed color value.
-  int get themeSeedColor => throw _privateConstructorUsedError;
+/// Theme mode: system, light, or dark.
+ ThemeMode get themeMode;/// App locale: 'en', 'zh', or null for system default.
+ String? get locale;/// Custom cache directory path (null = default platform path).
+ String? get cachePath;/// Preferred audio quality identifier.
+/// 0 = auto (best available), or specific quality code.
+ int get preferredQuality;/// Theme seed color value.
+ int get themeSeedColor;
+/// Create a copy of UserPreferences
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UserPreferencesCopyWith<UserPreferences> get copyWith => _$UserPreferencesCopyWithImpl<UserPreferences>(this as UserPreferences, _$identity);
 
   /// Serializes this UserPreferences to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of UserPreferences
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserPreferencesCopyWith<UserPreferences> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor);
+
+@override
+String toString() {
+  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $UserPreferencesCopyWith<$Res> {
-  factory $UserPreferencesCopyWith(
-          UserPreferences value, $Res Function(UserPreferences) then) =
-      _$UserPreferencesCopyWithImpl<$Res, UserPreferences>;
-  @useResult
-  $Res call(
-      {ThemeMode themeMode,
-      String? locale,
-      String? cachePath,
-      int preferredQuality,
-      int themeSeedColor});
-}
+abstract mixin class $UserPreferencesCopyWith<$Res>  {
+  factory $UserPreferencesCopyWith(UserPreferences value, $Res Function(UserPreferences) _then) = _$UserPreferencesCopyWithImpl;
+@useResult
+$Res call({
+ ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor
+});
 
+
+
+
+}
 /// @nodoc
-class _$UserPreferencesCopyWithImpl<$Res, $Val extends UserPreferences>
+class _$UserPreferencesCopyWithImpl<$Res>
     implements $UserPreferencesCopyWith<$Res> {
-  _$UserPreferencesCopyWithImpl(this._value, this._then);
+  _$UserPreferencesCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final UserPreferences _self;
+  final $Res Function(UserPreferences) _then;
 
-  /// Create a copy of UserPreferences
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? themeMode = null,
-    Object? locale = freezed,
-    Object? cachePath = freezed,
-    Object? preferredQuality = null,
-    Object? themeSeedColor = null,
-  }) {
-    return _then(_value.copyWith(
-      themeMode: null == themeMode
-          ? _value.themeMode
-          : themeMode // ignore: cast_nullable_to_non_nullable
-              as ThemeMode,
-      locale: freezed == locale
-          ? _value.locale
-          : locale // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cachePath: freezed == cachePath
-          ? _value.cachePath
-          : cachePath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      preferredQuality: null == preferredQuality
-          ? _value.preferredQuality
-          : preferredQuality // ignore: cast_nullable_to_non_nullable
-              as int,
-      themeSeedColor: null == themeSeedColor
-          ? _value.themeSeedColor
-          : themeSeedColor // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
+/// Create a copy of UserPreferences
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,}) {
+  return _then(_self.copyWith(
+themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
+as String?,cachePath: freezed == cachePath ? _self.cachePath : cachePath // ignore: cast_nullable_to_non_nullable
+as String?,preferredQuality: null == preferredQuality ? _self.preferredQuality : preferredQuality // ignore: cast_nullable_to_non_nullable
+as int,themeSeedColor: null == themeSeedColor ? _self.themeSeedColor : themeSeedColor // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$UserPreferencesImplCopyWith<$Res>
-    implements $UserPreferencesCopyWith<$Res> {
-  factory _$$UserPreferencesImplCopyWith(_$UserPreferencesImpl value,
-          $Res Function(_$UserPreferencesImpl) then) =
-      __$$UserPreferencesImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {ThemeMode themeMode,
-      String? locale,
-      String? cachePath,
-      int preferredQuality,
-      int themeSeedColor});
 }
 
-/// @nodoc
-class __$$UserPreferencesImplCopyWithImpl<$Res>
-    extends _$UserPreferencesCopyWithImpl<$Res, _$UserPreferencesImpl>
-    implements _$$UserPreferencesImplCopyWith<$Res> {
-  __$$UserPreferencesImplCopyWithImpl(
-      _$UserPreferencesImpl _value, $Res Function(_$UserPreferencesImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of UserPreferences
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? themeMode = null,
-    Object? locale = freezed,
-    Object? cachePath = freezed,
-    Object? preferredQuality = null,
-    Object? themeSeedColor = null,
-  }) {
-    return _then(_$UserPreferencesImpl(
-      themeMode: null == themeMode
-          ? _value.themeMode
-          : themeMode // ignore: cast_nullable_to_non_nullable
-              as ThemeMode,
-      locale: freezed == locale
-          ? _value.locale
-          : locale // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cachePath: freezed == cachePath
-          ? _value.cachePath
-          : cachePath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      preferredQuality: null == preferredQuality
-          ? _value.preferredQuality
-          : preferredQuality // ignore: cast_nullable_to_non_nullable
-              as int,
-      themeSeedColor: null == themeSeedColor
-          ? _value.themeSeedColor
-          : themeSeedColor // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
+/// Adds pattern-matching-related methods to [UserPreferences].
+extension UserPreferencesPatterns on UserPreferences {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _UserPreferences value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UserPreferences() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _UserPreferences value)  $default,){
+final _that = this;
+switch (_that) {
+case _UserPreferences():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _UserPreferences value)?  $default,){
+final _that = this;
+switch (_that) {
+case _UserPreferences() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UserPreferences() when $default != null:
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)  $default,) {final _that = this;
+switch (_that) {
+case _UserPreferences():
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)?  $default,) {final _that = this;
+switch (_that) {
+case _UserPreferences() when $default != null:
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$UserPreferencesImpl implements _UserPreferences {
-  const _$UserPreferencesImpl(
-      {this.themeMode = ThemeMode.system,
-      this.locale,
-      this.cachePath,
-      this.preferredQuality = 0,
-      this.themeSeedColor = 0xFF4CAF50});
 
-  factory _$UserPreferencesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserPreferencesImplFromJson(json);
+class _UserPreferences implements UserPreferences {
+  const _UserPreferences({this.themeMode = ThemeMode.system, this.locale, this.cachePath, this.preferredQuality = 0, this.themeSeedColor = 0xFF4CAF50});
+  factory _UserPreferences.fromJson(Map<String, dynamic> json) => _$UserPreferencesFromJson(json);
 
-  /// Theme mode: system, light, or dark.
-  @override
-  @JsonKey()
-  final ThemeMode themeMode;
+/// Theme mode: system, light, or dark.
+@override@JsonKey() final  ThemeMode themeMode;
+/// App locale: 'en', 'zh', or null for system default.
+@override final  String? locale;
+/// Custom cache directory path (null = default platform path).
+@override final  String? cachePath;
+/// Preferred audio quality identifier.
+/// 0 = auto (best available), or specific quality code.
+@override@JsonKey() final  int preferredQuality;
+/// Theme seed color value.
+@override@JsonKey() final  int themeSeedColor;
 
-  /// App locale: 'en', 'zh', or null for system default.
-  @override
-  final String? locale;
+/// Create a copy of UserPreferences
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UserPreferencesCopyWith<_UserPreferences> get copyWith => __$UserPreferencesCopyWithImpl<_UserPreferences>(this, _$identity);
 
-  /// Custom cache directory path (null = default platform path).
-  @override
-  final String? cachePath;
-
-  /// Preferred audio quality identifier.
-  /// 0 = auto (best available), or specific quality code.
-  @override
-  @JsonKey()
-  final int preferredQuality;
-
-  /// Theme seed color value.
-  @override
-  @JsonKey()
-  final int themeSeedColor;
-
-  @override
-  String toString() {
-    return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$UserPreferencesImpl &&
-            (identical(other.themeMode, themeMode) ||
-                other.themeMode == themeMode) &&
-            (identical(other.locale, locale) || other.locale == locale) &&
-            (identical(other.cachePath, cachePath) ||
-                other.cachePath == cachePath) &&
-            (identical(other.preferredQuality, preferredQuality) ||
-                other.preferredQuality == preferredQuality) &&
-            (identical(other.themeSeedColor, themeSeedColor) ||
-                other.themeSeedColor == themeSeedColor));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, themeMode, locale, cachePath,
-      preferredQuality, themeSeedColor);
-
-  /// Create a copy of UserPreferences
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$UserPreferencesImplCopyWith<_$UserPreferencesImpl> get copyWith =>
-      __$$UserPreferencesImplCopyWithImpl<_$UserPreferencesImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$UserPreferencesImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$UserPreferencesToJson(this, );
 }
 
-abstract class _UserPreferences implements UserPreferences {
-  const factory _UserPreferences(
-      {final ThemeMode themeMode,
-      final String? locale,
-      final String? cachePath,
-      final int preferredQuality,
-      final int themeSeedColor}) = _$UserPreferencesImpl;
-
-  factory _UserPreferences.fromJson(Map<String, dynamic> json) =
-      _$UserPreferencesImpl.fromJson;
-
-  /// Theme mode: system, light, or dark.
-  @override
-  ThemeMode get themeMode;
-
-  /// App locale: 'en', 'zh', or null for system default.
-  @override
-  String? get locale;
-
-  /// Custom cache directory path (null = default platform path).
-  @override
-  String? get cachePath;
-
-  /// Preferred audio quality identifier.
-  /// 0 = auto (best available), or specific quality code.
-  @override
-  int get preferredQuality;
-
-  /// Theme seed color value.
-  @override
-  int get themeSeedColor;
-
-  /// Create a copy of UserPreferences
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserPreferencesImplCopyWith<_$UserPreferencesImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor);
+
+@override
+String toString() {
+  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UserPreferencesCopyWith<$Res> implements $UserPreferencesCopyWith<$Res> {
+  factory _$UserPreferencesCopyWith(_UserPreferences value, $Res Function(_UserPreferences) _then) = __$UserPreferencesCopyWithImpl;
+@override @useResult
+$Res call({
+ ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor
+});
+
+
+
+
+}
+/// @nodoc
+class __$UserPreferencesCopyWithImpl<$Res>
+    implements _$UserPreferencesCopyWith<$Res> {
+  __$UserPreferencesCopyWithImpl(this._self, this._then);
+
+  final _UserPreferences _self;
+  final $Res Function(_UserPreferences) _then;
+
+/// Create a copy of UserPreferences
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,}) {
+  return _then(_UserPreferences(
+themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
+as String?,cachePath: freezed == cachePath ? _self.cachePath : cachePath // ignore: cast_nullable_to_non_nullable
+as String?,preferredQuality: null == preferredQuality ? _self.preferredQuality : preferredQuality // ignore: cast_nullable_to_non_nullable
+as int,themeSeedColor: null == themeSeedColor ? _self.themeSeedColor : themeSeedColor // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+// dart format on

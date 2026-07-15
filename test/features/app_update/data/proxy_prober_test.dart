@@ -11,8 +11,8 @@ class _MockHttpClientAdapter implements HttpClientAdapter {
   _MockHttpClientAdapter({
     required Set<String> successHosts,
     Duration delay = Duration.zero,
-  })  : _successHosts = successHosts,
-        _delay = delay;
+  }) : _successHosts = successHosts,
+       _delay = delay;
 
   @override
   Future<ResponseBody> fetch(
@@ -72,13 +72,10 @@ void main() {
       ]);
 
       // Should return one of the successful proxies
-      expect(
-        [
-          'https://raw.githubusercontent.com',
-          'https://ghfast.top/https://raw.githubusercontent.com',
-        ],
-        contains(result),
-      );
+      expect([
+        'https://raw.githubusercontent.com',
+        'https://ghfast.top/https://raw.githubusercontent.com',
+      ], contains(result));
     });
 
     test('全部失败时回退到第一个代理', () async {
@@ -118,9 +115,7 @@ void main() {
     test('相同代理列表第二次调用走缓存', () async {
       int callCount = 0;
       final dio = Dio();
-      dio.httpClientAdapter = _CountingAdapter(
-        onFetch: () => callCount++,
-      );
+      dio.httpClientAdapter = _CountingAdapter(onFetch: () => callCount++);
 
       final prober = ProxyProber(dio: dio);
       final proxies = ['https://proxy-a.com', 'https://proxy-b.com'];
@@ -136,9 +131,7 @@ void main() {
     test('clearCache 后重新探测', () async {
       int callCount = 0;
       final dio = Dio();
-      dio.httpClientAdapter = _CountingAdapter(
-        onFetch: () => callCount++,
-      );
+      dio.httpClientAdapter = _CountingAdapter(onFetch: () => callCount++);
 
       final prober = ProxyProber(dio: dio);
       final proxies = ['https://proxy-x.com'];
@@ -167,16 +160,14 @@ void main() {
     test('kMetadataUrls 包含直连地址', () {
       expect(
         kMetadataUrls.any(
-            (url) => url.startsWith('https://raw.githubusercontent.com')),
+          (url) => url.startsWith('https://raw.githubusercontent.com'),
+        ),
         true,
       );
     });
 
     test('kReleaseProxies 包含直连地址', () {
-      expect(
-        kReleaseProxies,
-        contains('https://github.com'),
-      );
+      expect(kReleaseProxies, contains('https://github.com'));
     });
 
     test('代理列表非空', () {

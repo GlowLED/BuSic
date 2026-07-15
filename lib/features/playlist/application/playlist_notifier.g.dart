@@ -6,206 +6,156 @@ part of 'playlist_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playlistListNotifierHash() =>
-    r'569fbec71a282df696eb3d95723988e96e9bde38';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// State notifier managing playlist list and CRUD operations.
+
+@ProviderFor(PlaylistListNotifier)
+final playlistListNotifierProvider = PlaylistListNotifierProvider._();
 
 /// State notifier managing playlist list and CRUD operations.
-///
-/// Copied from [PlaylistListNotifier].
-@ProviderFor(PlaylistListNotifier)
-final playlistListNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    PlaylistListNotifier, List<Playlist>>.internal(
-  PlaylistListNotifier.new,
-  name: r'playlistListNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$playlistListNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$PlaylistListNotifier = AutoDisposeAsyncNotifier<List<Playlist>>;
-String _$playlistDetailNotifierHash() =>
-    r'936542285ace71022b51a38321711553218839a3';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$PlaylistDetailNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<List<SongItem>> {
-  late final int playlistId;
-
-  FutureOr<List<SongItem>> build(
-    int playlistId,
-  );
-}
-
-/// State notifier managing songs within a specific playlist.
-///
-/// Copied from [PlaylistDetailNotifier].
-@ProviderFor(PlaylistDetailNotifier)
-const playlistDetailNotifierProvider = PlaylistDetailNotifierFamily();
-
-/// State notifier managing songs within a specific playlist.
-///
-/// Copied from [PlaylistDetailNotifier].
-class PlaylistDetailNotifierFamily extends Family<AsyncValue<List<SongItem>>> {
-  /// State notifier managing songs within a specific playlist.
-  ///
-  /// Copied from [PlaylistDetailNotifier].
-  const PlaylistDetailNotifierFamily();
-
-  /// State notifier managing songs within a specific playlist.
-  ///
-  /// Copied from [PlaylistDetailNotifier].
-  PlaylistDetailNotifierProvider call(
-    int playlistId,
-  ) {
-    return PlaylistDetailNotifierProvider(
-      playlistId,
-    );
-  }
-
-  @override
-  PlaylistDetailNotifierProvider getProviderOverride(
-    covariant PlaylistDetailNotifierProvider provider,
-  ) {
-    return call(
-      provider.playlistId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'playlistDetailNotifierProvider';
-}
-
-/// State notifier managing songs within a specific playlist.
-///
-/// Copied from [PlaylistDetailNotifier].
-class PlaylistDetailNotifierProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<PlaylistDetailNotifier,
-        List<SongItem>> {
-  /// State notifier managing songs within a specific playlist.
-  ///
-  /// Copied from [PlaylistDetailNotifier].
-  PlaylistDetailNotifierProvider(
-    int playlistId,
-  ) : this._internal(
-          () => PlaylistDetailNotifier()..playlistId = playlistId,
-          from: playlistDetailNotifierProvider,
-          name: r'playlistDetailNotifierProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$playlistDetailNotifierHash,
-          dependencies: PlaylistDetailNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              PlaylistDetailNotifierFamily._allTransitiveDependencies,
-          playlistId: playlistId,
-        );
-
-  PlaylistDetailNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.playlistId,
-  }) : super.internal();
-
-  final int playlistId;
-
-  @override
-  FutureOr<List<SongItem>> runNotifierBuild(
-    covariant PlaylistDetailNotifier notifier,
-  ) {
-    return notifier.build(
-      playlistId,
-    );
-  }
-
-  @override
-  Override overrideWith(PlaylistDetailNotifier Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: PlaylistDetailNotifierProvider._internal(
-        () => create()..playlistId = playlistId,
-        from: from,
-        name: null,
+final class PlaylistListNotifierProvider
+    extends $AsyncNotifierProvider<PlaylistListNotifier, List<Playlist>> {
+  /// State notifier managing playlist list and CRUD operations.
+  PlaylistListNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'playlistListNotifierProvider',
+        isAutoDispose: true,
         dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        playlistId: playlistId,
-      ),
-    );
-  }
+        $allTransitiveDependencies: null,
+      );
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<PlaylistDetailNotifier,
-      List<SongItem>> createElement() {
-    return _PlaylistDetailNotifierProviderElement(this);
+  String debugGetCreateSourceHash() => _$playlistListNotifierHash();
+
+  @$internal
+  @override
+  PlaylistListNotifier create() => PlaylistListNotifier();
+}
+
+String _$playlistListNotifierHash() =>
+    r'dc949eb60909e9a3cd625101ec35138dbae665e4';
+
+/// State notifier managing playlist list and CRUD operations.
+
+abstract class _$PlaylistListNotifier extends $AsyncNotifier<List<Playlist>> {
+  FutureOr<List<Playlist>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Playlist>>, List<Playlist>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Playlist>>, List<Playlist>>,
+              AsyncValue<List<Playlist>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
   }
+}
+
+/// State notifier managing songs within a specific playlist.
+
+@ProviderFor(PlaylistDetailNotifier)
+final playlistDetailNotifierProvider = PlaylistDetailNotifierFamily._();
+
+/// State notifier managing songs within a specific playlist.
+final class PlaylistDetailNotifierProvider
+    extends $AsyncNotifierProvider<PlaylistDetailNotifier, List<SongItem>> {
+  /// State notifier managing songs within a specific playlist.
+  PlaylistDetailNotifierProvider._({
+    required PlaylistDetailNotifierFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'playlistDetailNotifierProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$playlistDetailNotifierHash();
+
+  @override
+  String toString() {
+    return r'playlistDetailNotifierProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  PlaylistDetailNotifier create() => PlaylistDetailNotifier();
 
   @override
   bool operator ==(Object other) {
     return other is PlaylistDetailNotifierProvider &&
-        other.playlistId == playlistId;
+        other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, playlistId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin PlaylistDetailNotifierRef
-    on AutoDisposeAsyncNotifierProviderRef<List<SongItem>> {
-  /// The parameter `playlistId` of this provider.
-  int get playlistId;
-}
+String _$playlistDetailNotifierHash() =>
+    r'34f21071f7c22f17a6baceaef1ed0222e8940735';
 
-class _PlaylistDetailNotifierProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<PlaylistDetailNotifier,
-        List<SongItem>> with PlaylistDetailNotifierRef {
-  _PlaylistDetailNotifierProviderElement(super.provider);
+/// State notifier managing songs within a specific playlist.
+
+final class PlaylistDetailNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          PlaylistDetailNotifier,
+          AsyncValue<List<SongItem>>,
+          List<SongItem>,
+          FutureOr<List<SongItem>>,
+          int
+        > {
+  PlaylistDetailNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'playlistDetailNotifierProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// State notifier managing songs within a specific playlist.
+
+  PlaylistDetailNotifierProvider call(int playlistId) =>
+      PlaylistDetailNotifierProvider._(argument: playlistId, from: this);
 
   @override
-  int get playlistId => (origin as PlaylistDetailNotifierProvider).playlistId;
+  String toString() => r'playlistDetailNotifierProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+/// State notifier managing songs within a specific playlist.
+
+abstract class _$PlaylistDetailNotifier extends $AsyncNotifier<List<SongItem>> {
+  late final _$args = ref.$arg as int;
+  int get playlistId => _$args;
+
+  FutureOr<List<SongItem>> build(int playlistId);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<SongItem>>, List<SongItem>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<SongItem>>, List<SongItem>>,
+              AsyncValue<List<SongItem>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}

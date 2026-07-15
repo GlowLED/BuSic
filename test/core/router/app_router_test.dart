@@ -16,10 +16,7 @@ void main() {
       final router = container.read(appRouterProvider);
       addTearDown(router.dispose);
 
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        AppRoutes.home,
-      );
+      expect(router.routeInformationProvider.value.uri.path, AppRoutes.home);
     });
 
     test('player route uses a bottom-up transition', () {
@@ -31,14 +28,12 @@ void main() {
       expect(page, isA<CustomTransitionPage<void>>());
 
       expect(page.transitionDuration, const Duration(milliseconds: 280));
-      expect(
-        page.reverseTransitionDuration,
-        const Duration(milliseconds: 240),
-      );
+      expect(page.reverseTransitionDuration, const Duration(milliseconds: 240));
     });
 
-    testWidgets('player transition builds a slide from the bottom',
-        (tester) async {
+    testWidgets('player transition builds a slide from the bottom', (
+      tester,
+    ) async {
       final page = buildPlayerRoutePage(
         key: const ValueKey('player'),
         child: const SizedBox(),
@@ -59,8 +54,15 @@ void main() {
         ),
       );
 
-      expect(find.byType(SlideTransition), findsOneWidget);
-      expect(find.byType(FadeTransition), findsOneWidget);
+      final slide = tester.widget<SlideTransition>(
+        find
+            .descendant(
+              of: find.byType(Builder),
+              matching: find.byType(SlideTransition),
+            )
+            .last,
+      );
+      expect(slide.child, isA<FadeTransition>());
     });
   });
 }

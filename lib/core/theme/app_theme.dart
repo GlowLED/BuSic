@@ -64,27 +64,18 @@ class AppTheme {
   static const Color _lightSurfaceRaised = Color(0xFFFFFFFF);
 
   static ThemeData lightTheme({required Color seedColor}) {
-    return _buildTheme(
-      seedColor: seedColor,
-      brightness: Brightness.light,
-    );
+    return _buildTheme(seedColor: seedColor, brightness: Brightness.light);
   }
 
   static ThemeData darkTheme({required Color seedColor}) {
-    return _buildTheme(
-      seedColor: seedColor,
-      brightness: Brightness.dark,
-    );
+    return _buildTheme(seedColor: seedColor, brightness: Brightness.dark);
   }
 
   static ThemeData _buildTheme({
     required Color seedColor,
     required Brightness brightness,
   }) {
-    final bundle = _buildBundle(
-      seedColor: seedColor,
-      brightness: brightness,
-    );
+    final bundle = _buildBundle(seedColor: seedColor, brightness: brightness);
     final typography = brightness == Brightness.dark
         ? Typography.material2021().white
         : Typography.material2021().black;
@@ -243,9 +234,7 @@ class AppTheme {
         helperStyle: textTheme.bodySmall?.copyWith(
           color: bundle.palette.textMuted,
         ),
-        errorStyle: textTheme.bodySmall?.copyWith(
-          color: bundle.palette.danger,
-        ),
+        errorStyle: textTheme.bodySmall?.copyWith(color: bundle.palette.danger),
         contentPadding: EdgeInsets.symmetric(
           horizontal: _spacing.md,
           vertical: _spacing.sm,
@@ -486,24 +475,27 @@ class AppTheme {
     // Backgrounds and surfaces are kept neutral with no accent tint:
     // light is flat pure white, dark is a neutral charcoal ramp.
     final backgroundPrimary = isDark ? _darkBase : _lightBase;
-    final backgroundSecondary =
-        isDark ? const Color(0xFF131313) : _lightBase;
+    final backgroundSecondary = isDark ? const Color(0xFF131313) : _lightBase;
     final surfacePrimary = isDark ? _darkSurface : _lightSurface;
-    final surfaceSecondary =
-        isDark ? const Color(0xFF1F1F1F) : _lightSurface;
+    final surfaceSecondary = isDark ? const Color(0xFF1F1F1F) : _lightSurface;
     final surfaceElevated = isDark ? _darkSurfaceRaised : _lightSurfaceRaised;
 
-    final textPrimary =
-        isDark ? const Color(0xFFF5F5F5) : const Color(0xFF1A1A1A);
-    final textSecondary =
-        isDark ? const Color(0xFFC2C2C2) : const Color(0xFF5A5A5A);
-    final textMuted =
-        isDark ? const Color(0xFF8F8F8F) : const Color(0xFF8A8A8A);
+    final textPrimary = isDark
+        ? const Color(0xFFF5F5F5)
+        : const Color(0xFF1A1A1A);
+    final textSecondary = isDark
+        ? const Color(0xFFC2C2C2)
+        : const Color(0xFF5A5A5A);
+    final textMuted = isDark
+        ? const Color(0xFF8F8F8F)
+        : const Color(0xFF8A8A8A);
     // Neutral borders carry visual definition now that surfaces are flat.
-    final borderSubtle =
-        isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8EB);
-    final borderStrong =
-        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFD4D4D8);
+    final borderSubtle = isDark
+        ? const Color(0xFF2A2A2A)
+        : const Color(0xFFE8E8EB);
+    final borderStrong = isDark
+        ? const Color(0xFF3A3A3A)
+        : const Color(0xFFD4D4D8);
     // Accent is intentionally retained for selected/active states.
     final accentSoft = isDark
         ? _tintSurface(accentStrong, _darkSurface, 0.28)
@@ -544,10 +536,16 @@ class AppTheme {
       coverGlow: accentStrong.withValues(alpha: isDark ? 0.38 : 0.20),
     );
 
-    final secondary =
-        _blend(baseScheme.secondary, accentStrong, isDark ? 0.24 : 0.16);
-    final tertiary =
-        _blend(baseScheme.tertiary, accentStrong, isDark ? 0.18 : 0.12);
+    final secondary = _blend(
+      baseScheme.secondary,
+      accentStrong,
+      isDark ? 0.24 : 0.16,
+    );
+    final tertiary = _blend(
+      baseScheme.tertiary,
+      accentStrong,
+      isDark ? 0.18 : 0.12,
+    );
     final secondaryContainer = _tintSurface(
       secondary,
       surfaceSecondary,
@@ -617,10 +615,7 @@ class AppTheme {
     );
   }
 
-  static TextTheme _buildTextTheme(
-    TextTheme base,
-    AppThemePalette palette,
-  ) {
+  static TextTheme _buildTextTheme(TextTheme base, AppThemePalette palette) {
     final isWindows = defaultTargetPlatform == TargetPlatform.windows;
     final isLinux = defaultTargetPlatform == TargetPlatform.linux;
     final bodyWeight = isWindows ? FontWeight.w400 : FontWeight.w500;
@@ -644,11 +639,7 @@ class AppTheme {
       if (isWindows) {
         return tuned.copyWith(
           fontFamily: 'Microsoft YaHei UI',
-          fontFamilyFallback: const [
-            'Microsoft YaHei',
-            'Segoe UI',
-            'Arial',
-          ],
+          fontFamilyFallback: const ['Microsoft YaHei', 'Segoe UI', 'Arial'],
         );
       }
 

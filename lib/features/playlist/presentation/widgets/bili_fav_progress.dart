@@ -10,11 +10,11 @@ class BiliFavProgressView extends StatelessWidget {
     super.key,
     required this.importCurrent,
     required this.importTotal,
-  })  : isCompleted = false,
-        resultImported = 0,
-        resultReused = 0,
-        resultFailed = 0,
-        onConfirm = null;
+  }) : isCompleted = false,
+       resultImported = 0,
+       resultReused = 0,
+       resultFailed = 0,
+       onConfirm = null;
 
   const BiliFavProgressView.completed({
     super.key,
@@ -22,9 +22,9 @@ class BiliFavProgressView extends StatelessWidget {
     required this.resultReused,
     required this.resultFailed,
     required this.onConfirm,
-  })  : isCompleted = true,
-        importCurrent = 0,
-        importTotal = 0;
+  }) : isCompleted = true,
+       importCurrent = 0,
+       importTotal = 0;
 
   final bool isCompleted;
 
@@ -91,10 +91,7 @@ class BiliFavProgressView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: onConfirm,
-              child: Text(l10n.confirmImport),
-            ),
+            FilledButton(onPressed: onConfirm, child: Text(l10n.confirmImport)),
           ],
         ),
       ),

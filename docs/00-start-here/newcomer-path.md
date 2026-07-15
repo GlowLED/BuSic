@@ -14,7 +14,7 @@
 
 ```bash
 flutter pub get
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 flutter run -d windows
 ```
@@ -36,7 +36,7 @@ flutter run -d <device_id>
 - `lib/l10n/*.arb`
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 

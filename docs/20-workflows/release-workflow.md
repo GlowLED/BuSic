@@ -15,7 +15,7 @@
 ## 2. 本地发布前最低检查
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 
@@ -24,7 +24,7 @@ flutter test
 如果改了 codegen 相关内容：
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 ## 3. 当前推荐发布路径
@@ -46,7 +46,7 @@ python3 scripts/release.py
   - 步骤固定：
     - `flutter pub get`
     - `build_runner`
-    - `flutter analyze --no-fatal-infos`
+    - `flutter analyze`
     - `flutter test`
 
 - `Release`

@@ -40,6 +40,5 @@ class Songs extends Table {
   TextColumn get localPath => text().nullable()();
 
   /// Timestamp when the song was added.
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

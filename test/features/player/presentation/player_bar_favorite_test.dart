@@ -272,12 +272,7 @@ Widget _buildSubject({
       playerParseRepositoryProvider.overrideWithValue(_FakeParseRepository()),
       playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
     ],
-    child: buildTestApp(
-      SizedBox(
-        width: width,
-        child: const PlayerBar(),
-      ),
-    ),
+    child: buildTestApp(SizedBox(width: width, child: const PlayerBar())),
   );
 }
 
@@ -293,7 +288,9 @@ Future<int> _seedSong(
   required int cid,
   required String title,
 }) {
-  return db.into(db.songs).insert(
+  return db
+      .into(db.songs)
+      .insert(
         SongsCompanion.insert(
           bvid: bvid,
           cid: cid,
@@ -304,24 +301,23 @@ Future<int> _seedSong(
 }
 
 Future<void> _seedFavorite(AppDatabase db, int songId) async {
-  final playlistId = await db.into(db.playlists).insert(
+  final playlistId = await db
+      .into(db.playlists)
+      .insert(
         PlaylistsCompanion.insert(
           name: '@@favorites@@',
           isFavorite: const Value(true),
           sortOrder: const Value(-1),
         ),
       );
-  await db.into(db.playlistSongs).insert(
-        PlaylistSongsCompanion.insert(
-          playlistId: playlistId,
-          songId: songId,
-        ),
+  await db
+      .into(db.playlistSongs)
+      .insert(
+        PlaylistSongsCompanion.insert(playlistId: playlistId, songId: songId),
       );
 }
 
-Future<void> _seedPlayerPreferences({
-  required AudioTrack track,
-}) async {
+Future<void> _seedPlayerPreferences({required AudioTrack track}) async {
   SharedPreferences.setMockInitialValues({
     'player_current_track': jsonEncode(track.toJson()),
     'player_queue': jsonEncode([track.toJson()]),
@@ -417,10 +413,7 @@ class _FakeParseRepository implements ParseRepository {
   }
 
   @override
-  Future<List<AudioStreamInfo>> getAvailableQualities(
-    String bvid,
-    int cid,
-  ) {
+  Future<List<AudioStreamInfo>> getAvailableQualities(String bvid, int cid) {
     throw UnimplementedError();
   }
 

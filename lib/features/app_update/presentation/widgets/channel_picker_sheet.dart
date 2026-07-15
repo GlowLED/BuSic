@@ -7,10 +7,7 @@ import '../../domain/models/download_channel.dart';
 class ChannelPickerSheet extends StatelessWidget {
   final Set<DownloadChannel> availableChannels;
 
-  const ChannelPickerSheet({
-    super.key,
-    required this.availableChannels,
-  });
+  const ChannelPickerSheet({super.key, required this.availableChannels});
 
   /// 显示渠道选择 BottomSheet，返回选中的渠道或 null。
   static Future<DownloadChannel?> show(
@@ -19,9 +16,7 @@ class ChannelPickerSheet extends StatelessWidget {
   }) {
     return showModalBottomSheet<DownloadChannel>(
       context: context,
-      builder: (_) => ChannelPickerSheet(
-        availableChannels: availableChannels,
-      ),
+      builder: (_) => ChannelPickerSheet(availableChannels: availableChannels),
     );
   }
 

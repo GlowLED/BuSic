@@ -10,7 +10,7 @@ part 'player_state.freezed.dart';
 /// Represents everything the UI needs to render the player controls,
 /// progress bar, queue, and current track info.
 @freezed
-class PlayerState with _$PlayerState {
+abstract class PlayerState with _$PlayerState {
   const factory PlayerState({
     /// Currently playing track, or `null` if nothing is loaded.
     AudioTrack? currentTrack,

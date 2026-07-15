@@ -21,7 +21,7 @@ compatibility: opencode
 ## 最低验证
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 
@@ -30,9 +30,9 @@ Agent 执行时，`flutter ...` 通常需要提权到沙箱外；完整分类见
 如果改了 `@riverpod`、`@freezed`、Drift 或 `lib/l10n/*.arb`：
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 

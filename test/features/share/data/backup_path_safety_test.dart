@@ -39,7 +39,9 @@ void main() {
   group('备份导出不含下载路径', () {
     test('有 localPath 的歌曲导出后 SharedSong 不含路径字段', () async {
       // 插入一首已下载的歌曲
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1backup01',
               cid: 1001,
@@ -62,7 +64,8 @@ void main() {
       expect(song.customTitle, '自定义标题');
 
       // 验证 JSON 中不包含 localPath 或 audioQuality
-      final json = jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
       final songsJson = json['songs'] as List;
       final songJson = songsJson.first as Map<String, dynamic>;
 
@@ -74,7 +77,9 @@ void main() {
 
     test('多首歌（有和无 localPath）导出后都不含路径信息', () async {
       // 有下载
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1backup02',
               cid: 2001,
@@ -86,7 +91,9 @@ void main() {
           );
 
       // 无下载
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1backup03',
               cid: 2002,
@@ -99,7 +106,8 @@ void main() {
       expect(backup.songs, hasLength(2));
 
       // 两首歌都不应含路径
-      final json = jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
       final songsJson = json['songs'] as List;
 
       for (final s in songsJson) {
@@ -121,10 +129,10 @@ void main() {
       final json = song.toJson();
 
       // SharedSong JSON 键为缩写：b, c, ct, ca
-      expect(json.containsKey('b'), true);   // bvid
-      expect(json.containsKey('c'), true);   // cid
-      expect(json.containsKey('ct'), true);  // customTitle
-      expect(json.containsKey('ca'), true);  // customArtist
+      expect(json.containsKey('b'), true); // bvid
+      expect(json.containsKey('c'), true); // cid
+      expect(json.containsKey('ct'), true); // customTitle
+      expect(json.containsKey('ca'), true); // customArtist
 
       // 不应包含任何路径相关字段
       expect(json.containsKey('localPath'), false);
@@ -182,16 +190,20 @@ void main() {
 
       for (final song in songs) {
         // localPath 必须为 null — 不会从备份引入任何路径
-        expect(song.localPath, isNull,
-            reason: '歌曲 ${song.bvid} 不应有 localPath');
-        expect(song.audioQuality, 0,
-            reason: '歌曲 ${song.bvid} audioQuality 应为 0');
+        expect(song.localPath, isNull, reason: '歌曲 ${song.bvid} 不应有 localPath');
+        expect(
+          song.audioQuality,
+          0,
+          reason: '歌曲 ${song.bvid} audioQuality 应为 0',
+        );
       }
     });
 
     test('覆盖导入时已有歌曲保留本地 localPath', () async {
       // 先在本地下载一首歌
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1keep01',
               cid: 5001,
@@ -203,12 +215,12 @@ void main() {
           );
 
       // 创建一个歌单
-      final plId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '旧歌单'),
-          );
-      await db.into(db.playlistSongs).insert(
-            PlaylistSongsCompanion.insert(playlistId: plId, songId: 1),
-          );
+      final plId = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '旧歌单'));
+      await db
+          .into(db.playlistSongs)
+          .insert(PlaylistSongsCompanion.insert(playlistId: plId, songId: 1));
 
       // 备份包含同一首歌和一首新歌
       final now = DateTime.now();
@@ -225,13 +237,21 @@ void main() {
         ],
         songs: const [
           SharedSong(bvid: 'BV1keep01', cid: 5001), // 与本地已有歌曲相同
-          SharedSong(bvid: 'BV1new01', cid: 5002),  // 全新歌曲
+          SharedSong(bvid: 'BV1new01', cid: 5002), // 全新歌曲
         ],
         playlistSongs: const [
           BackupPlaylistSong(
-              playlistId: 1, bvid: 'BV1keep01', cid: 5001, sortOrder: 0),
+            playlistId: 1,
+            bvid: 'BV1keep01',
+            cid: 5001,
+            sortOrder: 0,
+          ),
           BackupPlaylistSong(
-              playlistId: 1, bvid: 'BV1new01', cid: 5002, sortOrder: 1),
+            playlistId: 1,
+            bvid: 'BV1new01',
+            cid: 5002,
+            sortOrder: 1,
+          ),
         ],
       );
 
@@ -240,23 +260,25 @@ void main() {
       expect(result.songsCreated, 1); // BV1new01 是新的
 
       // 验证本地已有歌曲的 localPath 保留
-      final keptSong = await (db.select(db.songs)
-            ..where((t) => t.bvid.equals('BV1keep01')))
-          .getSingle();
+      final keptSong = await (db.select(
+        db.songs,
+      )..where((t) => t.bvid.equals('BV1keep01'))).getSingle();
       expect(keptSong.localPath, '/local/cache/kept.m4s');
       expect(keptSong.audioQuality, 30280);
 
       // 新歌曲没有 localPath
-      final newSong = await (db.select(db.songs)
-            ..where((t) => t.bvid.equals('BV1new01')))
-          .getSingle();
+      final newSong = await (db.select(
+        db.songs,
+      )..where((t) => t.bvid.equals('BV1new01'))).getSingle();
       expect(newSong.localPath, isNull);
       expect(newSong.audioQuality, 0);
     });
 
     test('导出 → 在另一台设备导入的完整往返不会泄漏路径', () async {
       // ─── 设备 A：有下载的歌曲 ───
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1round01',
               cid: 6001,
@@ -268,12 +290,12 @@ void main() {
             ),
           );
 
-      final plId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '我的歌单'),
-          );
-      await db.into(db.playlistSongs).insert(
-            PlaylistSongsCompanion.insert(playlistId: plId, songId: 1),
-          );
+      final plId = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '我的歌单'));
+      await db
+          .into(db.playlistSongs)
+          .insert(PlaylistSongsCompanion.insert(playlistId: plId, songId: 1));
 
       // 导出备份
       final backup = await syncRepo.exportFullBackup();
@@ -282,10 +304,7 @@ void main() {
       expect(backup.songs.first.bvid, 'BV1round01');
       final backupJson = jsonDecode(jsonEncode(backup.toJson()));
       final songJsonList = (backupJson as Map)['songs'] as List;
-      expect(
-        (songJsonList.first as Map).containsKey('localPath'),
-        false,
-      );
+      expect((songJsonList.first as Map).containsKey('localPath'), false);
 
       // ─── 设备 B：导入备份 ───
       final dbB = AppDatabase.forTesting(NativeDatabase.memory());
@@ -298,10 +317,8 @@ void main() {
       // 设备 B 上的歌曲不应有任何设备 A 的路径
       final songsB = await dbB.select(dbB.songs).get();
       expect(songsB, hasLength(1));
-      expect(songsB.first.localPath, isNull,
-          reason: '设备B不应继承设备A的本地路径');
-      expect(songsB.first.audioQuality, 0,
-          reason: '设备B没有缓存，audioQuality应为0');
+      expect(songsB.first.localPath, isNull, reason: '设备B不应继承设备A的本地路径');
+      expect(songsB.first.audioQuality, 0, reason: '设备B没有缓存，audioQuality应为0');
 
       // 自定义标题应保留
       expect(songsB.first.customTitle, '我的歌');
@@ -316,7 +333,9 @@ void main() {
 
   group('备份不含下载任务', () {
     test('有进行中的下载任务时导出备份不包含任务数据', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1task01',
               cid: 7001,
@@ -326,7 +345,9 @@ void main() {
           );
 
       // 创建下载任务
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               status: const Value(1), // downloading
@@ -338,13 +359,16 @@ void main() {
       final backup = await syncRepo.exportFullBackup();
 
       // AppBackup 模型中根本没有 download_tasks 字段
-      final json = jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
       expect(json.containsKey('downloadTasks'), false);
       expect(json.containsKey('download_tasks'), false);
     });
 
     test('已完成的下载任务也不会出现在备份中', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1task02',
               cid: 7002,
@@ -355,7 +379,9 @@ void main() {
             ),
           );
 
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               status: const Value(2), // completed
@@ -372,7 +398,8 @@ void main() {
       expect(backup.songs.first.bvid, 'BV1task02');
 
       // JSON 中不含下载任务数据
-      final json = jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
       expect(json.containsKey('downloadTasks'), false);
     });
   });
@@ -383,7 +410,9 @@ void main() {
 
   group('多歌单共享歌曲的备份恢复', () {
     test('同一首歌在多个歌单中，导出后只出现一次在 songs 列表', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1multi01',
               cid: 8001,
@@ -396,10 +425,12 @@ void main() {
 
       // 三个歌单引用同一首歌
       for (var i = 0; i < 3; i++) {
-        final plId = await db.into(db.playlists).insert(
-              PlaylistsCompanion.insert(name: '歌单${i + 1}'),
-            );
-        await db.into(db.playlistSongs).insert(
+        final plId = await db
+            .into(db.playlists)
+            .insert(PlaylistsCompanion.insert(name: '歌单${i + 1}'));
+        await db
+            .into(db.playlistSongs)
+            .insert(
               PlaylistSongsCompanion.insert(
                 playlistId: plId,
                 songId: songId,
@@ -431,18 +462,32 @@ void main() {
         createdAt: now,
         playlists: [
           BackupPlaylist(
-              originalId: 1, name: '恢复歌单X', sortOrder: 0, createdAt: now),
+            originalId: 1,
+            name: '恢复歌单X',
+            sortOrder: 0,
+            createdAt: now,
+          ),
           BackupPlaylist(
-              originalId: 2, name: '恢复歌单Y', sortOrder: 1, createdAt: now),
+            originalId: 2,
+            name: '恢复歌单Y',
+            sortOrder: 1,
+            createdAt: now,
+          ),
         ],
-        songs: const [
-          SharedSong(bvid: 'BV1restore01', cid: 9001),
-        ],
+        songs: const [SharedSong(bvid: 'BV1restore01', cid: 9001)],
         playlistSongs: const [
           BackupPlaylistSong(
-              playlistId: 1, bvid: 'BV1restore01', cid: 9001, sortOrder: 0),
+            playlistId: 1,
+            bvid: 'BV1restore01',
+            cid: 9001,
+            sortOrder: 0,
+          ),
           BackupPlaylistSong(
-              playlistId: 2, bvid: 'BV1restore01', cid: 9001, sortOrder: 0),
+            playlistId: 2,
+            bvid: 'BV1restore01',
+            cid: 9001,
+            sortOrder: 0,
+          ),
         ],
       );
 

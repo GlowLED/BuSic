@@ -21,11 +21,7 @@ abstract class ParseRepository {
   /// Requires [bvid] and [cid] to identify the page.
   /// Optionally specify [quality] to request a specific audio quality.
   /// Higher qualities may require authentication (cookies).
-  Future<AudioStreamInfo> getAudioStream(
-    String bvid,
-    int cid, {
-    int? quality,
-  });
+  Future<AudioStreamInfo> getAudioStream(String bvid, int cid, {int? quality});
 
   /// Search Bilibili videos by keyword (optional extension).
   ///
@@ -48,10 +44,7 @@ abstract class ParseRepository {
   ///
   /// Returns a list of [AudioStreamInfo] sorted by quality descending.
   /// The available qualities depend on the video and user's login status.
-  Future<List<AudioStreamInfo>> getAvailableQualities(
-    String bvid,
-    int cid,
-  );
+  Future<List<AudioStreamInfo>> getAvailableQualities(String bvid, int cid);
 
   /// Fetch the current WBI signing keys from Bilibili nav API.
   ///

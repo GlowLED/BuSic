@@ -5,7 +5,7 @@ part 'playlist.g.dart';
 
 /// Domain model representing a user-created playlist.
 @freezed
-class Playlist with _$Playlist {
+abstract class Playlist with _$Playlist {
   const factory Playlist({
     /// Database primary key.
     required int id,

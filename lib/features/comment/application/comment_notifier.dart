@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -13,7 +14,7 @@ part 'comment_notifier.g.dart';
 
 /// Internal state for the comment notifier.
 @freezed
-class CommentState with _$CommentState {
+abstract class CommentState with _$CommentState {
   const factory CommentState({
     /// Resolved numeric AID for the video.
     @Default(0) int aid,
@@ -41,7 +42,7 @@ class CommentState with _$CommentState {
 /// Riverpod notifier managing the comment list for a specific video.
 ///
 /// Family parameter is the video's `bvid` string.
-@riverpod
+@Riverpod(name: 'commentNotifierProvider')
 class CommentNotifier extends _$CommentNotifier {
   late CommentRepository _repository;
 
@@ -72,7 +73,7 @@ class CommentNotifier extends _$CommentNotifier {
 
   /// Load the next page of comments.
   Future<void> loadMore() async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null || current.isEnd || current.isLoadingMore) return;
 
     state = AsyncData(current.copyWith(isLoadingMore: true));
@@ -84,12 +85,14 @@ class CommentNotifier extends _$CommentNotifier {
         next: current.nextCursor,
       );
 
-      state = AsyncData(current.copyWith(
-        comments: _pinMyComments([...current.comments, ...page.replies]),
-        nextCursor: page.next,
-        isEnd: page.isEnd,
-        isLoadingMore: false,
-      ));
+      state = AsyncData(
+        current.copyWith(
+          comments: _pinMyComments([...current.comments, ...page.replies]),
+          nextCursor: page.next,
+          isEnd: page.isEnd,
+          isLoadingMore: false,
+        ),
+      );
     } catch (e) {
       AppLogger.error('Failed to load more comments: $e', tag: 'Comment');
       state = AsyncData(current.copyWith(isLoadingMore: false));
@@ -98,25 +101,24 @@ class CommentNotifier extends _$CommentNotifier {
 
   /// Change sort mode and reload comments.
   Future<void> changeSortMode(int mode) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null || current.sortMode == mode) return;
 
     state = const AsyncLoading();
 
     try {
-      final page = await _repository.getComments(
-        oid: current.aid,
-        mode: mode,
-      );
+      final page = await _repository.getComments(oid: current.aid, mode: mode);
 
-      state = AsyncData(CommentState(
-        aid: current.aid,
-        comments: _pinMyComments(page.replies),
-        nextCursor: page.next,
-        isEnd: page.isEnd,
-        sortMode: mode,
-        totalCount: page.totalCount,
-      ));
+      state = AsyncData(
+        CommentState(
+          aid: current.aid,
+          comments: _pinMyComments(page.replies),
+          nextCursor: page.next,
+          isEnd: page.isEnd,
+          sortMode: mode,
+          totalCount: page.totalCount,
+        ),
+      );
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
     }
@@ -124,10 +126,10 @@ class CommentNotifier extends _$CommentNotifier {
 
   /// Post a new top-level comment.
   Future<void> addComment(String message) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
 
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) throw Exception('未登录');
 
     try {
@@ -138,10 +140,12 @@ class CommentNotifier extends _$CommentNotifier {
       );
 
       _myPostedComments.add(newComment);
-      state = AsyncData(current.copyWith(
-        comments: [newComment, ...current.comments],
-        totalCount: current.totalCount + 1,
-      ));
+      state = AsyncData(
+        current.copyWith(
+          comments: [newComment, ...current.comments],
+          totalCount: current.totalCount + 1,
+        ),
+      );
     } catch (e) {
       AppLogger.error('Failed to add comment: $e', tag: 'Comment');
       rethrow;
@@ -154,10 +158,10 @@ class CommentNotifier extends _$CommentNotifier {
     required int rootRpid,
     required int parentRpid,
   }) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
 
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) throw Exception('未登录');
 
     try {
@@ -174,12 +178,14 @@ class CommentNotifier extends _$CommentNotifier {
         oid: current.aid,
         mode: current.sortMode,
       );
-      state = AsyncData(current.copyWith(
-        comments: _pinMyComments(reloaded.replies),
-        nextCursor: reloaded.next,
-        isEnd: reloaded.isEnd,
-        totalCount: reloaded.totalCount,
-      ));
+      state = AsyncData(
+        current.copyWith(
+          comments: _pinMyComments(reloaded.replies),
+          nextCursor: reloaded.next,
+          isEnd: reloaded.isEnd,
+          totalCount: reloaded.totalCount,
+        ),
+      );
     } catch (e) {
       AppLogger.error('Failed to reply: $e', tag: 'Comment');
       rethrow;
@@ -188,10 +194,10 @@ class CommentNotifier extends _$CommentNotifier {
 
   /// Like or unlike a comment.
   Future<void> toggleLike(int rpid) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null) return;
 
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) throw Exception('未登录');
 
     // Find the comment and toggle optimistically
@@ -200,8 +206,7 @@ class CommentNotifier extends _$CommentNotifier {
 
     final comment = current.comments[idx];
     final newLiked = !comment.isLiked;
-    final newLikeCount =
-        comment.likeCount + (newLiked ? 1 : -1);
+    final newLikeCount = comment.likeCount + (newLiked ? 1 : -1);
 
     // Optimistic update
     final updatedComments = [...current.comments];
@@ -235,7 +240,7 @@ class CommentNotifier extends _$CommentNotifier {
   /// 2. Among the API results, comments whose [Comment.mid] matches the
   ///    current user are moved to the front.
   List<Comment> _pinMyComments(List<Comment> comments) {
-    final user = ref.read(authNotifierProvider).valueOrNull;
+    final user = ref.read(authNotifierProvider).value;
     final myMid = user != null ? int.tryParse(user.userId) : null;
 
     // Separate API-returned own comments from others

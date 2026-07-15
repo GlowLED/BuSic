@@ -135,15 +135,17 @@ class _MinimalScreenState extends ConsumerState<MinimalScreen>
           final info = await parseRepo.getVideoInfo(video.bvid);
           if (info.pages.isEmpty) continue;
           final page = info.pages.first;
-          tracks.add(AudioTrack(
-            songId: 0,
-            bvid: info.bvid,
-            cid: page.cid,
-            title: info.title,
-            artist: info.owner,
-            coverUrl: info.coverUrl,
-            duration: Duration(seconds: page.duration),
-          ));
+          tracks.add(
+            AudioTrack(
+              songId: 0,
+              bvid: info.bvid,
+              cid: page.cid,
+              title: info.title,
+              artist: info.owner,
+              coverUrl: info.coverUrl,
+              duration: Duration(seconds: page.duration),
+            ),
+          );
         } catch (e) {
           // 单个视频解析失败不阻塞整体
           AppLogger.warning('跳过视频 ${video.bvid}', tag: 'Minimal');

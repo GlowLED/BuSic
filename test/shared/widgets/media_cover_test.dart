@@ -10,19 +10,14 @@ import '../../test_helpers/test_app.dart';
 
 void main() {
   testWidgets('shows placeholder icon when cover is missing', (tester) async {
-    await tester.pumpWidget(
-      buildTestApp(
-        const Center(
-          child: MediaCover(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp(const Center(child: MediaCover())));
 
     expect(find.byIcon(Icons.music_note_rounded), findsOneWidget);
   });
 
-  testWidgets('keeps placeholder visible while remote cover is unresolved',
-      (tester) async {
+  testWidgets('keeps placeholder visible while remote cover is unresolved', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildTestApp(
         const Center(
@@ -49,21 +44,16 @@ void main() {
     expect(find.byIcon(Icons.music_note_rounded), findsOneWidget);
   });
 
-  testWidgets('decodes local cover with aspect-preserving ResizeImage',
-      (tester) async {
+  testWidgets('decodes local cover with aspect-preserving ResizeImage', (
+    tester,
+  ) async {
     final tempDir = Directory.systemTemp.createTempSync('media_cover_test');
     addTearDown(() => tempDir.deleteSync(recursive: true));
     final file = File('${tempDir.path}/cover.png')..writeAsBytesSync(const []);
 
     await tester.pumpWidget(
       buildTestApp(
-        Center(
-          child: MediaCover(
-            coverUrl: file.path,
-            width: 72,
-            height: 72,
-          ),
-        ),
+        Center(child: MediaCover(coverUrl: file.path, width: 72, height: 72)),
       ),
     );
 

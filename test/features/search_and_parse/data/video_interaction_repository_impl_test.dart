@@ -26,11 +26,7 @@ void main() {
     test('会合并点赞、投币和收藏状态', () async {
       adapter.register(
         '/x/web-interface/archive/has/like',
-        body: {
-          'code': 0,
-          'message': '0',
-          'data': 1,
-        },
+        body: {'code': 0, 'message': '0', 'data': 1},
       );
       adapter.register(
         '/x/web-interface/archive/coins',
@@ -45,10 +41,7 @@ void main() {
         body: {
           'code': 0,
           'message': '0',
-          'data': {
-            'count': 3,
-            'favoured': true,
-          },
+          'data': {'count': 3, 'favoured': true},
         },
       );
 
@@ -102,10 +95,7 @@ void main() {
     test('点赞和取消点赞使用 archive like 接口', () async {
       adapter.register(
         '/x/web-interface/archive/like',
-        body: {
-          'code': 0,
-          'message': '0',
-        },
+        body: {'code': 0, 'message': '0'},
       );
 
       await repository.setLike(aid: 123456, like: true, csrf: 'csrf-token');
@@ -178,11 +168,7 @@ void main() {
     test('分享记录使用 share add 接口', () async {
       adapter.register(
         '/x/web-interface/share/add',
-        body: {
-          'code': 0,
-          'message': '0',
-          'data': 1,
-        },
+        body: {'code': 0, 'message': '0', 'data': 1},
       );
 
       await repository.recordShare(
@@ -203,18 +189,11 @@ void main() {
     test('B 站错误码会转换为 VideoInteractionException', () async {
       adapter.register(
         '/x/web-interface/archive/like',
-        body: {
-          'code': 65004,
-          'message': '取消赞失败',
-        },
+        body: {'code': 65004, 'message': '取消赞失败'},
       );
 
       await expectLater(
-        () => repository.setLike(
-          aid: 123456,
-          like: false,
-          csrf: 'csrf-token',
-        ),
+        () => repository.setLike(aid: 123456, like: false, csrf: 'csrf-token'),
         throwsA(
           isA<VideoInteractionException>()
               .having((error) => error.code, 'code', 65004)
@@ -229,20 +208,14 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
   final List<_RecordedRequest> requests = [];
   final Map<String, List<_MockHttpResponse>> _responses = {};
 
-  void register(
-    String pattern, {
-    required Object body,
-    int statusCode = 200,
-  }) {
+  void register(String pattern, {required Object body, int statusCode = 200}) {
     _responses[pattern] = [
       _MockHttpResponse(body: body, statusCode: statusCode),
     ];
   }
 
   void registerError(String pattern) {
-    _responses[pattern] = [
-      const _MockHttpResponse(error: true),
-    ];
+    _responses[pattern] = [const _MockHttpResponse(error: true)];
   }
 
   @override
@@ -255,20 +228,23 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     final requestBody = await _readRequestBody(requestStream, options.data);
-    requests.add(_RecordedRequest(
-      method: options.method,
-      uri: options.uri,
-      headers: Map<String, dynamic>.from(options.headers),
-      body: requestBody,
-    ));
+    requests.add(
+      _RecordedRequest(
+        method: options.method,
+        uri: options.uri,
+        headers: Map<String, dynamic>.from(options.headers),
+        body: requestBody,
+      ),
+    );
 
     final url = options.uri.toString();
     for (final entry in _responses.entries) {
       if (!url.contains(entry.key)) continue;
 
       final responses = entry.value;
-      final response =
-          responses.length > 1 ? responses.removeAt(0) : responses.first;
+      final response = responses.length > 1
+          ? responses.removeAt(0)
+          : responses.first;
       if (response.error) {
         throw DioException(
           requestOptions: options,

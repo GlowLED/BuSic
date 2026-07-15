@@ -12,7 +12,7 @@ part 'bvid_info.g.dart';
 ///
 /// Contains the video's metadata and its page list (多P).
 @freezed
-class BvidInfo with _$BvidInfo {
+abstract class BvidInfo with _$BvidInfo {
   @JsonSerializable(explicitToJson: true)
   const factory BvidInfo({
     /// Bilibili BV number.

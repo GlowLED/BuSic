@@ -16,7 +16,7 @@ class CommentImage {
 
 /// Domain model representing a single Bilibili comment.
 @freezed
-class Comment with _$Comment {
+abstract class Comment with _$Comment {
   const factory Comment({
     /// Comment ID (rpid).
     required int rpid,

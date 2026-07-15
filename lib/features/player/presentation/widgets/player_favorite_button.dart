@@ -61,7 +61,8 @@ class _PlayerFavoriteButtonState extends ConsumerState<PlayerFavoriteButton> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final favState = ref.watch(favoriteNotifierProvider);
-    final isFavorited = widget.track.songId > 0 &&
+    final isFavorited =
+        widget.track.songId > 0 &&
         (favState.value?.contains(widget.track.songId) ?? false);
 
     return IconButton(
@@ -83,9 +84,9 @@ class _PlayerFavoriteButtonState extends ConsumerState<PlayerFavoriteButton> {
           final newId = await ref
               .read(favoriteNotifierProvider.notifier)
               .favoriteFromTrack(widget.track);
-          ref.read(playerNotifierProvider.notifier).updateCurrentTrackSongId(
-                newId,
-              );
+          ref
+              .read(playerNotifierProvider.notifier)
+              .updateCurrentTrackSongId(newId);
         }
       },
     );

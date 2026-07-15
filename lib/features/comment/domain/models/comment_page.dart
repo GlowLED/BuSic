@@ -6,7 +6,7 @@ part 'comment_page.freezed.dart';
 
 /// Paginated response for a comment list.
 @freezed
-class CommentPage with _$CommentPage {
+abstract class CommentPage with _$CommentPage {
   const factory CommentPage({
     /// Total number of comments.
     required int totalCount,

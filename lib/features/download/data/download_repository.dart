@@ -26,7 +26,11 @@ abstract class DownloadRepository {
   ///
   /// Resets the task status/progress and kicks off a new download.
   Future<void> restartDownload(
-      int taskId, String url, String savePath, int quality);
+    int taskId,
+    String url,
+    String savePath,
+    int quality,
+  );
 
   /// Get the bvid and cid for a song by its database [songId].
   Future<({String bvid, int cid})?> getSongBvidCid(int songId);

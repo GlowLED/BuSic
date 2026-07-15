@@ -38,7 +38,9 @@ void main() {
 
     test('导出包含歌单和歌曲', () async {
       // 插入歌曲
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1test001',
               cid: 1001,
@@ -49,7 +51,9 @@ void main() {
             ),
           );
 
-      final songId2 = await db.into(db.songs).insert(
+      final songId2 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1test002',
               cid: 2002,
@@ -59,22 +63,25 @@ void main() {
           );
 
       // 插入歌单
-      final playlistId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(
-              name: '测试歌单',
-              sortOrder: const Value(0),
-            ),
+      final playlistId = await db
+          .into(db.playlists)
+          .insert(
+            PlaylistsCompanion.insert(name: '测试歌单', sortOrder: const Value(0)),
           );
 
       // 关联歌曲
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId,
               sortOrder: const Value(0),
             ),
           );
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId2,
@@ -154,7 +161,9 @@ void main() {
 
     test('合并导入时已有歌曲应跳过', () async {
       // 先插入一首歌曲
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1abc001',
               cid: 1001,
@@ -208,11 +217,10 @@ void main() {
 
     test('合并导入时同名歌单应合并', () async {
       // 先创建同名歌单
-      await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(
-              name: '已有歌单',
-              sortOrder: const Value(0),
-            ),
+      await db
+          .into(db.playlists)
+          .insert(
+            PlaylistsCompanion.insert(name: '已有歌单', sortOrder: const Value(0)),
           );
 
       final now = DateTime.now();
@@ -250,7 +258,9 @@ void main() {
   group('importBackupOverwrite', () {
     test('覆盖导入应清空歌单和关联、保留已有歌曲', () async {
       // 先插入歌曲、歌单、关联
-      final existingSongId = await db.into(db.songs).insert(
+      final existingSongId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1exist01',
               cid: 9999,
@@ -260,14 +270,15 @@ void main() {
             ),
           );
 
-      final existingPlaylistId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(
-              name: '旧歌单',
-              sortOrder: const Value(0),
-            ),
+      final existingPlaylistId = await db
+          .into(db.playlists)
+          .insert(
+            PlaylistsCompanion.insert(name: '旧歌单', sortOrder: const Value(0)),
           );
 
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: existingPlaylistId,
               songId: existingSongId,
@@ -287,9 +298,7 @@ void main() {
             createdAt: now,
           ),
         ],
-        songs: const [
-          SharedSong(bvid: 'BV1new001', cid: 3001),
-        ],
+        songs: const [SharedSong(bvid: 'BV1new001', cid: 3001)],
         playlistSongs: const [
           BackupPlaylistSong(
             playlistId: 1,
@@ -322,7 +331,9 @@ void main() {
 
     test('覆盖导入时已有歌曲(bvid+cid)应跳过', () async {
       // 先插入相同 bvid+cid 的歌曲
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1same001',
               cid: 5001,
@@ -343,9 +354,7 @@ void main() {
             createdAt: now,
           ),
         ],
-        songs: const [
-          SharedSong(bvid: 'BV1same001', cid: 5001),
-        ],
+        songs: const [SharedSong(bvid: 'BV1same001', cid: 5001)],
         playlistSongs: const [
           BackupPlaylistSong(
             playlistId: 1,
@@ -370,7 +379,9 @@ void main() {
   group('导出 → 导入往返测试', () {
     test('导出后合并导入应还原数据', () async {
       // 插入测试数据
-      final songId1 = await db.into(db.songs).insert(
+      final songId1 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1round01',
               cid: 7001,
@@ -380,7 +391,9 @@ void main() {
             ),
           );
 
-      final songId2 = await db.into(db.songs).insert(
+      final songId2 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1round02',
               cid: 7002,
@@ -389,21 +402,24 @@ void main() {
             ),
           );
 
-      final playlistId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(
-              name: '往返歌单',
-              sortOrder: const Value(0),
-            ),
+      final playlistId = await db
+          .into(db.playlists)
+          .insert(
+            PlaylistsCompanion.insert(name: '往返歌单', sortOrder: const Value(0)),
           );
 
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId1,
               sortOrder: const Value(0),
             ),
           );
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId2,
@@ -450,7 +466,9 @@ void main() {
 
     test('导出后覆盖导入应还原数据', () async {
       // 插入测试数据
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1ow001',
               cid: 8001,
@@ -459,14 +477,18 @@ void main() {
             ),
           );
 
-      final playlistId = await db.into(db.playlists).insert(
+      final playlistId = await db
+          .into(db.playlists)
+          .insert(
             PlaylistsCompanion.insert(
               name: '覆盖测试歌单',
               sortOrder: const Value(0),
             ),
           );
 
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId,
@@ -480,7 +502,9 @@ void main() {
       final db2 = AppDatabase.forTesting(NativeDatabase.memory());
       final syncRepo2 = SyncRepositoryImpl(db: db2);
 
-      await db2.into(db2.playlists).insert(
+      await db2
+          .into(db2.playlists)
+          .insert(
             PlaylistsCompanion.insert(
               name: '应被清除的歌单',
               sortOrder: const Value(0),
@@ -516,9 +540,7 @@ void main() {
             createdAt: now,
           ),
         ],
-        songs: const [
-          SharedSong(bvid: 'BV1json01', cid: 100),
-        ],
+        songs: const [SharedSong(bvid: 'BV1json01', cid: 100)],
         playlistSongs: const [
           BackupPlaylistSong(
             playlistId: 1,
@@ -530,7 +552,8 @@ void main() {
       );
 
       // toJson() 不深层转换嵌套对象，需做 JSON 往返确保可反序列化
-      final json = jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(backup.toJson())) as Map<String, dynamic>;
       final restored = AppBackup.fromJson(json);
 
       expect(restored.version, backup.version);

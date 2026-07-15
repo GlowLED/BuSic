@@ -164,12 +164,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     });
 
     try {
-      final searchResult =
-          await ref.read(parseNotifierProvider.notifier).searchVideos(
-                keyword,
-                page: nextPage,
-                updateStateOnError: false,
-              );
+      final searchResult = await ref
+          .read(parseNotifierProvider.notifier)
+          .searchVideos(keyword, page: nextPage, updateStateOnError: false);
       if (!mounted || keyword != _currentKeyword) return;
       setState(() {
         _searchResults = [..._searchResults, ...searchResult.results];
@@ -216,10 +213,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: showVideoDetail == null
-            ? _buildSearchLayout(
-                parseState: parseState,
-                l10n: l10n,
-              )
+            ? _buildSearchLayout(parseState: parseState, l10n: l10n)
             : SizedBox.expand(
                 child: AnimatedSwitcher(
                   duration: _contentSwitchDuration,
@@ -285,8 +279,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: AnimatedAlign(
                   duration: _searchBarAnimationDuration,
                   curve: Curves.easeInOutCubic,
-                  alignment:
-                      inputDocked ? Alignment.topCenter : Alignment.center,
+                  alignment: inputDocked
+                      ? Alignment.topCenter
+                      : Alignment.center,
                   child: AnimatedPadding(
                     duration: _searchBarAnimationDuration,
                     curve: Curves.easeInOutCubic,
@@ -523,21 +518,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final content = !showSubmitButton
         ? field
         : compact
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  field,
-                  SizedBox(height: spacing.sm),
-                  SizedBox(width: double.infinity, child: submit),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(child: field),
-                  SizedBox(width: spacing.sm),
-                  submit,
-                ],
-              );
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              field,
+              SizedBox(height: spacing.sm),
+              SizedBox(width: double.infinity, child: submit),
+            ],
+          )
+        : Row(
+            children: [
+              Expanded(child: field),
+              SizedBox(width: spacing.sm),
+              submit,
+            ],
+          );
 
     return AppPanel(
       key: const ValueKey('search_bar_surface'),
@@ -614,10 +609,12 @@ class _SearchInputHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final availableWidth =
-        (maxWidth - spacing.lg * 2).clamp(0.0, maxWidth).toDouble();
-    final centeredWidth =
-        availableWidth.clamp(0.0, _centeredSearchMaxWidth).toDouble();
+    final availableWidth = (maxWidth - spacing.lg * 2)
+        .clamp(0.0, maxWidth)
+        .toDouble();
+    final centeredWidth = availableWidth
+        .clamp(0.0, _centeredSearchMaxWidth)
+        .toDouble();
 
     return AnimatedContainer(
       duration: _searchBarAnimationDuration,
@@ -665,10 +662,7 @@ class _SearchErrorBanner extends StatelessWidget {
 }
 
 class _SearchLoadingState extends StatelessWidget {
-  const _SearchLoadingState({
-    super.key,
-    required this.label,
-  });
+  const _SearchLoadingState({super.key, required this.label});
 
   final String label;
 

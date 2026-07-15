@@ -4,7 +4,7 @@ part 'video_interaction_state.freezed.dart';
 
 /// Runtime state for Bilibili video interaction actions.
 @freezed
-class VideoInteractionState with _$VideoInteractionState {
+abstract class VideoInteractionState with _$VideoInteractionState {
   const factory VideoInteractionState({
     /// Whether the current user has liked the video.
     @Default(false) bool isLiked,

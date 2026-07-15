@@ -31,28 +31,29 @@ class ShareRepositoryImpl implements ShareRepository {
   ShareRepositoryImpl({
     required AppDatabase db,
     required ParseRepository parseRepo,
-  })  : _db = db,
-        _parseRepo = parseRepo;
+  }) : _db = db,
+       _parseRepo = parseRepo;
 
   @override
   Future<SharedPlaylist> exportPlaylist(int playlistId) async {
     // 获取歌单信息
-    final playlistRow = await (_db.select(_db.playlists)
-          ..where((t) => t.id.equals(playlistId)))
-        .getSingleOrNull();
+    final playlistRow = await (_db.select(
+      _db.playlists,
+    )..where((t) => t.id.equals(playlistId))).getSingleOrNull();
     if (playlistRow == null) {
       throw StateError('歌单不存在: $playlistId');
     }
 
     // 获取歌单中的歌曲（按 sortOrder 排序）
-    final query = _db.select(_db.songs).join([
-      innerJoin(
-        _db.playlistSongs,
-        _db.playlistSongs.songId.equalsExp(_db.songs.id),
-      ),
-    ])
-      ..where(_db.playlistSongs.playlistId.equals(playlistId))
-      ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)]);
+    final query =
+        _db.select(_db.songs).join([
+            innerJoin(
+              _db.playlistSongs,
+              _db.playlistSongs.songId.equalsExp(_db.songs.id),
+            ),
+          ])
+          ..where(_db.playlistSongs.playlistId.equals(playlistId))
+          ..orderBy([OrderingTerm.asc(_db.playlistSongs.sortOrder)]);
 
     final rows = await query.get();
     final songs = rows.map((row) {
@@ -66,10 +67,7 @@ class ShareRepositoryImpl implements ShareRepository {
       );
     }).toList();
 
-    return SharedPlaylist(
-      name: playlistRow.name,
-      songs: songs,
-    );
+    return SharedPlaylist(name: playlistRow.name, songs: songs);
   }
 
   @override
@@ -141,9 +139,9 @@ class ShareRepositoryImpl implements ShareRepository {
     final songIds = <int>[];
 
     // 创建歌单
-    final playlistId = await _db.into(_db.playlists).insert(
-          PlaylistsCompanion.insert(name: playlistName),
-        );
+    final playlistId = await _db
+        .into(_db.playlists)
+        .insert(PlaylistsCompanion.insert(name: playlistName));
 
     // 逐首处理歌曲（使用信号量控制并发）
     final semaphore = _Semaphore(_maxConcurrency);
@@ -228,10 +226,11 @@ class ShareRepositoryImpl implements ShareRepository {
     final results = <SongMetadataPreview>[];
     for (final song in songs) {
       // 检查本地是否已有
-      final existing = await (_db.select(_db.songs)
-            ..where(
-                (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid)))
-          .getSingleOrNull();
+      final existing =
+          await (_db.select(_db.songs)..where(
+                (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid),
+              ))
+              .getSingleOrNull();
 
       final bvidInfo = bvidInfoMap[song.bvid];
       String displayTitle;
@@ -245,7 +244,8 @@ class ShareRepositoryImpl implements ShareRepository {
           (p) => p.cid == song.cid,
           orElse: () => bvidInfo.pages.first,
         );
-        displayTitle = song.customTitle ??
+        displayTitle =
+            song.customTitle ??
             (page.partTitle.isNotEmpty ? page.partTitle : bvidInfo.title);
         displayArtist = song.customArtist ?? bvidInfo.owner;
       } else {
@@ -253,13 +253,15 @@ class ShareRepositoryImpl implements ShareRepository {
         displayArtist = song.customArtist ?? '';
       }
 
-      results.add(SongMetadataPreview(
-        song: song,
-        displayTitle: displayTitle,
-        displayArtist: displayArtist,
-        existsLocally: existing != null,
-        fetchFailed: bvidInfo == null && existing == null,
-      ));
+      results.add(
+        SongMetadataPreview(
+          song: song,
+          displayTitle: displayTitle,
+          displayArtist: displayArtist,
+          existsLocally: existing != null,
+          fetchFailed: bvidInfo == null && existing == null,
+        ),
+      );
     }
 
     return results;
@@ -274,10 +276,11 @@ class ShareRepositoryImpl implements ShareRepository {
       await semaphore.acquire();
 
       // 检查本地是否已有该歌曲
-      final existing = await (_db.select(_db.songs)
-            ..where(
-                (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid)))
-          .getSingleOrNull();
+      final existing =
+          await (_db.select(_db.songs)..where(
+                (t) => t.bvid.equals(song.bvid) & t.cid.equals(song.cid),
+              ))
+              .getSingleOrNull();
 
       if (existing != null) {
         semaphore.release();
@@ -292,7 +295,9 @@ class ShareRepositoryImpl implements ShareRepository {
           orElse: () => videoInfo.pages.first,
         );
 
-        final songId = await _db.into(_db.songs).insert(
+        final songId = await _db
+            .into(_db.songs)
+            .insert(
               SongsCompanion.insert(
                 bvid: song.bvid,
                 cid: song.cid,
@@ -318,11 +323,7 @@ class ShareRepositoryImpl implements ShareRepository {
         return _SongProcessResult(_SongStatus.failed, null);
       }
     } catch (e) {
-      AppLogger.error(
-        '处理歌曲失败: ${song.bvid}',
-        tag: 'ShareRepo',
-        error: e,
-      );
+      AppLogger.error('处理歌曲失败: ${song.bvid}', tag: 'ShareRepo', error: e);
       semaphore.release();
       return _SongProcessResult(_SongStatus.failed, null);
     }

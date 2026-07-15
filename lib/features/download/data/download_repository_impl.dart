@@ -24,11 +24,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
       StreamController.broadcast();
 
   DownloadRepositoryImpl({required BiliDio dio, required AppDatabase db})
-      : _db = db,
-        _engine = DownloadEngine(dio: dio);
+    : _db = db,
+      _engine = DownloadEngine(dio: dio);
 
-  domain.DownloadTask _mapTask(DownloadTask row,
-      {String? songTitle, String? songArtist, String? coverUrl}) {
+  domain.DownloadTask _mapTask(
+    DownloadTask row, {
+    String? songTitle,
+    String? songArtist,
+    String? coverUrl,
+  }) {
     return domain.DownloadTask(
       id: row.id,
       songId: row.songId,
@@ -49,7 +53,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
     required String savePath,
     int quality = 0,
   }) async {
-    final taskId = await _db.into(_db.downloadTasks).insert(
+    final taskId = await _db
+        .into(_db.downloadTasks)
+        .insert(
           DownloadTasksCompanion.insert(
             songId: songId,
             filePath: Value(savePath),
@@ -58,9 +64,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
         );
 
     // Cache task info for quick progress emissions
-    final song = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(songId)))
-        .getSingleOrNull();
+    final song = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(songId))).getSingleOrNull();
     _activeTaskCache[taskId] = domain.DownloadTask(
       id: taskId,
       songId: songId,
@@ -94,8 +100,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
       await _updateTaskStatus(taskId, 1);
       final cached = _activeTaskCache[taskId];
       if (cached != null) {
-        _activeTaskCache[taskId] =
-            cached.copyWith(status: domain.DownloadStatus.downloading);
+        _activeTaskCache[taskId] = cached.copyWith(
+          status: domain.DownloadStatus.downloading,
+        );
       }
 
       await _engine.download(
@@ -105,12 +112,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
         startOffset: startOffset,
         onProgress: (receivedBytes, totalBytes) {
           if (totalBytes <= 0) return;
-          final progress =
-              ((receivedBytes / totalBytes) * 100).round().clamp(0, 100);
+          final progress = ((receivedBytes / totalBytes) * 100).round().clamp(
+            0,
+            100,
+          );
           metrics.update(receivedBytes, totalBytes);
 
           // Persist to DB every 5%
-          final lastDb = _lastDbProgress[taskId] ??
+          final lastDb =
+              _lastDbProgress[taskId] ??
               (startOffset > 0 ? (startOffset * 100 ~/ totalBytes) : 0);
           if (progress - lastDb >= 5) {
             _lastDbProgress[taskId] = progress;
@@ -125,13 +135,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
             _lastEmitTime[taskId] = now;
             final c = _activeTaskCache[taskId];
             if (c != null) {
-              _taskUpdateController.add(c.copyWith(
-                status: domain.DownloadStatus.downloading,
-                progress: progress / 100.0,
-                totalBytes: totalBytes,
-                receivedBytes: receivedBytes,
-                speed: metrics.speed,
-              ));
+              _taskUpdateController.add(
+                c.copyWith(
+                  status: domain.DownloadStatus.downloading,
+                  progress: progress / 100.0,
+                  totalBytes: totalBytes,
+                  receivedBytes: receivedBytes,
+                  speed: metrics.speed,
+                ),
+              );
             }
           }
         },
@@ -140,16 +152,17 @@ class DownloadRepositoryImpl implements DownloadRepository {
       if (cancelToken.isCancelled) return;
 
       // Mark completed
-      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
-          .write(const DownloadTasksCompanion(
-        status: Value(2),
-        progress: Value(100),
-      ));
-      await (_db.update(_db.songs)..where((t) => t.id.equals(songId)))
-          .write(SongsCompanion(
-        localPath: Value(savePath),
-        audioQuality: Value(quality),
-      ));
+      await (_db.update(
+        _db.downloadTasks,
+      )..where((t) => t.id.equals(taskId))).write(
+        const DownloadTasksCompanion(status: Value(2), progress: Value(100)),
+      );
+      await (_db.update(_db.songs)..where((t) => t.id.equals(songId))).write(
+        SongsCompanion(
+          localPath: Value(savePath),
+          audioQuality: Value(quality),
+        ),
+      );
       _taskUpdateController.add(null); // structural change
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) return;
@@ -165,14 +178,18 @@ class DownloadRepositoryImpl implements DownloadRepository {
     }
   }
 
-  Future<void> _updateTaskStatus(int taskId, int status,
-      {int? progress}) async {
+  Future<void> _updateTaskStatus(
+    int taskId,
+    int status, {
+    int? progress,
+  }) async {
     final companion = DownloadTasksCompanion(
       status: Value(status),
       progress: progress != null ? Value(progress) : const Value.absent(),
     );
-    await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
-        .write(companion);
+    await (_db.update(
+      _db.downloadTasks,
+    )..where((t) => t.id.equals(taskId))).write(companion);
     _taskUpdateController.add(null); // structural change
   }
 
@@ -191,10 +208,14 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
   @override
   Future<void> restartDownload(
-      int taskId, String url, String savePath, int quality) async {
-    final row = await (_db.select(_db.downloadTasks)
-          ..where((t) => t.id.equals(taskId)))
-        .getSingleOrNull();
+    int taskId,
+    String url,
+    String savePath,
+    int quality,
+  ) async {
+    final row = await (_db.select(
+      _db.downloadTasks,
+    )..where((t) => t.id.equals(taskId))).getSingleOrNull();
     if (row == null) return;
 
     // Check for existing partial file to determine resume offset
@@ -206,26 +227,32 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
     // Update file path and quality; preserve progress if resuming
     if (startOffset > 0) {
-      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
-          .write(DownloadTasksCompanion(
-        status: const Value(0),
-        filePath: Value(savePath),
-        quality: Value(quality),
-      ));
+      await (_db.update(
+        _db.downloadTasks,
+      )..where((t) => t.id.equals(taskId))).write(
+        DownloadTasksCompanion(
+          status: const Value(0),
+          filePath: Value(savePath),
+          quality: Value(quality),
+        ),
+      );
     } else {
-      await (_db.update(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
-          .write(DownloadTasksCompanion(
-        status: const Value(0),
-        progress: const Value(0),
-        filePath: Value(savePath),
-        quality: Value(quality),
-      ));
+      await (_db.update(
+        _db.downloadTasks,
+      )..where((t) => t.id.equals(taskId))).write(
+        DownloadTasksCompanion(
+          status: const Value(0),
+          progress: const Value(0),
+          filePath: Value(savePath),
+          quality: Value(quality),
+        ),
+      );
     }
 
     // Cache task info for progress emissions
-    final song = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(row.songId)))
-        .getSingleOrNull();
+    final song = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(row.songId))).getSingleOrNull();
     _activeTaskCache[taskId] = domain.DownloadTask(
       id: taskId,
       songId: row.songId,
@@ -238,24 +265,30 @@ class DownloadRepositoryImpl implements DownloadRepository {
     );
 
     _taskUpdateController.add(null); // structural change
-    _downloadFile(taskId, row.songId, url, savePath, quality,
-        startOffset: startOffset);
+    _downloadFile(
+      taskId,
+      row.songId,
+      url,
+      savePath,
+      quality,
+      startOffset: startOffset,
+    );
   }
 
   @override
   Future<({String bvid, int cid})?> getSongBvidCid(int songId) async {
-    final song = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(songId)))
-        .getSingleOrNull();
+    final song = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(songId))).getSingleOrNull();
     if (song == null) return null;
     return (bvid: song.bvid, cid: song.cid);
   }
 
   @override
   Future<int> getTaskQuality(int taskId) async {
-    final row = await (_db.select(_db.downloadTasks)
-          ..where((t) => t.id.equals(taskId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.downloadTasks,
+    )..where((t) => t.id.equals(taskId))).getSingleOrNull();
     return row?.quality ?? 0;
   }
 
@@ -341,8 +374,7 @@ class DownloadRepositoryImpl implements DownloadRepository {
         _db.songs,
         _db.songs.id.equalsExp(_db.downloadTasks.songId),
       ),
-    ])
-      ..orderBy([OrderingTerm.desc(_db.downloadTasks.createdAt)]);
+    ])..orderBy([OrderingTerm.desc(_db.downloadTasks.createdAt)]);
 
     final rows = await query.get();
     return rows.map((row) {
@@ -359,14 +391,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
   @override
   Future<List<domain.DownloadTask>> getActiveTasks() async {
-    final query = _db.select(_db.downloadTasks).join([
-      leftOuterJoin(
-        _db.songs,
-        _db.songs.id.equalsExp(_db.downloadTasks.songId),
-      ),
-    ])
-      ..where(_db.downloadTasks.status.isIn([0, 1]))
-      ..orderBy([OrderingTerm.desc(_db.downloadTasks.createdAt)]);
+    final query =
+        _db.select(_db.downloadTasks).join([
+            leftOuterJoin(
+              _db.songs,
+              _db.songs.id.equalsExp(_db.downloadTasks.songId),
+            ),
+          ])
+          ..where(_db.downloadTasks.status.isIn([0, 1]))
+          ..orderBy([OrderingTerm.desc(_db.downloadTasks.createdAt)]);
 
     final rows = await query.get();
     return rows.map((row) {
@@ -383,14 +416,15 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
   @override
   Future<void> deleteTask(int taskId, {bool deleteFile = false}) async {
-    final row = await (_db.select(_db.downloadTasks)
-          ..where((t) => t.id.equals(taskId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.downloadTasks,
+    )..where((t) => t.id.equals(taskId))).getSingleOrNull();
 
     // Determine whether to delete the file on disk:
     // - Always delete partial files for non-completed tasks
     // - For completed tasks, only delete when deleteFile is true
-    final shouldDeleteFile = deleteFile ||
+    final shouldDeleteFile =
+        deleteFile ||
         (row != null &&
             row.status != 2 && // not completed
             row.filePath != null);
@@ -406,27 +440,28 @@ class DownloadRepositoryImpl implements DownloadRepository {
       }
       // Clear song's local cache reference
       if (row != null) {
-        await (_db.update(_db.songs)..where((t) => t.id.equals(row.songId)))
-            .write(const SongsCompanion(
-          localPath: Value(null),
-          audioQuality: Value(0),
-        ));
+        await (_db.update(
+          _db.songs,
+        )..where((t) => t.id.equals(row.songId))).write(
+          const SongsCompanion(localPath: Value(null), audioQuality: Value(0)),
+        );
       }
     }
 
     _cancelTokens[taskId]?.cancel();
     _cancelTokens.remove(taskId);
 
-    await (_db.delete(_db.downloadTasks)..where((t) => t.id.equals(taskId)))
-        .go();
+    await (_db.delete(
+      _db.downloadTasks,
+    )..where((t) => t.id.equals(taskId))).go();
     _taskUpdateController.add(null);
   }
 
   /// Get the current audio quality stored for a song in the database.
   Future<int> getSongAudioQuality(int songId) async {
-    final song = await (_db.select(_db.songs)
-          ..where((t) => t.id.equals(songId)))
-        .getSingleOrNull();
+    final song = await (_db.select(
+      _db.songs,
+    )..where((t) => t.id.equals(songId))).getSingleOrNull();
     return song?.audioQuality ?? 0;
   }
 }

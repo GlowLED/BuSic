@@ -17,7 +17,7 @@ part 'share_notifier.g.dart';
 /// 歌单分享功能的状态管理 Notifier
 ///
 /// 管理歌单的导出（到剪贴板）和导入（从剪贴板）流程。
-@riverpod
+@Riverpod(name: 'shareNotifierProvider')
 class ShareNotifier extends _$ShareNotifier {
   late final ShareRepository _shareRepo;
 
@@ -60,11 +60,13 @@ class ShareNotifier extends _$ShareNotifier {
       }
 
       final playlist = _shareRepo.decodeFromClipboard(clipData.text!);
-      state = ShareState.preview(SharedPlaylistPreview(
-        name: playlist.name,
-        songCount: playlist.songs.length,
-        bvids: playlist.songs.map((s) => s.bvid).toList(),
-      ));
+      state = ShareState.preview(
+        SharedPlaylistPreview(
+          name: playlist.name,
+          songCount: playlist.songs.length,
+          bvids: playlist.songs.map((s) => s.bvid).toList(),
+        ),
+      );
       return playlist;
     } on FormatException catch (e) {
       state = ShareState.error(e.message);
@@ -81,10 +83,7 @@ class ShareNotifier extends _$ShareNotifier {
   /// 确认导入歌单
   ///
   /// [playlist] 为解析后的分享数据，[name] 可选覆盖歌单名称。
-  Future<void> confirmImport(
-    SharedPlaylist playlist, {
-    String? name,
-  }) async {
+  Future<void> confirmImport(SharedPlaylist playlist, {String? name}) async {
     final link = ref.keepAlive();
     try {
       state = ShareState.importing(total: playlist.songs.length);

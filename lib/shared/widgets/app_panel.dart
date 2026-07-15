@@ -38,7 +38,8 @@ class AppPanel extends StatelessWidget {
     final palette = context.appPalette;
     final depth = context.appDepth;
     final effectiveRadius = borderRadius ?? context.appRadii.largeRadius;
-    final effectiveColors = backgroundColors ??
+    final effectiveColors =
+        backgroundColors ??
         [
           palette.surfaceElevated.withValues(alpha: 0.96),
           palette.surfaceSecondary.withValues(alpha: 0.92),
@@ -70,10 +71,7 @@ class AppPanel extends StatelessWidget {
                 width: borderWidth ?? depth.outline,
               ),
             ),
-            child: Padding(
-              padding: padding ?? EdgeInsets.zero,
-              child: child,
-            ),
+            child: Padding(padding: padding ?? EdgeInsets.zero, child: child),
           ),
         ),
       ),

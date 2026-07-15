@@ -24,6 +24,5 @@ class DownloadTasks extends Table {
   IntColumn get quality => integer().withDefault(const Constant(0))();
 
   /// Timestamp when the download task was created.
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

@@ -50,7 +50,7 @@
 改完 `.agents/skills/` 后，运行：
 
 ```bash
-python scripts/validate-skills.py
+python3 scripts/validate-skills.py
 ```
 
 这个脚本会检查：

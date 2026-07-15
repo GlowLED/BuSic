@@ -81,9 +81,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           _buildBackgroundScrim(isDark),
 
           // Content
-          SafeArea(
-            child: isWide ? _buildWideLayout() : _buildPortraitLayout(),
-          ),
+          SafeArea(child: isWide ? _buildWideLayout() : _buildPortraitLayout()),
         ],
       ),
     );
@@ -221,8 +219,9 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           children: [
             Text(
               track?.title ?? l10n.unknownTitle,
-              style: context.textTheme.headlineSmall
-                  ?.copyWith(color: Colors.white),
+              style: context.textTheme.headlineSmall?.copyWith(
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -230,8 +229,9 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             const SizedBox(height: 8),
             Text(
               track?.artist ?? l10n.unknownArtist,
-              style:
-                  context.textTheme.bodyLarge?.copyWith(color: Colors.white70),
+              style: context.textTheme.bodyLarge?.copyWith(
+                color: Colors.white70,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -364,8 +364,9 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
             children: [
               Text(
                 track?.title ?? l10n.unknownTitle,
-                style: context.textTheme.headlineSmall
-                    ?.copyWith(color: Colors.white),
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -373,8 +374,9 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
               const SizedBox(height: 8),
               Text(
                 track?.artist ?? l10n.unknownArtist,
-                style: context.textTheme.bodyLarge
-                    ?.copyWith(color: Colors.white70),
+                style: context.textTheme.bodyLarge?.copyWith(
+                  color: Colors.white70,
+                ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -410,9 +412,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           fadeOutDuration: Duration.zero,
           useOldImageOnUrlChange: true,
         ),
-        ColoredBox(
-          color: Colors.black.withValues(alpha: isDark ? 0.54 : 0.22),
-        ),
+        ColoredBox(color: Colors.black.withValues(alpha: isDark ? 0.54 : 0.22)),
       ],
     );
   }
@@ -424,16 +424,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [
-                  Color(0xFF05070A),
-                  Color(0xFF0B1016),
-                  Color(0xFF030405),
-                ]
-              : const [
-                  Color(0xFFF7F9FC),
-                  Color(0xFFE9EEF6),
-                  Color(0xFFDCE6F1),
-                ],
+              ? const [Color(0xFF05070A), Color(0xFF0B1016), Color(0xFF030405)]
+              : const [Color(0xFFF7F9FC), Color(0xFFE9EEF6), Color(0xFFDCE6F1)],
         ),
       ),
     );

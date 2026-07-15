@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 
-enum CommentSectionAppearance {
-  standard,
-  playerOverlay,
-}
+enum CommentSectionAppearance { standard, playerOverlay }
 
 ThemeData commentSectionTheme(
   BuildContext context,

@@ -54,16 +54,17 @@ class _PlaylistTileState extends State<PlaylistTile> {
     final borderColor = widget.playlist.isFavorite
         ? palette.accentStrong.withValues(alpha: 0.5)
         : _isHovered
-            ? palette.borderStrong.withValues(alpha: 0.98)
-            : palette.borderSubtle.withValues(alpha: 0.92);
+        ? palette.borderStrong.withValues(alpha: 0.98)
+        : palette.borderSubtle.withValues(alpha: 0.92);
 
     final glowShadow = BoxShadow(
       color: palette.coverGlow.withValues(
-          alpha: widget.playlist.isFavorite
-              ? 0.24
-              : _isHovered
-                  ? 0.14
-                  : 0.08),
+        alpha: widget.playlist.isFavorite
+            ? 0.24
+            : _isHovered
+            ? 0.14
+            : 0.08,
+      ),
       blurRadius: depth.glowBlur * 0.36,
       spreadRadius: depth.glowSpread * 0.28,
     );
@@ -73,8 +74,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
       borderRadius: context.appRadii.largeRadius,
       backgroundColors: [topColor, bottomColor],
       borderColor: borderColor,
-      borderWidth:
-          widget.playlist.isFavorite ? depth.outlineStrong : depth.outline,
+      borderWidth: widget.playlist.isFavorite
+          ? depth.outlineStrong
+          : depth.outline,
       boxShadow: [...depth.panelShadow, glowShadow],
       child: Material(
         color: Colors.transparent,
@@ -123,10 +125,12 @@ class _PlaylistTileState extends State<PlaylistTile> {
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  palette.backgroundPrimary
-                                      .withValues(alpha: 0.08),
-                                  palette.backgroundPrimary
-                                      .withValues(alpha: 0.72),
+                                  palette.backgroundPrimary.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  palette.backgroundPrimary.withValues(
+                                    alpha: 0.72,
+                                  ),
                                 ],
                               ),
                               borderRadius: context.appRadii.largeRadius,
@@ -139,8 +143,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
                         bottom: spacing.sm,
                         child: _PlaylistInfoPill(
                           icon: Icons.queue_music_rounded,
-                          label: context.l10n
-                              .songsTotal(widget.playlist.songCount),
+                          label: context.l10n.songsTotal(
+                            widget.playlist.songCount,
+                          ),
                         ),
                       ),
                       if (widget.playlist.isFavorite)
@@ -153,8 +158,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
                               width: 34,
                               height: 34,
                               decoration: BoxDecoration(
-                                color:
-                                    palette.dangerSoft.withValues(alpha: 0.92),
+                                color: palette.dangerSoft.withValues(
+                                  alpha: 0.92,
+                                ),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: palette.danger.withValues(alpha: 0.34),
@@ -200,10 +206,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
 }
 
 class _PlaylistInfoPill extends StatelessWidget {
-  const _PlaylistInfoPill({
-    required this.icon,
-    required this.label,
-  });
+  const _PlaylistInfoPill({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -229,11 +232,7 @@ class _PlaylistInfoPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: palette.textPrimary,
-          ),
+          Icon(icon, size: 12, color: palette.textPrimary),
           SizedBox(width: spacing.xxs),
           Text(
             label,

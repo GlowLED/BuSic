@@ -8,16 +8,9 @@ import '../../../core/utils/platform_utils.dart';
 import '../data/bili_web_login_cookie_store.dart';
 import '../data/linux_managed_browser_login_service.dart';
 
-enum WebLoginMode {
-  embeddedWebView,
-  managedBrowser,
-}
+enum WebLoginMode { embeddedWebView, managedBrowser }
 
-enum WebLoginHostPlatform {
-  linux,
-  windows,
-  other,
-}
+enum WebLoginHostPlatform { linux, windows, other }
 
 enum WebLoginAvailabilityStatus {
   available,
@@ -39,25 +32,25 @@ class WebLoginAvailability {
     WebLoginMode mode = WebLoginMode.embeddedWebView,
     WebViewEnvironment? webViewEnvironment,
   }) : this._(
-          status: WebLoginAvailabilityStatus.available,
-          mode: mode,
-          webViewEnvironment: webViewEnvironment,
-        );
+         status: WebLoginAvailabilityStatus.available,
+         mode: mode,
+         webViewEnvironment: webViewEnvironment,
+       );
 
   const WebLoginAvailability.unsupportedPlatform()
-      : this._(status: WebLoginAvailabilityStatus.unsupportedPlatform);
+    : this._(status: WebLoginAvailabilityStatus.unsupportedPlatform);
 
   const WebLoginAvailability.browserMissing()
-      : this._(status: WebLoginAvailabilityStatus.browserMissing);
+    : this._(status: WebLoginAvailabilityStatus.browserMissing);
 
   const WebLoginAvailability.webView2Missing()
-      : this._(status: WebLoginAvailabilityStatus.webView2Missing);
+    : this._(status: WebLoginAvailabilityStatus.webView2Missing);
 
   const WebLoginAvailability.initializationFailed(Object error)
-      : this._(
-          status: WebLoginAvailabilityStatus.initializationFailed,
-          error: error,
-        );
+    : this._(
+        status: WebLoginAvailabilityStatus.initializationFailed,
+        error: error,
+      );
 
   final WebLoginAvailabilityStatus status;
   final WebLoginMode mode;
@@ -69,53 +62,53 @@ class WebLoginAvailability {
 
 final webLoginAvailabilityProvider =
     FutureProvider.autoDispose<WebLoginAvailability>((ref) async {
-  final hostPlatform = ref.watch(webLoginHostPlatformProvider);
+      final hostPlatform = ref.watch(webLoginHostPlatformProvider);
 
-  if (hostPlatform == WebLoginHostPlatform.linux) {
-    final service = ref.watch(linuxManagedBrowserLoginServiceProvider);
-    final available = await service.isAvailable();
-    if (!available) {
-      return const WebLoginAvailability.browserMissing();
-    }
-    return const WebLoginAvailability.available(
-      mode: WebLoginMode.managedBrowser,
-    );
-  }
+      if (hostPlatform == WebLoginHostPlatform.linux) {
+        final service = ref.watch(linuxManagedBrowserLoginServiceProvider);
+        final available = await service.isAvailable();
+        if (!available) {
+          return const WebLoginAvailability.browserMissing();
+        }
+        return const WebLoginAvailability.available(
+          mode: WebLoginMode.managedBrowser,
+        );
+      }
 
-  if (hostPlatform != WebLoginHostPlatform.windows) {
-    return const WebLoginAvailability.available();
-  }
+      if (hostPlatform != WebLoginHostPlatform.windows) {
+        return const WebLoginAvailability.available();
+      }
 
-  try {
-    final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    if (availableVersion == null) {
-      return const WebLoginAvailability.webView2Missing();
-    }
+      try {
+        final availableVersion = await WebViewEnvironment.getAvailableVersion();
+        if (availableVersion == null) {
+          return const WebLoginAvailability.webView2Missing();
+        }
 
-    final dataPath = await PlatformUtils.getDataPath();
-    final webViewEnvironment = await WebViewEnvironment.create(
-      settings: WebViewEnvironmentSettings(
-        userDataFolder: p.join(dataPath, 'webview2'),
-      ),
-    );
+        final dataPath = await PlatformUtils.getDataPath();
+        final webViewEnvironment = await WebViewEnvironment.create(
+          settings: WebViewEnvironmentSettings(
+            userDataFolder: p.join(dataPath, 'webview2'),
+          ),
+        );
 
-    ref.onDispose(() {
-      webViewEnvironment.dispose();
+        ref.onDispose(() {
+          webViewEnvironment.dispose();
+        });
+
+        return WebLoginAvailability.available(
+          webViewEnvironment: webViewEnvironment,
+        );
+      } catch (e, stackTrace) {
+        AppLogger.error(
+          'Failed to initialize Windows WebView2 environment',
+          tag: 'Auth',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        return WebLoginAvailability.initializationFailed(e);
+      }
     });
-
-    return WebLoginAvailability.available(
-      webViewEnvironment: webViewEnvironment,
-    );
-  } catch (e, stackTrace) {
-    AppLogger.error(
-      'Failed to initialize Windows WebView2 environment',
-      tag: 'Auth',
-      error: e,
-      stackTrace: stackTrace,
-    );
-    return WebLoginAvailability.initializationFailed(e);
-  }
-});
 
 final webLoginHostPlatformProvider = Provider<WebLoginHostPlatform>((ref) {
   if (PlatformUtils.isLinux || defaultTargetPlatform == TargetPlatform.linux) {
@@ -128,16 +121,17 @@ final webLoginHostPlatformProvider = Provider<WebLoginHostPlatform>((ref) {
   return WebLoginHostPlatform.other;
 });
 
-final biliWebLoginCookieStoreProvider =
-    Provider.autoDispose.family<BiliWebLoginCookieStore, WebViewEnvironment?>(
-  (ref, webViewEnvironment) {
-    return InAppBiliWebLoginCookieStore(
-      webViewEnvironment: webViewEnvironment,
-    );
-  },
-);
+final biliWebLoginCookieStoreProvider = Provider.autoDispose
+    .family<BiliWebLoginCookieStore, WebViewEnvironment?>((
+      ref,
+      webViewEnvironment,
+    ) {
+      return InAppBiliWebLoginCookieStore(
+        webViewEnvironment: webViewEnvironment,
+      );
+    });
 
 final linuxManagedBrowserLoginServiceProvider =
     Provider<LinuxManagedBrowserLoginService>((ref) {
-  return ProcessLinuxManagedBrowserLoginService();
-});
+      return ProcessLinuxManagedBrowserLoginService();
+    });

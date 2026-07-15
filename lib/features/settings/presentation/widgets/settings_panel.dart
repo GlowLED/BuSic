@@ -105,8 +105,9 @@ class SettingsTile extends StatelessWidget {
     final spacing = context.appSpacing;
     final palette = context.appPalette;
     final accent = destructive ? palette.danger : palette.accentStrong;
-    final iconBackground =
-        destructive ? palette.dangerSoft : palette.surfaceSecondary;
+    final iconBackground = destructive
+        ? palette.dangerSoft
+        : palette.surfaceSecondary;
     final active = enabled && (onTap != null || onLongPress != null);
 
     return Opacity(
@@ -170,10 +171,7 @@ class SettingsTile extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if (body != null) ...[
-                    SizedBox(height: spacing.sm),
-                    body!,
-                  ],
+                  if (body != null) ...[SizedBox(height: spacing.sm), body!],
                 ],
               ),
             ),

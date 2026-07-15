@@ -130,7 +130,7 @@ class ParseRepositoryImpl implements ParseRepository {
 
     final backupUrls =
         (selected['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
-            [];
+        [];
 
     return AudioStreamInfo(
       url: selected['baseUrl'] as String? ?? selected['base_url'] as String,
@@ -167,8 +167,10 @@ class ParseRepositoryImpl implements ParseRepository {
     final data = response.data['data'];
     if (data == null) {
       // Fallback: retry with fnval=16 if extended flags fail
-      AppLogger.info('Retrying getAvailableQualities with fnval=16',
-          tag: 'Parse');
+      AppLogger.info(
+        'Retrying getAvailableQualities with fnval=16',
+        tag: 'Parse',
+      );
       return _getAvailableQualitiesFallback(bvid, cid);
     }
     final dash = data['dash'] as Map<String, dynamic>?;
@@ -190,14 +192,16 @@ class ParseRepositoryImpl implements ParseRepository {
     for (final stream in audioStreams) {
       final backupUrls =
           (stream['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
-              [];
-      results.add(AudioStreamInfo(
-        url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
-        quality: stream['id'] as int,
-        mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
-        bandwidth: stream['bandwidth'] as int?,
-        backupUrls: backupUrls,
-      ));
+          [];
+      results.add(
+        AudioStreamInfo(
+          url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
+          quality: stream['id'] as int,
+          mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
+          bandwidth: stream['bandwidth'] as int?,
+          backupUrls: backupUrls,
+        ),
+      );
     }
 
     // Dolby Atmos streams
@@ -206,17 +210,20 @@ class ParseRepositoryImpl implements ParseRepository {
       final dolbyAudio = dolby['audio'];
       if (dolbyAudio is List) {
         for (final stream in dolbyAudio) {
-          final backupUrls = (stream['backupUrl'] as List?)
+          final backupUrls =
+              (stream['backupUrl'] as List?)
                   ?.map((e) => e.toString())
                   .toList() ??
               [];
-          results.add(AudioStreamInfo(
-            url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
-            quality: stream['id'] as int,
-            mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
-            bandwidth: stream['bandwidth'] as int?,
-            backupUrls: backupUrls,
-          ));
+          results.add(
+            AudioStreamInfo(
+              url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
+              quality: stream['id'] as int,
+              mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
+              bandwidth: stream['bandwidth'] as int?,
+              backupUrls: backupUrls,
+            ),
+          );
         }
       }
     }
@@ -226,18 +233,22 @@ class ParseRepositoryImpl implements ParseRepository {
     if (flac != null) {
       final flacAudio = flac['audio'];
       if (flacAudio is Map<String, dynamic>) {
-        final backupUrls = (flacAudio['backupUrl'] as List?)
+        final backupUrls =
+            (flacAudio['backupUrl'] as List?)
                 ?.map((e) => e.toString())
                 .toList() ??
             [];
-        results.add(AudioStreamInfo(
-          url: flacAudio['baseUrl'] as String? ??
-              flacAudio['base_url'] as String,
-          quality: flacAudio['id'] as int,
-          mimeType: flacAudio['mimeType'] as String? ?? 'audio/mp4',
-          bandwidth: flacAudio['bandwidth'] as int?,
-          backupUrls: backupUrls,
-        ));
+        results.add(
+          AudioStreamInfo(
+            url:
+                flacAudio['baseUrl'] as String? ??
+                flacAudio['base_url'] as String,
+            quality: flacAudio['id'] as int,
+            mimeType: flacAudio['mimeType'] as String? ?? 'audio/mp4',
+            bandwidth: flacAudio['bandwidth'] as int?,
+            backupUrls: backupUrls,
+          ),
+        );
       }
     }
 
@@ -252,13 +263,7 @@ class ParseRepositoryImpl implements ParseRepository {
     int cid,
   ) async {
     final params = WbiSign.encodeWbi(
-      {
-        'bvid': bvid,
-        'cid': cid,
-        'fnval': 16,
-        'fnver': 0,
-        'fourk': 1,
-      },
+      {'bvid': bvid, 'cid': cid, 'fnval': 16, 'fnver': 0, 'fourk': 1},
       imgKey: _imgKey!,
       subKey: _subKey!,
     );
@@ -277,14 +282,16 @@ class ParseRepositoryImpl implements ParseRepository {
     for (final stream in audioStreams) {
       final backupUrls =
           (stream['backupUrl'] as List?)?.map((e) => e.toString()).toList() ??
-              [];
-      results.add(AudioStreamInfo(
-        url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
-        quality: stream['id'] as int,
-        mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
-        bandwidth: stream['bandwidth'] as int?,
-        backupUrls: backupUrls,
-      ));
+          [];
+      results.add(
+        AudioStreamInfo(
+          url: stream['baseUrl'] as String? ?? stream['base_url'] as String,
+          quality: stream['id'] as int,
+          mimeType: stream['mimeType'] as String? ?? 'audio/mp4',
+          bandwidth: stream['bandwidth'] as int?,
+          backupUrls: backupUrls,
+        ),
+      );
     }
     results.sort((a, b) => b.quality.compareTo(a.quality));
     return results;
@@ -318,8 +325,10 @@ class ParseRepositoryImpl implements ParseRepository {
     final results = data['result'] as List? ?? [];
 
     final videoList = results.map((item) {
-      final title = (item['title'] as String? ?? '')
-          .replaceAll(RegExp(r'<[^>]*>'), ''); // Strip HTML tags
+      final title = (item['title'] as String? ?? '').replaceAll(
+        RegExp(r'<[^>]*>'),
+        '',
+      ); // Strip HTML tags
       return BvidInfo(
         bvid: item['bvid'] as String? ?? '',
         title: title,
@@ -414,11 +423,13 @@ class ParseRepositoryImpl implements ParseRepository {
     }
     final list = data['list'] as List<dynamic>? ?? [];
     return list
-        .map((item) => BiliFavFolder(
-              id: item['id'] as int,
-              title: item['title'] as String,
-              mediaCount: item['media_count'] as int,
-            ))
+        .map(
+          (item) => BiliFavFolder(
+            id: item['id'] as int,
+            title: item['title'] as String,
+            mediaCount: item['media_count'] as int,
+          ),
+        )
         .toList();
   }
 
@@ -478,11 +489,7 @@ class ParseRepositoryImpl implements ParseRepository {
     while (hasMore) {
       final response = await _biliDio.get(
         '/x/v3/fav/resource/list',
-        queryParameters: {
-          'media_id': mediaId,
-          'pn': page,
-          'ps': 20,
-        },
+        queryParameters: {'media_id': mediaId, 'pn': page, 'ps': 20},
       );
       final data = response.data['data'];
       if (data == null) break;
@@ -500,18 +507,20 @@ class ParseRepositoryImpl implements ParseRepository {
         final bvid = media['bvid'] as String?;
         if (bvid == null || bvid.isEmpty) continue;
 
-        items.add(BiliFavItem(
-          bvid: bvid,
-          title: media['title'] as String? ?? '',
-          upper:
-              (media['upper'] as Map<String, dynamic>?)?['name'] as String? ??
-                  '',
-          cover: media['cover'] as String?,
-          duration: media['duration'] as int? ?? 0,
-          firstCid:
-              (media['ugc'] as Map<String, dynamic>?)?['first_cid'] as int? ??
-                  0,
-        ));
+        items.add(
+          BiliFavItem(
+            bvid: bvid,
+            title: media['title'] as String? ?? '',
+            upper:
+                (media['upper'] as Map<String, dynamic>?)?['name'] as String? ??
+                '',
+            cover: media['cover'] as String?,
+            duration: media['duration'] as int? ?? 0,
+            firstCid:
+                (media['ugc'] as Map<String, dynamic>?)?['first_cid'] as int? ??
+                0,
+          ),
+        );
       }
 
       hasMore = data['has_more'] as bool? ?? false;
@@ -530,12 +539,14 @@ class ParseRepositoryImpl implements ParseRepository {
     final pagesRaw = data['pages'] as List? ?? [];
     final pages = pagesRaw
         .whereType<Map<String, dynamic>>()
-        .map((page) => PageInfo(
-              cid: _asInt(page['cid']) ?? 0,
-              page: _asInt(page['page']) ?? 0,
-              partTitle: page['part'] as String? ?? '',
-              duration: _asInt(page['duration']) ?? 0,
-            ))
+        .map(
+          (page) => PageInfo(
+            cid: _asInt(page['cid']) ?? 0,
+            page: _asInt(page['page']) ?? 0,
+            partTitle: page['part'] as String? ?? '',
+            duration: _asInt(page['duration']) ?? 0,
+          ),
+        )
         .toList();
 
     return BvidInfo(

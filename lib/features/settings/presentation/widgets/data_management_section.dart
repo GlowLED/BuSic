@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../share/application/sync_notifier.dart';
+import '../../../share/domain/models/sync_state.dart';
 import '../../../share/presentation/widgets/backup_overview_dialog.dart';
 import 'settings_panel.dart';
 
@@ -40,12 +41,14 @@ class DataManagementSection extends ConsumerWidget {
     await notifier.exportToFile();
     final state = ref.read(syncNotifierProvider);
     if (context.mounted) {
-      state.whenOrNull(
-        exportSuccess: (path) => context.showSnackBar(
-          l10n.backupExportedTo(path),
-        ),
-        error: (msg) => context.showSnackBar(msg),
-      );
+      switch (state) {
+        case SyncExportSuccess(:final filePath):
+          context.showSnackBar(l10n.backupExportedTo(filePath));
+        case SyncError(:final message):
+          context.showSnackBar(message);
+        default:
+          break;
+      }
     }
   }
 
@@ -55,9 +58,9 @@ class DataManagementSection extends ConsumerWidget {
     if (backup == null) {
       final state = ref.read(syncNotifierProvider);
       if (context.mounted) {
-        state.whenOrNull(
-          error: (msg) => context.showSnackBar(msg),
-        );
+        if (state case SyncError(:final message)) {
+          context.showSnackBar(message);
+        }
       }
       return;
     }
@@ -77,8 +80,8 @@ class DataManagementSection extends ConsumerWidget {
           }
           final importState = ref.read(syncNotifierProvider);
           if (context.mounted) {
-            importState.whenOrNull(
-              importSuccess: (result) {
+            switch (importState) {
+              case SyncImportSuccess(:final result):
                 context.showSnackBar(
                   l10n.backupImportResult(
                     result.playlistsCreated,
@@ -86,9 +89,11 @@ class DataManagementSection extends ConsumerWidget {
                     result.songsCreated,
                   ),
                 );
-              },
-              error: (msg) => context.showSnackBar(msg),
-            );
+              case SyncError(:final message):
+                context.showSnackBar(message);
+              default:
+                break;
+            }
           }
         },
       ),

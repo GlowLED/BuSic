@@ -34,8 +34,7 @@ void showSongContextMenu({
               isFav ? Icons.favorite : Icons.favorite_border,
               color: isFav ? Colors.redAccent : null,
             ),
-            title:
-                Text(isFav ? l10n.removeFromFavorites : l10n.addToFavorites),
+            title: Text(isFav ? l10n.removeFromFavorites : l10n.addToFavorites),
             onTap: () {
               Navigator.pop(ctx);
               ref
@@ -50,10 +49,8 @@ void showSongContextMenu({
               Navigator.pop(ctx);
               showDialog(
                 context: context,
-                builder: (_) => MetadataEditDialog(
-                  song: song,
-                  playlistId: playlistId,
-                ),
+                builder: (_) =>
+                    MetadataEditDialog(song: song, playlistId: playlistId),
               );
             },
           ),
@@ -72,7 +69,9 @@ void showSongContextMenu({
             title: Text(l10n.addToPlaylist),
             onTap: () {
               Navigator.pop(ctx);
-              ref.read(playerNotifierProvider.notifier).addToQueue(
+              ref
+                  .read(playerNotifierProvider.notifier)
+                  .addToQueue(
                     AudioTrack(
                       songId: song.id,
                       bvid: song.bvid,
@@ -94,12 +93,12 @@ void showSongContextMenu({
             },
           ),
           ListTile(
-            leading: Icon(
-              song.isCached ? Icons.download_done : Icons.download,
+            leading: Icon(song.isCached ? Icons.download_done : Icons.download),
+            title: Text(
+              song.isCached
+                  ? '${l10n.cached} (${song.qualityLabel})'
+                  : l10n.downloadSong,
             ),
-            title: Text(song.isCached
-                ? '${l10n.cached} (${song.qualityLabel})'
-                : l10n.downloadSong),
             onTap: song.isCached
                 ? null
                 : () {

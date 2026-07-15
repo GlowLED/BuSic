@@ -10,6 +10,7 @@ import '../../../shared/widgets/song_tile.dart';
 import '../../player/application/player_notifier.dart';
 import '../../player/domain/models/play_mode.dart';
 import '../../share/application/share_notifier.dart';
+import '../../share/domain/models/share_state.dart';
 import '../application/favorite_notifier.dart';
 import '../../share/presentation/widgets/share_dialog.dart';
 import '../application/playlist_notifier.dart';
@@ -126,8 +127,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         return match.isNotEmpty ? match.first : null;
       },
     );
-    final playlistName =
-        playlist?.isFavorite == true ? l10n.myFavorites : playlist?.name;
+    final playlistName = playlist?.isFavorite == true
+        ? l10n.myFavorites
+        : playlist?.name;
 
     return Scaffold(
       body: songsAsync.when(
@@ -161,8 +163,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                             songs.length,
                           )
                         : _editMode == _EditMode.reorder
-                            ? l10n.sortingMode
-                            : playlistName ?? l10n.playlists,
+                        ? l10n.sortingMode
+                        : playlistName ?? l10n.playlists,
                     style: context.textTheme.titleMedium,
                   ),
                   background: Container(
@@ -205,18 +207,18 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
               else if (_editMode == _EditMode.reorder)
                 SliverReorderableList(
                   itemCount: songs.length,
-                  onReorder: (oldIndex, newIndex) {
-                    if (newIndex > oldIndex) newIndex--;
+                  onReorderItem: (oldIndex, newIndex) {
                     ref
                         .read(
-                            playlistDetailNotifierProvider(playlistId).notifier)
+                          playlistDetailNotifierProvider(playlistId).notifier,
+                        )
                         .reorderSongs(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {
                     final song = songs[index];
                     final isCurrentSong =
                         playerState.currentTrack?.songId == song.id &&
-                            playerState.isPlaying;
+                        playerState.isPlaying;
 
                     return Padding(
                       key: ValueKey(song.id),
@@ -237,97 +239,83 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                 )
               else
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final song = songs[index];
-                      final isCurrentSong =
-                          playerState.currentTrack?.songId == song.id;
-                      final isSelected = _selectedSongIds.contains(song.id);
-                      return _editMode == _EditMode.batchSelect
-                          ? Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                context.appSpacing.md,
-                                index == 0 ? context.appSpacing.sm : 0,
-                                context.appSpacing.md,
-                                context.appSpacing.xxs,
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final song = songs[index];
+                    final isCurrentSong =
+                        playerState.currentTrack?.songId == song.id;
+                    final isSelected = _selectedSongIds.contains(song.id);
+                    return _editMode == _EditMode.batchSelect
+                        ? Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              context.appSpacing.md,
+                              index == 0 ? context.appSpacing.sm : 0,
+                              context.appSpacing.md,
+                              context.appSpacing.xxs,
+                            ),
+                            child: _buildBatchSelectSongRow(
+                              context: context,
+                              song: song,
+                              isCurrentSong:
+                                  isCurrentSong && playerState.isPlaying,
+                              isSelected: isSelected,
+                            ),
+                          )
+                        : Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              context.appSpacing.md,
+                              index == 0 ? context.appSpacing.sm : 0,
+                              context.appSpacing.md,
+                              context.appSpacing.xxs,
+                            ),
+                            child: SongTile(
+                              title: song.displayTitle,
+                              artist: song.displayArtist,
+                              coverUrl: song.coverUrl,
+                              duration: Formatters.formatDuration(
+                                Duration(seconds: song.duration),
                               ),
-                              child: _buildBatchSelectSongRow(
-                                context: context,
-                                song: song,
-                                isCurrentSong:
-                                    isCurrentSong && playerState.isPlaying,
-                                isSelected: isSelected,
-                              ),
-                            )
-                          : Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                context.appSpacing.md,
-                                index == 0 ? context.appSpacing.sm : 0,
-                                context.appSpacing.md,
-                                context.appSpacing.xxs,
-                              ),
-                              child: SongTile(
-                                title: song.displayTitle,
-                                artist: song.displayArtist,
-                                coverUrl: song.coverUrl,
-                                duration: Formatters.formatDuration(
-                                  Duration(seconds: song.duration),
-                                ),
-                                isPlaying:
-                                    isCurrentSong && playerState.isPlaying,
-                                isCached: song.isCached,
-                                qualityLabel:
-                                    song.isCached ? song.qualityLabel : null,
-                                isFavorited:
-                                    favState.value?.contains(song.id) ?? false,
-                                onLongPress: () {
-                                  setState(() {
-                                    _editMode = _EditMode.batchSelect;
-                                    _selectedSongIds.add(song.id);
-                                  });
-                                },
-                                onFavoritePressed: () {
+                              isPlaying: isCurrentSong && playerState.isPlaying,
+                              isCached: song.isCached,
+                              qualityLabel: song.isCached
+                                  ? song.qualityLabel
+                                  : null,
+                              isFavorited:
+                                  favState.value?.contains(song.id) ?? false,
+                              onLongPress: () {
+                                setState(() {
+                                  _editMode = _EditMode.batchSelect;
+                                  _selectedSongIds.add(song.id);
+                                });
+                              },
+                              onFavoritePressed: () {
+                                ref
+                                    .read(favoriteNotifierProvider.notifier)
+                                    .toggleFavorite(song.id);
+                              },
+                              onTap: () {
+                                if (isCurrentSong && playerState.isPlaying) {
                                   ref
-                                      .read(
-                                        favoriteNotifierProvider.notifier,
-                                      )
-                                      .toggleFavorite(song.id);
-                                },
-                                onTap: () {
-                                  if (isCurrentSong && playerState.isPlaying) {
-                                    ref
-                                        .read(
-                                          playerNotifierProvider.notifier,
-                                        )
-                                        .pause();
-                                  } else if (isCurrentSong) {
-                                    ref
-                                        .read(
-                                          playerNotifierProvider.notifier,
-                                        )
-                                        .resume();
-                                  } else {
-                                    _playSong(
-                                      ref,
-                                      song,
-                                      songs,
-                                      playlistName,
-                                    );
-                                  }
-                                },
-                                onMorePressed: () {
-                                  showSongContextMenu(
-                                    context: context,
-                                    ref: ref,
-                                    song: song,
-                                    playlistId: playlistId,
-                                  );
-                                },
-                              ),
-                            );
-                    },
-                    childCount: songs.length,
-                  ),
+                                      .read(playerNotifierProvider.notifier)
+                                      .pause();
+                                } else if (isCurrentSong) {
+                                  ref
+                                      .read(playerNotifierProvider.notifier)
+                                      .resume();
+                                } else {
+                                  _playSong(ref, song, songs, playlistName);
+                                }
+                              },
+                              onMorePressed: () {
+                                showSongContextMenu(
+                                  context: context,
+                                  ref: ref,
+                                  song: song,
+                                  playlistId: playlistId,
+                                );
+                              },
+                            ),
+                          );
+                  }, childCount: songs.length),
                 ),
             ],
           );
@@ -343,11 +331,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     required bool isCurrentSong,
   }) {
     return MediaRow(
-      cover: MediaCover(
-        coverUrl: song.coverUrl,
-        width: 58,
-        height: 58,
-      ),
+      cover: MediaCover(coverUrl: song.coverUrl, width: 58, height: 58),
       title: Text(
         song.displayTitle,
         maxLines: 1,
@@ -394,11 +378,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     required bool isSelected,
   }) {
     return MediaRow(
-      cover: MediaCover(
-        coverUrl: song.coverUrl,
-        width: 58,
-        height: 58,
-      ),
+      cover: MediaCover(coverUrl: song.coverUrl, width: 58, height: 58),
       title: Text(
         song.displayTitle,
         maxLines: 1,
@@ -453,11 +433,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.download_done_rounded,
-              size: 12,
-              color: palette.success,
-            ),
+            Icon(Icons.download_done_rounded, size: 12, color: palette.success),
             SizedBox(width: context.appSpacing.xxs),
             Text(
               song.qualityLabel.isNotEmpty
@@ -473,8 +449,12 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     ];
   }
 
-  List<Widget> _buildActions(BuildContext context, List<SongItem> songs,
-      String? playlistName, dynamic l10n) {
+  List<Widget> _buildActions(
+    BuildContext context,
+    List<SongItem> songs,
+    String? playlistName,
+    dynamic l10n,
+  ) {
     if (_editMode == _EditMode.batchSelect) {
       final allSelected = _selectedSongIds.length == songs.length;
       return [
@@ -543,11 +523,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                   builder: (_) => CoverSelectionDialog(playlistId: playlistId),
                 );
               case 'downloadAll':
-                downloadAllUncached(
-                  context: context,
-                  ref: ref,
-                  songs: songs,
-                );
+                downloadAllUncached(context: context, ref: ref, songs: songs);
             }
           },
           itemBuilder: (_) => [
@@ -596,18 +572,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: context.appPalette.textSecondary,
-        ),
+        Icon(icon, size: 18, color: context.appPalette.textSecondary),
         SizedBox(width: context.appSpacing.sm),
-        Expanded(
-          child: Text(
-            label,
-            style: context.textTheme.bodyMedium,
-          ),
-        ),
+        Expanded(child: Text(label, style: context.textTheme.bodyMedium)),
       ],
     );
   }
@@ -616,7 +583,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   void _playAll(WidgetRef ref, List<SongItem> songs, String? playlistName) {
     if (songs.isEmpty) return;
     ref.read(playerNotifierProvider.notifier).setMode(PlayMode.sequential);
-    ref.read(playerNotifierProvider.notifier).playSongFromPlaylist(
+    ref
+        .read(playerNotifierProvider.notifier)
+        .playSongFromPlaylist(
           song: songs.first,
           songs: songs,
           playlistId: playlistId,
@@ -652,9 +621,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   }
 
   /// Play a specific song within the playlist context.
-  void _playSong(WidgetRef ref, SongItem song, List<SongItem> songs,
-      String? playlistName) {
-    ref.read(playerNotifierProvider.notifier).playSongFromPlaylist(
+  void _playSong(
+    WidgetRef ref,
+    SongItem song,
+    List<SongItem> songs,
+    String? playlistName,
+  ) {
+    ref
+        .read(playerNotifierProvider.notifier)
+        .playSongFromPlaylist(
           song: song,
           songs: songs,
           playlistId: playlistId,
@@ -683,24 +658,20 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         .exportToClipboard(playlistId);
     final state = ref.read(shareNotifierProvider);
     if (context.mounted) {
-      state.when(
-        idle: () {},
-        exporting: () {},
-        exported: (_) => context.showSnackBar(context.l10n.copiedToClipboard),
-        importing: (_, __) {},
-        preview: (_) {},
-        importSuccess: (_) {},
-        error: (msg) => context.showSnackBar(msg),
-      );
+      switch (state) {
+        case ShareExported():
+          context.showSnackBar(context.l10n.copiedToClipboard);
+        case ShareError(:final message):
+          context.showSnackBar(message);
+        default:
+          break;
+      }
     }
   }
 }
 
 class _AccessoryPill extends StatelessWidget {
-  const _AccessoryPill({
-    required this.icon,
-    required this.tooltip,
-  });
+  const _AccessoryPill({required this.icon, required this.tooltip});
 
   final IconData icon;
   final String tooltip;
@@ -718,11 +689,7 @@ class _AccessoryPill extends StatelessWidget {
           color: palette.surfaceSecondary.withValues(alpha: 0.9),
           borderRadius: context.appRadii.mediumRadius,
         ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: palette.textSecondary,
-        ),
+        child: Icon(icon, size: 18, color: palette.textSecondary),
       ),
     );
   }

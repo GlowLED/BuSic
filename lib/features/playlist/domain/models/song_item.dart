@@ -8,7 +8,7 @@ part 'song_item.g.dart';
 /// Combines origin and custom metadata — UI layer should use
 /// [displayTitle] and [displayArtist] for rendering.
 @freezed
-class SongItem with _$SongItem {
+abstract class SongItem with _$SongItem {
   const SongItem._();
 
   const factory SongItem({
@@ -58,12 +58,18 @@ class SongItem with _$SongItem {
   /// Human-readable quality label for the cached version.
   String get qualityLabel {
     switch (audioQuality) {
-      case 30216: return '64kbps';
-      case 30232: return '132kbps';
-      case 30280: return '192kbps';
-      case 30250: return 'Dolby';
-      case 30251: return 'Hi-Res';
-      default: return '';
+      case 30216:
+        return '64kbps';
+      case 30232:
+        return '132kbps';
+      case 30280:
+        return '192kbps';
+      case 30250:
+        return 'Dolby';
+      case 30251:
+        return 'Hi-Res';
+      default:
+        return '';
     }
   }
 

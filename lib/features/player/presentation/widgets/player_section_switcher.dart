@@ -24,9 +24,7 @@ class PlayerSectionSwitcher extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.18),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(4),
@@ -48,10 +46,7 @@ class PlayerSectionSwitcher extends StatelessWidget {
 }
 
 class PlayerSectionSwitcherItem {
-  const PlayerSectionSwitcherItem({
-    required this.label,
-    required this.icon,
-  });
+  const PlayerSectionSwitcherItem({required this.label, required this.icon});
 
   final String label;
   final IconData icon;
@@ -87,10 +82,7 @@ class _SwitcherItem extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: selected
                     ? Colors.white.withValues(alpha: 0.92)

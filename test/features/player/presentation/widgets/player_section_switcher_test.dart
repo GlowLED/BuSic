@@ -7,18 +7,12 @@ import '../../../../test_helpers/test_app.dart';
 
 void main() {
   const items = [
-    PlayerSectionSwitcherItem(
-      label: 'Info',
-      icon: Icons.info_outline_rounded,
-    ),
+    PlayerSectionSwitcherItem(label: 'Info', icon: Icons.info_outline_rounded),
     PlayerSectionSwitcherItem(
       label: 'Lyrics',
       icon: Icons.format_align_center_rounded,
     ),
-    PlayerSectionSwitcherItem(
-      label: 'Comments',
-      icon: Icons.comment_outlined,
-    ),
+    PlayerSectionSwitcherItem(label: 'Comments', icon: Icons.comment_outlined),
   ];
 
   testWidgets('renders all sections and forwards taps', (tester) async {
@@ -46,8 +40,9 @@ void main() {
     expect(selected, 1);
   });
 
-  testWidgets('updates selected text styling when parent state changes',
-      (tester) async {
+  testWidgets('updates selected text styling when parent state changes', (
+    tester,
+  ) async {
     var selectedIndex = 0;
 
     await tester.pumpWidget(
@@ -74,9 +69,6 @@ void main() {
     await tester.pumpAndSettle();
 
     final commentsText = tester.widget<Text>(find.text('Comments'));
-    expect(
-      commentsText.style?.color,
-      Colors.black.withValues(alpha: 0.88),
-    );
+    expect(commentsText.style?.color, Colors.black.withValues(alpha: 0.88));
   });
 }

@@ -48,14 +48,20 @@ class UpdateRepositoryImpl implements UpdateRepository {
   final ProxyProber _prober;
   final LanzouResolver _lanzouResolver;
 
-  UpdateRepositoryImpl({Dio? dio, ProxyProber? prober, LanzouResolver? lanzouResolver})
-      : _dio = dio ??
-            Dio(BaseOptions(
-              connectTimeout: const Duration(seconds: 10),
-              receiveTimeout: const Duration(seconds: 30),
-            )),
-        _prober = prober ?? ProxyProber(),
-        _lanzouResolver = lanzouResolver ?? LanzouResolver();
+  UpdateRepositoryImpl({
+    Dio? dio,
+    ProxyProber? prober,
+    LanzouResolver? lanzouResolver,
+  }) : _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: const Duration(seconds: 10),
+               receiveTimeout: const Duration(seconds: 30),
+             ),
+           ),
+       _prober = prober ?? ProxyProber(),
+       _lanzouResolver = lanzouResolver ?? LanzouResolver();
 
   // ── Manifest fetching (V2 primary) ───────────────────────────────
 
@@ -100,10 +106,12 @@ class UpdateRepositoryImpl implements UpdateRepository {
           lastError = e;
           failCount++;
           if (failCount >= total && !completer.isCompleted) {
-            completer.completeError(Exception(
-              'Failed to fetch manifest JSON from all '
-              '${kManifestUrls.length} sources. Last error: $lastError',
-            ));
+            completer.completeError(
+              Exception(
+                'Failed to fetch manifest JSON from all '
+                '${kManifestUrls.length} sources. Last error: $lastError',
+              ),
+            );
           }
         }
       }();
@@ -152,10 +160,12 @@ class UpdateRepositoryImpl implements UpdateRepository {
           lastError = e;
           failCount++;
           if (failCount >= total && !completer.isCompleted) {
-            completer.completeError(Exception(
-              'Failed to fetch manifest YAML from all '
-              '${kMetadataUrls.length} sources. Last error: $lastError',
-            ));
+            completer.completeError(
+              Exception(
+                'Failed to fetch manifest YAML from all '
+                '${kMetadataUrls.length} sources. Last error: $lastError',
+              ),
+            );
           }
         }
       }();
@@ -353,8 +363,9 @@ class UpdateRepositoryImpl implements UpdateRepository {
       isForceUpdate: isForceUpdate,
       assetName: assetName,
       downloadUrls: {DownloadChannel.github: downloadUrl},
-      releaseNotesUrl:
-          releaseNotesUrl?.isNotEmpty == true ? releaseNotesUrl : null,
+      releaseNotesUrl: releaseNotesUrl?.isNotEmpty == true
+          ? releaseNotesUrl
+          : null,
     );
   }
 
@@ -430,14 +441,15 @@ class UpdateRepositoryImpl implements UpdateRepository {
     CancelToken? cancelToken,
     int startByte = 0,
   }) async {
-    AppLogger.info('Downloading update from $url (startByte: $startByte)', tag: _kTag);
+    AppLogger.info(
+      'Downloading update from $url (startByte: $startByte)',
+      tag: _kTag,
+    );
 
     int lastReceivedBytes = startByte;
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
-    final headers = <String, dynamic>{
-      'User-Agent': 'BuSic-Updater',
-    };
+    final headers = <String, dynamic>{'User-Agent': 'BuSic-Updater'};
     if (startByte > 0) {
       headers['Range'] = 'bytes=$startByte-';
     }
@@ -536,7 +548,11 @@ class UpdateRepositoryImpl implements UpdateRepository {
   }
 
   @override
-  Future<void> applyUpdate(String localPath, {String? version, String? assetName}) async {
+  Future<void> applyUpdate(
+    String localPath, {
+    String? version,
+    String? assetName,
+  }) async {
     if (PlatformUtils.isAndroid) {
       await _applyAndroid(localPath);
     } else if (PlatformUtils.isWindows) {
@@ -546,9 +562,7 @@ class UpdateRepositoryImpl implements UpdateRepository {
     } else if (PlatformUtils.isMacOS) {
       await _applyMacOS(localPath);
     } else {
-      throw UnsupportedError(
-        'Auto-update is not supported on this platform.',
-      );
+      throw UnsupportedError('Auto-update is not supported on this platform.');
     }
   }
 
@@ -561,10 +575,7 @@ class UpdateRepositoryImpl implements UpdateRepository {
     try {
       await channel.invokeMethod('installApk', {'filePath': apkPath});
     } on PlatformException catch (e) {
-      AppLogger.error(
-        'Failed to launch installer: ${e.message}',
-        tag: _kTag,
-      );
+      AppLogger.error('Failed to launch installer: ${e.message}', tag: _kTag);
       throw Exception('Failed to launch APK installer: ${e.message}');
     }
   }
@@ -596,7 +607,8 @@ class UpdateRepositoryImpl implements UpdateRepository {
     final installDir = p.dirname(exePath);
 
     final batPath = p.join(tempDir.path, 'busic_update.bat');
-    final batContent = '@echo off\r\n'
+    final batContent =
+        '@echo off\r\n'
         'timeout /t 2 /nobreak >nul\r\n'
         'xcopy /s /y /q "${extractDir.path}\\*" "$installDir\\"\r\n'
         'start "" "$installDir\\busic.exe"\r\n'
@@ -605,15 +617,18 @@ class UpdateRepositoryImpl implements UpdateRepository {
 
     await File(batPath).writeAsString(batContent);
 
-    await Process.start(
-      'cmd',
-      ['/c', batPath],
-      mode: ProcessStartMode.detached,
-    );
+    await Process.start('cmd', [
+      '/c',
+      batPath,
+    ], mode: ProcessStartMode.detached);
     exit(0);
   }
 
-  Future<void> _applyLinux(String tarPath, {String? version, String? assetName}) async {
+  Future<void> _applyLinux(
+    String tarPath, {
+    String? version,
+    String? assetName,
+  }) async {
     AppLogger.info('Applying Linux update from: $tarPath', tag: _kTag);
 
     final tempDir = await getTemporaryDirectory();
@@ -641,7 +656,8 @@ class UpdateRepositoryImpl implements UpdateRepository {
           kReleaseProxies,
           testPath: '/$_kOwner/$_kRepo/releases',
         );
-        githubUrl = '$releaseProxy/$_kOwner/$_kRepo/releases/download/v$version/$assetName';
+        githubUrl =
+            '$releaseProxy/$_kOwner/$_kRepo/releases/download/v$version/$assetName';
       }
       AppLogger.warning(
         'Install directory is read-only, cannot auto-update',
@@ -652,7 +668,8 @@ class UpdateRepositoryImpl implements UpdateRepository {
 
     // Generate update shell script
     final shPath = p.join(tempDir.path, 'busic_update.sh');
-    final shContent = '#!/bin/bash\n'
+    final shContent =
+        '#!/bin/bash\n'
         'sleep 2\n'
         'cp -rf "${extractDir.path}/"* "$installDir/"\n'
         'chmod +x "$installDir/busic"\n'
@@ -663,11 +680,7 @@ class UpdateRepositoryImpl implements UpdateRepository {
     await File(shPath).writeAsString(shContent);
     await Process.run('chmod', ['+x', shPath]);
 
-    await Process.start(
-      'bash',
-      [shPath],
-      mode: ProcessStartMode.detached,
-    );
+    await Process.start('bash', [shPath], mode: ProcessStartMode.detached);
     exit(0);
   }
 
@@ -687,7 +700,8 @@ class UpdateRepositoryImpl implements UpdateRepository {
     // Replace .app bundle
     const appBundlePath = '/Applications/busic.app';
     final shPath = p.join(tempDir.path, 'busic_update.sh');
-    final shContent = '#!/bin/bash\n'
+    final shContent =
+        '#!/bin/bash\n'
         'sleep 2\n'
         'rm -rf "$appBundlePath"\n'
         'cp -R "${extractDir.path}/busic.app" "$appBundlePath"\n'
@@ -698,11 +712,7 @@ class UpdateRepositoryImpl implements UpdateRepository {
     await File(shPath).writeAsString(shContent);
     await Process.run('chmod', ['+x', shPath]);
 
-    await Process.start(
-      'bash',
-      [shPath],
-      mode: ProcessStartMode.detached,
-    );
+    await Process.start('bash', [shPath], mode: ProcessStartMode.detached);
     exit(0);
   }
 }

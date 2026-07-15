@@ -101,8 +101,8 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
   /// 当前显示的收藏夹列表（根据选中标签）
   List<BiliFavFolder> get _currentFolders =>
       _selectedSource == _FavSource.created
-          ? _createdFolders
-          : _collectedFolders;
+      ? _createdFolders
+      : _collectedFolders;
 
   // ── 业务方法 ──────────────────────────────────────────────────────────
 
@@ -186,10 +186,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
       if (!mounted) return;
 
       if (items == null || items.isEmpty) {
-        AppLogger.warning(
-          '收藏夹 "${folder.title}" 内容为空或加载失败',
-          tag: 'BiliFavUI',
-        );
+        AppLogger.warning('收藏夹 "${folder.title}" 内容为空或加载失败', tag: 'BiliFavUI');
         setState(() {
           _phase = _Phase.error;
           _errorMessage = context.l10n.favFolderEmpty;
@@ -197,10 +194,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
         return;
       }
 
-      AppLogger.info(
-        '收藏夹内容加载完成，共 ${items.length} 首有效视频',
-        tag: 'BiliFavUI',
-      );
+      AppLogger.info('收藏夹内容加载完成，共 ${items.length} 首有效视频', tag: 'BiliFavUI');
       setState(() {
         _phase = _Phase.preview;
         _items = items;
@@ -242,10 +236,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
 
     try {
       final notifier = ref.read(biliFavImportNotifierProvider.notifier);
-      await notifier.importToPlaylist(
-        playlistName: name,
-        items: selectedItems,
-      );
+      await notifier.importToPlaylist(playlistName: name, items: selectedItems);
 
       if (!mounted) return;
 
@@ -351,10 +342,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
     return Dialog(
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 480,
-          maxHeight: 560,
-        ),
+        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 560),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -410,12 +398,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
       child: Row(
         children: [
           if (leading != null) leading,
-          Expanded(
-            child: Text(
-              title,
-              style: context.textTheme.titleMedium,
-            ),
-          ),
+          Expanded(child: Text(title, style: context.textTheme.titleMedium)),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.of(context).pop(),
@@ -439,8 +422,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
           selectedCount: _selectedCount,
           allSelected: _allSelected,
           onToggleAll: _toggleAll,
-          onToggleItem: (index, val) =>
-              setState(() => _selected[index] = val),
+          onToggleItem: (index, val) => setState(() => _selected[index] = val),
           onStartImport: _selectedCount > 0 ? _startImport : null,
           onCancel: () => Navigator.of(context).pop(),
         );
@@ -480,10 +462,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
     }
 
     if (_foldersError != null) {
-      return BiliFavErrorView(
-        message: _foldersError!,
-        onRetry: _loadFolders,
-      );
+      return BiliFavErrorView(message: _foldersError!, onRetry: _loadFolders);
     }
 
     final hasCreated = _createdFolders.isNotEmpty;
@@ -531,9 +510,7 @@ class _BiliFavImportDialogState extends ConsumerState<BiliFavImportDialog> {
             },
             style: ButtonStyle(
               visualDensity: VisualDensity.compact,
-              textStyle: WidgetStatePropertyAll(
-                context.textTheme.labelMedium,
-              ),
+              textStyle: WidgetStatePropertyAll(context.textTheme.labelMedium),
             ),
           ),
         ),

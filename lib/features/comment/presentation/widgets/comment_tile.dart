@@ -40,8 +40,11 @@ class CommentTile extends StatelessWidget {
                 ? CachedNetworkImageProvider(comment.avatarUrl)
                 : null,
             child: comment.avatarUrl.isEmpty
-                ? Icon(Icons.person,
-                    size: 20, color: colorScheme.onSurfaceVariant)
+                ? Icon(
+                    Icons.person,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  )
                 : null,
           ),
           const SizedBox(width: 12),
@@ -76,10 +79,7 @@ class CommentTile extends StatelessWidget {
 
                 // Comment content
                 SelectionArea(
-                  child: Text(
-                    comment.content,
-                    style: textTheme.bodyMedium,
-                  ),
+                  child: Text(comment.content, style: textTheme.bodyMedium),
                 ),
                 if (comment.images.isNotEmpty) ...[
                   const SizedBox(height: 8),
@@ -133,8 +133,9 @@ class CommentTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
+                      color: colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.5,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

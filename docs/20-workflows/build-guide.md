@@ -6,8 +6,10 @@
 
 先看 `pubspec.yaml`：
 
-- Dart：`>=3.5.0 <4.0.0`
-- Flutter：`>=3.29.0`
+- Dart：`>=3.12.2 <4.0.0`
+- Flutter：`>=3.44.6`
+
+应用依赖解析结果固定在 `pubspec.lock`；升级依赖后必须一并提交锁文件，确保本地与 CI 使用同一版本集合。
 
 如果本地工具链不满足这里的约束，后续分析、代码生成和构建结果都不可信。
 
@@ -45,7 +47,7 @@
 ```bash
 flutter doctor -v
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 
@@ -54,6 +56,7 @@ flutter gen-l10n
 说明：
 
 - `build_runner` 负责 Riverpod / Freezed / Drift 生成代码
+- `build_runner 2.15` 已移除 `--delete-conflicting-outputs`，不要继续传这个旧参数
 - `flutter gen-l10n` 负责本地化代码
 - 生成文件不要手改
 
@@ -151,7 +154,7 @@ Android 正式包需要 keystore。项目默认约定：
 
 ```bash
 dart run build_runner clean
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 

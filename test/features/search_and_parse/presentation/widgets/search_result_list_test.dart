@@ -36,8 +36,9 @@ void main() {
     expect(tappedVideo?.bvid, 'BV1xx411c7mD');
   });
 
-  testWidgets('has no pagination controls and loads more near the bottom',
-      (tester) async {
+  testWidgets('has no pagination controls and loads more near the bottom', (
+    tester,
+  ) async {
     _setMobileViewport(tester);
     var loadMoreCount = 0;
 
@@ -68,8 +69,9 @@ void main() {
     expect(loadMoreCount, greaterThanOrEqualTo(1));
   });
 
-  testWidgets('does not auto load while already loading or failed',
-      (tester) async {
+  testWidgets('does not auto load while already loading or failed', (
+    tester,
+  ) async {
     _setMobileViewport(tester);
     var loadMoreCount = 0;
 
@@ -108,8 +110,9 @@ void main() {
     expect(loadMoreCount, 0);
   });
 
-  testWidgets('preserves scroll offset across load-more states',
-      (tester) async {
+  testWidgets('preserves scroll offset across load-more states', (
+    tester,
+  ) async {
     _setMobileViewport(tester);
     const storageKey = 'mobile_search_results';
 
@@ -136,9 +139,7 @@ void main() {
       );
     }
 
-    await tester.pumpWidget(
-      buildList(results: _manyResults, currentPage: 1),
-    );
+    await tester.pumpWidget(buildList(results: _manyResults, currentPage: 1));
 
     var scrollable = _scrollableStateForStorageKey(tester, storageKey);
     final targetOffset = scrollable.position.maxScrollExtent / 2;
@@ -148,11 +149,7 @@ void main() {
     expect(scrollable.position.pixels, greaterThan(0));
 
     await tester.pumpWidget(
-      buildList(
-        results: _manyResults,
-        currentPage: 1,
-        isLoadingMore: true,
-      ),
+      buildList(results: _manyResults, currentPage: 1, isLoadingMore: true),
     );
     await tester.pump();
 

@@ -4,7 +4,7 @@ part 'share_state.freezed.dart';
 
 /// 歌单分享功能状态
 @freezed
-class ShareState with _$ShareState {
+sealed class ShareState with _$ShareState {
   /// 空闲状态
   const factory ShareState.idle() = ShareIdle;
 
@@ -21,10 +21,12 @@ class ShareState with _$ShareState {
   }) = ShareImporting;
 
   /// 预览待导入的歌单
-  const factory ShareState.preview(SharedPlaylistPreview preview) = SharePreview;
+  const factory ShareState.preview(SharedPlaylistPreview preview) =
+      SharePreview;
 
   /// 导入成功
-  const factory ShareState.importSuccess(ShareImportResult result) = ShareImportSuccess;
+  const factory ShareState.importSuccess(ShareImportResult result) =
+      ShareImportSuccess;
 
   /// 出错
   const factory ShareState.error(String message) = ShareError;
@@ -32,7 +34,7 @@ class ShareState with _$ShareState {
 
 /// 分享导入结果
 @freezed
-class ShareImportResult with _$ShareImportResult {
+abstract class ShareImportResult with _$ShareImportResult {
   const factory ShareImportResult({
     /// 新建歌单 ID
     required int playlistId,
@@ -53,7 +55,7 @@ class ShareImportResult with _$ShareImportResult {
 
 /// 分享歌单预览信息（用于导入确认弹窗）
 @freezed
-class SharedPlaylistPreview with _$SharedPlaylistPreview {
+abstract class SharedPlaylistPreview with _$SharedPlaylistPreview {
   const factory SharedPlaylistPreview({
     /// 歌单名称
     required String name,

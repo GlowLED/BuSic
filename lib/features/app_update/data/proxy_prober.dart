@@ -51,11 +51,14 @@ class ProxyProber {
   final Map<int, String> _cache = {};
 
   ProxyProber({Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
               connectTimeout: _kProbeTimeout,
               receiveTimeout: _kProbeTimeout,
-            ));
+            ),
+          );
 
   /// Probe [proxies] by fetching [testPath] via HEAD and return the fastest.
   ///
@@ -67,10 +70,7 @@ class ProxyProber {
     final key = Object.hashAll(proxies);
     if (_cache.containsKey(key)) return _cache[key]!;
 
-    AppLogger.info(
-      'Probing ${proxies.length} proxies …',
-      tag: _kTag,
-    );
+    AppLogger.info('Probing ${proxies.length} proxies …', tag: _kTag);
 
     final completer = Completer<String>();
     var failCount = 0;

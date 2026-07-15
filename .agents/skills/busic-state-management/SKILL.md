@@ -19,6 +19,8 @@ compatibility: opencode
 ## Provider 选择
 
 - 业务 Notifier 默认使用 `@riverpod`
+- Riverpod 3 下为 `XxxNotifier` 显式声明 `@Riverpod(name: 'xxxNotifierProvider')`，保持仓库既有 provider 命名
+- 少量 `StateProvider` 从 `package:flutter_riverpod/legacy.dart` 导入
 - 全局注入、GoRouter、需要长期存活的 Repository 才使用手动 Provider
 - Repository 依赖通常在 Notifier `build()` 中创建
 

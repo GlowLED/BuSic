@@ -14,17 +14,20 @@ class LanzouResolver {
   final Dio _dio;
 
   LanzouResolver({Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 15),
               headers: {
                 'User-Agent':
                     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                        '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
               },
-            ));
+            ),
+          );
 
   /// 解析蓝奏云分享链接，返回文件直链。
   ///
@@ -81,8 +84,9 @@ class LanzouResolver {
 
     AppLogger.info('Detected acw_sc__v2 challenge', tag: _kTag);
 
-    final arg1Match = RegExp(r"var\s+arg1\s*=\s*'([0-9A-Fa-f]+)'")
-        .firstMatch(html);
+    final arg1Match = RegExp(
+      r"var\s+arg1\s*=\s*'([0-9A-Fa-f]+)'",
+    ).firstMatch(html);
     if (arg1Match == null) {
       throw Exception('无法提取 acw_sc__v2 挑战参数 arg1');
     }
@@ -91,8 +95,7 @@ class LanzouResolver {
     final host = Uri.parse(url).host;
 
     // 设置 cookie 并重新请求
-    _dio.options.headers['Cookie'] =
-        'acw_sc__v2=$cookieVal; domain=$host';
+    _dio.options.headers['Cookie'] = 'acw_sc__v2=$cookieVal; domain=$host';
 
     final resp2 = await _dio.get<String>(
       url,
@@ -107,9 +110,46 @@ class LanzouResolver {
   /// 从蓝奏云反爬 JS 逆向出的 cookie 计算算法
   static String _calcAcwScV2(String arg1) {
     const m = [
-      15, 35, 29, 24, 33, 16, 1, 38, 10, 9, 19, 31, 40, 27, 22, 23,
-      25, 13, 6, 11, 39, 18, 20, 8, 14, 21, 32, 26, 2, 30, 7, 4,
-      17, 5, 3, 28, 34, 37, 12, 36,
+      15,
+      35,
+      29,
+      24,
+      33,
+      16,
+      1,
+      38,
+      10,
+      9,
+      19,
+      31,
+      40,
+      27,
+      22,
+      23,
+      25,
+      13,
+      6,
+      11,
+      39,
+      18,
+      20,
+      8,
+      14,
+      21,
+      32,
+      26,
+      2,
+      30,
+      7,
+      4,
+      17,
+      5,
+      3,
+      28,
+      34,
+      37,
+      12,
+      36,
     ];
     const p = '3000176000856006061501533003690027800375';
 
@@ -155,8 +195,9 @@ class LanzouResolver {
 
   /// 从 HTML/JS 中提取 ajax URL 路径（/ajaxm.php?file=xxx）
   static String? _extractAjaxPath(String cleanJs) {
-    final m = RegExp(r"url\s*:\s*'(/ajaxm\.php\?file=\d+)'")
-        .firstMatch(cleanJs);
+    final m = RegExp(
+      r"url\s*:\s*'(/ajaxm\.php\?file=\d+)'",
+    ).firstMatch(cleanJs);
     return m?.group(1);
   }
 
@@ -164,8 +205,7 @@ class LanzouResolver {
 
   Future<String> _resolveWithoutPassword(String pageUrl, String html) async {
     // 提取 iframe src
-    final iframeMatch =
-        RegExp(r'<iframe[^>]+src="([^"]+)"').firstMatch(html);
+    final iframeMatch = RegExp(r'<iframe[^>]+src="([^"]+)"').firstMatch(html);
     if (iframeMatch == null) {
       throw Exception('无法解析蓝奏云页面：未找到 iframe');
     }
@@ -195,13 +235,15 @@ class LanzouResolver {
     final cleanHtml = _stripJsComments(iframeHtml);
 
     // 提取 wp_sign（无密码页面使用的 sign 变量）
-    final wpSignMatch =
-        RegExp(r"var\s+wp_sign\s*=\s*'([^']+)'").firstMatch(iframeHtml);
+    final wpSignMatch = RegExp(
+      r"var\s+wp_sign\s*=\s*'([^']+)'",
+    ).firstMatch(iframeHtml);
     final wpSign = wpSignMatch?.group(1) ?? '';
 
     // 提取 ajaxdata
-    final ajaxdataMatch =
-        RegExp(r"var\s+ajaxdata\s*=\s*'([^']+)'").firstMatch(iframeHtml);
+    final ajaxdataMatch = RegExp(
+      r"var\s+ajaxdata\s*=\s*'([^']+)'",
+    ).firstMatch(iframeHtml);
     final ajaxdata = ajaxdataMatch?.group(1) ?? '';
 
     // 提取 ajax URL 路径（/ajaxm.php?file=xxx）
@@ -254,8 +296,7 @@ class LanzouResolver {
     // 去除 JS 注释后提取 sign，避免匹配到注释中的旧值
     final cleanHtml = _stripJsComments(html);
 
-    final signMatch =
-        RegExp(r"'sign'\s*:\s*'([^']+)'").firstMatch(cleanHtml);
+    final signMatch = RegExp(r"'sign'\s*:\s*'([^']+)'").firstMatch(cleanHtml);
     final sign = signMatch?.group(1) ?? '';
 
     // 提取 ajax URL 路径（/ajaxm.php?file=xxx）
@@ -271,12 +312,7 @@ class LanzouResolver {
 
     final response = await _dio.post<String>(
       ajaxUrl,
-      data: {
-        'action': 'downprocess',
-        'sign': sign,
-        'p': password,
-        'kd': '1',
-      },
+      data: {'action': 'downprocess', 'sign': sign, 'p': password, 'kd': '1'},
       options: Options(
         contentType: 'application/x-www-form-urlencoded',
         headers: {'Referer': pageUrl},

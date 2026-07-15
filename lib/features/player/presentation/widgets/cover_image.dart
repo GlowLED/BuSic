@@ -29,7 +29,8 @@ Widget buildCoverImage(
     );
   }
 
-  final isLocal = coverUrl.startsWith('/') ||
+  final isLocal =
+      coverUrl.startsWith('/') ||
       coverUrl.startsWith('file://') ||
       RegExp(r'^[A-Za-z]:[/\\]').hasMatch(coverUrl);
   if (isLocal) {
