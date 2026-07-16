@@ -19,7 +19,8 @@ void showVolumeSheet(BuildContext context, WidgetRef ref) {
           Consumer(
             builder: (context, ref, _) {
               final volume = ref.watch(
-                  playerNotifierProvider.select((s) => s.volume));
+                playerNotifierProvider.select((s) => s.volume),
+              );
               return Slider(
                 value: volume,
                 onChanged: (v) {

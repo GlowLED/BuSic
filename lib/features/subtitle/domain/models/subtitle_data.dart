@@ -10,7 +10,7 @@ part 'subtitle_data.g.dart';
 /// Contains all subtitle lines sorted by time, plus metadata
 /// about the subtitle source (AI-generated or CC).
 @freezed
-class SubtitleData with _$SubtitleData {
+abstract class SubtitleData with _$SubtitleData {
   const factory SubtitleData({
     /// Subtitle lines sorted by start time.
     required List<SubtitleLine> lines,

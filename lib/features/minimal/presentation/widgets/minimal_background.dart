@@ -123,11 +123,7 @@ class _MinimalBackgroundState extends State<MinimalBackground>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1A1A2E),
-            Color(0xFF16213E),
-            Color(0xFF0F3460),
-          ],
+          colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F3460)],
         ),
       ),
     );
@@ -148,8 +144,8 @@ class _MinimalBackgroundState extends State<MinimalBackground>
     final scale = rawMax < _minimalBackgroundMinCacheDimension
         ? _minimalBackgroundMinCacheDimension / rawMax
         : rawMax > _minimalBackgroundMaxCacheDimension
-            ? _minimalBackgroundMaxCacheDimension / rawMax
-            : 1.0;
+        ? _minimalBackgroundMaxCacheDimension / rawMax
+        : 1.0;
 
     return (
       width: math.max(1, (rawWidth * scale).ceil()),

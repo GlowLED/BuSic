@@ -20,8 +20,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
           webLoginAvailabilityProvider.overrideWith(
             (ref) async => const WebLoginAvailability.unsupportedPlatform(),
           ),
@@ -50,32 +51,34 @@ void main() {
   });
 
   testWidgets(
-      'LoginScreen explains missing supported browser on Linux web login',
-      (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
-          webLoginHostPlatformProvider.overrideWithValue(
-            WebLoginHostPlatform.linux,
-          ),
-          webLoginAvailabilityProvider.overrideWith(
-            (ref) async => const WebLoginAvailability.browserMissing(),
-          ),
-        ],
-        child: buildTestApp(const LoginScreen()),
-      ),
-    );
+    'LoginScreen explains missing supported browser on Linux web login',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+            authQrPollIntervalProvider.overrideWithValue(
+              const Duration(hours: 1),
+            ),
+            webLoginHostPlatformProvider.overrideWithValue(
+              WebLoginHostPlatform.linux,
+            ),
+            webLoginAvailabilityProvider.overrideWith(
+              (ref) async => const WebLoginAvailability.browserMissing(),
+            ),
+          ],
+          child: buildTestApp(const LoginScreen()),
+        ),
+      );
 
-    await tester.pump();
-    await tester.tap(find.text('Web Login'));
-    await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.tap(find.text('Web Login'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('No supported browser found'), findsOneWidget);
-    expect(find.textContaining('Firefox'), findsOneWidget);
-  });
+      expect(find.text('No supported browser found'), findsOneWidget);
+      expect(find.textContaining('Firefox'), findsOneWidget);
+    },
+  );
 
   testWidgets('LoginScreen starts Linux managed browser web login', (
     tester,
@@ -86,8 +89,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
           webLoginHostPlatformProvider.overrideWithValue(
             WebLoginHostPlatform.linux,
           ),
@@ -129,8 +133,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
           webLoginHostPlatformProvider.overrideWithValue(
             WebLoginHostPlatform.linux,
           ),
@@ -166,8 +171,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
           webLoginHostPlatformProvider.overrideWithValue(
             WebLoginHostPlatform.linux,
           ),
@@ -198,8 +204,9 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-          authQrPollIntervalProvider
-              .overrideWithValue(const Duration(hours: 1)),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
           webLoginHostPlatformProvider.overrideWithValue(
             WebLoginHostPlatform.windows,
           ),
@@ -229,10 +236,7 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<({String qrUrl, String qrKey})> generateQrCode() async {
-    return (
-      qrUrl: 'https://example.com/qr',
-      qrKey: 'qr-key',
-    );
+    return (qrUrl: 'https://example.com/qr', qrKey: 'qr-key');
   }
 
   @override

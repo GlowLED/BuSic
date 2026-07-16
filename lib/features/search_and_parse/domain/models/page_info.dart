@@ -5,7 +5,7 @@ part 'page_info.g.dart';
 
 /// Information about a single page (分P) of a Bilibili video.
 @freezed
-class PageInfo with _$PageInfo {
+abstract class PageInfo with _$PageInfo {
   const factory PageInfo({
     /// Bilibili CID (unique identifier for this page).
     required int cid,

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,221 +9,288 @@ part of 'subtitle_data.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SubtitleData _$SubtitleDataFromJson(Map<String, dynamic> json) {
-  return _SubtitleData.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SubtitleData {
-  /// Subtitle lines sorted by start time.
-  List<SubtitleLine> get lines => throw _privateConstructorUsedError;
 
-  /// Source type: 'ai' for AI-generated, 'cc' for community captions.
-  String get sourceType => throw _privateConstructorUsedError;
-
-  /// Language code (e.g. 'ai-zh', 'zh-Hans').
-  String get language => throw _privateConstructorUsedError;
+/// Subtitle lines sorted by start time.
+ List<SubtitleLine> get lines;/// Source type: 'ai' for AI-generated, 'cc' for community captions.
+ String get sourceType;/// Language code (e.g. 'ai-zh', 'zh-Hans').
+ String get language;
+/// Create a copy of SubtitleData
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SubtitleDataCopyWith<SubtitleData> get copyWith => _$SubtitleDataCopyWithImpl<SubtitleData>(this as SubtitleData, _$identity);
 
   /// Serializes this SubtitleData to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of SubtitleData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $SubtitleDataCopyWith<SubtitleData> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubtitleData&&const DeepCollectionEquality().equals(other.lines, lines)&&(identical(other.sourceType, sourceType) || other.sourceType == sourceType)&&(identical(other.language, language) || other.language == language));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(lines),sourceType,language);
+
+@override
+String toString() {
+  return 'SubtitleData(lines: $lines, sourceType: $sourceType, language: $language)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $SubtitleDataCopyWith<$Res> {
-  factory $SubtitleDataCopyWith(
-          SubtitleData value, $Res Function(SubtitleData) then) =
-      _$SubtitleDataCopyWithImpl<$Res, SubtitleData>;
-  @useResult
-  $Res call({List<SubtitleLine> lines, String sourceType, String language});
-}
+abstract mixin class $SubtitleDataCopyWith<$Res>  {
+  factory $SubtitleDataCopyWith(SubtitleData value, $Res Function(SubtitleData) _then) = _$SubtitleDataCopyWithImpl;
+@useResult
+$Res call({
+ List<SubtitleLine> lines, String sourceType, String language
+});
 
+
+
+
+}
 /// @nodoc
-class _$SubtitleDataCopyWithImpl<$Res, $Val extends SubtitleData>
+class _$SubtitleDataCopyWithImpl<$Res>
     implements $SubtitleDataCopyWith<$Res> {
-  _$SubtitleDataCopyWithImpl(this._value, this._then);
+  _$SubtitleDataCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SubtitleData _self;
+  final $Res Function(SubtitleData) _then;
 
-  /// Create a copy of SubtitleData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? lines = null,
-    Object? sourceType = null,
-    Object? language = null,
-  }) {
-    return _then(_value.copyWith(
-      lines: null == lines
-          ? _value.lines
-          : lines // ignore: cast_nullable_to_non_nullable
-              as List<SubtitleLine>,
-      sourceType: null == sourceType
-          ? _value.sourceType
-          : sourceType // ignore: cast_nullable_to_non_nullable
-              as String,
-      language: null == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
+/// Create a copy of SubtitleData
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? lines = null,Object? sourceType = null,Object? language = null,}) {
+  return _then(_self.copyWith(
+lines: null == lines ? _self.lines : lines // ignore: cast_nullable_to_non_nullable
+as List<SubtitleLine>,sourceType: null == sourceType ? _self.sourceType : sourceType // ignore: cast_nullable_to_non_nullable
+as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
-/// @nodoc
-abstract class _$$SubtitleDataImplCopyWith<$Res>
-    implements $SubtitleDataCopyWith<$Res> {
-  factory _$$SubtitleDataImplCopyWith(
-          _$SubtitleDataImpl value, $Res Function(_$SubtitleDataImpl) then) =
-      __$$SubtitleDataImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<SubtitleLine> lines, String sourceType, String language});
 }
 
-/// @nodoc
-class __$$SubtitleDataImplCopyWithImpl<$Res>
-    extends _$SubtitleDataCopyWithImpl<$Res, _$SubtitleDataImpl>
-    implements _$$SubtitleDataImplCopyWith<$Res> {
-  __$$SubtitleDataImplCopyWithImpl(
-      _$SubtitleDataImpl _value, $Res Function(_$SubtitleDataImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of SubtitleData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? lines = null,
-    Object? sourceType = null,
-    Object? language = null,
-  }) {
-    return _then(_$SubtitleDataImpl(
-      lines: null == lines
-          ? _value._lines
-          : lines // ignore: cast_nullable_to_non_nullable
-              as List<SubtitleLine>,
-      sourceType: null == sourceType
-          ? _value.sourceType
-          : sourceType // ignore: cast_nullable_to_non_nullable
-              as String,
-      language: null == language
-          ? _value.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
+/// Adds pattern-matching-related methods to [SubtitleData].
+extension SubtitleDataPatterns on SubtitleData {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SubtitleData value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SubtitleData() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SubtitleData value)  $default,){
+final _that = this;
+switch (_that) {
+case _SubtitleData():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SubtitleData value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SubtitleData() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<SubtitleLine> lines,  String sourceType,  String language)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SubtitleData() when $default != null:
+return $default(_that.lines,_that.sourceType,_that.language);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<SubtitleLine> lines,  String sourceType,  String language)  $default,) {final _that = this;
+switch (_that) {
+case _SubtitleData():
+return $default(_that.lines,_that.sourceType,_that.language);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<SubtitleLine> lines,  String sourceType,  String language)?  $default,) {final _that = this;
+switch (_that) {
+case _SubtitleData() when $default != null:
+return $default(_that.lines,_that.sourceType,_that.language);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SubtitleDataImpl implements _SubtitleData {
-  const _$SubtitleDataImpl(
-      {required final List<SubtitleLine> lines,
-      required this.sourceType,
-      this.language = ''})
-      : _lines = lines;
 
-  factory _$SubtitleDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SubtitleDataImplFromJson(json);
+class _SubtitleData implements SubtitleData {
+  const _SubtitleData({required final  List<SubtitleLine> lines, required this.sourceType, this.language = ''}): _lines = lines;
+  factory _SubtitleData.fromJson(Map<String, dynamic> json) => _$SubtitleDataFromJson(json);
 
-  /// Subtitle lines sorted by start time.
-  final List<SubtitleLine> _lines;
-
-  /// Subtitle lines sorted by start time.
-  @override
-  List<SubtitleLine> get lines {
-    if (_lines is EqualUnmodifiableListView) return _lines;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_lines);
-  }
-
-  /// Source type: 'ai' for AI-generated, 'cc' for community captions.
-  @override
-  final String sourceType;
-
-  /// Language code (e.g. 'ai-zh', 'zh-Hans').
-  @override
-  @JsonKey()
-  final String language;
-
-  @override
-  String toString() {
-    return 'SubtitleData(lines: $lines, sourceType: $sourceType, language: $language)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$SubtitleDataImpl &&
-            const DeepCollectionEquality().equals(other._lines, _lines) &&
-            (identical(other.sourceType, sourceType) ||
-                other.sourceType == sourceType) &&
-            (identical(other.language, language) ||
-                other.language == language));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType,
-      const DeepCollectionEquality().hash(_lines), sourceType, language);
-
-  /// Create a copy of SubtitleData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$SubtitleDataImplCopyWith<_$SubtitleDataImpl> get copyWith =>
-      __$$SubtitleDataImplCopyWithImpl<_$SubtitleDataImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SubtitleDataImplToJson(
-      this,
-    );
-  }
+/// Subtitle lines sorted by start time.
+ final  List<SubtitleLine> _lines;
+/// Subtitle lines sorted by start time.
+@override List<SubtitleLine> get lines {
+  if (_lines is EqualUnmodifiableListView) return _lines;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_lines);
 }
 
-abstract class _SubtitleData implements SubtitleData {
-  const factory _SubtitleData(
-      {required final List<SubtitleLine> lines,
-      required final String sourceType,
-      final String language}) = _$SubtitleDataImpl;
+/// Source type: 'ai' for AI-generated, 'cc' for community captions.
+@override final  String sourceType;
+/// Language code (e.g. 'ai-zh', 'zh-Hans').
+@override@JsonKey() final  String language;
 
-  factory _SubtitleData.fromJson(Map<String, dynamic> json) =
-      _$SubtitleDataImpl.fromJson;
+/// Create a copy of SubtitleData
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SubtitleDataCopyWith<_SubtitleData> get copyWith => __$SubtitleDataCopyWithImpl<_SubtitleData>(this, _$identity);
 
-  /// Subtitle lines sorted by start time.
-  @override
-  List<SubtitleLine> get lines;
-
-  /// Source type: 'ai' for AI-generated, 'cc' for community captions.
-  @override
-  String get sourceType;
-
-  /// Language code (e.g. 'ai-zh', 'zh-Hans').
-  @override
-  String get language;
-
-  /// Create a copy of SubtitleData
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SubtitleDataImplCopyWith<_$SubtitleDataImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$SubtitleDataToJson(this, );
 }
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubtitleData&&const DeepCollectionEquality().equals(other._lines, _lines)&&(identical(other.sourceType, sourceType) || other.sourceType == sourceType)&&(identical(other.language, language) || other.language == language));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_lines),sourceType,language);
+
+@override
+String toString() {
+  return 'SubtitleData(lines: $lines, sourceType: $sourceType, language: $language)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SubtitleDataCopyWith<$Res> implements $SubtitleDataCopyWith<$Res> {
+  factory _$SubtitleDataCopyWith(_SubtitleData value, $Res Function(_SubtitleData) _then) = __$SubtitleDataCopyWithImpl;
+@override @useResult
+$Res call({
+ List<SubtitleLine> lines, String sourceType, String language
+});
+
+
+
+
+}
+/// @nodoc
+class __$SubtitleDataCopyWithImpl<$Res>
+    implements _$SubtitleDataCopyWith<$Res> {
+  __$SubtitleDataCopyWithImpl(this._self, this._then);
+
+  final _SubtitleData _self;
+  final $Res Function(_SubtitleData) _then;
+
+/// Create a copy of SubtitleData
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? lines = null,Object? sourceType = null,Object? language = null,}) {
+  return _then(_SubtitleData(
+lines: null == lines ? _self._lines : lines // ignore: cast_nullable_to_non_nullable
+as List<SubtitleLine>,sourceType: null == sourceType ? _self.sourceType : sourceType // ignore: cast_nullable_to_non_nullable
+as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+// dart format on

@@ -7,24 +7,17 @@ import 'package:path/path.dart' as p;
 import '../../../core/utils/logger.dart';
 import '../domain/models/bili_login_cookies.dart';
 
-typedef BrowserProcessRunner = Future<ProcessResult> Function(
-  String executable,
-  List<String> arguments,
-);
+typedef BrowserProcessRunner =
+    Future<ProcessResult> Function(String executable, List<String> arguments);
 
-typedef BrowserProcessStarter = Future<Process> Function(
-  String executable,
-  List<String> arguments,
-);
+typedef BrowserProcessStarter =
+    Future<Process> Function(String executable, List<String> arguments);
 
 typedef BrowserProfileDirectoryFactory = Future<Directory> Function();
 
 typedef BrowserWebSocketConnector = Future<WebSocket> Function(String url);
 
-enum LinuxManagedBrowserKind {
-  chromium,
-  firefox,
-}
+enum LinuxManagedBrowserKind { chromium, firefox }
 
 class LinuxManagedBrowserCandidate {
   const LinuxManagedBrowserCandidate({
@@ -78,13 +71,14 @@ class ProcessLinuxManagedBrowserLoginService
     BrowserProfileDirectoryFactory? createProfileDirectory,
     ChromeDevToolsClient? devToolsClient,
     FirefoxBiDiClient? firefoxBiDiClient,
-  })  : _candidates = candidates ?? _defaultCandidates,
-        _runProcess = runProcess ?? _defaultRunProcess,
-        _startProcess = startProcess ?? _defaultStartProcess,
-        _createProfileDirectory = createProfileDirectory ??
-            (() => Directory.systemTemp.createTemp('busic-web-login-')),
-        _devToolsClient = devToolsClient ?? ChromeDevToolsClient(),
-        _firefoxBiDiClient = firefoxBiDiClient ?? FirefoxBiDiClient();
+  }) : _candidates = candidates ?? _defaultCandidates,
+       _runProcess = runProcess ?? _defaultRunProcess,
+       _startProcess = startProcess ?? _defaultStartProcess,
+       _createProfileDirectory =
+           createProfileDirectory ??
+           (() => Directory.systemTemp.createTemp('busic-web-login-')),
+       _devToolsClient = devToolsClient ?? ChromeDevToolsClient(),
+       _firefoxBiDiClient = firefoxBiDiClient ?? FirefoxBiDiClient();
 
   static const _defaultCandidates = [
     LinuxManagedBrowserCandidate(
@@ -334,26 +328,28 @@ class ProcessLinuxManagedBrowserLoginService
       completeWithError();
     });
 
-    subscription =
-        stderr.transform(utf8.decoder).transform(const LineSplitter()).listen(
-      (line) {
-        final endpoint = FirefoxBiDiEndpointParser.extractEndpoint(line);
-        if (endpoint != null && !completer.isCompleted) {
-          timer?.cancel();
-          completer.complete(endpoint);
-        }
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        timer?.cancel();
-        if (!completer.isCompleted) {
-          completer.completeError(error, stackTrace);
-        }
-      },
-      onDone: () {
-        timer?.cancel();
-        completeWithError();
-      },
-    );
+    subscription = stderr
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .listen(
+          (line) {
+            final endpoint = FirefoxBiDiEndpointParser.extractEndpoint(line);
+            if (endpoint != null && !completer.isCompleted) {
+              timer?.cancel();
+              completer.complete(endpoint);
+            }
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            timer?.cancel();
+            if (!completer.isCompleted) {
+              completer.completeError(error, stackTrace);
+            }
+          },
+          onDone: () {
+            timer?.cancel();
+            completeWithError();
+          },
+        );
 
     return completer.future;
   }
@@ -366,10 +362,10 @@ class ProcessLinuxManagedBrowserLoginSession
     required Directory profileDir,
     required Uri browserWebSocketUri,
     required BrowserCookieClient cookieClient,
-  })  : _process = process,
-        _profileDir = profileDir,
-        _browserWebSocketUri = browserWebSocketUri,
-        _cookieClient = cookieClient;
+  }) : _process = process,
+       _profileDir = profileDir,
+       _browserWebSocketUri = browserWebSocketUri,
+       _cookieClient = cookieClient;
 
   static const _closeTimeout = Duration(seconds: 2);
 
@@ -382,8 +378,9 @@ class ProcessLinuxManagedBrowserLoginSession
   @override
   Future<BiliLoginCookies?> readBiliCookies() async {
     final cookies = await _cookieClient.getCookies(_browserWebSocketUri);
-    final cookieMap =
-        LinuxManagedBrowserCookieParser.extractBiliCookieMap(cookies);
+    final cookieMap = LinuxManagedBrowserCookieParser.extractBiliCookieMap(
+      cookies,
+    );
     return BiliLoginCookies.fromCookieMap(cookieMap);
   }
 
@@ -411,9 +408,8 @@ abstract class BrowserCookieClient {
 }
 
 class ChromeDevToolsClient implements BrowserCookieClient {
-  ChromeDevToolsClient({
-    BrowserWebSocketConnector? connectWebSocket,
-  }) : _connectWebSocket = connectWebSocket ?? WebSocket.connect;
+  ChromeDevToolsClient({BrowserWebSocketConnector? connectWebSocket})
+    : _connectWebSocket = connectWebSocket ?? WebSocket.connect;
 
   static const _requestTimeout = Duration(seconds: 5);
 
@@ -429,7 +425,9 @@ class ChromeDevToolsClient implements BrowserCookieClient {
   }
 
   Future<Map<String, dynamic>> _send(
-      Uri browserWebSocketUri, String method) async {
+    Uri browserWebSocketUri,
+    String method,
+  ) async {
     final socket = await _connectWebSocket(
       browserWebSocketUri.toString(),
     ).timeout(_requestTimeout);
@@ -447,9 +445,8 @@ class ChromeDevToolsClient implements BrowserCookieClient {
 }
 
 class FirefoxBiDiClient implements BrowserCookieClient {
-  FirefoxBiDiClient({
-    BrowserWebSocketConnector? connectWebSocket,
-  }) : _connectWebSocket = connectWebSocket ?? WebSocket.connect;
+  FirefoxBiDiClient({BrowserWebSocketConnector? connectWebSocket})
+    : _connectWebSocket = connectWebSocket ?? WebSocket.connect;
 
   static const _requestTimeout = Duration(seconds: 5);
 
@@ -465,9 +462,10 @@ class FirefoxBiDiClient implements BrowserCookieClient {
       requestTimeout: _requestTimeout,
     );
     try {
-      await connection.send('session.new', params: {
-        'capabilities': <String, dynamic>{},
-      });
+      await connection.send(
+        'session.new',
+        params: {'capabilities': <String, dynamic>{}},
+      );
       final response = await connection.send(
         'storage.getCookies',
         params: <String, dynamic>{},
@@ -487,8 +485,8 @@ class _JsonWebSocketCommandConnection {
   _JsonWebSocketCommandConnection(
     WebSocket socket, {
     required Duration requestTimeout,
-  })  : _socket = socket,
-        _requestTimeout = requestTimeout {
+  }) : _socket = socket,
+       _requestTimeout = requestTimeout {
     _subscription = _socket.listen(
       _handleMessage,
       onError: _completePendingWithError,
@@ -515,11 +513,13 @@ class _JsonWebSocketCommandConnection {
     final id = _nextId++;
     final completer = Completer<Map<String, dynamic>>();
     _pending[id] = completer;
-    _socket.add(jsonEncode({
-      'id': id,
-      'method': method,
-      if (params != null) 'params': params,
-    }));
+    _socket.add(
+      jsonEncode({
+        'id': id,
+        'method': method,
+        if (params != null) 'params': params,
+      }),
+    );
     return completer.future.timeout(_requestTimeout);
   }
 
@@ -564,11 +564,7 @@ class _JsonWebSocketCommandConnection {
 class LinuxManagedBrowserCookieParser {
   LinuxManagedBrowserCookieParser._();
 
-  static const _requiredCookieNames = {
-    'SESSDATA',
-    'bili_jct',
-    'DedeUserID',
-  };
+  static const _requiredCookieNames = {'SESSDATA', 'bili_jct', 'DedeUserID'};
 
   static Map<String, String> extractBiliCookieMap(
     List<Map<String, dynamic>> cookies,
@@ -632,8 +628,9 @@ class FirefoxBiDiEndpointParser {
   FirefoxBiDiEndpointParser._();
 
   static Uri? extractEndpoint(String output) {
-    final match =
-        RegExp(r'(ws://127\.0\.0\.1:\d+(?:/[^\s]+)?)').firstMatch(output);
+    final match = RegExp(
+      r'(ws://127\.0\.0\.1:\d+(?:/[^\s]+)?)',
+    ).firstMatch(output);
     final rawEndpoint = match?.group(1);
     if (rawEndpoint == null) return null;
 

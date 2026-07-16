@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/update_notifier.dart';
 import '../../domain/models/download_channel.dart';
+import '../../domain/models/update_state.dart';
 import 'channel_picker_sheet.dart';
 
 /// 设置页内嵌的下载进度 Tile — 根据 UpdateState 显示不同 UI。
@@ -17,9 +18,9 @@ class DownloadTile extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
-    return state.when(
-      idle: () => _buildIdleOrAvailable(context, ref, null),
-      checking: () => const ListTile(
+    return switch (state) {
+      UpdateStateIdle() => _buildIdleOrAvailable(context, ref, null),
+      UpdateStateChecking() => const ListTile(
         leading: SizedBox(
           width: 24,
           height: 24,
@@ -27,12 +28,19 @@ class DownloadTile extends ConsumerWidget {
         ),
         title: Text('...'),
       ),
-      available: (info) => _buildIdleOrAvailable(context, ref, info),
-      downloading: (info, progress, speed, channel, downloadedBytes, totalBytes) =>
-          _buildDownloading(context, ref, progress, speed, info.isForceUpdate),
-      paused: (info, progress, channel, downloadedBytes, totalBytes, localPath) =>
-          _buildPaused(context, ref, progress),
-      readyToInstall: (info, localPath) => ListTile(
+      UpdateStateAvailable(:final info) => _buildIdleOrAvailable(
+        context,
+        ref,
+        info,
+      ),
+      UpdateStateDownloading(:final info, :final progress, :final speed) =>
+        _buildDownloading(context, ref, progress, speed, info.isForceUpdate),
+      UpdateStatePaused(:final progress) => _buildPaused(
+        context,
+        ref,
+        progress,
+      ),
+      UpdateStateReadyToInstall(:final info) => ListTile(
         leading: Icon(Icons.check_circle, color: theme.colorScheme.primary),
         title: Text(l10n.downloadCompleteReady),
         subtitle: Text('v${info.latestVersion.semver}'),
@@ -42,7 +50,7 @@ class DownloadTile extends ConsumerWidget {
           child: Text(l10n.installUpdate),
         ),
       ),
-      error: (message) {
+      UpdateStateError(:final message) => () {
         if (message.startsWith('INSTALL_READ_ONLY:')) {
           final url = message.substring('INSTALL_READ_ONLY:'.length);
           return ListTile(
@@ -50,7 +58,10 @@ class DownloadTile extends ConsumerWidget {
             title: Text(l10n.updateError),
             subtitle: Text(l10n.linuxReadOnlyInstallDir, maxLines: 2),
             trailing: FilledButton(
-              onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+              onPressed: () => launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              ),
               child: Text(l10n.openDownloadPage),
             ),
           );
@@ -65,8 +76,8 @@ class DownloadTile extends ConsumerWidget {
             child: Text(l10n.retryDownload),
           ),
         );
-      },
-    );
+      }(),
+    };
   }
 
   Widget _buildIdleOrAvailable(
@@ -87,9 +98,7 @@ class DownloadTile extends ConsumerWidget {
       onTap: () async {
         if (info == null) {
           // Need to check for update first
-          await ref
-              .read(updateNotifierProvider.notifier)
-              .checkForUpdate();
+          await ref.read(updateNotifierProvider.notifier).checkForUpdate();
           return;
         }
 
@@ -122,8 +131,7 @@ class DownloadTile extends ConsumerWidget {
     final l10n = context.l10n;
 
     return GestureDetector(
-      onTap: () =>
-          ref.read(updateNotifierProvider.notifier).pauseDownload(),
+      onTap: () => ref.read(updateNotifierProvider.notifier).pauseDownload(),
       onLongPress: () => _showCancelConfirm(context, ref, isForceUpdate),
       child: ListTile(
         leading: const Icon(Icons.downloading),
@@ -155,21 +163,18 @@ class DownloadTile extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaused(
-    BuildContext context,
-    WidgetRef ref,
-    double progress,
-  ) {
+  Widget _buildPaused(BuildContext context, WidgetRef ref, double progress) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: () =>
-          ref.read(updateNotifierProvider.notifier).resumeDownload(),
+      onTap: () => ref.read(updateNotifierProvider.notifier).resumeDownload(),
       onLongPress: () => _showCancelConfirm(context, ref, false),
       child: ListTile(
-        leading: Icon(Icons.pause_circle_outline,
-            color: theme.colorScheme.onSurfaceVariant),
+        leading: Icon(
+          Icons.pause_circle_outline,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

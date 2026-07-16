@@ -22,8 +22,11 @@ void showImagePreview(BuildContext context, String url) {
                 filterQuality: FilterQuality.high,
                 placeholder: (_, __) =>
                     const Center(child: CircularProgressIndicator()),
-                errorWidget: (_, __, ___) => const Icon(Icons.broken_image,
-                    color: Colors.white54, size: 48),
+                errorWidget: (_, __, ___) => const Icon(
+                  Icons.broken_image,
+                  color: Colors.white54,
+                  size: 48,
+                ),
               ),
             ),
           ),
@@ -53,8 +56,7 @@ class CommentImageList extends StatefulWidget {
 class _CommentImageListState extends State<CommentImageList> {
   bool _expanded = false;
 
-  bool get _allPortrait =>
-      widget.images.every((img) => img.height > img.width);
+  bool get _allPortrait => widget.images.every((img) => img.height > img.width);
 
   bool get _allLandscape =>
       widget.images.every((img) => img.width >= img.height);
@@ -180,7 +182,10 @@ class _CommentImageListState extends State<CommentImageList> {
               aspectRatio: 1,
               child: isOverlay
                   ? _buildOverlayCell(
-                      context, widget.images[j], overlayRemaining)
+                      context,
+                      widget.images[j],
+                      overlayRemaining,
+                    )
                   : _buildGridCell(context, widget.images[j]),
             ),
           ),
@@ -202,17 +207,15 @@ class _CommentImageListState extends State<CommentImageList> {
           onTap: () => setState(() => _expanded = false),
           child: Text(
             '收起',
-            style: context.textTheme.labelMedium
-                ?.copyWith(color: context.colorScheme.primary),
+            style: context.textTheme.labelMedium?.copyWith(
+              color: context.colorScheme.primary,
+            ),
           ),
         ),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: rows,
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
   }
 
   Widget _buildGridCell(BuildContext context, CommentImage img) {
@@ -226,7 +229,10 @@ class _CommentImageListState extends State<CommentImageList> {
   }
 
   Widget _buildOverlayCell(
-      BuildContext context, CommentImage img, int remaining) {
+    BuildContext context,
+    CommentImage img,
+    int remaining,
+  ) {
     return GestureDetector(
       onTap: () => setState(() => _expanded = true),
       child: ClipRRect(

@@ -117,13 +117,22 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
     }
 
     return AppThemePalette(
-      backgroundPrimary:
-          Color.lerp(backgroundPrimary, other.backgroundPrimary, t)!,
-      backgroundSecondary:
-          Color.lerp(backgroundSecondary, other.backgroundSecondary, t)!,
+      backgroundPrimary: Color.lerp(
+        backgroundPrimary,
+        other.backgroundPrimary,
+        t,
+      )!,
+      backgroundSecondary: Color.lerp(
+        backgroundSecondary,
+        other.backgroundSecondary,
+        t,
+      )!,
       surfacePrimary: Color.lerp(surfacePrimary, other.surfacePrimary, t)!,
-      surfaceSecondary:
-          Color.lerp(surfaceSecondary, other.surfaceSecondary, t)!,
+      surfaceSecondary: Color.lerp(
+        surfaceSecondary,
+        other.surfaceSecondary,
+        t,
+      )!,
       surfaceElevated: Color.lerp(surfaceElevated, other.surfaceElevated, t)!,
       accentStrong: Color.lerp(accentStrong, other.accentStrong, t)!,
       accentSoft: Color.lerp(accentSoft, other.accentSoft, t)!,
@@ -254,10 +263,7 @@ class AppThemeRadii extends ThemeExtension<AppThemeRadii> {
   }
 
   @override
-  AppThemeRadii lerp(
-    covariant ThemeExtension<AppThemeRadii>? other,
-    double t,
-  ) {
+  AppThemeRadii lerp(covariant ThemeExtension<AppThemeRadii>? other, double t) {
     if (other is! AppThemeRadii) {
       return this;
     }
@@ -303,38 +309,30 @@ class AppThemeDepth extends ThemeExtension<AppThemeDepth> {
   final double glowSpread;
 
   List<BoxShadow> get panelShadow => [
-        BoxShadow(
-          color: shadowSoft,
-          blurRadius: panelBlur,
-          offset: panelOffset,
-        ),
-        BoxShadow(
-          color: shadow,
-          blurRadius: panelBlur * 0.55,
-          offset: Offset(panelOffset.dx, panelOffset.dy * 0.5),
-        ),
-      ];
+    BoxShadow(color: shadowSoft, blurRadius: panelBlur, offset: panelOffset),
+    BoxShadow(
+      color: shadow,
+      blurRadius: panelBlur * 0.55,
+      offset: Offset(panelOffset.dx, panelOffset.dy * 0.5),
+    ),
+  ];
 
   List<BoxShadow> get floatingShadow => [
-        BoxShadow(
-          color: shadowSoft,
-          blurRadius: floatingBlur,
-          offset: floatingOffset,
-        ),
-        BoxShadow(
-          color: shadow,
-          blurRadius: floatingBlur * 0.6,
-          offset: Offset(floatingOffset.dx, floatingOffset.dy * 0.45),
-        ),
-      ];
+    BoxShadow(
+      color: shadowSoft,
+      blurRadius: floatingBlur,
+      offset: floatingOffset,
+    ),
+    BoxShadow(
+      color: shadow,
+      blurRadius: floatingBlur * 0.6,
+      offset: Offset(floatingOffset.dx, floatingOffset.dy * 0.45),
+    ),
+  ];
 
   List<BoxShadow> get coverGlowShadow => [
-        BoxShadow(
-          color: glow,
-          blurRadius: glowBlur,
-          spreadRadius: glowSpread,
-        ),
-      ];
+    BoxShadow(color: glow, blurRadius: glowBlur, spreadRadius: glowSpread),
+  ];
 
   @override
   AppThemeDepth copyWith({
@@ -368,10 +366,7 @@ class AppThemeDepth extends ThemeExtension<AppThemeDepth> {
   }
 
   @override
-  AppThemeDepth lerp(
-    covariant ThemeExtension<AppThemeDepth>? other,
-    double t,
-  ) {
+  AppThemeDepth lerp(covariant ThemeExtension<AppThemeDepth>? other, double t) {
     if (other is! AppThemeDepth) {
       return this;
     }

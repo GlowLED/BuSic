@@ -34,7 +34,9 @@ class PlayQueueSheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  color: context.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.4,
+                  ),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -44,10 +46,7 @@ class PlayQueueSheet extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Text(
-                    l10n.queue,
-                    style: context.textTheme.titleMedium,
-                  ),
+                  Text(l10n.queue, style: context.textTheme.titleMedium),
                   const SizedBox(width: 8),
                   Text(
                     '(${playerState.queue.length})',
@@ -71,10 +70,13 @@ class PlayQueueSheet extends ConsumerWidget {
                   : ReorderableListView.builder(
                       scrollController: scrollController,
                       itemCount: playerState.queue.length,
-                      onReorder: (oldIndex, newIndex) {
+                      onReorderItem: (oldIndex, newIndex) {
+                        final legacyNewIndex = newIndex > oldIndex
+                            ? newIndex + 1
+                            : newIndex;
                         ref
                             .read(playerNotifierProvider.notifier)
-                            .reorderQueue(oldIndex, newIndex);
+                            .reorderQueue(oldIndex, legacyNewIndex);
                       },
                       itemBuilder: (context, index) {
                         final track = playerState.queue[index];
@@ -92,13 +94,17 @@ class PlayQueueSheet extends ConsumerWidget {
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 16),
                             color: context.colorScheme.error,
-                            child: Icon(Icons.delete,
-                                color: context.colorScheme.onError),
+                            child: Icon(
+                              Icons.delete,
+                              color: context.colorScheme.onError,
+                            ),
                           ),
                           child: ListTile(
                             leading: isCurrent
-                                ? Icon(Icons.equalizer,
-                                    color: context.colorScheme.primary)
+                                ? Icon(
+                                    Icons.equalizer,
+                                    color: context.colorScheme.primary,
+                                  )
                                 : Text(
                                     '${index + 1}',
                                     style: context.textTheme.bodySmall,
@@ -123,10 +129,7 @@ class PlayQueueSheet extends ConsumerWidget {
                             onTap: () {
                               ref
                                   .read(playerNotifierProvider.notifier)
-                                  .playTrack(
-                                    track,
-                                    queue: playerState.queue,
-                                  );
+                                  .playTrack(track, queue: playerState.queue);
                             },
                             trailing: ReorderableDragStartListener(
                               index: index,

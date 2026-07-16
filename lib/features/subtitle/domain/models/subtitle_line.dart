@@ -9,7 +9,7 @@ part 'subtitle_line.g.dart';
 /// The [musicRatio] field indicates how "musical" the segment is
 /// (1.0 = pure music/lyrics, 0.0 = pure speech).
 @freezed
-class SubtitleLine with _$SubtitleLine {
+abstract class SubtitleLine with _$SubtitleLine {
   const factory SubtitleLine({
     /// Start time in seconds.
     required double startTime,

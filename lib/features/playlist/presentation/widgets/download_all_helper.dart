@@ -32,7 +32,9 @@ Future<void> downloadAllUncached({
     final qualities = await ref
         .read(downloadNotifierProvider.notifier)
         .getAvailableQualities(
-            bvid: uncached.first.bvid, cid: uncached.first.cid);
+          bvid: uncached.first.bvid,
+          cid: uncached.first.cid,
+        );
 
     if (qualities.isEmpty) {
       scaffoldMessenger.showSnackBar(
@@ -63,20 +65,19 @@ Future<void> downloadAllUncached({
             ),
           );
           final songData = uncached
-              .map((s) => (
-                    id: s.id,
-                    bvid: s.bvid,
-                    cid: s.cid,
-                    title: s.displayTitle,
-                    isCached: s.isCached,
-                  ))
+              .map(
+                (s) => (
+                  id: s.id,
+                  bvid: s.bvid,
+                  cid: s.cid,
+                  title: s.displayTitle,
+                  isCached: s.isCached,
+                ),
+              )
               .toList();
           await ref
               .read(downloadNotifierProvider.notifier)
-              .downloadAllUncached(
-                songs: songData,
-                quality: selected.quality,
-              );
+              .downloadAllUncached(songs: songData, quality: selected.quality);
         },
       ),
     );

@@ -6,26 +6,74 @@ part of 'settings_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$settingsNotifierHash() => r'c8b4f8a3747e3e00c9809302d60e96d5f3cf7574';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// State notifier managing user preferences / settings.
+///
+/// Persists preferences to local storage and provides reactive
+/// access for theme, locale, and other app-wide settings.
+
+@ProviderFor(SettingsNotifier)
+final settingsNotifierProvider = SettingsNotifierProvider._();
 
 /// State notifier managing user preferences / settings.
 ///
 /// Persists preferences to local storage and provides reactive
 /// access for theme, locale, and other app-wide settings.
-///
-/// Copied from [SettingsNotifier].
-@ProviderFor(SettingsNotifier)
-final settingsNotifierProvider =
-    AutoDisposeNotifierProvider<SettingsNotifier, UserPreferences>.internal(
-  SettingsNotifier.new,
-  name: r'settingsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$settingsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class SettingsNotifierProvider
+    extends $NotifierProvider<SettingsNotifier, UserPreferences> {
+  /// State notifier managing user preferences / settings.
+  ///
+  /// Persists preferences to local storage and provides reactive
+  /// access for theme, locale, and other app-wide settings.
+  SettingsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'settingsNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-typedef _$SettingsNotifier = AutoDisposeNotifier<UserPreferences>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$settingsNotifierHash();
+
+  @$internal
+  @override
+  SettingsNotifier create() => SettingsNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UserPreferences value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UserPreferences>(value),
+    );
+  }
+}
+
+String _$settingsNotifierHash() => r'c22cd80078b9655d6e292f6faa0fba07f0faf95c';
+
+/// State notifier managing user preferences / settings.
+///
+/// Persists preferences to local storage and provides reactive
+/// access for theme, locale, and other app-wide settings.
+
+abstract class _$SettingsNotifier extends $Notifier<UserPreferences> {
+  UserPreferences build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<UserPreferences, UserPreferences>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<UserPreferences, UserPreferences>,
+              UserPreferences,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

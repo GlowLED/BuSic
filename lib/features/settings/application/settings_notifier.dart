@@ -10,7 +10,7 @@ part 'settings_notifier.g.dart';
 ///
 /// Persists preferences to local storage and provides reactive
 /// access for theme, locale, and other app-wide settings.
-@riverpod
+@Riverpod(name: 'settingsNotifierProvider')
 class SettingsNotifier extends _$SettingsNotifier {
   static const _keyThemeMode = 'theme_mode';
   static const _keyLocale = 'locale';

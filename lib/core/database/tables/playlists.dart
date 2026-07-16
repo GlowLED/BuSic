@@ -19,6 +19,5 @@ class Playlists extends Table {
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
   /// Timestamp when the playlist was created.
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

@@ -102,16 +102,20 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
       // 未超过移动阈值 → 视为点击跳转
       if (widget.duration.inMilliseconds > 0 && width > 0) {
         final value = _clampProgress(local.dx, width);
-        widget.onSeek(Duration(
-          milliseconds: (value * widget.duration.inMilliseconds).toInt(),
-        ));
+        widget.onSeek(
+          Duration(
+            milliseconds: (value * widget.duration.inMilliseconds).toInt(),
+          ),
+        );
       }
     } else if (!_isCancelled) {
       // 拖动结束且未取消 → 跳转到拖动位置
       if (widget.duration.inMilliseconds > 0) {
-        widget.onSeek(Duration(
-          milliseconds: (_dragValue * widget.duration.inMilliseconds).toInt(),
-        ));
+        widget.onSeek(
+          Duration(
+            milliseconds: (_dragValue * widget.duration.inMilliseconds).toInt(),
+          ),
+        );
       }
     }
     // 取消状态 → 不跳转
@@ -165,10 +169,12 @@ class _DraggableProgressBarState extends State<DraggableProgressBar> {
                 isCancelled: _isCancelled,
                 emphasis: emphasis,
                 activeColor: context.colorScheme.primary,
-                inactiveColor:
-                    context.colorScheme.primary.withValues(alpha: 0.2),
-                cancelledColor:
-                    context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                inactiveColor: context.colorScheme.primary.withValues(
+                  alpha: 0.2,
+                ),
+                cancelledColor: context.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
               ),
             );
           },
@@ -216,9 +222,11 @@ class _ProgressBarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final emphasisValue = emphasis.clamp(0.0, 1.0);
-    final trackHeight = _baseTrackHeight +
+    final trackHeight =
+        _baseTrackHeight +
         (_emphasizedTrackHeight - _baseTrackHeight) * emphasisValue;
-    final thumbRadius = _baseThumbRadius +
+    final thumbRadius =
+        _baseThumbRadius +
         (_emphasizedThumbRadius - _baseThumbRadius) * emphasisValue;
     final centerY = thumbRadius + _topInset;
     final y = centerY - trackHeight / 2;
@@ -292,10 +300,7 @@ class _ProgressBarPainter extends CustomPainter {
     double x = 0;
     while (x < width) {
       final segmentWidth = (x + _dashWidth > width) ? width - x : _dashWidth;
-      canvas.drawRect(
-        Rect.fromLTWH(x, y, segmentWidth, trackHeight),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(x, y, segmentWidth, trackHeight), paint);
       x += _dashWidth + _dashGap;
     }
   }
@@ -312,11 +317,7 @@ class _ProgressBarPainter extends CustomPainter {
     final cx = width <= radius * 2
         ? width / 2
         : x.clamp(radius, width - radius).toDouble();
-    canvas.drawCircle(
-      Offset(cx, centerY),
-      radius,
-      Paint()..color = color,
-    );
+    canvas.drawCircle(Offset(cx, centerY), radius, Paint()..color = color);
   }
 
   @override

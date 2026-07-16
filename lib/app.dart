@@ -68,9 +68,7 @@ class _AppState extends ConsumerState<App> {
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         return DesktopWindowResizeFrame(
-          child: _StartupAuthProbe(
-            child: child ?? const SizedBox.shrink(),
-          ),
+          child: _StartupAuthProbe(child: child ?? const SizedBox.shrink()),
         );
       },
     );
@@ -78,9 +76,7 @@ class _AppState extends ConsumerState<App> {
 }
 
 class _StartupAuthProbe extends ConsumerStatefulWidget {
-  const _StartupAuthProbe({
-    required this.child,
-  });
+  const _StartupAuthProbe({required this.child});
 
   final Widget child;
 

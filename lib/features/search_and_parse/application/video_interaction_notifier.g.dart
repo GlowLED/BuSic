@@ -6,210 +6,116 @@ part of 'video_interaction_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$videoInteractionNotifierHash() =>
-    r'6c61a6bd33838458c64f55de0c78897ebcbfc578';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$VideoInteractionNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<VideoInteractionState> {
-  late final String bvid;
-  late final int aid;
-
-  FutureOr<VideoInteractionState> build(
-    String bvid,
-    int aid,
-  );
-}
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// Manages Bilibili interaction state for a parsed video detail page.
-///
-/// Copied from [VideoInteractionNotifier].
+
 @ProviderFor(VideoInteractionNotifier)
-const videoInteractionNotifierProvider = VideoInteractionNotifierFamily();
+final videoInteractionNotifierProvider = VideoInteractionNotifierFamily._();
 
 /// Manages Bilibili interaction state for a parsed video detail page.
-///
-/// Copied from [VideoInteractionNotifier].
-class VideoInteractionNotifierFamily
-    extends Family<AsyncValue<VideoInteractionState>> {
+final class VideoInteractionNotifierProvider
+    extends
+        $AsyncNotifierProvider<
+          VideoInteractionNotifier,
+          VideoInteractionState
+        > {
   /// Manages Bilibili interaction state for a parsed video detail page.
-  ///
-  /// Copied from [VideoInteractionNotifier].
-  const VideoInteractionNotifierFamily();
+  VideoInteractionNotifierProvider._({
+    required VideoInteractionNotifierFamily super.from,
+    required (String, int) super.argument,
+  }) : super(
+         retry: null,
+         name: r'videoInteractionNotifierProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// Manages Bilibili interaction state for a parsed video detail page.
-  ///
-  /// Copied from [VideoInteractionNotifier].
-  VideoInteractionNotifierProvider call(
-    String bvid,
-    int aid,
-  ) {
-    return VideoInteractionNotifierProvider(
-      bvid,
-      aid,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$videoInteractionNotifierHash();
+
+  @override
+  String toString() {
+    return r'videoInteractionNotifierProvider'
+        ''
+        '$argument';
   }
 
+  @$internal
   @override
-  VideoInteractionNotifierProvider getProviderOverride(
-    covariant VideoInteractionNotifierProvider provider,
-  ) {
-    return call(
-      provider.bvid,
-      provider.aid,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'videoInteractionNotifierProvider';
-}
-
-/// Manages Bilibili interaction state for a parsed video detail page.
-///
-/// Copied from [VideoInteractionNotifier].
-class VideoInteractionNotifierProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<VideoInteractionNotifier,
-        VideoInteractionState> {
-  /// Manages Bilibili interaction state for a parsed video detail page.
-  ///
-  /// Copied from [VideoInteractionNotifier].
-  VideoInteractionNotifierProvider(
-    String bvid,
-    int aid,
-  ) : this._internal(
-          () => VideoInteractionNotifier()
-            ..bvid = bvid
-            ..aid = aid,
-          from: videoInteractionNotifierProvider,
-          name: r'videoInteractionNotifierProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$videoInteractionNotifierHash,
-          dependencies: VideoInteractionNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              VideoInteractionNotifierFamily._allTransitiveDependencies,
-          bvid: bvid,
-          aid: aid,
-        );
-
-  VideoInteractionNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.bvid,
-    required this.aid,
-  }) : super.internal();
-
-  final String bvid;
-  final int aid;
-
-  @override
-  FutureOr<VideoInteractionState> runNotifierBuild(
-    covariant VideoInteractionNotifier notifier,
-  ) {
-    return notifier.build(
-      bvid,
-      aid,
-    );
-  }
-
-  @override
-  Override overrideWith(VideoInteractionNotifier Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: VideoInteractionNotifierProvider._internal(
-        () => create()
-          ..bvid = bvid
-          ..aid = aid,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        bvid: bvid,
-        aid: aid,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<VideoInteractionNotifier,
-      VideoInteractionState> createElement() {
-    return _VideoInteractionNotifierProviderElement(this);
-  }
+  VideoInteractionNotifier create() => VideoInteractionNotifier();
 
   @override
   bool operator ==(Object other) {
     return other is VideoInteractionNotifierProvider &&
-        other.bvid == bvid &&
-        other.aid == aid;
+        other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, bvid.hashCode);
-    hash = _SystemHash.combine(hash, aid.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin VideoInteractionNotifierRef
-    on AutoDisposeAsyncNotifierProviderRef<VideoInteractionState> {
-  /// The parameter `bvid` of this provider.
-  String get bvid;
+String _$videoInteractionNotifierHash() =>
+    r'f5d7637f3728f0efff30d65ed8729f17fcd560b1';
 
-  /// The parameter `aid` of this provider.
-  int get aid;
-}
+/// Manages Bilibili interaction state for a parsed video detail page.
 
-class _VideoInteractionNotifierProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<VideoInteractionNotifier,
-        VideoInteractionState> with VideoInteractionNotifierRef {
-  _VideoInteractionNotifierProviderElement(super.provider);
+final class VideoInteractionNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          VideoInteractionNotifier,
+          AsyncValue<VideoInteractionState>,
+          VideoInteractionState,
+          FutureOr<VideoInteractionState>,
+          (String, int)
+        > {
+  VideoInteractionNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'videoInteractionNotifierProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Manages Bilibili interaction state for a parsed video detail page.
+
+  VideoInteractionNotifierProvider call(String bvid, int aid) =>
+      VideoInteractionNotifierProvider._(argument: (bvid, aid), from: this);
 
   @override
-  String get bvid => (origin as VideoInteractionNotifierProvider).bvid;
-  @override
-  int get aid => (origin as VideoInteractionNotifierProvider).aid;
+  String toString() => r'videoInteractionNotifierProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+/// Manages Bilibili interaction state for a parsed video detail page.
+
+abstract class _$VideoInteractionNotifier
+    extends $AsyncNotifier<VideoInteractionState> {
+  late final _$args = ref.$arg as (String, int);
+  String get bvid => _$args.$1;
+  int get aid => _$args.$2;
+
+  FutureOr<VideoInteractionState> build(String bvid, int aid);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<VideoInteractionState>, VideoInteractionState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<VideoInteractionState>,
+                VideoInteractionState
+              >,
+              AsyncValue<VideoInteractionState>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args.$1, _$args.$2));
+  }
+}

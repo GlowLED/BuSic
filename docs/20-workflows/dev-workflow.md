@@ -189,7 +189,7 @@
 - Drift 表 / 数据库
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 
@@ -198,7 +198,7 @@ flutter gen-l10n
 ### 6.2 最低验证
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 

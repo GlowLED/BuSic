@@ -46,15 +46,18 @@ class QualitySelectDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline,
-                        size: 16, color: colorScheme.tertiary),
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: colorScheme.tertiary,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         l10n.loginForHighQuality,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colorScheme.tertiary,
-                            ),
+                          color: colorScheme.tertiary,
+                        ),
                       ),
                     ),
                   ],
@@ -83,16 +86,20 @@ class QualitySelectDialog extends StatelessWidget {
                   trailing: badge != null
                       ? Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: colorScheme.tertiaryContainer,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text(badge,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: colorScheme.onTertiaryContainer,
-                              )),
+                          child: Text(
+                            badge,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: colorScheme.onTertiaryContainer,
+                            ),
+                          ),
                         )
                       : null,
                   onTap: () {

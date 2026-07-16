@@ -6,8 +6,8 @@ part of 'subtitle_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SubtitleDataImpl _$$SubtitleDataImplFromJson(Map<String, dynamic> json) =>
-    _$SubtitleDataImpl(
+_SubtitleData _$SubtitleDataFromJson(Map<String, dynamic> json) =>
+    _SubtitleData(
       lines: (json['lines'] as List<dynamic>)
           .map((e) => SubtitleLine.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -15,7 +15,7 @@ _$SubtitleDataImpl _$$SubtitleDataImplFromJson(Map<String, dynamic> json) =>
       language: json['language'] as String? ?? '',
     );
 
-Map<String, dynamic> _$$SubtitleDataImplToJson(_$SubtitleDataImpl instance) =>
+Map<String, dynamic> _$SubtitleDataToJson(_SubtitleData instance) =>
     <String, dynamic>{
       'lines': instance.lines,
       'sourceType': instance.sourceType,

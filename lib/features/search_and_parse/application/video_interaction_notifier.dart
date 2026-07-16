@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/api/bili_dio.dart';
@@ -11,13 +12,14 @@ import '../domain/models/video_interaction_state.dart';
 
 part 'video_interaction_notifier.g.dart';
 
-final videoInteractionRepositoryProvider =
-    Provider<VideoInteractionRepository>((ref) {
-  return VideoInteractionRepositoryImpl(biliDio: BiliDio());
-});
+final videoInteractionRepositoryProvider = Provider<VideoInteractionRepository>(
+  (ref) {
+    return VideoInteractionRepositoryImpl(biliDio: BiliDio());
+  },
+);
 
 /// Manages Bilibili interaction state for a parsed video detail page.
-@riverpod
+@Riverpod(name: 'videoInteractionNotifierProvider')
 class VideoInteractionNotifier extends _$VideoInteractionNotifier {
   static const _loginRequiredErrorCode = 'pleaseLoginFirst';
   static const _sessionInvalidErrorCode = 'biliSessionInvalid';
@@ -42,47 +44,31 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
     final link = ref.keepAlive();
     VideoInteractionState? rollbackState;
     try {
-      final current = state.valueOrNull;
+      final current = state.value;
       if (current == null || current.isBusy) return false;
       rollbackState = current;
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(
-          current.copyWith(lastError: _loginRequiredErrorCode),
-        );
+        state = AsyncData(current.copyWith(lastError: _loginRequiredErrorCode));
         return false;
       }
 
       final nextLiked = !current.isLiked;
       state = AsyncData(
-        current.copyWith(
-          isLiked: nextLiked,
-          isBusy: true,
-          lastError: null,
-        ),
+        current.copyWith(isLiked: nextLiked, isBusy: true, lastError: null),
       );
 
-      await _repository.setLike(
-        aid: aid,
-        like: nextLiked,
-        csrf: user!.biliJct,
-      );
+      await _repository.setLike(aid: aid, like: nextLiked, csrf: user!.biliJct);
 
       state = AsyncData(
-        current.copyWith(
-          isLiked: nextLiked,
-          isBusy: false,
-          lastError: null,
-        ),
+        current.copyWith(isLiked: nextLiked, isBusy: false, lastError: null),
       );
       return true;
     } catch (error, stackTrace) {
       final message = _messageFor(error);
-      final fallback = rollbackState?.copyWith(
-            isBusy: false,
-            lastError: message,
-          ) ??
+      final fallback =
+          rollbackState?.copyWith(isBusy: false, lastError: message) ??
           VideoInteractionState(lastError: message);
       state = AsyncData(fallback);
       await _invalidateSessionIfNeeded(error);
@@ -99,20 +85,15 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
   }
 
   /// Add one or two coins to the current video.
-  Future<bool> addCoin({
-    required int multiply,
-    required bool alsoLike,
-  }) async {
+  Future<bool> addCoin({required int multiply, required bool alsoLike}) async {
     final link = ref.keepAlive();
     try {
-      final current = state.valueOrNull;
+      final current = state.value;
       if (current == null || current.isBusy) return false;
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(
-          current.copyWith(lastError: _loginRequiredErrorCode),
-        );
+        state = AsyncData(current.copyWith(lastError: _loginRequiredErrorCode));
         return false;
       }
 
@@ -145,14 +126,12 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
   Future<bool> addToFavoriteFolder(int mediaId) async {
     final link = ref.keepAlive();
     try {
-      final current = state.valueOrNull;
+      final current = state.value;
       if (current == null || current.isBusy) return false;
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(
-          current.copyWith(lastError: _loginRequiredErrorCode),
-        );
+        state = AsyncData(current.copyWith(lastError: _loginRequiredErrorCode));
         return false;
       }
 
@@ -164,11 +143,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
       );
 
       state = AsyncData(
-        current.copyWith(
-          isFavorited: true,
-          isBusy: false,
-          lastError: null,
-        ),
+        current.copyWith(isFavorited: true, isBusy: false, lastError: null),
       );
       return true;
     } catch (error, stackTrace) {
@@ -187,23 +162,17 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
   Future<bool> recordShare() async {
     final link = ref.keepAlive();
     try {
-      final current = state.valueOrNull;
+      final current = state.value;
       if (current == null || current.isBusy) return false;
 
       final user = await ref.read(authNotifierProvider.future);
       if (!_hasValidLogin(user)) {
-        state = AsyncData(
-          current.copyWith(lastError: _loginRequiredErrorCode),
-        );
+        state = AsyncData(current.copyWith(lastError: _loginRequiredErrorCode));
         return false;
       }
 
       state = AsyncData(current.copyWith(isBusy: true, lastError: null));
-      await _repository.recordShare(
-        aid: aid,
-        bvid: bvid,
-        csrf: user!.biliJct,
-      );
+      await _repository.recordShare(aid: aid, bvid: bvid, csrf: user!.biliJct);
 
       state = AsyncData(current.copyWith(isBusy: false, lastError: null));
       return true;
@@ -221,7 +190,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
 
   /// Clear the last presentation-facing interaction error.
   void clearError() {
-    final current = state.valueOrNull;
+    final current = state.value;
     if (current == null || current.lastError == null) return;
     state = AsyncData(current.copyWith(lastError: null));
   }
@@ -235,7 +204,7 @@ class VideoInteractionNotifier extends _$VideoInteractionNotifier {
     StackTrace stackTrace,
     String logMessage,
   ) async {
-    final current = state.valueOrNull;
+    final current = state.value;
     state = AsyncData(
       (current ?? const VideoInteractionState()).copyWith(
         isBusy: false,

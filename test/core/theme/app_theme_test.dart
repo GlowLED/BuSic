@@ -22,7 +22,9 @@ void main() {
       expect(depth, isNotNull);
       expect(theme.scaffoldBackgroundColor, palette!.backgroundPrimary);
       expect(
-          theme.colorScheme.surfaceContainerHighest, palette.surfaceElevated);
+        theme.colorScheme.surfaceContainerHighest,
+        palette.surfaceElevated,
+      );
       expect(theme.colorScheme.error, palette.danger);
       expect(spacing!.xl, greaterThan(spacing.md));
       expect(radii!.pill, greaterThan(radii.large));
@@ -38,7 +40,9 @@ void main() {
       expect(theme.colorScheme.primary, palette.accentStrong);
       expect(theme.colorScheme.primaryContainer, palette.accentSoft);
       expect(
-          theme.navigationBarTheme.backgroundColor, palette.surfaceSecondary);
+        theme.navigationBarTheme.backgroundColor,
+        palette.surfaceSecondary,
+      );
       expect(theme.navigationRailTheme.indicatorColor, palette.accentSoft);
       expect(depth.coverGlowShadow, isNotEmpty);
     });
@@ -77,40 +81,40 @@ void main() {
           expect(
             _contrastRatio(selectedSurface, palette.surfacePrimary),
             greaterThan(
-              _contrastRatio(
-                previousSelectedSurface,
-                palette.surfacePrimary,
-              ),
+              _contrastRatio(previousSelectedSurface, palette.surfacePrimary),
             ),
           );
         }
       }
     });
 
-    test('windows text theme uses stable CJK fonts and regular body weight',
-        () {
-      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    test(
+      'windows text theme uses stable CJK fonts and regular body weight',
+      () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+        addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-      for (final theme in [
-        AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
-        AppTheme.darkTheme(seedColor: AppTheme.pinkSeed),
-      ]) {
-        expect(theme.textTheme.bodyLarge?.fontFamily, 'Microsoft YaHei UI');
-        expect(theme.textTheme.bodyMedium?.fontFamily, 'Microsoft YaHei UI');
-        expect(theme.textTheme.bodySmall?.fontFamily, 'Microsoft YaHei UI');
-        expect(
-          theme.textTheme.bodyMedium?.fontFamilyFallback,
-          const ['Microsoft YaHei', 'Segoe UI', 'Arial'],
-        );
+        for (final theme in [
+          AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
+          AppTheme.darkTheme(seedColor: AppTheme.pinkSeed),
+        ]) {
+          expect(theme.textTheme.bodyLarge?.fontFamily, 'Microsoft YaHei UI');
+          expect(theme.textTheme.bodyMedium?.fontFamily, 'Microsoft YaHei UI');
+          expect(theme.textTheme.bodySmall?.fontFamily, 'Microsoft YaHei UI');
+          expect(theme.textTheme.bodyMedium?.fontFamilyFallback, const [
+            'Microsoft YaHei',
+            'Segoe UI',
+            'Arial',
+          ]);
 
-        expect(theme.textTheme.bodyLarge?.fontWeight, FontWeight.w400);
-        expect(theme.textTheme.bodyMedium?.fontWeight, FontWeight.w400);
-        expect(theme.textTheme.bodySmall?.fontWeight, FontWeight.w400);
-        expect(theme.textTheme.titleMedium?.fontWeight, FontWeight.w700);
-        expect(theme.textTheme.labelMedium?.fontWeight, FontWeight.w700);
-      }
-    });
+          expect(theme.textTheme.bodyLarge?.fontWeight, FontWeight.w400);
+          expect(theme.textTheme.bodyMedium?.fontWeight, FontWeight.w400);
+          expect(theme.textTheme.bodySmall?.fontWeight, FontWeight.w400);
+          expect(theme.textTheme.titleMedium?.fontWeight, FontWeight.w700);
+          expect(theme.textTheme.labelMedium?.fontWeight, FontWeight.w700);
+        }
+      },
+    );
   });
 }
 

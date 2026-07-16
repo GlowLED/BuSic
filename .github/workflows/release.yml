@@ -31,7 +31,7 @@ permissions:
   contents: write   # 创建 Release 需要写权限
 
 env:
-  FLUTTER_VERSION: '3.29.1'
+  FLUTTER_VERSION: '3.44.6'
 
 jobs:
   # ───────────────────── 前置检查: 等待 CI 通过 + 解析 tag ─────────────
@@ -114,7 +114,7 @@ jobs:
       - name: Install dependencies & generate code
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
 
       - name: Build Linux
         run: flutter build linux --release
@@ -230,7 +230,7 @@ jobs:
       - name: Install dependencies & generate code
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
 
       - name: Build Windows
         run: flutter build windows --release
@@ -264,7 +264,7 @@ jobs:
       - name: Install dependencies & generate code
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
 
       - name: Build macOS
         run: flutter build macos --release
@@ -334,7 +334,7 @@ jobs:
       - name: Install dependencies & generate code
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
 
       - name: Decode keystore
         if: env.KEYSTORE_BASE64 != ''
@@ -377,7 +377,7 @@ jobs:
       - name: Install dependencies & generate code
         run: |
           flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
 
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign

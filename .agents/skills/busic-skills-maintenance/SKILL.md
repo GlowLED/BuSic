@@ -75,7 +75,7 @@ compatibility: opencode
 ## 建议自检
 
 ```bash
-python scripts/validate-skills.py
+python3 scripts/validate-skills.py
 ```
 
 建议至少确认：

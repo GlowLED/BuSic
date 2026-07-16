@@ -19,10 +19,7 @@ import '../../../test_helpers/test_app.dart';
 void main() {
   group('独占播放器评论外观', () {
     testWidgets('深色毛玻璃面板承载简洁评论行', (tester) async {
-      await _pumpComments(
-        tester,
-        const PlayerCommentPanel(bvid: _bvid),
-      );
+      await _pumpComments(tester, const PlayerCommentPanel(bvid: _bvid));
 
       expect(
         find.byKey(const ValueKey('player-comment-panel')),
@@ -32,30 +29,18 @@ void main() {
       expect(find.text(_rootCommentContent), findsOneWidget);
 
       final commentText = tester.widget<Text>(find.text(_rootCommentContent));
-      expect(
-        commentText.style?.color,
-        Colors.white.withValues(alpha: 0.90),
-      );
+      expect(commentText.style?.color, Colors.white.withValues(alpha: 0.90));
       final popularText = tester.widget<Text>(find.text('Popular'));
-      expect(
-        popularText.style?.color,
-        Colors.black.withValues(alpha: 0.88),
-      );
+      expect(popularText.style?.color, Colors.black.withValues(alpha: 0.88));
     });
 
     testWidgets('楼中楼回复弹层延续独占玻璃外观', (tester) async {
-      await _pumpComments(
-        tester,
-        const PlayerCommentPanel(bvid: _bvid),
-      );
+      await _pumpComments(tester, const PlayerCommentPanel(bvid: _bvid));
 
       await tester.tap(find.text('1条回复'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.byKey(const ValueKey('player-reply-panel')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('player-reply-panel')), findsOneWidget);
       expect(find.text(_replyContent), findsOneWidget);
     });
 
@@ -69,10 +54,7 @@ void main() {
         ),
       );
 
-      expect(
-        find.byKey(const ValueKey('player-comment-panel')),
-        findsNothing,
-      );
+      expect(find.byKey(const ValueKey('player-comment-panel')), findsNothing);
       expect(find.byType(AppPanel), findsNothing);
       expect(find.text(_rootCommentContent), findsOneWidget);
     });
@@ -87,18 +69,12 @@ Future<void> _pumpComments(WidgetTester tester, Widget child) async {
         commentRepositoryProvider.overrideWithValue(
           const _FakeCommentRepository(),
         ),
-        commentNotifierProvider(_bvid).overrideWith(
-          () => _FakeCommentNotifier(_commentState),
-        ),
+        commentNotifierProvider(
+          _bvid,
+        ).overrideWith(() => _FakeCommentNotifier(_commentState)),
       ],
       child: buildTestApp(
-        Center(
-          child: SizedBox(
-            width: 520,
-            height: 640,
-            child: child,
-          ),
-        ),
+        Center(child: SizedBox(width: 520, height: 640, child: child)),
       ),
     ),
   );

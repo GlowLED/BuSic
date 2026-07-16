@@ -74,11 +74,7 @@ class SongTile extends StatelessWidget {
     final l10n = context.l10n;
 
     return MediaRow(
-      cover: MediaCover(
-        coverUrl: coverUrl,
-        width: 58,
-        height: 58,
-      ),
+      cover: MediaCover(coverUrl: coverUrl, width: 58, height: 58),
       title: Row(
         children: [
           Expanded(
@@ -106,9 +102,7 @@ class SongTile extends StatelessWidget {
         artist,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: textTheme.bodyMedium?.copyWith(
-          color: palette.textSecondary,
-        ),
+        style: textTheme.bodyMedium?.copyWith(color: palette.textSecondary),
       ),
       badges: [
         if (isCached)
@@ -126,9 +120,7 @@ class SongTile extends StatelessWidget {
           if (duration != null) ...[
             Text(
               duration!,
-              style: textTheme.labelMedium?.copyWith(
-                color: palette.textMuted,
-              ),
+              style: textTheme.labelMedium?.copyWith(color: palette.textMuted),
             ),
             SizedBox(height: spacing.xs),
           ],
@@ -144,8 +136,9 @@ class SongTile extends StatelessWidget {
                       ? l10n.removeFromFavorites
                       : l10n.addToFavorites,
                   onPressed: enabled ? onFavoritePressed : null,
-                  iconColor:
-                      isFavorited! ? palette.danger : palette.textSecondary,
+                  iconColor: isFavorited!
+                      ? palette.danger
+                      : palette.textSecondary,
                 ),
                 SizedBox(width: spacing.xxs),
               ],
@@ -175,10 +168,7 @@ class SongTile extends StatelessWidget {
 }
 
 class _SongMetaBadge extends StatelessWidget {
-  const _SongMetaBadge({
-    required this.icon,
-    required this.label,
-  });
+  const _SongMetaBadge({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -204,11 +194,7 @@ class _SongMetaBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: palette.success,
-          ),
+          Icon(icon, size: 12, color: palette.success),
           SizedBox(width: spacing.xxs),
           Text(
             label,

@@ -10,10 +10,7 @@ void main() {
   testWidgets('wraps child in resize area when enabled', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: DesktopWindowResizeFrame(
-          enabled: true,
-          child: Text('content'),
-        ),
+        home: DesktopWindowResizeFrame(enabled: true, child: Text('content')),
       ),
     );
 
@@ -30,10 +27,7 @@ void main() {
   testWidgets('returns child directly when disabled', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: DesktopWindowResizeFrame(
-          enabled: false,
-          child: Text('content'),
-        ),
+        home: DesktopWindowResizeFrame(enabled: false, child: Text('content')),
       ),
     );
 
@@ -41,14 +35,12 @@ void main() {
     expect(find.text('content'), findsOneWidget);
   });
 
-  testWidgets('disables resize edges while maximized or fullscreen',
-      (tester) async {
+  testWidgets('disables resize edges while maximized or fullscreen', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: DesktopWindowResizeFrame(
-          enabled: true,
-          child: Text('content'),
-        ),
+        home: DesktopWindowResizeFrame(enabled: true, child: Text('content')),
       ),
     );
 

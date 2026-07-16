@@ -17,14 +17,16 @@ part 'app_database.g.dart';
 ///
 /// Includes all tables for songs, playlists, downloads, and user sessions.
 /// Run `dart run build_runner build` to generate the implementation.
-@DriftDatabase(tables: [
-  Songs,
-  Playlists,
-  PlaylistSongs,
-  DownloadTasks,
-  UserSessions,
-  Subtitles,
-])
+@DriftDatabase(
+  tables: [
+    Songs,
+    Playlists,
+    PlaylistSongs,
+    DownloadTasks,
+    UserSessions,
+    Subtitles,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

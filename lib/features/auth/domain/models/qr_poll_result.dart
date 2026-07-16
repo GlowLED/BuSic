@@ -5,7 +5,7 @@ part 'qr_poll_result.g.dart';
 
 /// Result of polling the QR code login status.
 @freezed
-class QrPollResult with _$QrPollResult {
+abstract class QrPollResult with _$QrPollResult {
   const factory QrPollResult({
     /// Status code:
     /// - 0: success

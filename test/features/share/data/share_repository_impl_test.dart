@@ -110,7 +110,9 @@ void main() {
   group('exportPlaylist', () {
     test('导出歌单包含正确的歌曲信息', () async {
       // 插入歌曲
-      final songId1 = await db.into(db.songs).insert(
+      final songId1 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1export01',
               cid: 1001,
@@ -120,7 +122,9 @@ void main() {
             ),
           );
 
-      final songId2 = await db.into(db.songs).insert(
+      final songId2 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1export02',
               cid: 2002,
@@ -130,7 +134,9 @@ void main() {
           );
 
       // 创建歌单
-      final playlistId = await db.into(db.playlists).insert(
+      final playlistId = await db
+          .into(db.playlists)
+          .insert(
             PlaylistsCompanion.insert(
               name: '导出测试歌单',
               sortOrder: const Value(0),
@@ -138,14 +144,18 @@ void main() {
           );
 
       // 关联歌曲
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId1,
               sortOrder: const Value(0),
             ),
           );
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId2,
@@ -166,10 +176,7 @@ void main() {
     });
 
     test('导出不存在的歌单应抛出异常', () async {
-      expect(
-        () => shareRepo.exportPlaylist(99999),
-        throwsA(isA<StateError>()),
-      );
+      expect(() => shareRepo.exportPlaylist(99999), throwsA(isA<StateError>()));
     });
   });
 
@@ -233,7 +240,8 @@ void main() {
       );
 
       // toJson() 不会深层转换嵌套对象，需做完整 JSON 往返
-      final json = jsonDecode(jsonEncode(playlist.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(playlist.toJson())) as Map<String, dynamic>;
       // 验证使用缩写键名
       expect(json.containsKey('v'), isTrue);
       expect(json.containsKey('n'), isTrue);
@@ -251,7 +259,8 @@ void main() {
         songs: [SharedSong(bvid: 'BV1null', cid: 1)],
       );
 
-      final json = jsonDecode(jsonEncode(playlist.toJson())) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(playlist.toJson())) as Map<String, dynamic>;
       final songJson = (json['s'] as List).first as Map<String, dynamic>;
       expect(songJson.containsKey('ct'), isFalse);
       expect(songJson.containsKey('ca'), isFalse);
@@ -260,11 +269,13 @@ void main() {
     test('解码时前缀不匹配应抛出 FormatException', () {
       expect(
         () => shareRepo.decodeFromClipboard('invalid data'),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          contains('不是 BuSic 歌单数据'),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('不是 BuSic 歌单数据'),
+          ),
+        ),
       );
     });
 
@@ -285,17 +296,18 @@ void main() {
     });
 
     test('解码时版本号过高应抛出 FormatException', () {
-      final futureJson =
-          jsonEncode({'v': 999, 'n': 'test', 's': []});
+      final futureJson = jsonEncode({'v': 999, 'n': 'test', 's': []});
       final base64Str = base64Encode(utf8.encode(futureJson));
 
       expect(
         () => shareRepo.decodeFromClipboard('busic://playlist/$base64Str'),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          contains('升级'),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('升级'),
+          ),
+        ),
       );
     });
 
@@ -305,11 +317,13 @@ void main() {
 
       expect(
         () => shareRepo.decodeFromClipboard('busic://playlist/$base64Str'),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          contains('没有歌曲'),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('没有歌曲'),
+          ),
+        ),
       );
     });
 
@@ -329,7 +343,9 @@ void main() {
   group('importPlaylist', () {
     test('导入时本地已有歌曲应复用', () async {
       // 预先插入一首歌曲
-      await db.into(db.songs).insert(
+      await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1reuse01',
               cid: 5001,
@@ -381,9 +397,9 @@ void main() {
       final songs = await db.select(db.songs).get();
       expect(songs, hasLength(2));
 
-      final psSongs = await (db.select(db.playlistSongs)
-            ..where((t) => t.playlistId.equals(result.playlistId)))
-          .get();
+      final psSongs = await (db.select(
+        db.playlistSongs,
+      )..where((t) => t.playlistId.equals(result.playlistId))).get();
       expect(psSongs, hasLength(2));
     });
 
@@ -418,9 +434,7 @@ void main() {
       // 不注册 BV1fail01 的 API 返回，模拟拉取失败
       const playlist = SharedPlaylist(
         name: '部分失败测试',
-        songs: [
-          SharedSong(bvid: 'BV1fail01', cid: 9001),
-        ],
+        songs: [SharedSong(bvid: 'BV1fail01', cid: 9001)],
       );
 
       final result = await shareRepo.importPlaylist(playlist);
@@ -435,7 +449,9 @@ void main() {
   group('导出 → 剪贴板 → 导入往返', () {
     test('歌单导出编码后解码应还原', () async {
       // 插入数据
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1trip01',
               cid: 3001,
@@ -445,14 +461,15 @@ void main() {
             ),
           );
 
-      final playlistId = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(
-              name: '往返歌单',
-              sortOrder: const Value(0),
-            ),
+      final playlistId = await db
+          .into(db.playlists)
+          .insert(
+            PlaylistsCompanion.insert(name: '往返歌单', sortOrder: const Value(0)),
           );
 
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlistId,
               songId: songId,

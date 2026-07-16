@@ -1,6 +1,7 @@
 # Miscellaneous
 *.class
 *.lock
+!pubspec.lock
 *.log
 *.pyc
 *.swp
@@ -132,4 +133,3 @@ temp/
 CLAUDE.md
 AGENTS.md
 .codex
-

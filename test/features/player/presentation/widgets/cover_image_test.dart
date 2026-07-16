@@ -7,16 +7,15 @@ import 'package:busic/features/player/presentation/widgets/cover_image.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('uses high quality cached network image by default',
-      (tester) async {
+  testWidgets('uses high quality cached network image by default', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildTestApp(
         Center(
           child: Builder(
-            builder: (context) => buildCoverImage(
-              context,
-              'https://example.com/cover.jpg',
-            ),
+            builder: (context) =>
+                buildCoverImage(context, 'https://example.com/cover.jpg'),
           ),
         ),
       ),
@@ -34,8 +33,9 @@ void main() {
     expect(image.useOldImageOnUrlChange, isFalse);
   });
 
-  testWidgets('passes high quality options to cached network image',
-      (tester) async {
+  testWidgets('passes high quality options to cached network image', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildTestApp(
         Center(

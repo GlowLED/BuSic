@@ -42,18 +42,8 @@ void main() {
             },
             'pic': 'https://example.com/cover.jpg',
             'pages': [
-              {
-                'cid': 1001,
-                'page': 1,
-                'part': 'P1',
-                'duration': 245,
-              },
-              {
-                'cid': 1002,
-                'page': 2,
-                'part': 'P2',
-                'duration': 180,
-              },
+              {'cid': 1001, 'page': 1, 'part': 'P1', 'duration': 245},
+              {'cid': 1002, 'page': 2, 'part': 'P2', 'duration': 180},
             ],
             'duration': 425,
             'stat': {
@@ -65,9 +55,7 @@ void main() {
               'share': 6,
               'like': 7,
             },
-            'rights': {
-              'no_reprint': 1,
-            },
+            'rights': {'no_reprint': 1},
           },
         },
       );
@@ -108,18 +96,9 @@ void main() {
           'code': 0,
           'message': '0',
           'data': [
-            {
-              'tag_id': 1,
-              'tag_name': 'music',
-            },
-            {
-              'id': '2',
-              'name': 'live',
-            },
-            {
-              'tag_id': 3,
-              'tag_name': '',
-            },
+            {'tag_id': 1, 'tag_name': 'music'},
+            {'id': '2', 'name': 'live'},
+            {'tag_id': 3, 'tag_name': ''},
           ],
         },
       );
@@ -237,20 +216,14 @@ void main() {
 class _QueuedHttpClientAdapter implements HttpClientAdapter {
   final Map<String, List<_MockHttpResponse>> _responses = {};
 
-  void register(
-    String pattern, {
-    required Object body,
-    int statusCode = 200,
-  }) {
+  void register(String pattern, {required Object body, int statusCode = 200}) {
     _responses[pattern] = [
       _MockHttpResponse(body: body, statusCode: statusCode),
     ];
   }
 
   void registerError(String pattern) {
-    _responses[pattern] = [
-      const _MockHttpResponse(error: true),
-    ];
+    _responses[pattern] = [const _MockHttpResponse(error: true)];
   }
 
   @override
@@ -268,8 +241,9 @@ class _QueuedHttpClientAdapter implements HttpClientAdapter {
       if (!url.contains(entry.key)) continue;
 
       final responses = entry.value;
-      final response =
-          responses.length > 1 ? responses.removeAt(0) : responses.first;
+      final response = responses.length > 1
+          ? responses.removeAt(0)
+          : responses.first;
       if (response.error) {
         throw DioException(
           requestOptions: options,

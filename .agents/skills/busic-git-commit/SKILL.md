@@ -55,7 +55,7 @@ docs(skills): 重构本地skills结构
 3. 提交前跑最低验证：
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 

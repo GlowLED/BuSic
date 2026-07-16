@@ -26,11 +26,9 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
   final BiliDio _biliDio;
   final AppDatabase _db;
 
-  SubtitleRepositoryImpl({
-    required BiliDio biliDio,
-    required AppDatabase db,
-  })  : _biliDio = biliDio,
-        _db = db;
+  SubtitleRepositoryImpl({required BiliDio biliDio, required AppDatabase db})
+    : _biliDio = biliDio,
+      _db = db;
 
   @override
   Future<SubtitleData?> getSubtitle({
@@ -40,10 +38,7 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
     // 1. Check DB cache first
     final cached = await getCachedSubtitle(bvid: bvid, cid: cid);
     if (cached != null) {
-      AppLogger.info(
-        'Subtitle cache hit for $bvid:$cid',
-        tag: 'Subtitle',
-      );
+      AppLogger.info('Subtitle cache hit for $bvid:$cid', tag: 'Subtitle');
       return cached;
     }
 
@@ -62,9 +57,7 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
     required int cid,
   }) async {
     final query = _db.select(_db.subtitles)
-      ..where(
-        (t) => t.bvid.equals(bvid) & t.cid.equals(cid),
-      );
+      ..where((t) => t.bvid.equals(bvid) & t.cid.equals(cid));
     final row = await query.getSingleOrNull();
     if (row == null) return null;
 
@@ -72,10 +65,7 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
       final json = jsonDecode(row.subtitleJson) as Map<String, dynamic>;
       return SubtitleData.fromJson(json);
     } catch (e) {
-      AppLogger.warning(
-        'Failed to parse cached subtitle: $e',
-        tag: 'Subtitle',
-      );
+      AppLogger.warning('Failed to parse cached subtitle: $e', tag: 'Subtitle');
       return null;
     }
   }
@@ -86,7 +76,9 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
     required int cid,
     required SubtitleData data,
   }) async {
-    await _db.into(_db.subtitles).insertOnConflictUpdate(
+    await _db
+        .into(_db.subtitles)
+        .insertOnConflictUpdate(
           SubtitlesCompanion.insert(
             bvid: bvid,
             cid: cid,
@@ -255,8 +247,9 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
   /// Validate that an AI subtitle URL path starts with `{aid}{cid}`.
   bool _validateAiSubtitleUrl(String url, int aid, int cid) {
     final parsed = Uri.parse(url.startsWith('//') ? 'https:$url' : url);
-    final match =
-        RegExp(r'/bfs/ai_subtitle/prod/(\d+)').firstMatch(parsed.path);
+    final match = RegExp(
+      r'/bfs/ai_subtitle/prod/(\d+)',
+    ).firstMatch(parsed.path);
     if (match == null) return false;
     final pathPrefix = match.group(1)!;
     final expected = '$aid$cid';
@@ -303,12 +296,14 @@ class SubtitleRepositoryImpl implements SubtitleRepository {
       final text = (map['content'] as String? ?? '').trim();
       if (text.isEmpty) continue;
 
-      lines.add(SubtitleLine(
-        startTime: (map['from'] as num?)?.toDouble() ?? 0.0,
-        endTime: (map['to'] as num?)?.toDouble() ?? 0.0,
-        content: text,
-        musicRatio: (map['music'] as num?)?.toDouble() ?? 0.0,
-      ));
+      lines.add(
+        SubtitleLine(
+          startTime: (map['from'] as num?)?.toDouble() ?? 0.0,
+          endTime: (map['to'] as num?)?.toDouble() ?? 0.0,
+          content: text,
+          musicRatio: (map['music'] as num?)?.toDouble() ?? 0.0,
+        ),
+      );
     }
 
     if (lines.isEmpty) return null;

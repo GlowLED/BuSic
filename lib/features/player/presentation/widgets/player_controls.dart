@@ -20,10 +20,7 @@ class PlayerControls extends ConsumerWidget {
         final isNarrow = constraints.maxWidth < 400;
 
         final modeBtn = IconButton(
-          icon: Icon(
-            _modeIcon(playerState.playMode),
-            color: Colors.white70,
-          ),
+          icon: Icon(_modeIcon(playerState.playMode), color: Colors.white70),
           onPressed: () {
             const modes = PlayMode.values;
             final next = (playerState.playMode.index + 1) % modes.length;
@@ -32,8 +29,7 @@ class PlayerControls extends ConsumerWidget {
         );
 
         final prevBtn = IconButton(
-          icon: const Icon(Icons.skip_previous,
-              color: Colors.white, size: 36),
+          icon: const Icon(Icons.skip_previous, color: Colors.white, size: 36),
           onPressed: () {
             ref.read(playerNotifierProvider.notifier).previous();
           },
@@ -62,8 +58,7 @@ class PlayerControls extends ConsumerWidget {
         );
 
         final nextBtn = IconButton(
-          icon:
-              const Icon(Icons.skip_next, color: Colors.white, size: 36),
+          icon: const Icon(Icons.skip_next, color: Colors.white, size: 36),
           onPressed: () {
             ref.read(playerNotifierProvider.notifier).next();
           },

@@ -13,11 +13,7 @@ class SongInfoPanel extends StatelessWidget {
   /// 是否正在加载中。
   final bool isLoading;
 
-  const SongInfoPanel({
-    super.key,
-    required this.track,
-    this.isLoading = false,
-  });
+  const SongInfoPanel({super.key, required this.track, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +135,7 @@ class _CoverArt extends StatelessWidget {
     return Container(
       color: const Color(0xFF2A2A3E),
       child: const Center(
-        child: Icon(
-          Icons.music_note_rounded,
-          color: Colors.white38,
-          size: 64,
-        ),
+        child: Icon(Icons.music_note_rounded, color: Colors.white38, size: 64),
       ),
     );
   }

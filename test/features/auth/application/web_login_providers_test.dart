@@ -6,26 +6,29 @@ import 'package:busic/features/auth/data/linux_managed_browser_login_service.dar
 import 'package:busic/features/auth/domain/models/bili_login_cookies.dart';
 
 void main() {
-  test('uses managed browser mode when Linux has a supported browser',
-      () async {
-    final container = ProviderContainer(
-      overrides: [
-        webLoginHostPlatformProvider.overrideWithValue(
-          WebLoginHostPlatform.linux,
-        ),
-        linuxManagedBrowserLoginServiceProvider.overrideWithValue(
-          const _FakeLinuxManagedBrowserLoginService(isAvailable: true),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+  test(
+    'uses managed browser mode when Linux has a supported browser',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          webLoginHostPlatformProvider.overrideWithValue(
+            WebLoginHostPlatform.linux,
+          ),
+          linuxManagedBrowserLoginServiceProvider.overrideWithValue(
+            const _FakeLinuxManagedBrowserLoginService(isAvailable: true),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    final availability =
-        await container.read(webLoginAvailabilityProvider.future);
+      final availability = await container.read(
+        webLoginAvailabilityProvider.future,
+      );
 
-    expect(availability.status, WebLoginAvailabilityStatus.available);
-    expect(availability.mode, WebLoginMode.managedBrowser);
-  });
+      expect(availability.status, WebLoginAvailabilityStatus.available);
+      expect(availability.mode, WebLoginMode.managedBrowser);
+    },
+  );
 
   test('reports missing browser when Linux has no supported browser', () async {
     final container = ProviderContainer(
@@ -40,8 +43,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final availability =
-        await container.read(webLoginAvailabilityProvider.future);
+    final availability = await container.read(
+      webLoginAvailabilityProvider.future,
+    );
 
     expect(availability.status, WebLoginAvailabilityStatus.browserMissing);
   });
@@ -50,7 +54,7 @@ void main() {
 class _FakeLinuxManagedBrowserLoginService
     implements LinuxManagedBrowserLoginService {
   const _FakeLinuxManagedBrowserLoginService({required bool isAvailable})
-      : _isAvailable = isAvailable;
+    : _isAvailable = isAvailable;
 
   final bool _isAvailable;
 

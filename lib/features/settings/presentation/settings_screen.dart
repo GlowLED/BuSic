@@ -43,10 +43,7 @@ class SettingsScreen extends ConsumerWidget {
                     borderRadius: context.appRadii.largeRadius,
                     boxShadow: context.appDepth.coverGlowShadow,
                   ),
-                  child: Icon(
-                    Icons.tune_rounded,
-                    color: palette.accentStrong,
-                  ),
+                  child: Icon(Icons.tune_rounded, color: palette.accentStrong),
                 ),
                 SizedBox(width: spacing.md),
                 Expanded(

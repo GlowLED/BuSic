@@ -202,7 +202,9 @@ class CommentRepositoryImpl implements CommentRepository {
       likeCount: raw['like'] as int? ?? 0,
       replyCount: raw['rcount'] as int? ?? 0,
       isLiked: (raw['action'] as int? ?? 0) == 1,
-      replies: childReplies.map((r) => _parseComment(r as Map<String, dynamic>)).toList(),
+      replies: childReplies
+          .map((r) => _parseComment(r as Map<String, dynamic>))
+          .toList(),
       images: images,
     );
   }

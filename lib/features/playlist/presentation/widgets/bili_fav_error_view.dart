@@ -6,11 +6,7 @@ import '../../../../shared/extensions/context_extensions.dart';
 ///
 /// 复用于收藏夹列表加载失败 / 导入失败等场景。
 class BiliFavErrorView extends StatelessWidget {
-  const BiliFavErrorView({
-    super.key,
-    required this.message,
-    this.onRetry,
-  });
+  const BiliFavErrorView({super.key, required this.message, this.onRetry});
 
   final String message;
   final VoidCallback? onRetry;

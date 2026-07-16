@@ -70,23 +70,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       _statusText = context.l10n.scanToLogin;
     });
     try {
-      final url = await ref.read(authNotifierProvider.notifier).login(
-        onScanned: () {
-          if (mounted) {
-            setState(() {
-              _statusText = context.l10n.qrScannedConfirm;
-            });
-          }
-        },
-        onExpired: () {
-          if (mounted) {
-            setState(() {
-              _isExpired = true;
-              _statusText = context.l10n.qrExpiredRefresh;
-            });
-          }
-        },
-      );
+      final url = await ref
+          .read(authNotifierProvider.notifier)
+          .login(
+            onScanned: () {
+              if (mounted) {
+                setState(() {
+                  _statusText = context.l10n.qrScannedConfirm;
+                });
+              }
+            },
+            onExpired: () {
+              if (mounted) {
+                setState(() {
+                  _isExpired = true;
+                  _statusText = context.l10n.qrExpiredRefresh;
+                });
+              }
+            },
+          );
       setState(() {
         _qrUrl = url;
         _isLoading = false;
@@ -113,7 +115,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     setState(() => _isCookieLogging = true);
     try {
-      await ref.read(authNotifierProvider.notifier).loginWithCookie(
+      await ref
+          .read(authNotifierProvider.notifier)
+          .loginWithCookie(
             sessdata: sessdata,
             biliJct: biliJct,
             dedeUserId: dedeUserId,
@@ -141,10 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     BiliLoginCookies cookies,
     LinuxManagedBrowserLoginSession session,
   ) async {
-    await _loginWithCapturedWebCookies(
-      cookies,
-      cleanup: session.close,
-    );
+    await _loginWithCapturedWebCookies(cookies, cleanup: session.close);
   }
 
   Future<void> _loginWithCapturedWebCookies(
@@ -155,7 +156,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     setState(() => _isWebLogging = true);
     try {
-      await ref.read(authNotifierProvider.notifier).loginWithWebCookies(
+      await ref
+          .read(authNotifierProvider.notifier)
+          .loginWithWebCookies(
             sessdata: cookies.sessdata,
             biliJct: cookies.biliJct,
             dedeUserId: cookies.dedeUserId,
@@ -521,11 +524,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 48,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              Icon(icon, size: 48, color: colorScheme.onSurfaceVariant),
               const SizedBox(height: 16),
               Text(
                 title,
@@ -613,7 +612,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.login),
                   label: Text(

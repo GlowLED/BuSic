@@ -80,7 +80,10 @@ class _ImportPreviewDialogState extends State<ImportPreviewDialog> {
             Row(
               children: [
                 Text(
-                  l10n.selectedSongCount(_selectedCount, widget.songsMetadata.length),
+                  l10n.selectedSongCount(
+                    _selectedCount,
+                    widget.songsMetadata.length,
+                  ),
                   style: context.textTheme.bodyMedium,
                 ),
                 const Spacer(),

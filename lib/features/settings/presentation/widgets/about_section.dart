@@ -28,13 +28,13 @@ class AboutSection extends ConsumerWidget {
       if (next is UpdateStateAvailable && next.info.isForceUpdate) {
         UpdateDialog.show(context);
       } else if (next is UpdateStateIdle && prev is UpdateStateChecking) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.upToDate)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.upToDate)));
       } else if (next is UpdateStateError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.message)));
       }
     });
 
@@ -44,9 +44,10 @@ class AboutSection extends ConsumerWidget {
       children: [
         Consumer(
           builder: (context, ref, _) {
-            final info = ref.watch(appInfoProvider).valueOrNull;
-            final versionDisplay =
-                info != null ? 'v${info.version}+${info.buildNumber}' : '';
+            final info = ref.watch(appInfoProvider).value;
+            final versionDisplay = info != null
+                ? 'v${info.version}+${info.buildNumber}'
+                : '';
             return SettingsTile(
               icon: Icons.info_outline_rounded,
               title: l10n.about,
@@ -82,7 +83,7 @@ class AboutSection extends ConsumerWidget {
           onTap: isChecking
               ? null
               : () =>
-                  ref.read(updateNotifierProvider.notifier).checkForUpdate(),
+                    ref.read(updateNotifierProvider.notifier).checkForUpdate(),
         ),
         const _UpdateDownloadTile(),
         SettingsTile(
@@ -107,9 +108,9 @@ class AboutSection extends ConsumerWidget {
     final l10n = context.l10n;
 
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.checkForUpdate)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.checkForUpdate)));
 
       final versions = await ref
           .read(updateNotifierProvider.notifier)
@@ -117,7 +118,7 @@ class AboutSection extends ConsumerWidget {
 
       if (!context.mounted) return;
 
-      final appInfo = ref.read(appInfoProvider).valueOrNull;
+      final appInfo = ref.read(appInfoProvider).value;
       final currentVersion = appInfo?.version ?? '';
 
       final selectedVersion = await VersionPickerDialog.show(
@@ -156,9 +157,9 @@ class AboutSection extends ConsumerWidget {
           .downloadHistoryVersion(selectedVersion, channel);
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -223,9 +224,15 @@ class _UpdateDownloadTile extends ConsumerWidget {
         ),
       ),
       available: (info) => _buildIdleOrAvailable(context, ref, info),
-      downloading: (info, progress, speed, channel, downloadedBytes,
-              totalBytes) =>
-          _buildDownloading(context, ref, progress, speed, info.isForceUpdate),
+      downloading:
+          (info, progress, speed, channel, downloadedBytes, totalBytes) =>
+              _buildDownloading(
+                context,
+                ref,
+                progress,
+                speed,
+                info.isForceUpdate,
+              ),
       paused:
           (info, progress, channel, downloadedBytes, totalBytes, localPath) =>
               _buildPaused(context, ref, progress),
@@ -301,9 +308,9 @@ class _UpdateDownloadTile extends ConsumerWidget {
           availableChannels: availableChannels,
         );
         if (channel != null) {
-          ref.read(updateNotifierProvider.notifier).startDownloadWithChannel(
-                channel,
-              );
+          ref
+              .read(updateNotifierProvider.notifier)
+              .startDownloadWithChannel(channel);
         }
       },
     );
@@ -333,10 +340,7 @@ class _UpdateDownloadTile extends ConsumerWidget {
                 '${(progress * 100).toStringAsFixed(0)}%',
                 style: context.textTheme.bodySmall,
               ),
-              Text(
-                _formatSpeed(speed),
-                style: context.textTheme.bodySmall,
-              ),
+              Text(_formatSpeed(speed), style: context.textTheme.bodySmall),
             ],
           ),
         ],
@@ -346,11 +350,7 @@ class _UpdateDownloadTile extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaused(
-    BuildContext context,
-    WidgetRef ref,
-    double progress,
-  ) {
+  Widget _buildPaused(BuildContext context, WidgetRef ref, double progress) {
     final l10n = context.l10n;
 
     return SettingsTile(

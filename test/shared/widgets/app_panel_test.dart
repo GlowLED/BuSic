@@ -6,8 +6,9 @@ import 'package:busic/shared/widgets/app_panel.dart';
 import '../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('applies the same border radius to the inner decoration',
-      (tester) async {
+  testWidgets('applies the same border radius to the inner decoration', (
+    tester,
+  ) async {
     const customRadius = BorderRadius.all(Radius.circular(28));
 
     await tester.pumpWidget(

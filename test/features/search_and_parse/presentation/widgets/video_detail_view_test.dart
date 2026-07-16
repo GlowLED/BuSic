@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 
 import 'package:busic/core/theme/app_theme.dart';
 import 'package:busic/core/theme/app_theme_tokens.dart';
@@ -29,8 +30,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoDetailView', () {
-    testWidgets('makes video text and comment content selectable',
-        (tester) async {
+    testWidgets('makes video text and comment content selectable', (
+      tester,
+    ) async {
       _setDesktopViewport(tester);
 
       await _pumpVideoDetail(
@@ -139,10 +141,7 @@ void main() {
     testWidgets('渲染 B 站式简介页结构和返回按钮', (tester) async {
       var didBack = false;
       final repository = _FakeVideoInteractionRepository(
-        initialState: const VideoInteractionState(
-          isLiked: true,
-          coinsGiven: 1,
-        ),
+        initialState: const VideoInteractionState(isLiked: true, coinsGiven: 1),
       );
 
       await _pumpVideoDetail(
@@ -168,8 +167,9 @@ void main() {
       expect(didBack, isTrue);
     });
 
-    testWidgets('updates tab bar colors when the theme changes',
-        (tester) async {
+    testWidgets('updates tab bar colors when the theme changes', (
+      tester,
+    ) async {
       final repository = _FakeVideoInteractionRepository();
       final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
       final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
@@ -205,8 +205,9 @@ void main() {
       expect(_tabBar(tester).indicatorColor, darkPalette.accentStrong);
     });
 
-    testWidgets('updates pinned tab bar colors without another scroll',
-        (tester) async {
+    testWidgets('updates pinned tab bar colors without another scroll', (
+      tester,
+    ) async {
       final repository = _FakeVideoInteractionRepository();
       final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
       final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
@@ -236,8 +237,9 @@ void main() {
       expect(_tabBar(tester).indicatorColor, darkPalette.accentStrong);
     });
 
-    testWidgets('does not render a title expand control for long titles',
-        (tester) async {
+    testWidgets('does not render a title expand control for long titles', (
+      tester,
+    ) async {
       const longTitle =
           'Night Drive Live Performance Extended Arrangement With Long Title';
       final video = _video.copyWith(title: longTitle);
@@ -254,8 +256,9 @@ void main() {
       expect(find.text('Collapse'), findsNothing);
     });
 
-    testWidgets('keeps the description expand control available',
-        (tester) async {
+    testWidgets('keeps the description expand control available', (
+      tester,
+    ) async {
       final video = _video.copyWith(
         description: List.filled(
           8,
@@ -283,10 +286,9 @@ void main() {
       await _pumpVideoDetail(
         tester,
         interactionRepository: _FakeVideoInteractionRepository(),
-        parseState: ParseState.selectingPages(
-          _multiPageVideo,
-          [_multiPageVideo.pages.first],
-        ),
+        parseState: ParseState.selectingPages(_multiPageVideo, [
+          _multiPageVideo.pages.first,
+        ]),
       );
 
       expect(find.text('Select Pages'), findsOneWidget);
@@ -317,8 +319,11 @@ void main() {
       await tester.tap(find.text('Stage Folder'));
       await tester.pumpAndSettle();
 
-      expect(repository.addFavoriteCalls.single,
-          (aid: _aid, mediaId: 789, csrf: _csrf));
+      expect(repository.addFavoriteCalls.single, (
+        aid: _aid,
+        mediaId: 789,
+        csrf: _csrf,
+      ));
     });
   });
 }
@@ -375,10 +380,7 @@ void _expectTextInSelectionArea(String text) {
 
   expect(textFinder, findsOneWidget);
   expect(
-    find.ancestor(
-      of: textFinder,
-      matching: find.byType(SelectionArea),
-    ),
+    find.ancestor(of: textFinder, matching: find.byType(SelectionArea)),
     findsOneWidget,
   );
 }
@@ -388,10 +390,7 @@ void _expectTextInInkWell(String text) {
 
   expect(textFinder, findsOneWidget);
   expect(
-    find.ancestor(
-      of: textFinder,
-      matching: find.byType(InkWell),
-    ),
+    find.ancestor(of: textFinder, matching: find.byType(InkWell)),
     findsOneWidget,
   );
 }
@@ -400,12 +399,7 @@ const _aid = 123456;
 const _bvid = 'BV1xx411c7mD';
 const _csrf = 'csrf-token';
 
-const _page = PageInfo(
-  cid: 1001,
-  page: 1,
-  partTitle: 'Main',
-  duration: 245,
-);
+const _page = PageInfo(cid: 1001, page: 1, partTitle: 'Main', duration: 245);
 
 const _video = BvidInfo(
   bvid: _bvid,
@@ -550,7 +544,7 @@ class _FakeVideoInteractionRepository implements VideoInteractionRepository {
   final List<({int aid, String bvid})> getStateCalls = [];
   final List<({int aid, bool like, String csrf})> setLikeCalls = [];
   final List<({int aid, int multiply, bool alsoLike, String csrf})>
-      addCoinCalls = [];
+  addCoinCalls = [];
   final List<({int aid, int mediaId, String csrf})> addFavoriteCalls = [];
   final List<({int aid, String bvid, String csrf})> recordShareCalls = [];
 

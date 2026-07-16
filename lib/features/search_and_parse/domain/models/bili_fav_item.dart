@@ -6,7 +6,7 @@ part 'bili_fav_item.freezed.dart';
 ///
 /// 由 `/x/v3/fav/resource/list` API 返回。
 @freezed
-class BiliFavItem with _$BiliFavItem {
+abstract class BiliFavItem with _$BiliFavItem {
   const factory BiliFavItem({
     /// BV 号
     required String bvid,

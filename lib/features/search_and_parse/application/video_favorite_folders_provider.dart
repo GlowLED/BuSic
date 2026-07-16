@@ -13,16 +13,16 @@ final videoFavoriteFoldersRepositoryProvider = Provider<ParseRepository>((ref) {
 /// Loads the current user's Bilibili favorite folders for video collection.
 final videoFavoriteFoldersProvider =
     FutureProvider.autoDispose<List<BiliFavFolder>>((ref) async {
-  final user = await ref.watch(authNotifierProvider.future);
-  if (user == null || !user.isLoggedIn) {
-    throw StateError('pleaseLoginFirst');
-  }
+      final user = await ref.watch(authNotifierProvider.future);
+      if (user == null || !user.isLoggedIn) {
+        throw StateError('pleaseLoginFirst');
+      }
 
-  final mid = int.tryParse(user.userId);
-  if (mid == null) {
-    throw StateError('pleaseLoginFirst');
-  }
+      final mid = int.tryParse(user.userId);
+      if (mid == null) {
+        throw StateError('pleaseLoginFirst');
+      }
 
-  final repository = ref.watch(videoFavoriteFoldersRepositoryProvider);
-  return repository.getFavoriteFolders(mid);
-});
+      final repository = ref.watch(videoFavoriteFoldersRepositoryProvider);
+      return repository.getFavoriteFolders(mid);
+    });

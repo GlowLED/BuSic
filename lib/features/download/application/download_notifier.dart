@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -24,10 +25,7 @@ part 'download_notifier.g.dart';
 /// This ensures the repository instance (and its stream controller)
 /// persists across notifier rebuilds, so progress updates are never lost.
 final downloadRepositoryProvider = Provider<DownloadRepository>((ref) {
-  return DownloadRepositoryImpl(
-    dio: BiliDio(),
-    db: ref.read(databaseProvider),
-  );
+  return DownloadRepositoryImpl(dio: BiliDio(), db: ref.read(databaseProvider));
 });
 
 /// A simple signal provider that gets incremented whenever download status
@@ -41,7 +39,7 @@ final downloadChangeSignalProvider = StateProvider<int>((ref) => 0);
 /// download screen is not visible. This ensures [downloadChangeSignalProvider]
 /// fires when downloads complete in the background, allowing playlist views
 /// to refresh their download status indicators.
-@Riverpod(keepAlive: true)
+@Riverpod(name: 'downloadNotifierProvider', keepAlive: true)
 class DownloadNotifier extends _$DownloadNotifier {
   late DownloadRepository _repository;
   late ParseRepository _parseRepository;
@@ -111,16 +109,20 @@ class DownloadNotifier extends _$DownloadNotifier {
     required String title,
   }) async {
     // ── Dedup check: skip if same or higher quality already exists ──
-    final tasks = state.valueOrNull ?? [];
+    final tasks = state.value ?? [];
 
     // Check for active download of same song
-    final hasActive = tasks.any((t) =>
-        t.songId == songId &&
-        (t.status == DownloadStatus.pending ||
-            t.status == DownloadStatus.downloading));
+    final hasActive = tasks.any(
+      (t) =>
+          t.songId == songId &&
+          (t.status == DownloadStatus.pending ||
+              t.status == DownloadStatus.downloading),
+    );
     if (hasActive) {
-      AppLogger.info('Song $songId already downloading, skipping',
-          tag: 'Download');
+      AppLogger.info(
+        'Song $songId already downloading, skipping',
+        tag: 'Download',
+      );
       return false;
     }
 
@@ -129,8 +131,9 @@ class DownloadNotifier extends _$DownloadNotifier {
         .getSongAudioQuality(songId);
     if (existingQuality >= quality && existingQuality > 0) {
       AppLogger.info(
-          'Song $songId already has quality $existingQuality >= $quality, skipping',
-          tag: 'Download');
+        'Song $songId already has quality $existingQuality >= $quality, skipping',
+        tag: 'Download',
+      );
       return false;
     }
 
@@ -143,8 +146,9 @@ class DownloadNotifier extends _$DownloadNotifier {
       if (oldTask.songId == songId &&
           oldTask.status == DownloadStatus.completed) {
         AppLogger.info(
-            'Replacing quality $existingQuality → $quality for song $songId',
-            tag: 'Download');
+          'Replacing quality $existingQuality → $quality for song $songId',
+          tag: 'Download',
+        );
         await _repository.deleteTask(oldTask.id, deleteFile: true);
       }
     }
@@ -211,15 +215,17 @@ class DownloadNotifier extends _$DownloadNotifier {
   /// the download using the existing task row.
   Future<void> retryDownload(int taskId) async {
     // Find the task to get songId and filePath
-    final tasks = state.valueOrNull ?? await _repository.getAllTasks();
+    final tasks = state.value ?? await _repository.getAllTasks();
     final task = tasks.where((t) => t.id == taskId).firstOrNull;
     if (task == null) return;
 
     // Look up song's bvid and cid for stream URL resolution
     final songInfo = await _repository.getSongBvidCid(task.songId);
     if (songInfo == null) {
-      AppLogger.error('Cannot retry: song ${task.songId} not found',
-          tag: 'Download');
+      AppLogger.error(
+        'Cannot retry: song ${task.songId} not found',
+        tag: 'Download',
+      );
       return;
     }
 
@@ -254,8 +260,10 @@ class DownloadNotifier extends _$DownloadNotifier {
         if (!await downloadDir.exists()) {
           await downloadDir.create(recursive: true);
         }
-        final safeTitle =
-            (task.songTitle ?? 'song').replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+        final safeTitle = (task.songTitle ?? 'song').replaceAll(
+          RegExp(r'[<>:"/\\|?*]'),
+          '_',
+        );
         savePath = path.join(
           downloadDir.path,
           '${safeTitle}_${songInfo.bvid}_$quality.m4s',
@@ -263,7 +271,11 @@ class DownloadNotifier extends _$DownloadNotifier {
       }
 
       await _repository.restartDownload(
-          taskId, streamInfo.url, savePath, quality);
+        taskId,
+        streamInfo.url,
+        savePath,
+        quality,
+      );
       ref.invalidateSelf();
     } catch (e) {
       AppLogger.error('Retry download failed: $e', tag: 'Download');
@@ -298,7 +310,7 @@ class DownloadNotifier extends _$DownloadNotifier {
   /// were successfully queued for download.
   Future<int> downloadAllUncached({
     required List<({int id, String bvid, int cid, String title, bool isCached})>
-        songs,
+    songs,
     required int quality,
   }) async {
     final uncached = songs.where((s) => !s.isCached).toList();

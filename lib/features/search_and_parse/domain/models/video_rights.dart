@@ -5,7 +5,7 @@ part 'video_rights.g.dart';
 
 /// Bilibili video permission and copyright flags.
 @freezed
-class VideoRights with _$VideoRights {
+abstract class VideoRights with _$VideoRights {
   const factory VideoRights({
     /// Whether reposting is forbidden without creator authorization.
     @Default(false) bool noReprint,

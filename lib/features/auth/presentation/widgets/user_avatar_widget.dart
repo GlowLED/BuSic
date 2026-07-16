@@ -28,8 +28,10 @@ class UserAvatarWidget extends ConsumerWidget {
                     ? CachedNetworkImageProvider(user.avatarUrl!)
                     : null,
                 child: user.avatarUrl == null
-                    ? Text(user.nickname.isNotEmpty ? user.nickname[0] : '?',
-                        style: TextStyle(color: colorScheme.onPrimaryContainer))
+                    ? Text(
+                        user.nickname.isNotEmpty ? user.nickname[0] : '?',
+                        style: TextStyle(color: colorScheme.onPrimaryContainer),
+                      )
                     : null,
               ),
             ),
@@ -42,7 +44,8 @@ class UserAvatarWidget extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox(
-        width: 36, height: 36,
+        width: 36,
+        height: 36,
         child: Padding(
           padding: EdgeInsets.all(8),
           child: CircularProgressIndicator(strokeWidth: 2),

@@ -8,7 +8,7 @@ part 'user_preferences.g.dart';
 ///
 /// Persisted locally (could use shared_preferences or a dedicated DB table).
 @freezed
-class UserPreferences with _$UserPreferences {
+abstract class UserPreferences with _$UserPreferences {
   const factory UserPreferences({
     /// Theme mode: system, light, or dark.
     @Default(ThemeMode.system) ThemeMode themeMode,

@@ -7,6 +7,7 @@ import '../../../shared/widgets/app_panel.dart';
 import '../../../shared/widgets/common_dialogs.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../share/application/share_notifier.dart';
+import '../../share/domain/models/share_state.dart';
 import '../../share/domain/models/shared_playlist.dart';
 import '../../share/presentation/widgets/import_preview_dialog.dart';
 import '../application/playlist_notifier.dart';
@@ -38,9 +39,7 @@ class PlaylistListScreen extends ConsumerWidget {
       body: SafeArea(
         child: playlistsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Text(error.toString()),
-          ),
+          error: (error, _) => Center(child: Text(error.toString())),
           data: (playlists) => _PlaylistHomeContent(
             playlists: playlists,
             onOpenPlaylist: (playlist) {
@@ -84,10 +83,7 @@ class PlaylistListScreen extends ConsumerWidget {
   }
 
   /// 从 B 站收藏夹导入
-  Future<void> _importFromBiliFav(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Future<void> _importFromBiliFav(BuildContext context, WidgetRef ref) async {
     // 检查登录状态
     final user = await ref.read(authNotifierProvider.future);
     if (user == null) {
@@ -120,9 +116,9 @@ class PlaylistListScreen extends ConsumerWidget {
       // 解析失败，状态已在 notifier 中设置为 error
       final state = ref.read(shareNotifierProvider);
       if (context.mounted) {
-        state.whenOrNull(
-          error: (msg) => context.showSnackBar(msg),
-        );
+        if (state case ShareError(:final message)) {
+          context.showSnackBar(message);
+        }
       }
       return;
     }
@@ -158,19 +154,14 @@ class PlaylistListScreen extends ConsumerWidget {
     // 显示带选择框的导入预览弹窗，等待用户操作结果
     final selection = await showDialog<(String, List<SharedSong>)>(
       context: context,
-      builder: (_) => ImportPreviewDialog(
-        playlist: playlist,
-        songsMetadata: metadata,
-      ),
+      builder: (_) =>
+          ImportPreviewDialog(playlist: playlist, songsMetadata: metadata),
     );
 
     if (selection == null || !context.mounted) return;
 
     final (name, selectedSongs) = selection;
-    final filteredPlaylist = SharedPlaylist(
-      name: name,
-      songs: selectedSongs,
-    );
+    final filteredPlaylist = SharedPlaylist(name: name, songs: selectedSongs);
 
     // 显示导入进度弹窗
     showDialog(
@@ -197,18 +188,16 @@ class PlaylistListScreen extends ConsumerWidget {
       Navigator.of(context, rootNavigator: true).pop(); // 关闭导入进度弹窗
 
       final state = ref.read(shareNotifierProvider);
-      state.whenOrNull(
-        importSuccess: (result) {
+      switch (state) {
+        case ShareImportSuccess(:final result):
           context.showSnackBar(
-            l10n.importResult(
-              result.imported,
-              result.reused,
-              result.failed,
-            ),
+            l10n.importResult(result.imported, result.reused, result.failed),
           );
-        },
-        error: (msg) => context.showSnackBar(msg),
-      );
+        case ShareError(:final message):
+          context.showSnackBar(message);
+        default:
+          break;
+      }
     } catch (e) {
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // 关闭导入进度弹窗
@@ -337,19 +326,16 @@ class _PlaylistHomeContent extends StatelessWidget {
                 crossAxisSpacing: spacing.md,
                 mainAxisSpacing: spacing.md,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final playlist = playlists[index];
-                  return PlaylistTile(
-                    playlist: playlist.isFavorite
-                        ? playlist.copyWith(name: context.l10n.myFavorites)
-                        : playlist,
-                    onTap: () => onOpenPlaylist(playlist),
-                    onLongPress: () => onShowPlaylistMenu(playlist),
-                  );
-                },
-                childCount: playlists.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final playlist = playlists[index];
+                return PlaylistTile(
+                  playlist: playlist.isFavorite
+                      ? playlist.copyWith(name: context.l10n.myFavorites)
+                      : playlist,
+                  onTap: () => onOpenPlaylist(playlist),
+                  onLongPress: () => onShowPlaylistMenu(playlist),
+                );
+              }, childCount: playlists.length),
             ),
           ),
         ],
@@ -359,9 +345,7 @@ class _PlaylistHomeContent extends StatelessWidget {
 }
 
 class _CreatePlaylistFab extends StatelessWidget {
-  const _CreatePlaylistFab({
-    required this.onTap,
-  });
+  const _CreatePlaylistFab({required this.onTap});
 
   final VoidCallback onTap;
 

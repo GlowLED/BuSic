@@ -38,9 +38,7 @@ void main() {
         ownerUid: 42,
         ownerFace: 'https://example.com/avatar.jpg',
         coverUrl: 'https://example.com/cover.jpg',
-        pages: [
-          PageInfo(cid: 1001, page: 1, partTitle: 'P1', duration: 245),
-        ],
+        pages: [PageInfo(cid: 1001, page: 1, partTitle: 'P1', duration: 245)],
         duration: 245,
         stats: VideoStats(
           view: 10,
@@ -52,9 +50,7 @@ void main() {
           like: 7,
         ),
         rights: VideoRights(noReprint: true),
-        tags: [
-          VideoTag(id: 1, name: 'music'),
-        ],
+        tags: [VideoTag(id: 1, name: 'music')],
       );
 
       final json = info.toJson();

@@ -6,7 +6,7 @@
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 
@@ -55,7 +55,7 @@ flutter run -d <device_id>
 可以单开一个终端：
 
 ```bash
-dart run build_runner watch --delete-conflicting-outputs
+dart run build_runner watch
 ```
 
 ## 4. BuSic 特有的调试面
@@ -140,7 +140,7 @@ adb logcat -s flutter
 ### 5.3 分析与测试
 
 ```bash
-flutter analyze --no-fatal-infos
+flutter analyze
 flutter test
 ```
 
@@ -173,7 +173,7 @@ flutter test
 
 ```bash
 dart run build_runner clean
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
 ```
 

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:busic/features/subtitle/application/subtitle_notifier.dart';
@@ -35,9 +36,10 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           subtitleRepositoryProvider.overrideWithValue(repository),
-          subtitleCurrentTrackKeyProvider.overrideWithValue(
-            (bvid: 'BVloaded', cid: 1),
-          ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue((
+            bvid: 'BVloaded',
+            cid: 1,
+          )),
         ],
       );
       addTearDown(container.dispose);
@@ -56,8 +58,9 @@ void main() {
       expect(loaded.status, SubtitleLoadStatus.loaded);
       expect(loaded.subtitleData?.lines, hasLength(2));
 
-      final notifier =
-          container.read(subtitleNotifierProvider('BVloaded', 1).notifier);
+      final notifier = container.read(
+        subtitleNotifierProvider('BVloaded', 1).notifier,
+      );
       notifier.updatePosition(const Duration(milliseconds: 1200));
       expect(
         container
@@ -81,9 +84,10 @@ void main() {
           subtitleRepositoryProvider.overrideWithValue(
             _FakeSubtitleRepository(result: null),
           ),
-          subtitleCurrentTrackKeyProvider.overrideWithValue(
-            (bvid: 'BVempty', cid: 2),
-          ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue((
+            bvid: 'BVempty',
+            cid: 2,
+          )),
         ],
       );
       addTearDown(container.dispose);
@@ -109,9 +113,10 @@ void main() {
               error: const SubtitleLoginRequiredException(),
             ),
           ),
-          subtitleCurrentTrackKeyProvider.overrideWithValue(
-            (bvid: 'BVlogin', cid: 3),
-          ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue((
+            bvid: 'BVlogin',
+            cid: 3,
+          )),
         ],
       );
       addTearDown(container.dispose);
@@ -135,9 +140,10 @@ void main() {
           subtitleRepositoryProvider.overrideWithValue(
             _FakeSubtitleRepository(error: StateError('boom')),
           ),
-          subtitleCurrentTrackKeyProvider.overrideWithValue(
-            (bvid: 'BVerror', cid: 4),
-          ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue((
+            bvid: 'BVerror',
+            cid: 4,
+          )),
         ],
       );
       addTearDown(container.dispose);
@@ -193,13 +199,17 @@ void main() {
         SubtitleLoadStatus.notFound,
       );
 
-      container.read(currentTrackProvider.notifier).state =
-          (bvid: 'BVother', cid: 6);
+      container.read(currentTrackProvider.notifier).state = (
+        bvid: 'BVother',
+        cid: 6,
+      );
       await _settle();
       subscription.close();
       await _settle();
-      container.read(currentTrackProvider.notifier).state =
-          (bvid: 'BVterminal', cid: 5);
+      container.read(currentTrackProvider.notifier).state = (
+        bvid: 'BVterminal',
+        cid: 5,
+      );
 
       subscription = container.listen(
         subtitleNotifierProvider('BVterminal', 5),
@@ -229,9 +239,10 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           subtitleRepositoryProvider.overrideWithValue(repository),
-          subtitleCurrentTrackKeyProvider.overrideWithValue(
-            (bvid: 'BVretry', cid: 7),
-          ),
+          subtitleCurrentTrackKeyProvider.overrideWithValue((
+            bvid: 'BVretry',
+            cid: 7,
+          )),
         ],
       );
       addTearDown(container.dispose);
@@ -268,11 +279,8 @@ Future<void> _settle() async {
 }
 
 class _FakeSubtitleRepository implements SubtitleRepository {
-  _FakeSubtitleRepository({
-    this.result,
-    this.error,
-    List<Object?>? outcomes,
-  }) : outcomes = outcomes == null ? [] : List<Object?>.of(outcomes);
+  _FakeSubtitleRepository({this.result, this.error, List<Object?>? outcomes})
+    : outcomes = outcomes == null ? [] : List<Object?>.of(outcomes);
 
   final SubtitleData? result;
   final Object? error;

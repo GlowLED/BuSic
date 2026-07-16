@@ -8,7 +8,7 @@ part 'shared_playlist.g.dart';
 /// JSON 键名缩短（v/n/s/b/c/ct/ca），显著减小序列化体积。
 /// 导入时根据 bvid+cid 调用 B 站 API 拉取元数据。
 @freezed
-class SharedPlaylist with _$SharedPlaylist {
+abstract class SharedPlaylist with _$SharedPlaylist {
   const factory SharedPlaylist({
     /// 格式版本号，用于向前兼容
     @JsonKey(name: 'v') @Default(1) int version,
@@ -29,7 +29,7 @@ class SharedPlaylist with _$SharedPlaylist {
 /// 导入时根据 bvid+cid 调用 B 站 API 拉取元数据（标题/作者/封面/时长）。
 /// 仅当用户修改过自定义标题/作者时才携带 ct/ca 字段。
 @freezed
-class SharedSong with _$SharedSong {
+abstract class SharedSong with _$SharedSong {
   const factory SharedSong({
     /// Bilibili BV 号（全局唯一标识之一）
     @JsonKey(name: 'b') required String bvid,

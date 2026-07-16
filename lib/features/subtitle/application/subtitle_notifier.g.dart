@@ -6,269 +6,218 @@ part of 'subtitle_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$subtitleNotifierHash() => r'9a614944d0472ee9534d5cae569e784db1a8dbf0';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$SubtitleNotifier extends BuildlessAutoDisposeNotifier<
-    ({
-      SubtitleData? subtitleData,
-      int currentLineIndex,
-      SubtitleLoadStatus status,
-      String? errorMessage
-    })> {
-  late final String bvid;
-  late final int cid;
-
-  ({
-    SubtitleData? subtitleData,
-    int currentLineIndex,
-    SubtitleLoadStatus status,
-    String? errorMessage
-  }) build(
-    String bvid,
-    int cid,
-  );
-}
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// State notifier for subtitle/lyrics data of a specific video.
 ///
 /// Uses family parameters `(bvid, cid)` so each video gets its own
 /// independent subtitle instance with automatic disposal.
-///
-/// Copied from [SubtitleNotifier].
+
 @ProviderFor(SubtitleNotifier)
-const subtitleNotifierProvider = SubtitleNotifierFamily();
+final subtitleNotifierProvider = SubtitleNotifierFamily._();
 
 /// State notifier for subtitle/lyrics data of a specific video.
 ///
 /// Uses family parameters `(bvid, cid)` so each video gets its own
 /// independent subtitle instance with automatic disposal.
-///
-/// Copied from [SubtitleNotifier].
-class SubtitleNotifierFamily extends Family<
+final class SubtitleNotifierProvider
+    extends
+        $NotifierProvider<
+          SubtitleNotifier,
+          ({
+            int currentLineIndex,
+            String? errorMessage,
+            SubtitleLoadStatus status,
+            SubtitleData? subtitleData,
+          })
+        > {
+  /// State notifier for subtitle/lyrics data of a specific video.
+  ///
+  /// Uses family parameters `(bvid, cid)` so each video gets its own
+  /// independent subtitle instance with automatic disposal.
+  SubtitleNotifierProvider._({
+    required SubtitleNotifierFamily super.from,
+    required (String, int) super.argument,
+  }) : super(
+         retry: null,
+         name: r'subtitleNotifierProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$subtitleNotifierHash();
+
+  @override
+  String toString() {
+    return r'subtitleNotifierProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  SubtitleNotifier create() => SubtitleNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(
     ({
-      SubtitleData? subtitleData,
       int currentLineIndex,
+      String? errorMessage,
       SubtitleLoadStatus status,
-      String? errorMessage
-    })> {
-  /// State notifier for subtitle/lyrics data of a specific video.
-  ///
-  /// Uses family parameters `(bvid, cid)` so each video gets its own
-  /// independent subtitle instance with automatic disposal.
-  ///
-  /// Copied from [SubtitleNotifier].
-  const SubtitleNotifierFamily();
-
-  /// State notifier for subtitle/lyrics data of a specific video.
-  ///
-  /// Uses family parameters `(bvid, cid)` so each video gets its own
-  /// independent subtitle instance with automatic disposal.
-  ///
-  /// Copied from [SubtitleNotifier].
-  SubtitleNotifierProvider call(
-    String bvid,
-    int cid,
-  ) {
-    return SubtitleNotifierProvider(
-      bvid,
-      cid,
-    );
-  }
-
-  @override
-  SubtitleNotifierProvider getProviderOverride(
-    covariant SubtitleNotifierProvider provider,
-  ) {
-    return call(
-      provider.bvid,
-      provider.cid,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'subtitleNotifierProvider';
-}
-
-/// State notifier for subtitle/lyrics data of a specific video.
-///
-/// Uses family parameters `(bvid, cid)` so each video gets its own
-/// independent subtitle instance with automatic disposal.
-///
-/// Copied from [SubtitleNotifier].
-class SubtitleNotifierProvider extends AutoDisposeNotifierProviderImpl<
-    SubtitleNotifier,
-    ({
       SubtitleData? subtitleData,
-      int currentLineIndex,
-      SubtitleLoadStatus status,
-      String? errorMessage
-    })> {
-  /// State notifier for subtitle/lyrics data of a specific video.
-  ///
-  /// Uses family parameters `(bvid, cid)` so each video gets its own
-  /// independent subtitle instance with automatic disposal.
-  ///
-  /// Copied from [SubtitleNotifier].
-  SubtitleNotifierProvider(
-    String bvid,
-    int cid,
-  ) : this._internal(
-          () => SubtitleNotifier()
-            ..bvid = bvid
-            ..cid = cid,
-          from: subtitleNotifierProvider,
-          name: r'subtitleNotifierProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$subtitleNotifierHash,
-          dependencies: SubtitleNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              SubtitleNotifierFamily._allTransitiveDependencies,
-          bvid: bvid,
-          cid: cid,
-        );
-
-  SubtitleNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.bvid,
-    required this.cid,
-  }) : super.internal();
-
-  final String bvid;
-  final int cid;
-
-  @override
-  ({
-    SubtitleData? subtitleData,
-    int currentLineIndex,
-    SubtitleLoadStatus status,
-    String? errorMessage
-  }) runNotifierBuild(
-    covariant SubtitleNotifier notifier,
+    })
+    value,
   ) {
-    return notifier.build(
-      bvid,
-      cid,
-    );
-  }
-
-  @override
-  Override overrideWith(SubtitleNotifier Function() create) {
-    return ProviderOverride(
+    return $ProviderOverride(
       origin: this,
-      override: SubtitleNotifierProvider._internal(
-        () => create()
-          ..bvid = bvid
-          ..cid = cid,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        bvid: bvid,
-        cid: cid,
-      ),
+      providerOverride:
+          $SyncValueProvider<
+            ({
+              int currentLineIndex,
+              String? errorMessage,
+              SubtitleLoadStatus status,
+              SubtitleData? subtitleData,
+            })
+          >(value),
     );
-  }
-
-  @override
-  AutoDisposeNotifierProviderElement<
-      SubtitleNotifier,
-      ({
-        SubtitleData? subtitleData,
-        int currentLineIndex,
-        SubtitleLoadStatus status,
-        String? errorMessage
-      })> createElement() {
-    return _SubtitleNotifierProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SubtitleNotifierProvider &&
-        other.bvid == bvid &&
-        other.cid == cid;
+    return other is SubtitleNotifierProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, bvid.hashCode);
-    hash = _SystemHash.combine(hash, cid.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin SubtitleNotifierRef on AutoDisposeNotifierProviderRef<
-    ({
-      SubtitleData? subtitleData,
-      int currentLineIndex,
-      SubtitleLoadStatus status,
-      String? errorMessage
-    })> {
-  /// The parameter `bvid` of this provider.
-  String get bvid;
+String _$subtitleNotifierHash() => r'5735560c0d9e05bb028f8dd93bc738cc113e9de3';
 
-  /// The parameter `cid` of this provider.
-  int get cid;
-}
+/// State notifier for subtitle/lyrics data of a specific video.
+///
+/// Uses family parameters `(bvid, cid)` so each video gets its own
+/// independent subtitle instance with automatic disposal.
 
-class _SubtitleNotifierProviderElement
-    extends AutoDisposeNotifierProviderElement<
-        SubtitleNotifier,
-        ({
-          SubtitleData? subtitleData,
-          int currentLineIndex,
-          SubtitleLoadStatus status,
-          String? errorMessage
-        })> with SubtitleNotifierRef {
-  _SubtitleNotifierProviderElement(super.provider);
+final class SubtitleNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          SubtitleNotifier,
+          ({
+            int currentLineIndex,
+            String? errorMessage,
+            SubtitleLoadStatus status,
+            SubtitleData? subtitleData,
+          }),
+          ({
+            int currentLineIndex,
+            String? errorMessage,
+            SubtitleLoadStatus status,
+            SubtitleData? subtitleData,
+          }),
+          ({
+            int currentLineIndex,
+            String? errorMessage,
+            SubtitleLoadStatus status,
+            SubtitleData? subtitleData,
+          }),
+          (String, int)
+        > {
+  SubtitleNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'subtitleNotifierProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// State notifier for subtitle/lyrics data of a specific video.
+  ///
+  /// Uses family parameters `(bvid, cid)` so each video gets its own
+  /// independent subtitle instance with automatic disposal.
+
+  SubtitleNotifierProvider call(String bvid, int cid) =>
+      SubtitleNotifierProvider._(argument: (bvid, cid), from: this);
 
   @override
-  String get bvid => (origin as SubtitleNotifierProvider).bvid;
-  @override
-  int get cid => (origin as SubtitleNotifierProvider).cid;
+  String toString() => r'subtitleNotifierProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+/// State notifier for subtitle/lyrics data of a specific video.
+///
+/// Uses family parameters `(bvid, cid)` so each video gets its own
+/// independent subtitle instance with automatic disposal.
+
+abstract class _$SubtitleNotifier
+    extends
+        $Notifier<
+          ({
+            int currentLineIndex,
+            String? errorMessage,
+            SubtitleLoadStatus status,
+            SubtitleData? subtitleData,
+          })
+        > {
+  late final _$args = ref.$arg as (String, int);
+  String get bvid => _$args.$1;
+  int get cid => _$args.$2;
+
+  ({
+    int currentLineIndex,
+    String? errorMessage,
+    SubtitleLoadStatus status,
+    SubtitleData? subtitleData,
+  })
+  build(String bvid, int cid);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              ({
+                int currentLineIndex,
+                String? errorMessage,
+                SubtitleLoadStatus status,
+                SubtitleData? subtitleData,
+              }),
+              ({
+                int currentLineIndex,
+                String? errorMessage,
+                SubtitleLoadStatus status,
+                SubtitleData? subtitleData,
+              })
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                ({
+                  int currentLineIndex,
+                  String? errorMessage,
+                  SubtitleLoadStatus status,
+                  SubtitleData? subtitleData,
+                }),
+                ({
+                  int currentLineIndex,
+                  String? errorMessage,
+                  SubtitleLoadStatus status,
+                  SubtitleData? subtitleData,
+                })
+              >,
+              ({
+                int currentLineIndex,
+                String? errorMessage,
+                SubtitleLoadStatus status,
+                SubtitleData? subtitleData,
+              }),
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args.$1, _$args.$2));
+  }
+}

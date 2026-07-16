@@ -29,8 +29,9 @@ import 'package:busic/main.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('keeps desktop sidebar compact on extra-wide layouts',
-      (tester) async {
+  testWidgets('keeps desktop sidebar compact on extra-wide layouts', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(1600, 900));
 
     expect(find.byIcon(Icons.search_outlined), findsOneWidget);
@@ -41,8 +42,9 @@ void main() {
     expect(find.text('Settings'), findsNothing);
   });
 
-  testWidgets('uses label-only bottom navigation in mobile portrait',
-      (tester) async {
+  testWidgets('uses label-only bottom navigation in mobile portrait', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(390, 844));
 
     expect(find.text('Search'), findsOneWidget);
@@ -53,17 +55,21 @@ void main() {
     expect(find.byIcon(Icons.settings_outlined), findsNothing);
   });
 
-  testWidgets('uses static text-only selection in mobile portrait',
-      (tester) async {
+  testWidgets('uses static text-only selection in mobile portrait', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(390, 844));
 
     final playlistLabel = _navLabel('Playlists');
     final searchLabel = _navLabel('Search');
-    final palette =
-        Theme.of(tester.element(searchLabel)).extension<AppThemePalette>()!;
+    final palette = Theme.of(
+      tester.element(searchLabel),
+    ).extension<AppThemePalette>()!;
 
     expect(
-        tester.widget<Text>(playlistLabel).style?.color, palette.textPrimary);
+      tester.widget<Text>(playlistLabel).style?.color,
+      palette.textPrimary,
+    );
     expect(tester.widget<Text>(searchLabel).style?.color, palette.textMuted);
     expect(tester.widget<Text>(searchLabel).style?.fontSize, 13);
     expect(tester.widget<Text>(searchLabel).style?.fontWeight, FontWeight.w600);
@@ -85,8 +91,9 @@ void main() {
     expect(tester.widget<Text>(playlistLabel).style?.color, palette.textMuted);
   });
 
-  testWidgets('uses icon-only side navigation in mobile landscape',
-      (tester) async {
+  testWidgets('uses icon-only side navigation in mobile landscape', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(700, 390));
 
     expect(find.byIcon(Icons.search_outlined), findsOneWidget);
@@ -97,14 +104,17 @@ void main() {
     expect(find.text('Settings'), findsNothing);
   });
 
-  testWidgets('keeps desktop content close to the compact player bar',
-      (tester) async {
+  testWidgets('keeps desktop content close to the compact player bar', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(1000, 800));
 
-    await tester.tap(find.ancestor(
-      of: find.byIcon(Icons.search_outlined),
-      matching: find.byType(InkWell),
-    ));
+    await tester.tap(
+      find.ancestor(
+        of: find.byIcon(Icons.search_outlined),
+        matching: find.byType(InkWell),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -115,8 +125,9 @@ void main() {
     expect(playerRect.top - searchRect.bottom, closeTo(8, 0.1));
   });
 
-  testWidgets('places mobile portrait content directly above the player bar',
-      (tester) async {
+  testWidgets('places mobile portrait content directly above the player bar', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(390, 844));
 
     await tester.tap(_navLabel('Search'));
@@ -130,8 +141,9 @@ void main() {
     expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
 
-  testWidgets('keeps mobile portrait bottom chrome fixed above keyboard',
-      (tester) async {
+  testWidgets('keeps mobile portrait bottom chrome fixed above keyboard', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(390, 844));
 
     await tester.tap(_navLabel('Search'));
@@ -155,14 +167,17 @@ void main() {
     expect(navAfter.bottom, closeTo(navBefore.bottom, 0.1));
   });
 
-  testWidgets('places mobile landscape content directly above the player bar',
-      (tester) async {
+  testWidgets('places mobile landscape content directly above the player bar', (
+    tester,
+  ) async {
     await _pumpShell(tester, const Size(700, 390));
 
-    await tester.tap(find.ancestor(
-      of: find.byIcon(Icons.search_outlined),
-      matching: find.byType(InkWell),
-    ));
+    await tester.tap(
+      find.ancestor(
+        of: find.byIcon(Icons.search_outlined),
+        matching: find.byType(InkWell),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -191,9 +206,7 @@ Future<void> _pumpShell(WidgetTester tester, Size size) async {
         databaseProvider.overrideWithValue(db),
         audioHandlerProvider.overrideWithValue(_FakeAudioHandler()),
         playerRepositoryProvider.overrideWithValue(_FakePlayerRepository()),
-        playerParseRepositoryProvider.overrideWithValue(
-          _FakeParseRepository(),
-        ),
+        playerParseRepositoryProvider.overrideWithValue(_FakeParseRepository()),
       ],
       child: Consumer(
         builder: (context, ref, _) {
@@ -288,19 +301,12 @@ class _FakeParseRepository implements ParseRepository {
   }
 
   @override
-  Future<List<AudioStreamInfo>> getAvailableQualities(
-    String bvid,
-    int cid,
-  ) {
+  Future<List<AudioStreamInfo>> getAvailableQualities(String bvid, int cid) {
     throw UnimplementedError();
   }
 
   @override
-  Future<AudioStreamInfo> getAudioStream(
-    String bvid,
-    int cid, {
-    int? quality,
-  }) {
+  Future<AudioStreamInfo> getAudioStream(String bvid, int cid, {int? quality}) {
     throw UnimplementedError();
   }
 

@@ -70,15 +70,16 @@ void main() {
 
       final result = await container.read(provider.notifier).toggleLike();
 
-      final state = container.read(provider).valueOrNull;
+      final state = container.read(provider).value;
       expect(result, isTrue);
       expect(state?.isLiked, isTrue);
       expect(state?.isBusy, isFalse);
       expect(state?.lastError, isNull);
-      expect(
-        repository.setLikeCalls.single,
-        (aid: _aid, like: true, csrf: _csrf),
-      );
+      expect(repository.setLikeCalls.single, (
+        aid: _aid,
+        like: true,
+        csrf: _csrf,
+      ));
     });
 
     test('点赞失败会回滚并写入 lastError', () async {
@@ -98,7 +99,7 @@ void main() {
 
       final result = await container.read(provider.notifier).toggleLike();
 
-      final state = container.read(provider).valueOrNull;
+      final state = container.read(provider).value;
       expect(result, isFalse);
       expect(state?.isLiked, isTrue);
       expect(state?.isBusy, isFalse);
@@ -120,7 +121,7 @@ void main() {
       final subscription = container.listen<AsyncValue<VideoInteractionState>>(
         provider,
         (_, next) {
-          final error = next.valueOrNull?.lastError;
+          final error = next.value?.lastError;
           if (error != null) errors.add(error);
         },
       );
@@ -150,15 +151,17 @@ void main() {
           .read(provider.notifier)
           .addCoin(multiply: 2, alsoLike: true);
 
-      final state = container.read(provider).valueOrNull;
+      final state = container.read(provider).value;
       expect(result, isTrue);
       expect(state?.coinsGiven, 2);
       expect(state?.isLiked, isTrue);
       expect(state?.isBusy, isFalse);
-      expect(
-        repository.addCoinCalls.single,
-        (aid: _aid, multiply: 2, alsoLike: true, csrf: _csrf),
-      );
+      expect(repository.addCoinCalls.single, (
+        aid: _aid,
+        multiply: 2,
+        alsoLike: true,
+        csrf: _csrf,
+      ));
     });
 
     test('收藏成功会更新收藏态', () async {
@@ -173,17 +176,19 @@ void main() {
       addTearDown(subscription.close);
       await container.read(provider.future);
 
-      final result =
-          await container.read(provider.notifier).addToFavoriteFolder(789);
+      final result = await container
+          .read(provider.notifier)
+          .addToFavoriteFolder(789);
 
-      final state = container.read(provider).valueOrNull;
+      final state = container.read(provider).value;
       expect(result, isTrue);
       expect(state?.isFavorited, isTrue);
       expect(state?.isBusy, isFalse);
-      expect(
-        repository.addFavoriteCalls.single,
-        (aid: _aid, mediaId: 789, csrf: _csrf),
-      );
+      expect(repository.addFavoriteCalls.single, (
+        aid: _aid,
+        mediaId: 789,
+        csrf: _csrf,
+      ));
     });
 
     test('分享记录失败不抛出并保留错误态', () async {
@@ -203,15 +208,16 @@ void main() {
 
       final result = await container.read(provider.notifier).recordShare();
 
-      final state = container.read(provider).valueOrNull;
+      final state = container.read(provider).value;
       expect(result, isFalse);
       expect(state?.isBusy, isFalse);
       expect(state?.lastError, 'biliSessionInvalid');
       expect(authRepository.clearSessionCallCount, 1);
-      expect(
-        repository.recordShareCalls.single,
-        (aid: _aid, bvid: _bvid, csrf: _csrf),
-      );
+      expect(repository.recordShareCalls.single, (
+        aid: _aid,
+        bvid: _bvid,
+        csrf: _csrf,
+      ));
     });
   });
 }
@@ -248,8 +254,8 @@ class _FakeAuthRepository implements AuthRepository {
   }) : refreshResults = List.of(refreshResults);
 
   _FakeAuthRepository.loggedIn()
-      : loadSessionResult = _user,
-        refreshResults = [_user];
+    : loadSessionResult = _user,
+      refreshResults = [_user];
 
   final User? loadSessionResult;
   final List<User?> refreshResults;
@@ -309,7 +315,7 @@ class _FakeVideoInteractionRepository implements VideoInteractionRepository {
   final List<({int aid, String bvid})> getStateCalls = [];
   final List<({int aid, bool like, String csrf})> setLikeCalls = [];
   final List<({int aid, int multiply, bool alsoLike, String csrf})>
-      addCoinCalls = [];
+  addCoinCalls = [];
   final List<({int aid, int mediaId, String csrf})> addFavoriteCalls = [];
   final List<({int aid, String bvid, String csrf})> recordShareCalls = [];
 

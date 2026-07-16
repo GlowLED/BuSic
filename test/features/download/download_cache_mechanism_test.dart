@@ -33,7 +33,9 @@ void main() {
 
   group('歌曲 localPath 基础读写', () {
     test('新建歌曲 localPath 默认为 null', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1cache001',
               cid: 1001,
@@ -42,16 +44,18 @@ void main() {
             ),
           );
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
 
       expect(song.localPath, isNull);
       expect(song.audioQuality, 0);
     });
 
     test('下载完成后 localPath 和 audioQuality 正确更新', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1cache002',
               cid: 1002,
@@ -68,16 +72,18 @@ void main() {
         ),
       );
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
 
       expect(song.localPath, '/cache/test_song.m4s');
       expect(song.audioQuality, 30280);
     });
 
     test('删除下载后 localPath 和 audioQuality 被清零', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1cache003',
               cid: 1003,
@@ -90,22 +96,21 @@ void main() {
 
       // 模拟删除下载：清空 localPath 和 audioQuality
       await (db.update(db.songs)..where((t) => t.id.equals(songId))).write(
-        const SongsCompanion(
-          localPath: Value(null),
-          audioQuality: Value(0),
-        ),
+        const SongsCompanion(localPath: Value(null), audioQuality: Value(0)),
       );
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
 
       expect(song.localPath, isNull);
       expect(song.audioQuality, 0);
     });
 
     test('重新下载更高质量时 localPath 和 audioQuality 更新', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1cache004',
               cid: 1004,
@@ -124,9 +129,9 @@ void main() {
         ),
       );
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
 
       expect(song.localPath, '/cache/high_q.m4s');
       expect(song.audioQuality, 30280);
@@ -140,7 +145,9 @@ void main() {
   group('多歌单引用同一首歌的下载共享', () {
     test('一首歌加入多个歌单后，下载只需一次，所有歌单都能看到 localPath', () async {
       // 创建一首歌
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1shared01',
               cid: 5001,
@@ -150,21 +157,25 @@ void main() {
           );
 
       // 创建两个歌单
-      final playlist1Id = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '歌单A'),
-          );
-      final playlist2Id = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '歌单B'),
-          );
+      final playlist1Id = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '歌单A'));
+      final playlist2Id = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '歌单B'));
 
       // 同一首歌加入两个歌单
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlist1Id,
               songId: songId,
             ),
           );
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlist2Id,
               songId: songId,
@@ -198,7 +209,9 @@ void main() {
 
     test('删除一个歌单不影响另一个歌单中的歌曲和缓存', () async {
       // 创建歌曲（已下载）
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1shared02',
               cid: 5002,
@@ -210,20 +223,24 @@ void main() {
           );
 
       // 两个歌单
-      final playlist1Id = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '歌单C'),
-          );
-      final playlist2Id = await db.into(db.playlists).insert(
-            PlaylistsCompanion.insert(name: '歌单D'),
-          );
+      final playlist1Id = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '歌单C'));
+      final playlist2Id = await db
+          .into(db.playlists)
+          .insert(PlaylistsCompanion.insert(name: '歌单D'));
 
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlist1Id,
               songId: songId,
             ),
           );
-      await db.into(db.playlistSongs).insert(
+      await db
+          .into(db.playlistSongs)
+          .insert(
             PlaylistSongsCompanion.insert(
               playlistId: playlist2Id,
               songId: songId,
@@ -231,14 +248,14 @@ void main() {
           );
 
       // 删除歌单C的关联
-      await (db.delete(db.playlistSongs)
-            ..where((t) => t.playlistId.equals(playlist1Id)))
-          .go();
+      await (db.delete(
+        db.playlistSongs,
+      )..where((t) => t.playlistId.equals(playlist1Id))).go();
 
       // 歌曲本身不应被删除
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingleOrNull();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingleOrNull();
       expect(song, isNotNull);
       expect(song!.localPath, '/cache/shared2.m4s');
 
@@ -250,7 +267,9 @@ void main() {
 
     test('同一首歌在三个歌单中，下载任务只创建一个', () async {
       // 创建歌曲
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1shared03',
               cid: 5003,
@@ -261,19 +280,20 @@ void main() {
 
       // 三个歌单
       for (var i = 0; i < 3; i++) {
-        final plId = await db.into(db.playlists).insert(
-              PlaylistsCompanion.insert(name: '歌单$i'),
-            );
-        await db.into(db.playlistSongs).insert(
-              PlaylistSongsCompanion.insert(
-                playlistId: plId,
-                songId: songId,
-              ),
+        final plId = await db
+            .into(db.playlists)
+            .insert(PlaylistsCompanion.insert(name: '歌单$i'));
+        await db
+            .into(db.playlistSongs)
+            .insert(
+              PlaylistSongsCompanion.insert(playlistId: plId, songId: songId),
             );
       }
 
       // 创建一个下载任务
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               filePath: const Value('/cache/triple.m4s'),
@@ -282,12 +302,14 @@ void main() {
           );
 
       // 模拟下载完成
-      await (db.update(db.downloadTasks)
-            ..where((t) => t.songId.equals(songId)))
-          .write(const DownloadTasksCompanion(
-        status: Value(2), // completed
-        progress: Value(100),
-      ));
+      await (db.update(
+        db.downloadTasks,
+      )..where((t) => t.songId.equals(songId))).write(
+        const DownloadTasksCompanion(
+          status: Value(2), // completed
+          progress: Value(100),
+        ),
+      );
       await (db.update(db.songs)..where((t) => t.id.equals(songId))).write(
         const SongsCompanion(
           localPath: Value('/cache/triple.m4s'),
@@ -315,7 +337,9 @@ void main() {
       const cid = 6001;
 
       // 插入歌曲
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: bvid,
               cid: cid,
@@ -327,10 +351,10 @@ void main() {
           );
 
       // 按 bvid+cid 查询（模拟导入时的去重检查）
-      final existing = await (db.select(db.songs)
-            ..where(
-                (t) => t.bvid.equals(bvid) & t.cid.equals(cid)))
-          .getSingleOrNull();
+      final existing =
+          await (db.select(db.songs)
+                ..where((t) => t.bvid.equals(bvid) & t.cid.equals(cid)))
+              .getSingleOrNull();
 
       expect(existing, isNotNull);
       expect(existing!.id, songId);
@@ -344,7 +368,9 @@ void main() {
 
   group('下载任务与歌曲表联动', () {
     test('下载完成时同时更新 download_tasks 和 songs 表', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1link001',
               cid: 7001,
@@ -353,7 +379,9 @@ void main() {
             ),
           );
 
-      final taskId = await db.into(db.downloadTasks).insert(
+      final taskId = await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               filePath: const Value('/cache/linked.m4s'),
@@ -362,12 +390,11 @@ void main() {
           );
 
       // 模拟下载完成
-      await (db.update(db.downloadTasks)
-            ..where((t) => t.id.equals(taskId)))
-          .write(const DownloadTasksCompanion(
-        status: Value(2),
-        progress: Value(100),
-      ));
+      await (db.update(
+        db.downloadTasks,
+      )..where((t) => t.id.equals(taskId))).write(
+        const DownloadTasksCompanion(status: Value(2), progress: Value(100)),
+      );
       await (db.update(db.songs)..where((t) => t.id.equals(songId))).write(
         const SongsCompanion(
           localPath: Value('/cache/linked.m4s'),
@@ -376,21 +403,23 @@ void main() {
       );
 
       // 验证两个表都正确更新
-      final task = await (db.select(db.downloadTasks)
-            ..where((t) => t.id.equals(taskId)))
-          .getSingle();
+      final task = await (db.select(
+        db.downloadTasks,
+      )..where((t) => t.id.equals(taskId))).getSingle();
       expect(task.status, 2); // completed
       expect(task.progress, 100);
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
       expect(song.localPath, '/cache/linked.m4s');
       expect(song.audioQuality, 30232);
     });
 
     test('删除下载任务（deleteFile=true）应清空歌曲的 localPath', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1del001',
               cid: 8001,
@@ -401,7 +430,9 @@ void main() {
             ),
           );
 
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               status: const Value(2), // completed
@@ -413,24 +444,21 @@ void main() {
 
       // 模拟 deleteTask(deleteFile: true) 的 DB 操作
       await (db.update(db.songs)..where((t) => t.id.equals(songId))).write(
-        const SongsCompanion(
-          localPath: Value(null),
-          audioQuality: Value(0),
-        ),
+        const SongsCompanion(localPath: Value(null), audioQuality: Value(0)),
       );
-      await (db.delete(db.downloadTasks)
-            ..where((t) => t.songId.equals(songId)))
-          .go();
+      await (db.delete(
+        db.downloadTasks,
+      )..where((t) => t.songId.equals(songId))).go();
 
-      final song = await (db.select(db.songs)
-            ..where((t) => t.id.equals(songId)))
-          .getSingle();
+      final song = await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle();
       expect(song.localPath, isNull);
       expect(song.audioQuality, 0);
 
-      final tasks = await (db.select(db.downloadTasks)
-            ..where((t) => t.songId.equals(songId)))
-          .get();
+      final tasks = await (db.select(
+        db.downloadTasks,
+      )..where((t) => t.songId.equals(songId))).get();
       expect(tasks, isEmpty);
     });
   });
@@ -446,7 +474,9 @@ void main() {
       final tempFile = File('${tempDir.path}/test_song.m4s');
       await tempFile.writeAsBytes([0, 1, 2, 3]);
 
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1fresh01',
               cid: 9001,
@@ -466,14 +496,15 @@ void main() {
     });
 
     test('歌曲有 localPath 但文件不存在时返回 null', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1fresh02',
               cid: 9002,
               originTitle: '文件不存在的歌曲',
               originArtist: '歌手',
-              localPath:
-                  const Value('/non_existent_path/phantom.m4s'),
+              localPath: const Value('/non_existent_path/phantom.m4s'),
               audioQuality: const Value(30280),
             ),
           );
@@ -483,7 +514,9 @@ void main() {
     });
 
     test('歌曲无 localPath 时返回 null', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1fresh03',
               cid: 9003,
@@ -509,7 +542,9 @@ void main() {
   group('队列 localPath 刷新模拟', () {
     test('下载完成后队列中的 track 能获取到最新 localPath', () async {
       // 先创建歌曲（无 localPath）
-      final songId1 = await db.into(db.songs).insert(
+      final songId1 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1queue01',
               cid: 10001,
@@ -517,7 +552,9 @@ void main() {
               originArtist: '歌手',
             ),
           );
-      final songId2 = await db.into(db.songs).insert(
+      final songId2 = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1queue02',
               cid: 10002,
@@ -561,7 +598,9 @@ void main() {
       final tempFile = File('${tempDir.path}/already.m4s');
       await tempFile.writeAsBytes([0, 1, 2]);
 
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1skip01',
               cid: 11001,
@@ -593,7 +632,9 @@ void main() {
 
   group('下载任务去重', () {
     test('同一 songId 已有进行中的下载任务时不应创建新任务', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1dedup01',
               cid: 12001,
@@ -603,7 +644,9 @@ void main() {
           );
 
       // 创建一个进行中的下载任务
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               status: const Value(1), // downloading
@@ -612,16 +655,17 @@ void main() {
           );
 
       // 检查是否有活跃的下载任务
-      final activeTasks = await (db.select(db.downloadTasks)
-            ..where((t) =>
-                t.songId.equals(songId) & t.status.isIn([0, 1])))
-          .get();
+      final activeTasks = await (db.select(
+        db.downloadTasks,
+      )..where((t) => t.songId.equals(songId) & t.status.isIn([0, 1]))).get();
 
       expect(activeTasks.isNotEmpty, true); // 有活跃任务 → 不应重复下载
     });
 
     test('同一 songId 已完成的下载、再次下载更高质量应替换', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1dedup02',
               cid: 12002,
@@ -632,7 +676,9 @@ void main() {
             ),
           );
 
-      final oldTaskId = await db.into(db.downloadTasks).insert(
+      final oldTaskId = await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               status: const Value(2), // completed
@@ -643,22 +689,23 @@ void main() {
           );
 
       // 获取当前音质
-      final existingQuality =
-          (await (db.select(db.songs)..where((t) => t.id.equals(songId)))
-                  .getSingle())
-              .audioQuality;
+      final existingQuality = (await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle()).audioQuality;
       expect(existingQuality, 30216);
 
       // 请求 30280（更高质量）→ 应允许
       expect(30280 > existingQuality, true);
 
       // 删除旧任务
-      await (db.delete(db.downloadTasks)
-            ..where((t) => t.id.equals(oldTaskId)))
-          .go();
+      await (db.delete(
+        db.downloadTasks,
+      )..where((t) => t.id.equals(oldTaskId))).go();
 
       // 创建新任务
-      await db.into(db.downloadTasks).insert(
+      await db
+          .into(db.downloadTasks)
+          .insert(
             DownloadTasksCompanion.insert(
               songId: songId,
               filePath: const Value('/cache/high.m4s'),
@@ -666,15 +713,17 @@ void main() {
             ),
           );
 
-      final tasks = await (db.select(db.downloadTasks)
-            ..where((t) => t.songId.equals(songId)))
-          .get();
+      final tasks = await (db.select(
+        db.downloadTasks,
+      )..where((t) => t.songId.equals(songId))).get();
       expect(tasks.length, 1);
       expect(tasks.first.quality, 30280);
     });
 
     test('同一 songId 已有相同或更高质量时不应再次下载', () async {
-      final songId = await db.into(db.songs).insert(
+      final songId = await db
+          .into(db.songs)
+          .insert(
             SongsCompanion.insert(
               bvid: 'BV1dedup03',
               cid: 12003,
@@ -685,10 +734,9 @@ void main() {
           );
 
       // 请求 30216（更低质量）→ existingQuality >= quality → 应跳过
-      final existingQuality =
-          (await (db.select(db.songs)..where((t) => t.id.equals(songId)))
-                  .getSingle())
-              .audioQuality;
+      final existingQuality = (await (db.select(
+        db.songs,
+      )..where((t) => t.id.equals(songId))).getSingle()).audioQuality;
       expect(existingQuality >= 30216, true);
       // 不应创建新任务
     });
@@ -700,16 +748,16 @@ void main() {
 // ────────────────────────────────────────────────────────────────
 
 /// 查询某个歌单中的所有歌曲
-Future<List<Song>> _getSongsInPlaylist(
-    AppDatabase db, int playlistId) async {
-  final query = db.select(db.songs).join([
-    innerJoin(
-      db.playlistSongs,
-      db.playlistSongs.songId.equalsExp(db.songs.id),
-    ),
-  ])
-    ..where(db.playlistSongs.playlistId.equals(playlistId))
-    ..orderBy([OrderingTerm.asc(db.playlistSongs.sortOrder)]);
+Future<List<Song>> _getSongsInPlaylist(AppDatabase db, int playlistId) async {
+  final query =
+      db.select(db.songs).join([
+          innerJoin(
+            db.playlistSongs,
+            db.playlistSongs.songId.equalsExp(db.songs.id),
+          ),
+        ])
+        ..where(db.playlistSongs.playlistId.equals(playlistId))
+        ..orderBy([OrderingTerm.asc(db.playlistSongs.sortOrder)]);
 
   final rows = await query.get();
   return rows.map((row) => row.readTable(db.songs)).toList();
@@ -717,11 +765,10 @@ Future<List<Song>> _getSongsInPlaylist(
 
 /// 模拟 PlayerNotifier._getFreshLocalPath 的逻辑：
 /// 从 DB 查询 localPath，如果文件存在则返回路径，否则返回 null
-Future<String?> _simulateGetFreshLocalPath(
-    AppDatabase db, int songId) async {
-  final song = await (db.select(db.songs)
-        ..where((t) => t.id.equals(songId)))
-      .getSingleOrNull();
+Future<String?> _simulateGetFreshLocalPath(AppDatabase db, int songId) async {
+  final song = await (db.select(
+    db.songs,
+  )..where((t) => t.id.equals(songId))).getSingleOrNull();
   final path = song?.localPath;
   if (path == null) return null;
   try {

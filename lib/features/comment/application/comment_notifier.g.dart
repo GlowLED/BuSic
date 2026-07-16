@@ -6,195 +6,115 @@ part of 'comment_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$commentNotifierHash() => r'e4c386cd89db69dd45115044d3c346279c0f2f7e';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$CommentNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<CommentState> {
-  late final String bvid;
-
-  FutureOr<CommentState> build(
-    String bvid,
-  );
-}
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// Riverpod notifier managing the comment list for a specific video.
 ///
 /// Family parameter is the video's `bvid` string.
-///
-/// Copied from [CommentNotifier].
+
 @ProviderFor(CommentNotifier)
-const commentNotifierProvider = CommentNotifierFamily();
+final commentNotifierProvider = CommentNotifierFamily._();
 
 /// Riverpod notifier managing the comment list for a specific video.
 ///
 /// Family parameter is the video's `bvid` string.
-///
-/// Copied from [CommentNotifier].
-class CommentNotifierFamily extends Family<AsyncValue<CommentState>> {
+final class CommentNotifierProvider
+    extends $AsyncNotifierProvider<CommentNotifier, CommentState> {
   /// Riverpod notifier managing the comment list for a specific video.
   ///
   /// Family parameter is the video's `bvid` string.
-  ///
-  /// Copied from [CommentNotifier].
-  const CommentNotifierFamily();
+  CommentNotifierProvider._({
+    required CommentNotifierFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'commentNotifierProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// Riverpod notifier managing the comment list for a specific video.
-  ///
-  /// Family parameter is the video's `bvid` string.
-  ///
-  /// Copied from [CommentNotifier].
-  CommentNotifierProvider call(
-    String bvid,
-  ) {
-    return CommentNotifierProvider(
-      bvid,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$commentNotifierHash();
+
+  @override
+  String toString() {
+    return r'commentNotifierProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  CommentNotifierProvider getProviderOverride(
-    covariant CommentNotifierProvider provider,
-  ) {
-    return call(
-      provider.bvid,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'commentNotifierProvider';
-}
-
-/// Riverpod notifier managing the comment list for a specific video.
-///
-/// Family parameter is the video's `bvid` string.
-///
-/// Copied from [CommentNotifier].
-class CommentNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    CommentNotifier, CommentState> {
-  /// Riverpod notifier managing the comment list for a specific video.
-  ///
-  /// Family parameter is the video's `bvid` string.
-  ///
-  /// Copied from [CommentNotifier].
-  CommentNotifierProvider(
-    String bvid,
-  ) : this._internal(
-          () => CommentNotifier()..bvid = bvid,
-          from: commentNotifierProvider,
-          name: r'commentNotifierProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$commentNotifierHash,
-          dependencies: CommentNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              CommentNotifierFamily._allTransitiveDependencies,
-          bvid: bvid,
-        );
-
-  CommentNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.bvid,
-  }) : super.internal();
-
-  final String bvid;
-
-  @override
-  FutureOr<CommentState> runNotifierBuild(
-    covariant CommentNotifier notifier,
-  ) {
-    return notifier.build(
-      bvid,
-    );
-  }
-
-  @override
-  Override overrideWith(CommentNotifier Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: CommentNotifierProvider._internal(
-        () => create()..bvid = bvid,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        bvid: bvid,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<CommentNotifier, CommentState>
-      createElement() {
-    return _CommentNotifierProviderElement(this);
-  }
+  CommentNotifier create() => CommentNotifier();
 
   @override
   bool operator ==(Object other) {
-    return other is CommentNotifierProvider && other.bvid == bvid;
+    return other is CommentNotifierProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, bvid.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin CommentNotifierRef on AutoDisposeAsyncNotifierProviderRef<CommentState> {
-  /// The parameter `bvid` of this provider.
-  String get bvid;
-}
+String _$commentNotifierHash() => r'00cb1f93414ca0875112efd3df3692c420398934';
 
-class _CommentNotifierProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<CommentNotifier,
-        CommentState> with CommentNotifierRef {
-  _CommentNotifierProviderElement(super.provider);
+/// Riverpod notifier managing the comment list for a specific video.
+///
+/// Family parameter is the video's `bvid` string.
+
+final class CommentNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          CommentNotifier,
+          AsyncValue<CommentState>,
+          CommentState,
+          FutureOr<CommentState>,
+          String
+        > {
+  CommentNotifierFamily._()
+    : super(
+        retry: null,
+        name: r'commentNotifierProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Riverpod notifier managing the comment list for a specific video.
+  ///
+  /// Family parameter is the video's `bvid` string.
+
+  CommentNotifierProvider call(String bvid) =>
+      CommentNotifierProvider._(argument: bvid, from: this);
 
   @override
-  String get bvid => (origin as CommentNotifierProvider).bvid;
+  String toString() => r'commentNotifierProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+/// Riverpod notifier managing the comment list for a specific video.
+///
+/// Family parameter is the video's `bvid` string.
+
+abstract class _$CommentNotifier extends $AsyncNotifier<CommentState> {
+  late final _$args = ref.$arg as String;
+  String get bvid => _$args;
+
+  FutureOr<CommentState> build(String bvid);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<CommentState>, CommentState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<CommentState>, CommentState>,
+              AsyncValue<CommentState>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}

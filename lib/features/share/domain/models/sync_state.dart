@@ -5,7 +5,7 @@ part 'sync_state.freezed.dart';
 
 /// 数据同步功能状态
 @freezed
-class SyncState with _$SyncState {
+sealed class SyncState with _$SyncState {
   /// 空闲状态
   const factory SyncState.idle() = SyncIdle;
 
@@ -22,7 +22,8 @@ class SyncState with _$SyncState {
   const factory SyncState.preview(AppBackup backup) = SyncPreview;
 
   /// 导入成功
-  const factory SyncState.importSuccess(ImportResult result) = SyncImportSuccess;
+  const factory SyncState.importSuccess(ImportResult result) =
+      SyncImportSuccess;
 
   /// 出错
   const factory SyncState.error(String message) = SyncError;
@@ -30,7 +31,7 @@ class SyncState with _$SyncState {
 
 /// 数据导入结果统计
 @freezed
-class ImportResult with _$ImportResult {
+abstract class ImportResult with _$ImportResult {
   const factory ImportResult({
     /// 新建的歌单数量
     required int playlistsCreated,

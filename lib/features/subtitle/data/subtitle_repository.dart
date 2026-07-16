@@ -8,10 +8,7 @@ abstract class SubtitleRepository {
   /// Get subtitle data, checking DB cache first, then fetching from API.
   ///
   /// Returns `null` if no subtitle is available after all retries.
-  Future<SubtitleData?> getSubtitle({
-    required String bvid,
-    required int cid,
-  });
+  Future<SubtitleData?> getSubtitle({required String bvid, required int cid});
 
   /// Get cached subtitle from the local database.
   Future<SubtitleData?> getCachedSubtitle({

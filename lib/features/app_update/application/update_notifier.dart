@@ -27,7 +27,7 @@ const _kDownloadChannelKey = 'update_dl_channel';
 const _kDownloadPathKey = 'update_dl_path';
 const _kDownloadUrlKey = 'update_dl_url';
 
-@riverpod
+@Riverpod(name: 'updateNotifierProvider')
 class UpdateNotifier extends _$UpdateNotifier {
   CancelToken? _cancelToken;
   final UpdateRepositoryImpl _repo = UpdateRepositoryImpl();
@@ -47,10 +47,7 @@ class UpdateNotifier extends _$UpdateNotifier {
         final lastCheck = prefs.getInt(_kLastCheckKey) ?? 0;
         final now = DateTime.now().millisecondsSinceEpoch;
         if (now - lastCheck < _kCheckCooldownMs) {
-          AppLogger.info(
-            'Silent check skipped (cooldown active)',
-            tag: _kTag,
-          );
+          AppLogger.info('Silent check skipped (cooldown active)', tag: _kTag);
           return;
         }
       }
@@ -60,10 +57,7 @@ class UpdateNotifier extends _$UpdateNotifier {
       final info = await _repo.checkForUpdate();
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(
-        _kLastCheckKey,
-        DateTime.now().millisecondsSinceEpoch,
-      );
+      await prefs.setInt(_kLastCheckKey, DateTime.now().millisecondsSinceEpoch);
 
       if (info.currentVersion >= info.latestVersion) {
         state = const UpdateState.idle();
@@ -183,10 +177,7 @@ class UpdateNotifier extends _$UpdateNotifier {
 
       await _clearPersistedDownloadState();
 
-      state = UpdateState.readyToInstall(
-        info: info,
-        localPath: savePath,
-      );
+      state = UpdateState.readyToInstall(info: info, localPath: savePath);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
         // Only reset to idle if truly cancelled (not paused)
@@ -218,8 +209,8 @@ class UpdateNotifier extends _$UpdateNotifier {
     _cancelToken?.cancel('User paused');
     _cancelToken = null;
 
-    final downloadedBytes =
-        (currentState.progress * currentState.totalBytes).toInt();
+    final downloadedBytes = (currentState.progress * currentState.totalBytes)
+        .toInt();
 
     final savePath = p.join(
       Directory.systemTemp.path,
@@ -383,10 +374,7 @@ class UpdateNotifier extends _$UpdateNotifier {
         return;
       }
 
-      state = UpdateState.readyToInstall(
-        info: info,
-        localPath: savePath,
-      );
+      state = UpdateState.readyToInstall(info: info, localPath: savePath);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
         state = const UpdateState.idle();
@@ -421,8 +409,12 @@ class UpdateNotifier extends _$UpdateNotifier {
         assetName: currentState.info.assetName,
       );
     } catch (e, st) {
-      AppLogger.error('Apply update failed', tag: _kTag, error: e,
-          stackTrace: st);
+      AppLogger.error(
+        'Apply update failed',
+        tag: _kTag,
+        error: e,
+        stackTrace: st,
+      );
       final message = e.toString();
       if (message.startsWith('INSTALL_READ_ONLY:')) {
         state = UpdateState.error(message);

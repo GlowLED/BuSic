@@ -112,8 +112,11 @@ class DownloadTaskTile extends StatelessWidget {
                               color: Colors.white,
                             ),
                           )
-                        : const Icon(Icons.hourglass_empty,
-                            color: Colors.white, size: 20),
+                        : const Icon(
+                            Icons.hourglass_empty,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                   ),
                 ),
               ),
@@ -174,9 +177,10 @@ class DownloadTaskTile extends StatelessWidget {
           );
         }
         return Text(
-          [task.songArtist, l10n.pending]
-              .where((s) => s != null && s.isNotEmpty)
-              .join(' · '),
+          [
+            task.songArtist,
+            l10n.pending,
+          ].where((s) => s != null && s.isNotEmpty).join(' · '),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );

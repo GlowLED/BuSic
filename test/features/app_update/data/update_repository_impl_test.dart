@@ -55,7 +55,7 @@ class _MockResponse {
 
   _MockResponse({
     this.body = '',
-// ignore: unused_element_parameter
+    // ignore: unused_element_parameter
     this.statusCode = 200,
     this.headers = const {
       Headers.contentTypeHeader: ['text/plain'],
@@ -93,10 +93,7 @@ void main() {
       mockAdapter = _MockAdapter();
       dio.httpClientAdapter = mockAdapter;
 
-      repo = UpdateRepositoryImpl(
-        dio: dio,
-        prober: _FakeProber(),
-      );
+      repo = UpdateRepositoryImpl(dio: dio, prober: _FakeProber());
     });
 
     test('下载文件并回调进度', () async {
@@ -145,10 +142,7 @@ void main() {
       mockAdapter = _MockAdapter();
       dio.httpClientAdapter = mockAdapter;
 
-      repo = UpdateRepositoryImpl(
-        dio: dio,
-        prober: _FakeProber(),
-      );
+      repo = UpdateRepositoryImpl(dio: dio, prober: _FakeProber());
     });
 
     test('checksum 文件不可用时返回 true（不阻断更新）', () async {
@@ -181,9 +175,7 @@ void main() {
 
       mockAdapter.registerRoute(
         'checksums.sha256',
-        _MockResponse(
-          body: '$expectedHash  busic-android.apk\n',
-        ),
+        _MockResponse(body: '$expectedHash  busic-android.apk\n'),
       );
 
       try {
@@ -230,9 +222,7 @@ void main() {
 
       mockAdapter.registerRoute(
         'checksums.sha256',
-        _MockResponse(
-          body: 'abcdef123456  busic-linux-x64.tar.gz\n',
-        ),
+        _MockResponse(body: 'abcdef123456  busic-linux-x64.tar.gz\n'),
       );
 
       try {
@@ -253,10 +243,7 @@ void main() {
   group('UpdateRepositoryImpl.probeProxies', () {
     test('probeProxies 调用 prober 不抛异常', () async {
       final dio = Dio();
-      final repo = UpdateRepositoryImpl(
-        dio: dio,
-        prober: _FakeProber(),
-      );
+      final repo = UpdateRepositoryImpl(dio: dio, prober: _FakeProber());
 
       // Should not throw
       await repo.probeProxies();

@@ -7,7 +7,7 @@ part 'user.g.dart';
 ///
 /// Contains authentication credentials and basic profile info.
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     /// Bilibili user ID (DedeUserID).
     required String userId,

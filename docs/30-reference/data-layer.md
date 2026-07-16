@@ -68,7 +68,7 @@ class NewItems extends Table {
 新增表后需要：
 1. 在 `AppDatabase` 的 `@DriftDatabase(tables: [...])` 中注册
 2. 递增 `schemaVersion` 并编写迁移代码
-3. 运行 `dart run build_runner build --delete-conflicting-outputs`
+3. 运行 `dart run build_runner build`
 
 ## Freezed 模型
 
@@ -81,7 +81,7 @@ part 'audio_track.freezed.dart';
 part 'audio_track.g.dart';
 
 @freezed
-class AudioTrack with _$AudioTrack {
+abstract class AudioTrack with _$AudioTrack {
   const factory AudioTrack({
     required int songId,
     required String bvid,
@@ -104,7 +104,7 @@ class AudioTrack with _$AudioTrack {
 
 ```dart
 @freezed
-class ParseState with _$ParseState {
+sealed class ParseState with _$ParseState {
   const factory ParseState.idle() = _Idle;
   const factory ParseState.parsing() = _Parsing;
   const factory ParseState.success(BvidInfo info) = _Success;
@@ -129,7 +129,7 @@ state.when(
 
 ```dart
 @freezed
-class SongItem with _$SongItem {
+abstract class SongItem with _$SongItem {
   // 需要 const 私有构造函数才能添加自定义 getter
   const SongItem._();
 
@@ -146,7 +146,7 @@ class SongItem with _$SongItem {
 
 ```dart
 @freezed
-class PlayerState with _$PlayerState {
+abstract class PlayerState with _$PlayerState {
   const factory PlayerState({
     AudioTrack? currentTrack,
     @Default([]) List<AudioTrack> queue,

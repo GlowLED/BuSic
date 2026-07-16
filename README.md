@@ -11,7 +11,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/GlowLED/BuSic?color=blue&style=flat-square)](https://github.com/GlowLED/BuSic/releases)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Android%20%7C%20iOS-lightgrey?style=flat-square)](#)
-[![Flutter](https://img.shields.io/badge/Flutter-3.29-02569B?logo=flutter&style=flat-square)](https://flutter.dev/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.44.6-02569B?logo=flutter&style=flat-square)](https://flutter.dev/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://github.com/GlowLED/BuSic/blob/main/LICENSE)
 
 </div>

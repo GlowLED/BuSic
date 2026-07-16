@@ -6,21 +6,57 @@ part of 'update_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$updateNotifierHash() => r'412df798f4bedb8b7e9a89829511b970b98ae0d7';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [UpdateNotifier].
 @ProviderFor(UpdateNotifier)
-final updateNotifierProvider =
-    AutoDisposeNotifierProvider<UpdateNotifier, UpdateState>.internal(
-  UpdateNotifier.new,
-  name: r'updateNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$updateNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final updateNotifierProvider = UpdateNotifierProvider._();
 
-typedef _$UpdateNotifier = AutoDisposeNotifier<UpdateState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class UpdateNotifierProvider
+    extends $NotifierProvider<UpdateNotifier, UpdateState> {
+  UpdateNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'updateNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateNotifierHash();
+
+  @$internal
+  @override
+  UpdateNotifier create() => UpdateNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UpdateState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UpdateState>(value),
+    );
+  }
+}
+
+String _$updateNotifierHash() => r'409e3ee92726545753f40e2681825b1e135932d8';
+
+abstract class _$UpdateNotifier extends $Notifier<UpdateState> {
+  UpdateState build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<UpdateState, UpdateState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<UpdateState, UpdateState>,
+              UpdateState,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

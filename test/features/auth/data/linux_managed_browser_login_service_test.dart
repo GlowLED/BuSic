@@ -9,34 +9,19 @@ void main() {
   group('LinuxManagedBrowserCookieParser', () {
     test('只提取 B 站登录 Cookie', () {
       final cookieMap = LinuxManagedBrowserCookieParser.extractBiliCookieMap([
-        {
-          'name': 'SESSDATA',
-          'value': 'sess',
-          'domain': '.bilibili.com',
-        },
+        {'name': 'SESSDATA', 'value': 'sess', 'domain': '.bilibili.com'},
         {
           'name': 'bili_jct',
           'value': 'csrf',
           'domain': 'passport.bilibili.com',
         },
-        {
-          'name': 'DedeUserID',
-          'value': '42',
-          'domain': 'api.bilibili.com',
-        },
+        {'name': 'DedeUserID', 'value': '42', 'domain': 'api.bilibili.com'},
         {
           'name': 'bili_jct',
-          'value': {
-            'type': 'base64',
-            'value': 'Y3NyZi1mcm9tLWJpZGk=',
-          },
+          'value': {'type': 'base64', 'value': 'Y3NyZi1mcm9tLWJpZGk='},
           'domain': '.bilibili.com',
         },
-        {
-          'name': 'SESSDATA',
-          'value': 'other',
-          'domain': 'example.com',
-        },
+        {'name': 'SESSDATA', 'value': 'other', 'domain': 'example.com'},
       ]);
 
       final cookies = BiliLoginCookies.fromCookieMap(cookieMap);
@@ -48,11 +33,7 @@ void main() {
 
     test('缺少关键 Cookie 时返回不可登录数据', () {
       final cookieMap = LinuxManagedBrowserCookieParser.extractBiliCookieMap([
-        {
-          'name': 'SESSDATA',
-          'value': 'sess',
-          'domain': '.bilibili.com',
-        },
+        {'name': 'SESSDATA', 'value': 'sess', 'domain': '.bilibili.com'},
       ]);
 
       expect(BiliLoginCookies.fromCookieMap(cookieMap), isNull);
@@ -204,27 +185,22 @@ void main() {
 
   group('BrowserCookieResponseParser', () {
     test('解析 WebDriver BiDi storage.getCookies 响应', () {
-      final cookies = BrowserCookieResponseParser.extractCookies(
-        {
-          'result': {
-            'cookies': [
-              {
-                'name': 'SESSDATA',
-                'value': {
-                  'type': 'string',
-                  'value': 'sess',
-                },
-                'domain': '.bilibili.com',
-              },
-            ],
-            'partitionKey': <String, Object?>{},
-          },
+      final cookies = BrowserCookieResponseParser.extractCookies({
+        'result': {
+          'cookies': [
+            {
+              'name': 'SESSDATA',
+              'value': {'type': 'string', 'value': 'sess'},
+              'domain': '.bilibili.com',
+            },
+          ],
+          'partitionKey': <String, Object?>{},
         },
-        protocolName: 'WebDriver BiDi',
-      );
+      }, protocolName: 'WebDriver BiDi');
 
-      final cookieMap =
-          LinuxManagedBrowserCookieParser.extractBiliCookieMap(cookies);
+      final cookieMap = LinuxManagedBrowserCookieParser.extractBiliCookieMap(
+        cookies,
+      );
 
       expect(cookieMap['SESSDATA'], 'sess');
     });

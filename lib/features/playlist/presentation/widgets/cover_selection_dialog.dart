@@ -16,10 +16,7 @@ class CoverSelectionDialog extends ConsumerWidget {
   /// The playlist ID to update cover for.
   final int playlistId;
 
-  const CoverSelectionDialog({
-    super.key,
-    required this.playlistId,
-  });
+  const CoverSelectionDialog({super.key, required this.playlistId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,8 +125,9 @@ class _SongCoverPickerDialog extends ConsumerWidget {
           error: (e, _) => Center(child: Text(e.toString())),
           data: (songs) {
             // Filter songs with cover URLs
-            final songsWithCover =
-                songs.where((s) => s.coverUrl != null).toList();
+            final songsWithCover = songs
+                .where((s) => s.coverUrl != null)
+                .toList();
             if (songsWithCover.isEmpty) {
               return Center(
                 child: Text(

@@ -9,7 +9,7 @@ part 'app_backup.g.dart';
 /// 涵盖所有用户数据（不含登录凭据和下载任务），
 /// 用于离线数据导出/导入。
 @freezed
-class AppBackup with _$AppBackup {
+abstract class AppBackup with _$AppBackup {
   const factory AppBackup({
     /// 备份格式版本
     @Default(1) int version,
@@ -39,7 +39,7 @@ class AppBackup with _$AppBackup {
 
 /// 备份用歌单数据
 @freezed
-class BackupPlaylist with _$BackupPlaylist {
+abstract class BackupPlaylist with _$BackupPlaylist {
   const factory BackupPlaylist({
     /// 原始 ID（用于关联关系映射）
     required int originalId,
@@ -63,7 +63,7 @@ class BackupPlaylist with _$BackupPlaylist {
 
 /// 备份用歌单歌曲关联
 @freezed
-class BackupPlaylistSong with _$BackupPlaylistSong {
+abstract class BackupPlaylistSong with _$BackupPlaylistSong {
   const factory BackupPlaylistSong({
     /// 原始歌单 ID
     required int playlistId,
@@ -84,7 +84,7 @@ class BackupPlaylistSong with _$BackupPlaylistSong {
 
 /// 备份用用户偏好
 @freezed
-class BackupPreferences with _$BackupPreferences {
+abstract class BackupPreferences with _$BackupPreferences {
   const factory BackupPreferences({
     /// 主题模式
     String? themeMode,

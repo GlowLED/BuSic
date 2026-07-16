@@ -5,7 +5,7 @@ part 'video_stats.g.dart';
 
 /// Bilibili video engagement counters.
 @freezed
-class VideoStats with _$VideoStats {
+abstract class VideoStats with _$VideoStats {
   const factory VideoStats({
     /// View count.
     @Default(0) int view,

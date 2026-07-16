@@ -29,19 +29,14 @@ class DownloadEngine {
     int startOffset = 0,
     required void Function(int receivedBytes, int totalBytes) onProgress,
   }) async {
-    final headers = <String, dynamic>{
-      'Referer': 'https://www.bilibili.com',
-    };
+    final headers = <String, dynamic>{'Referer': 'https://www.bilibili.com'};
     if (startOffset > 0) {
       headers['Range'] = 'bytes=$startOffset-';
     }
 
     final response = await _dio.get(
       url,
-      options: Options(
-        responseType: ResponseType.stream,
-        headers: headers,
-      ),
+      options: Options(responseType: ResponseType.stream, headers: headers),
       cancelToken: cancelToken,
     );
 

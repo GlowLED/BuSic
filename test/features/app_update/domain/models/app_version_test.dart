@@ -39,17 +39,11 @@ void main() {
     });
 
     test('格式错误时抛出 FormatException', () {
-      expect(
-        () => AppVersion.parse('1.2'),
-        throwsA(isA<FormatException>()),
-      );
+      expect(() => AppVersion.parse('1.2'), throwsA(isA<FormatException>()));
     });
 
     test('空字符串抛出异常', () {
-      expect(
-        () => AppVersion.parse(''),
-        throwsA(isA<FormatException>()),
-      );
+      expect(() => AppVersion.parse(''), throwsA(isA<FormatException>()));
     });
 
     test('解析不含数字的字符串抛出异常', () {

@@ -12,15 +12,13 @@ part 'favorite_notifier.g.dart';
 /// UI widgets watch this provider to render the heart icon state.
 /// Call [loadFavoriteStatus] after loading a page's song list,
 /// then [toggleFavorite] when the user taps the heart button.
-@riverpod
+@Riverpod(name: 'favoriteNotifierProvider')
 class FavoriteNotifier extends _$FavoriteNotifier {
   late PlaylistRepositoryImpl _repository;
 
   @override
   Future<Set<int>> build() async {
-    _repository = PlaylistRepositoryImpl(
-      db: ref.read(databaseProvider),
-    );
+    _repository = PlaylistRepositoryImpl(db: ref.read(databaseProvider));
     // Start with an empty set; pages call loadFavoriteStatus on demand.
     return {};
   }

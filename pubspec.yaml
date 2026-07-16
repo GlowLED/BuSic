@@ -4,8 +4,8 @@ publish_to: "none"
 version: 0.4.3+18
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.29.0"
+  sdk: '>=3.12.2 <4.0.0'
+  flutter: '>=3.44.6'
 
 dependencies:
   flutter:
@@ -15,19 +15,19 @@ dependencies:
 
   # State Management (Riverpod code generation)示例：
 
-  flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
+  flutter_riverpod: ^3.3.2
+  riverpod_annotation: ^4.0.3
 
   # Routing
   go_router: ^14.2.0
 
   # Database (Drift - SQLite ORM)
-  drift: ^2.18.0
+  drift: ^2.34.2
   sqlite3_flutter_libs: ^0.5.21
 
   # Immutable Models
-  freezed_annotation: ^2.4.1
-  json_annotation: ^4.9.0
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
 
   # Network
   dio: ^5.4.3+1
@@ -76,14 +76,17 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
   # Code Generation
-  build_runner: ^2.4.9
-  riverpod_generator: ^2.4.0
-  freezed: ^2.5.2
-  json_serializable: ^6.8.0
-  drift_dev: ^2.18.0
+  # Keep this group on analyzer 12-compatible versions for Dart 3.12.
+  # Newer drift_dev requires analyzer 13, while riverpod_generator 4.0.4
+  # requires analyzer 12. Freezed needs the listed preview to support it.
+  build_runner: 2.15.1
+  riverpod_generator: ^4.0.4
+  freezed: 3.2.6-dev.1
+  json_serializable: ^6.14.0
+  drift_dev: 2.34.0
 
   # App Icon Generation
   flutter_launcher_icons: ^0.14.3

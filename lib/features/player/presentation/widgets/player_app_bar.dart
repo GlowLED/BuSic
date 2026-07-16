@@ -97,10 +97,7 @@ class PlayerAppBar extends ConsumerWidget {
           ),
           // ❤️ Favourite button
           if (track != null)
-            PlayerFavoriteButton(
-              track: track!,
-              inactiveColor: Colors.white,
-            ),
+            PlayerFavoriteButton(track: track!, inactiveColor: Colors.white),
           IconButton(
             icon: const Icon(Icons.queue_music, color: Colors.white),
             tooltip: l10n.queue,

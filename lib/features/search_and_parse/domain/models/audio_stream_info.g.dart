@@ -6,9 +6,8 @@ part of 'audio_stream_info.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AudioStreamInfoImpl _$$AudioStreamInfoImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AudioStreamInfoImpl(
+_AudioStreamInfo _$AudioStreamInfoFromJson(Map<String, dynamic> json) =>
+    _AudioStreamInfo(
       url: json['url'] as String,
       quality: (json['quality'] as num).toInt(),
       mimeType: json['mimeType'] as String?,
@@ -16,14 +15,14 @@ _$AudioStreamInfoImpl _$$AudioStreamInfoImplFromJson(
       expireTime: json['expireTime'] == null
           ? null
           : DateTime.parse(json['expireTime'] as String),
-      backupUrls: (json['backupUrls'] as List<dynamic>?)
+      backupUrls:
+          (json['backupUrls'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
     );
 
-Map<String, dynamic> _$$AudioStreamInfoImplToJson(
-        _$AudioStreamInfoImpl instance) =>
+Map<String, dynamic> _$AudioStreamInfoToJson(_AudioStreamInfo instance) =>
     <String, dynamic>{
       'url': instance.url,
       'quality': instance.quality,

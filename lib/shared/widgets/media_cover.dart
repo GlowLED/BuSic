@@ -38,25 +38,16 @@ class MediaCover extends StatelessWidget {
       builder: (context, constraints) {
         final cacheSize = _resolveCacheSize(context, constraints);
         Widget child = DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-          ),
+          decoration: BoxDecoration(borderRadius: borderRadius),
           child: _buildImage(context, cacheSize),
         );
 
         if (aspectRatio != null) {
-          child = AspectRatio(
-            aspectRatio: aspectRatio!,
-            child: child,
-          );
+          child = AspectRatio(aspectRatio: aspectRatio!, child: child);
         }
 
         if (width != null || height != null) {
-          child = SizedBox(
-            width: width,
-            height: height,
-            child: child,
-          );
+          child = SizedBox(width: width, height: height, child: child);
         }
 
         return ClipRRect(
@@ -77,8 +68,9 @@ class MediaCover extends StatelessWidget {
     }
 
     if (_isLocalPath(cover)) {
-      final path =
-          cover.startsWith('file://') ? Uri.parse(cover).toFilePath() : cover;
+      final path = cover.startsWith('file://')
+          ? Uri.parse(cover).toFilePath()
+          : cover;
       final fileProvider = FileImage(File(path));
       // 用 ResizeImagePolicy.fit 在缓存上界内保持原始宽高比解码，避免长图被
       // 压扁成正方形位图（默认 exact 策略会按精确尺寸解码导致变形）。
@@ -118,18 +110,10 @@ class MediaCover extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            palette.accentSoft,
-            palette.surfaceSecondary,
-          ],
+          colors: [palette.accentSoft, palette.surfaceSecondary],
         ),
       ),
-      child: Center(
-        child: Icon(
-          placeholderIcon,
-          color: palette.textSecondary,
-        ),
-      ),
+      child: Center(child: Icon(placeholderIcon, color: palette.textSecondary)),
     );
   }
 
@@ -143,11 +127,13 @@ class MediaCover extends StatelessWidget {
     BuildContext context,
     BoxConstraints constraints,
   ) {
-    var displayWidth = _finiteDimension(width) ??
+    var displayWidth =
+        _finiteDimension(width) ??
         (constraints.hasBoundedWidth
             ? _finiteDimension(constraints.maxWidth)
             : null);
-    var displayHeight = _finiteDimension(height) ??
+    var displayHeight =
+        _finiteDimension(height) ??
         (constraints.hasBoundedHeight
             ? _finiteDimension(constraints.maxHeight)
             : null);
@@ -183,8 +169,8 @@ class MediaCover extends StatelessWidget {
     final scale = rawMax < _mediaCoverMinCacheDimension
         ? _mediaCoverMinCacheDimension / rawMax
         : rawMax > _mediaCoverMaxCacheDimension
-            ? _mediaCoverMaxCacheDimension / rawMax
-            : 1.0;
+        ? _mediaCoverMaxCacheDimension / rawMax
+        : 1.0;
 
     return (
       width: math.max(1, (rawWidth * scale).ceil()),

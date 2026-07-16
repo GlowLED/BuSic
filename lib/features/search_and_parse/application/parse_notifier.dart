@@ -17,7 +17,7 @@ part 'parse_notifier.freezed.dart';
 
 /// Possible states of the parse/search flow.
 @freezed
-class ParseState with _$ParseState {
+abstract class ParseState with _$ParseState {
   /// No active parsing operation.
   const factory ParseState.idle() = _Idle;
 
@@ -38,7 +38,7 @@ class ParseState with _$ParseState {
 }
 
 /// State notifier managing the BV number parsing and page selection flow.
-@riverpod
+@Riverpod(name: 'parseNotifierProvider')
 class ParseNotifier extends _$ParseNotifier {
   late ParseRepository _repository;
   late PlaylistRepository _playlistRepository;
@@ -92,8 +92,10 @@ class ParseNotifier extends _$ParseNotifier {
   void selectAllPages() {
     final current = state;
     if (current is! _SelectingPages) return;
-    state =
-        ParseState.selectingPages(current.info, List.from(current.info.pages));
+    state = ParseState.selectingPages(
+      current.info,
+      List.from(current.info.pages),
+    );
   }
 
   /// Deselect all pages.

@@ -33,7 +33,7 @@ compatibility: opencode
 - 先用 [`busic-main-workflow`](../busic-main-workflow/SKILL.md) 定位主真源
 - 按职责加载对应的子 skill，不重复阅读无关规范
 - 改了规则就同步 `docs/`；改了规范入口就同步 `.agents/skills/`
-- 验证至少覆盖 `flutter analyze --no-fatal-infos` 与 `flutter test`，必要时加平台手测
+- 验证至少覆盖 `flutter analyze` 与 `flutter test`，必要时加平台手测
 - 汇报时明确区分：已完成、已验证、未验证、建议后续
 
 ## 沙箱与提权

@@ -11,7 +11,7 @@ class VideoInteractionRepositoryImpl implements VideoInteractionRepository {
   final BiliDio _biliDio;
 
   VideoInteractionRepositoryImpl({required BiliDio biliDio})
-      : _biliDio = biliDio;
+    : _biliDio = biliDio;
 
   @override
   Future<VideoInteractionState> getInteractionState({
@@ -50,11 +50,7 @@ class VideoInteractionRepositoryImpl implements VideoInteractionRepository {
     await _postInteraction(
       label: 'set video like',
       path: '/x/web-interface/archive/like',
-      data: {
-        'aid': aid,
-        'like': like ? 1 : 2,
-        'csrf': csrf,
-      },
+      data: {'aid': aid, 'like': like ? 1 : 2, 'csrf': csrf},
       fallbackMessage: '点赞操作失败',
     );
   }
@@ -113,41 +109,24 @@ class VideoInteractionRepositoryImpl implements VideoInteractionRepository {
     await _postInteraction(
       label: 'record video share',
       path: '/x/web-interface/share/add',
-      data: {
-        'aid': aid,
-        'bvid': bvid,
-        'csrf': csrf,
-        'source': 'web_normal',
-      },
+      data: {'aid': aid, 'bvid': bvid, 'csrf': csrf, 'source': 'web_normal'},
       fallbackMessage: '分享记录失败',
     );
   }
 
-  Future<bool> _isLiked({
-    required int aid,
-    required String bvid,
-  }) async {
+  Future<bool> _isLiked({required int aid, required String bvid}) async {
     final response = await _biliDio.get(
       '/x/web-interface/archive/has/like',
-      queryParameters: {
-        'aid': aid,
-        'bvid': bvid,
-      },
+      queryParameters: {'aid': aid, 'bvid': bvid},
     );
     _ensureSuccess(response.data, fallbackMessage: '获取点赞状态失败');
     return _asInt(response.data['data']) == 1;
   }
 
-  Future<int> _coinsGiven({
-    required int aid,
-    required String bvid,
-  }) async {
+  Future<int> _coinsGiven({required int aid, required String bvid}) async {
     final response = await _biliDio.get(
       '/x/web-interface/archive/coins',
-      queryParameters: {
-        'aid': aid,
-        'bvid': bvid,
-      },
+      queryParameters: {'aid': aid, 'bvid': bvid},
     );
     _ensureSuccess(response.data, fallbackMessage: '获取投币状态失败');
 
@@ -174,10 +153,7 @@ class VideoInteractionRepositoryImpl implements VideoInteractionRepository {
     try {
       return await read();
     } catch (error, stackTrace) {
-      AppLogger.warning(
-        'Failed to $label: $error',
-        tag: 'VideoInteraction',
-      );
+      AppLogger.warning('Failed to $label: $error', tag: 'VideoInteraction');
       AppLogger.error(
         'Interaction state read failed',
         tag: 'VideoInteraction',
@@ -212,15 +188,13 @@ class VideoInteractionRepositoryImpl implements VideoInteractionRepository {
     }
   }
 
-  void _ensureSuccess(
-    dynamic responseData, {
-    required String fallbackMessage,
-  }) {
+  void _ensureSuccess(dynamic responseData, {required String fallbackMessage}) {
     final data = _asStringMap(responseData);
     final code = _asInt(data?['code']) ?? -1;
     if (code == 0) return;
 
-    final message = data?['message'] as String? ??
+    final message =
+        data?['message'] as String? ??
         data?['msg'] as String? ??
         fallbackMessage;
     throw VideoInteractionException(code, message);

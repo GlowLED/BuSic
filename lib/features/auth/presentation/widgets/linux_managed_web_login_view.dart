@@ -20,7 +20,8 @@ class LinuxManagedWebLoginView extends StatefulWidget {
   final Future<void> Function(
     BiliLoginCookies cookies,
     LinuxManagedBrowserLoginSession session,
-  ) onCookiesCaptured;
+  )
+  onCookiesCaptured;
   final VoidCallback onCookieMissing;
   final bool isVerifying;
 
@@ -138,11 +139,7 @@ class _LinuxManagedWebLoginViewState extends State<LinuxManagedWebLoginView> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.open_in_browser,
-                size: 36,
-                color: colorScheme.primary,
-              ),
+              Icon(Icons.open_in_browser, size: 36, color: colorScheme.primary),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
