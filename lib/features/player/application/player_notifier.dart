@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:busic/core/services/mpris_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -47,6 +48,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
   late BusicAudioHandler _audioHandler;
+  late MprisService _mprisService;
   late AppDatabase _db;
   final List<StreamSubscription> _subscriptions = [];
   DateTime _lastPersist = DateTime.fromMillisecondsSinceEpoch(0);
@@ -67,12 +69,10 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     _parseRepository = ref.read(playerParseRepositoryProvider);
     _audioHandler = ref.read(audioHandlerProvider);
     _db = ref.read(databaseProvider);
-
     // Listen for download completions and refresh queue localPaths.
     ref.listen(downloadChangeSignalProvider, (_, __) {
       _refreshQueueLocalPaths();
     });
-
     // Connect media button callbacks (lock screen / notification controls)
     _audioHandler.onPlay = () => resume();
     _audioHandler.onPause = () => pause();
@@ -81,6 +81,18 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     _audioHandler.onSeek = (pos) => seekTo(pos);
     _audioHandler.onStop = () => pause();
 
+    if (Platform.isLinux) {
+      _mprisService = MprisService();
+      _mprisService.init(
+        onPlay: () => resume(),
+        onPause: () => pause(),
+        onNext: () => next(),
+        onPrevious: () => previous(),
+        onSeek: (pos) => seekTo(pos),
+        setVolume: (volume) => setVolume(volume),
+        setMode: (mode) => setMode(mode)
+      );
+    }
     // Listen to player streams
     _subscriptions.add(
       _repository.positionStream.listen((pos) {
@@ -90,6 +102,10 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
           playing: state.isPlaying,
           position: pos,
         );
+        if (Platform.isLinux) {
+          _mprisService.updatePlaybackStatus(state.isPlaying);
+          _mprisService.updatePosition(pos);
+        }
         // Throttle persist to once every 5 seconds
         final now = DateTime.now();
         if (now.difference(_lastPersist).inSeconds >= 5) {
@@ -103,6 +119,9 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         state = state.copyWith(duration: dur);
         // Update media session with the correct duration
         _audioHandler.setCurrentTrack(state.currentTrack, duration: dur);
+        if (Platform.isLinux) {
+          _mprisService.updateCurrentTrack(state.currentTrack, duration: dur);
+        }
       }),
     );
     _subscriptions.add(
@@ -112,6 +131,10 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
           playing: playing,
           position: state.position,
         );
+        if (Platform.isLinux) {
+          _mprisService.updatePlaybackStatus(playing);
+          _mprisService.updatePosition(state.position);
+        }
       }),
     );
     _subscriptions.add(
@@ -125,6 +148,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         sub.cancel();
       }
       _repository.dispose();
+      _mprisService.dispose();
     });
 
     // Restore last session asynchronously
@@ -540,12 +564,18 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// Set the playback mode (sequential, repeat, shuffle).
   void setMode(PlayMode mode) {
     state = state.copyWith(playMode: mode);
+    if (Platform.isLinux) {
+      _mprisService.updateLoopStatus(mode);
+    }
   }
 
   /// Set the volume level (0.0 to 1.0).
   Future<void> setVolume(double volume) async {
     await _repository.setVolume(volume);
     state = state.copyWith(volume: volume);
+    if (Platform.isLinux) {
+      _mprisService.updateVolume(volume);
+    }
   }
 
   /// Update the songId of the current track and its queue entry.
