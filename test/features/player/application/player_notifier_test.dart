@@ -46,6 +46,7 @@ void main() {
         audioHandlerProvider.overrideWithValue(fakeAudioHandler),
         playerRepositoryProvider.overrideWithValue(fakePlayerRepository),
         playerParseRepositoryProvider.overrideWithValue(fakeParseRepository),
+        playerMprisServiceProvider.overrideWithValue(null),
         playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
       ],
     );
@@ -57,6 +58,24 @@ void main() {
   });
 
   group('PlayerNotifier 可测试性回归', () {
+    test('MPRIS 未启用时销毁 notifier 不抛异常', () async {
+      final localContainer = ProviderContainer(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          audioHandlerProvider.overrideWithValue(fakeAudioHandler),
+          playerRepositoryProvider.overrideWithValue(fakePlayerRepository),
+          playerParseRepositoryProvider.overrideWithValue(fakeParseRepository),
+          playerMprisServiceProvider.overrideWithValue(null),
+          playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
+        ],
+      );
+
+      localContainer.read(playerNotifierProvider);
+      await _settle();
+
+      expect(localContainer.dispose, returnsNormally);
+    });
+
     test('恢复持久化状态后会同步音量到播放器仓储', () async {
       final track = _track(songId: 7, title: '恢复曲目');
       final queue = [track, _track(songId: 8, title: '队列第二首')];
