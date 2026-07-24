@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:audio_service/audio_service.dart';
 
@@ -18,43 +17,43 @@ import '../../features/player/domain/models/audio_track.dart';
 /// `PlayerNotifier` and receives metadata/state updates from it.
 class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Callbacks set by PlayerNotifier to handle media button events.
-  VoidCallback? onPlay;
-  VoidCallback? onPause;
-  VoidCallback? onSkipToNext;
-  VoidCallback? onSkipToPrevious;
-  void Function(Duration position)? onSeek;
-  VoidCallback? onStop;
+  Future<void> Function()? onPlay;
+  Future<void> Function()? onPause;
+  Future<void> Function()? onSkipToNext;
+  Future<void> Function()? onSkipToPrevious;
+  Future<void> Function(Duration position)? onSeek;
+  Future<void> Function()? onStop;
 
   BusicAudioHandler();
 
   @override
   Future<void> play() async {
-    onPlay?.call();
+    await onPlay?.call();
   }
 
   @override
   Future<void> pause() async {
-    onPause?.call();
+    await onPause?.call();
   }
 
   @override
   Future<void> skipToNext() async {
-    onSkipToNext?.call();
+    await onSkipToNext?.call();
   }
 
   @override
   Future<void> skipToPrevious() async {
-    onSkipToPrevious?.call();
+    await onSkipToPrevious?.call();
   }
 
   @override
   Future<void> seek(Duration position) async {
-    onSeek?.call(position);
+    await onSeek?.call(position);
   }
 
   @override
   Future<void> stop() async {
-    onStop?.call();
+    await onStop?.call();
   }
 
   /// Update the media session metadata from the current track.
@@ -63,14 +62,15 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
       mediaItem.add(null);
       return;
     }
-    mediaItem.add(MediaItem(
-      id: '${track.bvid}_${track.cid}',
-      title: track.title,
-      artist: track.artist,
-      artUri: track.coverUrl != null ? Uri.tryParse(track.coverUrl!) : null,
-      duration: duration ?? track.duration,
-    ));
-
+    mediaItem.add(
+      MediaItem(
+        id: '${track.bvid}_${track.cid}',
+        title: track.title,
+        artist: track.artist,
+        artUri: track.coverUrl != null ? Uri.tryParse(track.coverUrl!) : null,
+        duration: duration ?? track.duration,
+      ),
+    );
   }
 
   /// Update the playback state shown in the media session.

@@ -288,6 +288,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferredQuality => 'Preferred Quality';
 
   @override
+  String get playbackFade => 'Playback fade';
+
+  @override
+  String get playbackFadeDescription =>
+      'Smooth volume when playback starts, stops, or changes tracks';
+
+  @override
+  String get playbackFadeDuration => 'Fade duration';
+
+  @override
+  String get halfSecond => '0.5 seconds';
+
+  @override
+  String get oneSecond => '1 second';
+
+  @override
+  String get twoSeconds => '2 seconds';
+
+  @override
   String get about => 'About';
 
   @override

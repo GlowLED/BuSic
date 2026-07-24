@@ -5,7 +5,7 @@ import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
 import 'settings_panel.dart';
 
-/// Playback quality settings section.
+/// Playback behavior and quality settings section.
 class PlaybackSection extends ConsumerWidget {
   const PlaybackSection({super.key});
 
@@ -39,6 +39,42 @@ class PlaybackSection extends ConsumerWidget {
                     .setPreferredQuality(quality);
               }
             },
+          ),
+        ),
+        SettingsTile(
+          icon: Icons.multiline_chart_rounded,
+          title: l10n.playbackFade,
+          subtitle: l10n.playbackFadeDescription,
+          trailing: Switch(
+            value: settings.playbackFadeEnabled,
+            onChanged: (enabled) {
+              ref
+                  .read(settingsNotifierProvider.notifier)
+                  .setPlaybackFadeEnabled(enabled);
+            },
+          ),
+        ),
+        SettingsTile(
+          icon: Icons.timer_outlined,
+          title: l10n.playbackFadeDuration,
+          enabled: settings.playbackFadeEnabled,
+          trailing: DropdownButton<int>(
+            value: settings.playbackFadeDurationMs,
+            underline: const SizedBox.shrink(),
+            items: [
+              DropdownMenuItem(value: 500, child: Text(l10n.halfSecond)),
+              DropdownMenuItem(value: 1000, child: Text(l10n.oneSecond)),
+              DropdownMenuItem(value: 2000, child: Text(l10n.twoSeconds)),
+            ],
+            onChanged: settings.playbackFadeEnabled
+                ? (durationMs) {
+                    if (durationMs != null) {
+                      ref
+                          .read(settingsNotifierProvider.notifier)
+                          .setPlaybackFadeDurationMs(durationMs);
+                    }
+                  }
+                : null,
           ),
         ),
       ],

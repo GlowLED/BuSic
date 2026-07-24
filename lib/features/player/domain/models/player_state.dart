@@ -24,7 +24,10 @@ abstract class PlayerState with _$PlayerState {
     /// Total duration of the current track.
     @Default(Duration.zero) Duration duration,
 
-    /// Whether audio is currently playing (not paused/stopped).
+    /// The user's latest playback intent shown by UI and media controls.
+    ///
+    /// During a pause fade-out this becomes false before the engine pauses;
+    /// during resume it becomes true before the fade-in completes.
     @Default(false) bool isPlaying,
 
     /// Current playback mode.

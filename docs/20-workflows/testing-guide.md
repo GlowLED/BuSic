@@ -84,6 +84,7 @@ flutter test test/shared/widgets/song_tile_test.dart
 test/
 ├── core/
 │   ├── router/
+│   ├── services/
 │   └── theme/
 ├── features/
 │   ├── auth/
@@ -230,6 +231,7 @@ group('备份导出不含下载路径', () {
 | 范围 | 当前覆盖 | 现状判断 | 下一步 |
 |---|---|---|---|
 | `test/core/router` | `app_router_test.dart` | 已覆盖 | 路由结构变动时同步补回归 |
+| `test/core/services` | `audio_handler_test.dart` | 已覆盖异步媒体命令等待语义 | 媒体会话接口变动时同步补回归 |
 | `test/core/theme` | `app_theme_test.dart` | 已覆盖 | 改主题 token 时补断言 |
 | `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` / `desktop_window_resize_frame` | 部分覆盖 | 新增共享组件时同步补 widget tests |
 | `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
@@ -237,12 +239,12 @@ group('备份导出不含下载路径', () {
 | `features/download` | `download_cache_mechanism_test.dart` + `presentation/download_screen_test.dart` | 缓存主链路与下载页缓存语义已覆盖 | 后续补 Notifier 边界回归 |
 | `features/playlist` | `presentation/widgets/playlist_tile_test.dart` | 覆盖偏浅 | 优先补 `data` / `application` |
 | `features/search_and_parse` | `data` 层 3 个文件 + `application` + `domain/models` + `presentation` 层 2 个文件 | 覆盖较好 | 后续补 `presentation/search_screen.dart` 交互回归 |
-| `features/settings` | `application/settings_notifier_test.dart` | 局部覆盖 | 改设置持久化时继续补 |
+| `features/settings` | `application/settings_notifier_test.dart` + `presentation/playback_section_test.dart` | 设置持久化与播放渐变设置 UI 已覆盖 | 改设置持久化时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
 | `features/auth` | `domain/bili_login_cookies_test.dart` + `data/auth_repository_impl_test.dart` + `application/auth_notifier_test.dart` + `presentation/login_screen_test.dart` | Cookie 解析、登录校验、会话编排和三登录入口 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
 | `features/comment` | `presentation/comment_text_selection_test.dart` | 文本选择已覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
-| `features/player` | `application/player_notifier_test.dart` + `presentation/player_bar_favorite_test.dart` + `presentation/widgets/player_section_switcher_test.dart` + `presentation/widgets/draggable_progress_bar_test.dart` | 主链路状态、收藏显示和关键控件已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
+| `features/player` | `application/playback_fade_controller_test.dart` + `application/player_notifier_test.dart` + `presentation/player_bar_favorite_test.dart` + `presentation/widgets/player_section_switcher_test.dart` + `presentation/widgets/draggable_progress_bar_test.dart` | 主链路状态、播放渐变、快速播放/暂停竞态、即时按钮反馈、收藏显示和关键控件已覆盖 | 后续补 `presentation/full_player_screen.dart` 其余交互回归 |
 | `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` + `presentation/widgets/lyrics_panel_test.dart` | 缓存、重试、当前曲目终态和错误重试 UI 已覆盖 | 后续补播放器时间轴与歌词滚动联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 

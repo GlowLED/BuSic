@@ -56,7 +56,7 @@ final class PlayerNotifierProvider
   }
 }
 
-String _$playerNotifierHash() => r'a1a86b061360a643ac1ac66e814266b081a053d2';
+String _$playerNotifierHash() => r'c78f3587dd01a343474bd9be28fb215314879882';
 
 /// State notifier managing the audio player lifecycle.
 ///

@@ -25,6 +25,12 @@ abstract class UserPreferences with _$UserPreferences {
 
     /// Theme seed color value.
     @Default(0xFF4CAF50) int themeSeedColor,
+
+    /// Whether playback boundaries use volume fade transitions.
+    @Default(true) bool playbackFadeEnabled,
+
+    /// Duration of a single fade-in or fade-out transition.
+    @Default(1000) int playbackFadeDurationMs,
   }) = _UserPreferences;
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>

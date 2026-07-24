@@ -47,12 +47,7 @@ class PlayerControls extends ConsumerWidget {
               color: Colors.black87,
             ),
             onPressed: () {
-              final notifier = ref.read(playerNotifierProvider.notifier);
-              if (playerState.isPlaying) {
-                notifier.pause();
-              } else {
-                notifier.resume();
-              }
+              ref.read(playerNotifierProvider.notifier).togglePlayback();
             },
           ),
         );

@@ -21,7 +21,9 @@ mixin _$UserPreferences {
  String? get cachePath;/// Preferred audio quality identifier.
 /// 0 = auto (best available), or specific quality code.
  int get preferredQuality;/// Theme seed color value.
- int get themeSeedColor;
+ int get themeSeedColor;/// Whether playback boundaries use volume fade transitions.
+ bool get playbackFadeEnabled;/// Duration of a single fade-in or fade-out transition.
+ int get playbackFadeDurationMs;
 /// Create a copy of UserPreferences
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +36,16 @@ $UserPreferencesCopyWith<UserPreferences> get copyWith => _$UserPreferencesCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor)&&(identical(other.playbackFadeEnabled, playbackFadeEnabled) || other.playbackFadeEnabled == playbackFadeEnabled)&&(identical(other.playbackFadeDurationMs, playbackFadeDurationMs) || other.playbackFadeDurationMs == playbackFadeDurationMs));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor);
+int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor,playbackFadeEnabled,playbackFadeDurationMs);
 
 @override
 String toString() {
-  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
+  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor, playbackFadeEnabled: $playbackFadeEnabled, playbackFadeDurationMs: $playbackFadeDurationMs)';
 }
 
 
@@ -54,7 +56,7 @@ abstract mixin class $UserPreferencesCopyWith<$Res>  {
   factory $UserPreferencesCopyWith(UserPreferences value, $Res Function(UserPreferences) _then) = _$UserPreferencesCopyWithImpl;
 @useResult
 $Res call({
- ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor
+ ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor, bool playbackFadeEnabled, int playbackFadeDurationMs
 });
 
 
@@ -71,13 +73,15 @@ class _$UserPreferencesCopyWithImpl<$Res>
 
 /// Create a copy of UserPreferences
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,Object? playbackFadeEnabled = null,Object? playbackFadeDurationMs = null,}) {
   return _then(_self.copyWith(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
 as String?,cachePath: freezed == cachePath ? _self.cachePath : cachePath // ignore: cast_nullable_to_non_nullable
 as String?,preferredQuality: null == preferredQuality ? _self.preferredQuality : preferredQuality // ignore: cast_nullable_to_non_nullable
 as int,themeSeedColor: null == themeSeedColor ? _self.themeSeedColor : themeSeedColor // ignore: cast_nullable_to_non_nullable
+as int,playbackFadeEnabled: null == playbackFadeEnabled ? _self.playbackFadeEnabled : playbackFadeEnabled // ignore: cast_nullable_to_non_nullable
+as bool,playbackFadeDurationMs: null == playbackFadeDurationMs ? _self.playbackFadeDurationMs : playbackFadeDurationMs // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -163,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor,  bool playbackFadeEnabled,  int playbackFadeDurationMs)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserPreferences() when $default != null:
-return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor,_that.playbackFadeEnabled,_that.playbackFadeDurationMs);case _:
   return orElse();
 
 }
@@ -184,10 +188,10 @@ return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQual
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor,  bool playbackFadeEnabled,  int playbackFadeDurationMs)  $default,) {final _that = this;
 switch (_that) {
 case _UserPreferences():
-return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor,_that.playbackFadeEnabled,_that.playbackFadeDurationMs);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +208,10 @@ return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQual
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode themeMode,  String? locale,  String? cachePath,  int preferredQuality,  int themeSeedColor,  bool playbackFadeEnabled,  int playbackFadeDurationMs)?  $default,) {final _that = this;
 switch (_that) {
 case _UserPreferences() when $default != null:
-return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor);case _:
+return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQuality,_that.themeSeedColor,_that.playbackFadeEnabled,_that.playbackFadeDurationMs);case _:
   return null;
 
 }
@@ -219,7 +223,7 @@ return $default(_that.themeMode,_that.locale,_that.cachePath,_that.preferredQual
 @JsonSerializable()
 
 class _UserPreferences implements UserPreferences {
-  const _UserPreferences({this.themeMode = ThemeMode.system, this.locale, this.cachePath, this.preferredQuality = 0, this.themeSeedColor = 0xFF4CAF50});
+  const _UserPreferences({this.themeMode = ThemeMode.system, this.locale, this.cachePath, this.preferredQuality = 0, this.themeSeedColor = 0xFF4CAF50, this.playbackFadeEnabled = true, this.playbackFadeDurationMs = 1000});
   factory _UserPreferences.fromJson(Map<String, dynamic> json) => _$UserPreferencesFromJson(json);
 
 /// Theme mode: system, light, or dark.
@@ -233,6 +237,10 @@ class _UserPreferences implements UserPreferences {
 @override@JsonKey() final  int preferredQuality;
 /// Theme seed color value.
 @override@JsonKey() final  int themeSeedColor;
+/// Whether playback boundaries use volume fade transitions.
+@override@JsonKey() final  bool playbackFadeEnabled;
+/// Duration of a single fade-in or fade-out transition.
+@override@JsonKey() final  int playbackFadeDurationMs;
 
 /// Create a copy of UserPreferences
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserPreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.cachePath, cachePath) || other.cachePath == cachePath)&&(identical(other.preferredQuality, preferredQuality) || other.preferredQuality == preferredQuality)&&(identical(other.themeSeedColor, themeSeedColor) || other.themeSeedColor == themeSeedColor)&&(identical(other.playbackFadeEnabled, playbackFadeEnabled) || other.playbackFadeEnabled == playbackFadeEnabled)&&(identical(other.playbackFadeDurationMs, playbackFadeDurationMs) || other.playbackFadeDurationMs == playbackFadeDurationMs));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor);
+int get hashCode => Object.hash(runtimeType,themeMode,locale,cachePath,preferredQuality,themeSeedColor,playbackFadeEnabled,playbackFadeDurationMs);
 
 @override
 String toString() {
-  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor)';
+  return 'UserPreferences(themeMode: $themeMode, locale: $locale, cachePath: $cachePath, preferredQuality: $preferredQuality, themeSeedColor: $themeSeedColor, playbackFadeEnabled: $playbackFadeEnabled, playbackFadeDurationMs: $playbackFadeDurationMs)';
 }
 
 
@@ -267,7 +275,7 @@ abstract mixin class _$UserPreferencesCopyWith<$Res> implements $UserPreferences
   factory _$UserPreferencesCopyWith(_UserPreferences value, $Res Function(_UserPreferences) _then) = __$UserPreferencesCopyWithImpl;
 @override @useResult
 $Res call({
- ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor
+ ThemeMode themeMode, String? locale, String? cachePath, int preferredQuality, int themeSeedColor, bool playbackFadeEnabled, int playbackFadeDurationMs
 });
 
 
@@ -284,13 +292,15 @@ class __$UserPreferencesCopyWithImpl<$Res>
 
 /// Create a copy of UserPreferences
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? locale = freezed,Object? cachePath = freezed,Object? preferredQuality = null,Object? themeSeedColor = null,Object? playbackFadeEnabled = null,Object? playbackFadeDurationMs = null,}) {
   return _then(_UserPreferences(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,locale: freezed == locale ? _self.locale : locale // ignore: cast_nullable_to_non_nullable
 as String?,cachePath: freezed == cachePath ? _self.cachePath : cachePath // ignore: cast_nullable_to_non_nullable
 as String?,preferredQuality: null == preferredQuality ? _self.preferredQuality : preferredQuality // ignore: cast_nullable_to_non_nullable
 as int,themeSeedColor: null == themeSeedColor ? _self.themeSeedColor : themeSeedColor // ignore: cast_nullable_to_non_nullable
+as int,playbackFadeEnabled: null == playbackFadeEnabled ? _self.playbackFadeEnabled : playbackFadeEnabled // ignore: cast_nullable_to_non_nullable
+as bool,playbackFadeDurationMs: null == playbackFadeDurationMs ? _self.playbackFadeDurationMs : playbackFadeDurationMs // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

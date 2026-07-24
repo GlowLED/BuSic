@@ -12,11 +12,15 @@ part 'settings_notifier.g.dart';
 /// access for theme, locale, and other app-wide settings.
 @Riverpod(name: 'settingsNotifierProvider')
 class SettingsNotifier extends _$SettingsNotifier {
+  static const supportedPlaybackFadeDurations = [500, 1000, 2000];
+
   static const _keyThemeMode = 'theme_mode';
   static const _keyLocale = 'locale';
   static const _keyCachePath = 'cache_path';
   static const _keyPreferredQuality = 'preferred_quality';
   static const _keyThemeSeedColor = 'theme_seed_color';
+  static const _keyPlaybackFadeEnabled = 'playback_fade_enabled';
+  static const _keyPlaybackFadeDurationMs = 'playback_fade_duration_ms';
   static const _keyMinimalPlaylistId = 'minimal_playlist_id';
 
   @override
@@ -33,6 +37,13 @@ class SettingsNotifier extends _$SettingsNotifier {
     final cachePath = prefs.getString(_keyCachePath);
     final preferredQuality = prefs.getInt(_keyPreferredQuality) ?? 0;
     final themeSeedColor = prefs.getInt(_keyThemeSeedColor) ?? 0xFF4CAF50;
+    final playbackFadeEnabled = prefs.getBool(_keyPlaybackFadeEnabled) ?? true;
+    final storedPlaybackFadeDurationMs =
+        prefs.getInt(_keyPlaybackFadeDurationMs) ?? 1000;
+    final playbackFadeDurationMs =
+        supportedPlaybackFadeDurations.contains(storedPlaybackFadeDurationMs)
+        ? storedPlaybackFadeDurationMs
+        : 1000;
 
     state = UserPreferences(
       themeMode: themeModeIndex != null
@@ -42,6 +53,8 @@ class SettingsNotifier extends _$SettingsNotifier {
       cachePath: cachePath,
       preferredQuality: preferredQuality,
       themeSeedColor: themeSeedColor,
+      playbackFadeEnabled: playbackFadeEnabled,
+      playbackFadeDurationMs: playbackFadeDurationMs,
     );
   }
 
@@ -88,6 +101,23 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.setInt(_keyThemeSeedColor, colorValue);
   }
 
+  /// Enable or disable playback fade transitions.
+  Future<void> setPlaybackFadeEnabled(bool enabled) async {
+    state = state.copyWith(playbackFadeEnabled: enabled);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyPlaybackFadeEnabled, enabled);
+  }
+
+  /// Set the duration of a single playback fade transition.
+  Future<void> setPlaybackFadeDurationMs(int durationMs) async {
+    final normalized = supportedPlaybackFadeDurations.contains(durationMs)
+        ? durationMs
+        : 1000;
+    state = state.copyWith(playbackFadeDurationMs: normalized);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyPlaybackFadeDurationMs, normalized);
+  }
+
   /// Reset all settings to defaults.
   Future<void> resetToDefaults() async {
     state = const UserPreferences();
@@ -97,6 +127,8 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyCachePath);
     await prefs.remove(_keyPreferredQuality);
     await prefs.remove(_keyThemeSeedColor);
+    await prefs.remove(_keyPlaybackFadeEnabled);
+    await prefs.remove(_keyPlaybackFadeDurationMs);
 
     // Cleanup startup recommendation keys left by older builds.
     await prefs.remove('is_minimal_mode');

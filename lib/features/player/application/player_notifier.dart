@@ -22,6 +22,7 @@ import '../data/player_repository_impl.dart';
 import '../domain/models/audio_track.dart';
 import '../domain/models/play_mode.dart';
 import '../domain/models/player_state.dart';
+import 'playback_fade_controller.dart';
 import 'player_state_persistence.dart';
 
 part 'player_notifier.g.dart';
@@ -42,6 +43,14 @@ final playerResumeSeekDelayProvider = Provider<Duration>((ref) {
   return const Duration(milliseconds: 300);
 });
 
+final playerFadeTickIntervalProvider = Provider<Duration>((ref) {
+  return const Duration(milliseconds: 50);
+});
+
+final playerFadeDelayProvider = Provider<PlaybackFadeDelay>((ref) {
+  return (duration) => Future<void>.delayed(duration);
+});
+
 /// State notifier managing the audio player lifecycle.
 ///
 /// Controls playback, queue management, and mode switching.
@@ -52,10 +61,17 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   late PlayerRepository _repository;
   late ParseRepository _parseRepository;
   late BusicAudioHandler _audioHandler;
+  late PlaybackFadeController _fadeController;
   MprisService? _mprisService;
   late AppDatabase _db;
   final List<StreamSubscription> _subscriptions = [];
   DateTime _lastPersist = DateTime.fromMillisecondsSinceEpoch(0);
+  int _playbackCommandGeneration = 0;
+  Future<void> _transportTail = Future<void>.value();
+  bool _engineIsPlaying = false;
+  bool _naturalFadeActive = false;
+  String? _naturalFadeTrackKey;
+  Duration? _naturalFadeWindow;
 
   /// Whether the media_kit player currently has loaded media.
   /// After app restart, the player state is restored from prefs but
@@ -72,6 +88,11 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     _repository = ref.read(playerRepositoryProvider);
     _parseRepository = ref.read(playerParseRepositoryProvider);
     _audioHandler = ref.read(audioHandlerProvider);
+    _fadeController = PlaybackFadeController(
+      setVolume: _repository.setVolume,
+      tickInterval: ref.read(playerFadeTickIntervalProvider),
+      delay: ref.read(playerFadeDelayProvider),
+    );
     _mprisService = ref.read(playerMprisServiceProvider);
     _db = ref.read(databaseProvider);
     // Listen for download completions and refresh queue localPaths.
@@ -84,7 +105,21 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     _audioHandler.onSkipToNext = () => next();
     _audioHandler.onSkipToPrevious = () => previous();
     _audioHandler.onSeek = (pos) => seekTo(pos);
-    _audioHandler.onStop = () => pause();
+    _audioHandler.onStop = () => stop();
+
+    ref.listen(
+      settingsNotifierProvider.select(
+        (settings) => settings.playbackFadeEnabled,
+      ),
+      (_, enabled) {
+        if (!enabled) {
+          _naturalFadeActive = false;
+          _naturalFadeTrackKey = null;
+          _naturalFadeWindow = null;
+          unawaited(_fadeController.setImmediate(state.volume));
+        }
+      },
+    );
 
     _mprisService?.init(
       onPlay: () => resume(),
@@ -99,6 +134,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     _subscriptions.add(
       _repository.positionStream.listen((pos) {
         state = state.copyWith(position: pos);
+        _updateNaturalFade(pos);
         // Update media session position
         _audioHandler.updatePlaybackState(
           playing: state.isPlaying,
@@ -124,18 +160,15 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     );
     _subscriptions.add(
       _repository.playingStream.listen((playing) {
-        state = state.copyWith(isPlaying: playing);
-        _audioHandler.updatePlaybackState(
-          playing: playing,
-          position: state.position,
-        );
-        _mprisService?.updatePlaybackStatus(playing);
-        _mprisService?.updatePosition(state.position);
+        // Engine events can arrive after a newer user command. Keep the
+        // physical state for transport reconciliation, but never let a stale
+        // event overwrite the UI-facing playback intent.
+        _engineIsPlaying = playing;
       }),
     );
     _subscriptions.add(
       _repository.completedStream.listen((_) {
-        _onTrackCompleted();
+        unawaited(_onTrackCompleted());
       }),
     );
 
@@ -144,6 +177,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         sub.cancel();
       }
       _repository.dispose();
+      _fadeController.dispose();
       _mprisService?.dispose();
     });
 
@@ -155,10 +189,13 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
   /// Kick off the asynchronous restore of last session's state.
   Future<void> _initRestore() async {
+    final restoreCommand = _playbackCommandGeneration;
     final restored = await restoreState();
-    if (restored != null) {
+    if (restored != null &&
+        ref.mounted &&
+        restoreCommand == _playbackCommandGeneration) {
       state = restored;
-      await _repository.setVolume(restored.volume);
+      await _fadeController.setImmediate(restored.volume);
       AppLogger.info(
         'Restored last session: ${restored.currentTrack?.title}',
         tag: 'Player',
@@ -251,24 +288,212 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// Update the platform media session (notification, lock screen controls).
   void _updateMediaSession(AudioTrack track) {
     _audioHandler.setCurrentTrack(track);
-    _audioHandler.updatePlaybackState(playing: true, position: Duration.zero);
+    _audioHandler.updatePlaybackState(
+      playing: state.isPlaying,
+      position: state.position,
+    );
+    _mprisService?.updateCurrentTrack(track, duration: state.duration);
+    _mprisService?.updatePlaybackStatus(state.isPlaying);
+    _mprisService?.updatePosition(state.position);
+  }
+
+  bool get _playbackFadeEnabled {
+    return ref.read(settingsNotifierProvider).playbackFadeEnabled;
+  }
+
+  Duration get _playbackFadeDuration {
+    final durationMs = ref
+        .read(settingsNotifierProvider)
+        .playbackFadeDurationMs;
+    return Duration(milliseconds: max(0, durationMs));
+  }
+
+  int _beginPlaybackCommand() {
+    _playbackCommandGeneration++;
+    _naturalFadeActive = false;
+    _naturalFadeTrackKey = null;
+    _naturalFadeWindow = null;
+    _fadeController.cancel();
+    return _playbackCommandGeneration;
+  }
+
+  bool _isCurrentPlaybackCommand(int command) {
+    return command == _playbackCommandGeneration;
+  }
+
+  void _setPlaybackIntent(bool playing, {Duration? position}) {
+    final nextPosition = position ?? state.position;
+    state = state.copyWith(isPlaying: playing, position: nextPosition);
+    _audioHandler.updatePlaybackState(playing: playing, position: nextPosition);
+    _mprisService?.updatePlaybackStatus(playing);
+    _mprisService?.updatePosition(nextPosition);
+  }
+
+  Future<bool> _runTransportCommand(
+    int command,
+    Future<void> Function() operation, {
+    bool? resultingPlaying,
+    bool skipIfEngineStateMatches = false,
+  }) {
+    final result = Completer<bool>();
+    final previousCommand = _transportTail;
+
+    _transportTail = () async {
+      await previousCommand;
+      if (!_isCurrentPlaybackCommand(command)) {
+        result.complete(false);
+        return;
+      }
+      if (skipIfEngineStateMatches &&
+          resultingPlaying != null &&
+          _engineIsPlaying == resultingPlaying) {
+        result.complete(true);
+        return;
+      }
+
+      try {
+        await operation();
+        if (resultingPlaying != null) {
+          _engineIsPlaying = resultingPlaying;
+        }
+        result.complete(_isCurrentPlaybackCommand(command));
+      } catch (error, stackTrace) {
+        result.completeError(error, stackTrace);
+      }
+    }();
+
+    return result.future;
+  }
+
+  Duration _fadeDurationTo(double target) {
+    final configuredMicros = _playbackFadeDuration.inMicroseconds;
+    final referenceVolume = state.volume.clamp(0, 1).toDouble();
+    if (configuredMicros <= 0 || referenceVolume <= 0.0001) {
+      return Duration.zero;
+    }
+
+    final distance = (target - _fadeController.effectiveVolume).abs();
+    final ratio = (distance / referenceVolume).clamp(0.0, 1.0);
+    return Duration(microseconds: (configuredMicros * ratio).round());
+  }
+
+  Future<bool> _fadeOutForCommand(int command, {bool shouldFade = true}) async {
+    if (!_isCurrentPlaybackCommand(command)) return false;
+    if (!_playbackFadeEnabled ||
+        !_hasActiveMedia ||
+        !shouldFade ||
+        _fadeController.effectiveVolume <= 0.0001) {
+      return true;
+    }
+
+    final completed = await _fadeController.fadeTo(
+      target: 0,
+      duration: _fadeDurationTo(0),
+      phase: PlaybackFadePhase.fadeOut,
+    );
+    if (!completed &&
+        _isCurrentPlaybackCommand(command) &&
+        !_playbackFadeEnabled) {
+      return true;
+    }
+    return completed && _isCurrentPlaybackCommand(command);
+  }
+
+  Future<bool> _fadeInForCommand(int command) async {
+    if (!_isCurrentPlaybackCommand(command)) return false;
+    if (!_playbackFadeEnabled) {
+      return true;
+    }
+
+    final completed = await _fadeController.fadeTo(
+      target: state.volume,
+      duration: _fadeDurationTo(state.volume),
+      phase: PlaybackFadePhase.fadeIn,
+      targetProvider: () => state.volume,
+    );
+    return completed && _isCurrentPlaybackCommand(command);
+  }
+
+  Future<bool> _transitionToTrack({
+    required AudioTrack track,
+    required PlayerState nextState,
+    required int command,
+    bool fadeOutCurrent = true,
+  }) async {
+    final previousState = state;
+    final previousHasActiveMedia = _hasActiveMedia;
+    final previousEffectiveVolume = _fadeController.effectiveVolume;
+    final shouldFadeCurrent = _engineIsPlaying || previousState.isPlaying;
+    _setPlaybackIntent(true);
+
+    try {
+      if (fadeOutCurrent &&
+          !await _fadeOutForCommand(command, shouldFade: shouldFadeCurrent)) {
+        return false;
+      }
+      if (!_isCurrentPlaybackCommand(command)) return false;
+
+      state = nextState.copyWith(
+        currentTrack: track,
+        position: Duration.zero,
+        duration: track.duration,
+        isPlaying: true,
+      );
+      _updateMediaSession(track);
+
+      await _fadeController.setImmediate(
+        _playbackFadeEnabled ? 0 : state.volume,
+      );
+      if (!_isCurrentPlaybackCommand(command)) return false;
+
+      final opened = await _runTransportCommand(command, () async {
+        await _repository.play(track);
+        _hasActiveMedia = true;
+      }, resultingPlaying: true);
+      if (!opened) return false;
+
+      _naturalFadeActive = false;
+      _naturalFadeTrackKey = null;
+      _naturalFadeWindow = null;
+      await _fadeInForCommand(command);
+      return _isCurrentPlaybackCommand(command);
+    } catch (error) {
+      if (_isCurrentPlaybackCommand(command)) {
+        state = previousState;
+        _hasActiveMedia = previousHasActiveMedia;
+        _audioHandler.setCurrentTrack(
+          previousState.currentTrack,
+          duration: previousState.duration,
+        );
+        _setPlaybackIntent(
+          previousState.isPlaying,
+          position: previousState.position,
+        );
+        await _fadeController.setImmediate(previousEffectiveVolume);
+      }
+      AppLogger.error(
+        'Failed to open playback track',
+        tag: 'Player',
+        error: error,
+      );
+      rethrow;
+    }
   }
 
   /// Play a specific track, optionally replacing the queue.
   Future<void> playTrack(AudioTrack track, {List<AudioTrack>? queue}) async {
+    final command = _beginPlaybackCommand();
     final newQueue = queue ?? [track];
     final index = newQueue.indexOf(track);
 
-    state = state.copyWith(
-      currentTrack: track,
-      queue: newQueue,
-      currentIndex: index >= 0 ? index : 0,
-      position: Duration.zero,
+    await _transitionToTrack(
+      track: track,
+      command: command,
+      nextState: state.copyWith(
+        queue: newQueue,
+        currentIndex: index >= 0 ? index : 0,
+      ),
     );
-
-    _updateMediaSession(track);
-    await _repository.play(track);
-    _hasActiveMedia = true;
   }
 
   /// Play a list of [AudioTrack]s starting from [index].
@@ -281,23 +506,23 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     String? playlistName,
   }) async {
     if (tracks.isEmpty) return;
+    final command = _beginPlaybackCommand();
     index = index.clamp(0, tracks.length - 1);
 
     var track = await _ensurePlayable(tracks[index]);
+    if (!_isCurrentPlaybackCommand(command)) return;
 
     final queue = List<AudioTrack>.from(tracks)..[index] = track;
-    state = state.copyWith(
-      currentTrack: track,
-      queue: queue,
-      currentIndex: index,
-      position: Duration.zero,
-      playlistId: null,
-      playlistName: playlistName,
+    await _transitionToTrack(
+      track: track,
+      command: command,
+      nextState: state.copyWith(
+        queue: queue,
+        currentIndex: index,
+        playlistId: null,
+        playlistName: playlistName,
+      ),
     );
-
-    _updateMediaSession(track);
-    await _repository.play(track);
-    _hasActiveMedia = true;
   }
 
   /// Convert a [SongItem] to an [AudioTrack] by resolving the audio stream URL.
@@ -351,10 +576,12 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     required int playlistId,
     String? playlistName,
   }) async {
+    final command = _beginPlaybackCommand();
     final index = songs.indexWhere((s) => s.id == song.id);
 
     // Resolve current song first for immediate playback
     final track = await _resolveAudioTrack(song);
+    if (!_isCurrentPlaybackCommand(command)) return;
 
     // Build queue with placeholder tracks (will resolve on play)
     final queue = songs
@@ -379,23 +606,101 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       queue[index] = track;
     }
 
-    state = state.copyWith(
-      currentTrack: track,
-      queue: queue,
-      currentIndex: index >= 0 ? index : 0,
-      position: Duration.zero,
-      playlistId: playlistId,
-      playlistName: playlistName,
+    await _transitionToTrack(
+      track: track,
+      command: command,
+      nextState: state.copyWith(
+        queue: queue,
+        currentIndex: index >= 0 ? index : 0,
+        playlistId: playlistId,
+        playlistName: playlistName,
+      ),
     );
+  }
 
-    _updateMediaSession(track);
-    await _repository.play(track);
-    _hasActiveMedia = true;
+  /// Toggle the latest playback intent.
+  ///
+  /// The decision lives in the notifier so repeated taps before the next
+  /// widget rebuild always observe the newest intent instead of a stale UI
+  /// snapshot.
+  Future<void> togglePlayback() {
+    return state.isPlaying ? pause() : resume();
   }
 
   /// Pause the current playback.
   Future<void> pause() async {
-    await _repository.pause();
+    if (!state.isPlaying) return;
+
+    final shouldFade = _engineIsPlaying || state.isPlaying;
+    final command = _beginPlaybackCommand();
+    _setPlaybackIntent(false);
+
+    try {
+      if (!await _fadeOutForCommand(command, shouldFade: shouldFade)) return;
+      if (!_isCurrentPlaybackCommand(command)) return;
+      await _runTransportCommand(
+        command,
+        _repository.pause,
+        resultingPlaying: false,
+        skipIfEngineStateMatches: true,
+      );
+    } catch (error) {
+      if (_isCurrentPlaybackCommand(command)) {
+        _setPlaybackIntent(true);
+        try {
+          await _runTransportCommand(
+            command,
+            _repository.resume,
+            resultingPlaying: true,
+          );
+          await _fadeInForCommand(command);
+        } catch (_) {
+          // Preserve the original pause error after best-effort recovery.
+        }
+      }
+      rethrow;
+    }
+  }
+
+  /// Stop playback and reset the current position.
+  Future<void> stop() async {
+    final wasPlaying = state.isPlaying;
+    final shouldFade = _engineIsPlaying || wasPlaying;
+    final command = _beginPlaybackCommand();
+    _setPlaybackIntent(false);
+
+    try {
+      if (!await _fadeOutForCommand(command, shouldFade: shouldFade)) return;
+      if (!_isCurrentPlaybackCommand(command)) return;
+
+      final stopped = await _runTransportCommand(
+        command,
+        _repository.stop,
+        resultingPlaying: false,
+      );
+      if (!stopped) return;
+
+      _hasActiveMedia = false;
+      _setPlaybackIntent(false, position: Duration.zero);
+      await persistState();
+    } catch (error) {
+      if (_isCurrentPlaybackCommand(command)) {
+        _setPlaybackIntent(wasPlaying);
+        if (wasPlaying) {
+          try {
+            await _runTransportCommand(
+              command,
+              _repository.resume,
+              resultingPlaying: true,
+            );
+            await _fadeInForCommand(command);
+          } catch (_) {
+            // Preserve the original stop error after best-effort recovery.
+          }
+        }
+      }
+      rethrow;
+    }
   }
 
   /// Resume the current playback.
@@ -406,7 +711,9 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
   /// downloaded after the queue was built can be played offline.
   Future<void> resume() async {
     final track = state.currentTrack;
-    if (track == null) return;
+    if (track == null || state.isPlaying) return;
+    final command = _beginPlaybackCommand();
+    _setPlaybackIntent(true);
 
     // Check if the player needs to load the media first (restored state)
     if (!_hasActiveMedia) {
@@ -414,6 +721,9 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       try {
         playableTrack = await _ensurePlayable(track);
       } catch (e) {
+        if (_isCurrentPlaybackCommand(command)) {
+          _setPlaybackIntent(false);
+        }
         AppLogger.error(
           'Failed to resolve stream for resume',
           tag: 'Player',
@@ -421,38 +731,103 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         );
         return;
       }
+      if (!_isCurrentPlaybackCommand(command)) return;
 
       // Update in queue & state
       final updatedQueue = List<AudioTrack>.from(state.queue);
       if (state.currentIndex < updatedQueue.length) {
         updatedQueue[state.currentIndex] = playableTrack;
       }
-      state = state.copyWith(currentTrack: playableTrack, queue: updatedQueue);
-
       final savedPosition = state.position;
-      await _repository.play(playableTrack);
-      _hasActiveMedia = true;
-      // Seek to saved position after a short delay for media to load
-      if (savedPosition > Duration.zero) {
-        final seekDelay = ref.read(playerResumeSeekDelayProvider);
-        Future.delayed(seekDelay, () {
-          _repository.seek(savedPosition);
-        });
+      state = state.copyWith(currentTrack: playableTrack, queue: updatedQueue);
+      _updateMediaSession(playableTrack);
+
+      try {
+        await _fadeController.setImmediate(
+          _playbackFadeEnabled ? 0 : state.volume,
+        );
+        if (!_isCurrentPlaybackCommand(command)) return;
+
+        final opened = await _runTransportCommand(command, () async {
+          await _repository.play(playableTrack);
+          _hasActiveMedia = true;
+        }, resultingPlaying: true);
+        if (!opened) return;
+
+        // Keep restored playback silent until its saved position is applied.
+        if (savedPosition > Duration.zero) {
+          final seekDelay = ref.read(playerResumeSeekDelayProvider);
+          await Future<void>.delayed(seekDelay);
+          if (!_isCurrentPlaybackCommand(command)) return;
+          await _repository.seek(savedPosition);
+        }
+        await _fadeInForCommand(command);
+      } catch (error) {
+        if (_isCurrentPlaybackCommand(command)) {
+          _setPlaybackIntent(false);
+          await _fadeController.setImmediate(state.volume);
+        }
+        rethrow;
       }
       return;
     }
 
-    await _repository.resume();
+    try {
+      final resumed = await _runTransportCommand(
+        command,
+        _repository.resume,
+        resultingPlaying: true,
+        skipIfEngineStateMatches: true,
+      );
+      if (!resumed) return;
+      await _fadeInForCommand(command);
+    } catch (error) {
+      if (_isCurrentPlaybackCommand(command)) {
+        _setPlaybackIntent(false);
+        try {
+          await _runTransportCommand(
+            command,
+            _repository.pause,
+            resultingPlaying: false,
+          );
+        } catch (_) {
+          // Preserve the original resume error after best-effort recovery.
+        }
+        await _fadeController.setImmediate(
+          _playbackFadeEnabled ? 0 : state.volume,
+        );
+      }
+      rethrow;
+    }
   }
 
   /// Skip to the next track in the queue.
   Future<void> next() async {
-    if (state.queue.isEmpty) return;
+    final command = _beginPlaybackCommand();
+    await _next(command, fadeOutCurrent: true);
+  }
+
+  Future<void> _next(int command, {required bool fadeOutCurrent}) async {
+    if (state.queue.isEmpty || !_isCurrentPlaybackCommand(command)) return;
 
     final nextIndex = _getNextIndex();
     if (nextIndex == null) {
       // Sequential mode, last track finished: stop and reset to first track.
-      await _repository.stop();
+      _setPlaybackIntent(false);
+      if (fadeOutCurrent &&
+          !await _fadeOutForCommand(
+            command,
+            shouldFade: _engineIsPlaying || state.isPlaying,
+          )) {
+        return;
+      }
+      if (!_isCurrentPlaybackCommand(command)) return;
+      final stopped = await _runTransportCommand(
+        command,
+        _repository.stop,
+        resultingPlaying: false,
+      );
+      if (!stopped) return;
       _hasActiveMedia = false;
       final firstTrack = state.queue.isNotEmpty ? state.queue.first : null;
       state = state.copyWith(
@@ -462,17 +837,14 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
         position: Duration.zero,
         duration: firstTrack?.duration ?? Duration.zero,
       );
-      _audioHandler.updatePlaybackState(
-        playing: false,
-        position: Duration.zero,
-      );
+      _setPlaybackIntent(false, position: Duration.zero);
       if (firstTrack != null) {
         _audioHandler.setCurrentTrack(
           firstTrack,
           duration: firstTrack.duration,
         );
       }
-      persistState();
+      await persistState();
       return;
     }
 
@@ -484,27 +856,34 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       AppLogger.error('Failed to resolve next track', tag: 'Player', error: e);
       return;
     }
+    if (!_isCurrentPlaybackCommand(command)) return;
 
     final updatedQueue = List<AudioTrack>.from(state.queue);
     updatedQueue[nextIndex] = track;
-    state = state.copyWith(
-      queue: updatedQueue,
-      currentTrack: track,
-      currentIndex: nextIndex,
-      position: Duration.zero,
+    await _transitionToTrack(
+      track: track,
+      command: command,
+      fadeOutCurrent: fadeOutCurrent,
+      nextState: state.copyWith(queue: updatedQueue, currentIndex: nextIndex),
     );
-    _updateMediaSession(track);
-    await _repository.play(track);
-    _hasActiveMedia = true;
   }
 
   /// Skip to the previous track in the queue.
   Future<void> previous() async {
     if (state.queue.isEmpty) return;
+    final command = _beginPlaybackCommand();
 
     // If past 3 seconds, restart current track
     if (state.position.inSeconds > 3) {
+      final wasPlaying = state.isPlaying;
+      if (wasPlaying && !await _fadeOutForCommand(command, shouldFade: true)) {
+        return;
+      }
+      if (!_isCurrentPlaybackCommand(command)) return;
       await _repository.seek(Duration.zero);
+      if (wasPlaying && _isCurrentPlaybackCommand(command)) {
+        await _fadeInForCommand(command);
+      }
       return;
     }
 
@@ -520,18 +899,15 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
       AppLogger.error('Failed to resolve prev track', tag: 'Player', error: e);
       return;
     }
+    if (!_isCurrentPlaybackCommand(command)) return;
 
     final updatedQueue = List<AudioTrack>.from(state.queue);
     updatedQueue[prevIndex] = track;
-    state = state.copyWith(
-      queue: updatedQueue,
-      currentTrack: track,
-      currentIndex: prevIndex,
-      position: Duration.zero,
+    await _transitionToTrack(
+      track: track,
+      command: command,
+      nextState: state.copyWith(queue: updatedQueue, currentIndex: prevIndex),
     );
-    _updateMediaSession(track);
-    await _repository.play(track);
-    _hasActiveMedia = true;
   }
 
   /// Seek to a specific position in the current track.
@@ -555,6 +931,7 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
     if (!_hasActiveMedia) return;
     await _repository.seek(target);
+    _updateNaturalFade(target, positionWasSeek: true);
   }
 
   /// Set the playback mode (sequential, repeat, shuffle).
@@ -565,9 +942,24 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
 
   /// Set the volume level (0.0 to 1.0).
   Future<void> setVolume(double volume) async {
-    await _repository.setVolume(volume);
-    state = state.copyWith(volume: volume);
-    _mprisService?.updateVolume(volume);
+    final normalized = volume.clamp(0, 1).toDouble();
+    state = state.copyWith(volume: normalized);
+    _mprisService?.updateVolume(normalized);
+
+    if (!_playbackFadeEnabled) {
+      await _fadeController.setImmediate(normalized);
+      return;
+    }
+
+    // Fade-in reads the latest target on every step. Fade-out keeps heading
+    // to silence while this value becomes the target for the next playback.
+    if (_naturalFadeActive ||
+        _fadeController.phase == PlaybackFadePhase.fadeIn ||
+        _fadeController.phase == PlaybackFadePhase.fadeOut) {
+      return;
+    }
+
+    await _fadeController.setImmediate(normalized);
   }
 
   /// Update the songId of the current track and its queue entry.
@@ -622,17 +1014,80 @@ class PlayerNotifier extends _$PlayerNotifier with PlayerStatePersistence {
     state = state.copyWith(queue: newQueue, currentIndex: newCurrentIndex);
   }
 
-  void _onTrackCompleted() {
-    switch (state.playMode) {
-      case PlayMode.repeatOne:
-        if (state.currentTrack != null) {
-          _repository.play(state.currentTrack!);
-        }
-      case PlayMode.sequential:
-      case PlayMode.repeatAll:
-      case PlayMode.shuffle:
-        next();
+  void _updateNaturalFade(Duration position, {bool positionWasSeek = false}) {
+    final track = state.currentTrack;
+    final duration = state.duration;
+    if (!_playbackFadeEnabled ||
+        !_hasActiveMedia ||
+        !state.isPlaying ||
+        track == null ||
+        duration <= Duration.zero) {
+      return;
     }
+
+    final remaining = duration - position;
+    final fadeDuration = _playbackFadeDuration;
+    final trackKey = '${track.bvid}:${track.cid}:${state.currentIndex}';
+
+    if (_naturalFadeActive) {
+      final activeWindow = _naturalFadeWindow ?? fadeDuration;
+      final movedOutsideFadeWindow = remaining > activeWindow;
+      final trackChanged = _naturalFadeTrackKey != trackKey;
+      if (movedOutsideFadeWindow || trackChanged) {
+        _naturalFadeActive = false;
+        _naturalFadeTrackKey = null;
+        _naturalFadeWindow = null;
+        unawaited(_fadeController.setImmediate(state.volume));
+      } else if (positionWasSeek) {
+        _naturalFadeActive = false;
+        _naturalFadeTrackKey = null;
+        _naturalFadeWindow = null;
+        _fadeController.cancel();
+        _startNaturalFade(trackKey, remaining, fadeDuration);
+      }
+      return;
+    }
+
+    if (remaining <= Duration.zero || remaining > fadeDuration) return;
+
+    _startNaturalFade(trackKey, remaining, fadeDuration);
+  }
+
+  void _startNaturalFade(
+    String trackKey,
+    Duration remaining,
+    Duration fadeWindow,
+  ) {
+    _naturalFadeActive = true;
+    _naturalFadeTrackKey = trackKey;
+    _naturalFadeWindow = fadeWindow;
+    unawaited(
+      _fadeController
+          .fadeTo(
+            target: 0,
+            duration: remaining,
+            phase: PlaybackFadePhase.fadeOut,
+          )
+          .then((_) {})
+          .catchError((Object error, StackTrace stackTrace) {
+            if (_naturalFadeTrackKey == trackKey) {
+              _naturalFadeActive = false;
+              _naturalFadeTrackKey = null;
+              _naturalFadeWindow = null;
+              unawaited(_fadeController.setImmediate(state.volume));
+            }
+            AppLogger.error(
+              'Natural playback fade failed',
+              tag: 'Player',
+              error: error,
+            );
+          }),
+    );
+  }
+
+  Future<void> _onTrackCompleted() async {
+    final command = _beginPlaybackCommand();
+    await _next(command, fadeOutCurrent: false);
   }
 
   int? _getNextIndex() {

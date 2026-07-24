@@ -76,9 +76,8 @@ class _MinimalScreenState extends ConsumerState<MinimalScreen>
 
     // ── 应用被划掉：完整停止播放 + 销毁前台服务 ──
     try {
-      ref.read(playerNotifierProvider.notifier).pause();
-      // 通过 audioHandlerProvider 调用 stop()，销毁前台服务（移除通知栏、释放 WakeLock）
-      // 配合 AndroidManifest 的 stopWithTask="true" 双保险
+      // AudioHandler 的 stop 回调统一进入 PlayerNotifier.stop()，避免先 pause
+      // 再 stop 时重复启动两次渐出。
       ref.read(audioHandlerProvider).stop();
       AppLogger.info('App detached: 已停止播放并销毁音频服务', tag: 'Minimal');
     } catch (e) {

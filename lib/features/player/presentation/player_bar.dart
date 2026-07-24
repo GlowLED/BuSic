@@ -103,7 +103,7 @@ class PlayerBar extends ConsumerWidget {
             track: track,
             progress: progress,
             isPlaying: playerState.isPlaying,
-            onPlayPause: () => _togglePlayback(ref, playerState.isPlaying),
+            onPlayPause: () => _togglePlayback(ref),
             onShowQueue: track == null ? null : () => _showQueueSheet(context),
           );
         }
@@ -116,7 +116,7 @@ class PlayerBar extends ConsumerWidget {
           playModeLabel: _playModeLabel,
           nextMode: _nextMode,
           qualityLabel: _qualityLabel,
-          onPlayPause: () => _togglePlayback(ref, playerState.isPlaying),
+          onPlayPause: () => _togglePlayback(ref),
           onShowComments: track == null
               ? null
               : () => _showCommentsSheet(context, track.bvid),
@@ -125,13 +125,8 @@ class PlayerBar extends ConsumerWidget {
     );
   }
 
-  void _togglePlayback(WidgetRef ref, bool isPlaying) {
-    final notifier = ref.read(playerNotifierProvider.notifier);
-    if (isPlaying) {
-      notifier.pause();
-    } else {
-      notifier.resume();
-    }
+  void _togglePlayback(WidgetRef ref) {
+    ref.read(playerNotifierProvider.notifier).togglePlayback();
   }
 
   void _showQueueSheet(BuildContext context) {

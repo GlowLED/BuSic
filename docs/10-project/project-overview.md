@@ -97,6 +97,7 @@ lib/
 - `PlayerNotifier` 是 `keepAlive`
 - 播放器恢复时会重新解析 URL 或补查本地缓存路径
 - 下载完成会触发队列的 `localPath` 刷新
+- 默认在播放、暂停、停止、切歌和自然结尾使用可配置的音量渐入渐出；`PlayerState.volume` 始终保留用户目标音量，`PlayerState.isPlaying` 表示即时 UI 意图，快速反向操作从当前瞬时音量继续
 
 ### `playlist`
 

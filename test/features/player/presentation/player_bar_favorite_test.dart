@@ -17,6 +17,7 @@ import 'package:busic/features/player/domain/models/audio_track.dart';
 import 'package:busic/features/player/domain/models/play_mode.dart';
 import 'package:busic/features/player/presentation/player_bar.dart';
 import 'package:busic/features/player/presentation/widgets/draggable_progress_bar.dart';
+import 'package:busic/features/player/presentation/widgets/player_controls.dart';
 import 'package:busic/features/search_and_parse/data/parse_repository.dart';
 import 'package:busic/features/search_and_parse/domain/models/audio_stream_info.dart';
 import 'package:busic/features/search_and_parse/domain/models/bili_fav_folder.dart';
@@ -256,6 +257,103 @@ void main() {
       expect(transformStorage(), pausedStorage);
     });
   });
+
+  group('播放意图即时反馈', () {
+    testWidgets('PlayerBar 点击后下一帧立即切换播放暂停图标', (tester) async {
+      final songId = await _seedSong(
+        db,
+        bvid: 'BVbarintent01',
+        cid: 3001,
+        title: '底栏即时状态',
+      );
+      await _seedPlayerPreferences(
+        track: _track(
+          songId: songId,
+          bvid: 'BVbarintent01',
+          cid: 3001,
+          title: '底栏即时状态',
+        ),
+      );
+      final fadeDelay = _SwitchableFadeDelay();
+
+      await tester.pumpWidget(
+        _buildSubject(
+          db: db,
+          fakeAudioHandler: fakeAudioHandler,
+          fakePlayerRepository: fakePlayerRepository,
+          width: 390,
+          fadeDelay: fadeDelay.call,
+        ),
+      );
+      await _settle(tester);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await _settle(tester);
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+      await _settle(tester);
+
+      fadeDelay.gated = true;
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+    });
+
+    testWidgets('PlayerControls 点击后下一帧立即切换播放暂停图标', (tester) async {
+      final songId = await _seedSong(
+        db,
+        bvid: 'BVcontrolsintent01',
+        cid: 3002,
+        title: '全屏即时状态',
+      );
+      await _seedPlayerPreferences(
+        track: _track(
+          songId: songId,
+          bvid: 'BVcontrolsintent01',
+          cid: 3002,
+          title: '全屏即时状态',
+        ),
+      );
+      final fadeDelay = _SwitchableFadeDelay();
+
+      await tester.pumpWidget(
+        _buildControlsSubject(
+          db: db,
+          fakeAudioHandler: fakeAudioHandler,
+          fakePlayerRepository: fakePlayerRepository,
+          fadeDelay: fadeDelay.call,
+        ),
+      );
+      await _settle(tester);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await _settle(tester);
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+      await _settle(tester);
+
+      fadeDelay.gated = true;
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+    });
+  });
 }
 
 Widget _buildSubject({
@@ -263,6 +361,7 @@ Widget _buildSubject({
   required _FakeAudioHandler fakeAudioHandler,
   required _FakePlayerRepository fakePlayerRepository,
   double width = 720,
+  Future<void> Function(Duration)? fadeDelay,
 }) {
   return ProviderScope(
     overrides: [
@@ -271,8 +370,33 @@ Widget _buildSubject({
       playerRepositoryProvider.overrideWithValue(fakePlayerRepository),
       playerParseRepositoryProvider.overrideWithValue(_FakeParseRepository()),
       playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
+      playerFadeDelayProvider.overrideWithValue(fadeDelay ?? (_) async {}),
     ],
     child: buildTestApp(SizedBox(width: width, child: const PlayerBar())),
+  );
+}
+
+Widget _buildControlsSubject({
+  required AppDatabase db,
+  required _FakeAudioHandler fakeAudioHandler,
+  required _FakePlayerRepository fakePlayerRepository,
+  Future<void> Function(Duration)? fadeDelay,
+}) {
+  return ProviderScope(
+    overrides: [
+      databaseProvider.overrideWithValue(db),
+      audioHandlerProvider.overrideWithValue(fakeAudioHandler),
+      playerRepositoryProvider.overrideWithValue(fakePlayerRepository),
+      playerParseRepositoryProvider.overrideWithValue(_FakeParseRepository()),
+      playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
+      playerFadeDelayProvider.overrideWithValue(fadeDelay ?? (_) async {}),
+    ],
+    child: buildTestApp(
+      const ColoredBox(
+        color: Colors.black,
+        child: Center(child: PlayerControls()),
+      ),
+    ),
   );
 }
 
@@ -469,3 +593,15 @@ class _FakeParseRepository implements ParseRepository {
 }
 
 class _FakeAudioHandler extends BusicAudioHandler {}
+
+class _SwitchableFadeDelay {
+  final List<Completer<void>> _pending = [];
+  bool gated = false;
+
+  Future<void> call(Duration duration) {
+    if (!gated || duration == Duration.zero) return Future<void>.value();
+    final completer = Completer<void>();
+    _pending.add(completer);
+    return completer.future;
+  }
+}

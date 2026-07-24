@@ -15,6 +15,9 @@ _UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
       cachePath: json['cachePath'] as String?,
       preferredQuality: (json['preferredQuality'] as num?)?.toInt() ?? 0,
       themeSeedColor: (json['themeSeedColor'] as num?)?.toInt() ?? 0xFF4CAF50,
+      playbackFadeEnabled: json['playbackFadeEnabled'] as bool? ?? true,
+      playbackFadeDurationMs:
+          (json['playbackFadeDurationMs'] as num?)?.toInt() ?? 1000,
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
@@ -24,6 +27,8 @@ Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
       'cachePath': instance.cachePath,
       'preferredQuality': instance.preferredQuality,
       'themeSeedColor': instance.themeSeedColor,
+      'playbackFadeEnabled': instance.playbackFadeEnabled,
+      'playbackFadeDurationMs': instance.playbackFadeDurationMs,
     };
 
 const _$ThemeModeEnumMap = {

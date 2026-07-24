@@ -32,6 +32,7 @@ void main() {
   late _FakePlayerRepository fakePlayerRepository;
   late _FakeParseRepository fakeParseRepository;
   late _FakeAudioHandler fakeAudioHandler;
+  late _SwitchableFadeDelay fadeDelay;
   late ProviderContainer container;
 
   setUp(() {
@@ -40,6 +41,7 @@ void main() {
     fakePlayerRepository = _FakePlayerRepository();
     fakeParseRepository = _FakeParseRepository();
     fakeAudioHandler = _FakeAudioHandler();
+    fadeDelay = _SwitchableFadeDelay();
     container = ProviderContainer(
       overrides: [
         databaseProvider.overrideWithValue(db),
@@ -48,6 +50,10 @@ void main() {
         playerParseRepositoryProvider.overrideWithValue(fakeParseRepository),
         playerMprisServiceProvider.overrideWithValue(null),
         playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
+        playerFadeTickIntervalProvider.overrideWithValue(
+          const Duration(milliseconds: 500),
+        ),
+        playerFadeDelayProvider.overrideWithValue(fadeDelay.call),
       ],
     );
   });
@@ -67,6 +73,10 @@ void main() {
           playerParseRepositoryProvider.overrideWithValue(fakeParseRepository),
           playerMprisServiceProvider.overrideWithValue(null),
           playerResumeSeekDelayProvider.overrideWithValue(Duration.zero),
+          playerFadeTickIntervalProvider.overrideWithValue(
+            const Duration(milliseconds: 500),
+          ),
+          playerFadeDelayProvider.overrideWithValue(fadeDelay.call),
         ],
       );
 
@@ -269,6 +279,454 @@ void main() {
       expect(fakeAudioHandler.lastPosition, const Duration(seconds: 30));
     });
 
+    test('新曲从静音渐入且目标音量状态保持不变', () async {
+      final track = _track(
+        songId: 21,
+        title: '渐入歌曲',
+        streamUrl: 'https://example.com/fade-in.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await _settle();
+      fakePlayerRepository.volumeCalls.clear();
+
+      await notifier.playTrack(track, queue: [track]);
+
+      expect(fakePlayerRepository.volumeCalls, [0, 0.5, 1]);
+      expect(container.read(playerNotifierProvider).volume, 1);
+      expect(fakePlayerRepository.playedTracks.single, track);
+    });
+
+    test('从暂停状态选择新曲会立即切换为播放意图', () async {
+      final first = _track(
+        songId: 39,
+        title: '即时意图旧曲',
+        streamUrl: 'https://example.com/immediate-old.m4s',
+      );
+      final second = _track(
+        songId: 40,
+        title: '即时意图新曲',
+        streamUrl: 'https://example.com/immediate-new.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(first, queue: [first, second]);
+      await notifier.pause();
+
+      final playFuture = notifier.playTrack(second, queue: [first, second]);
+
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      expect(fakeAudioHandler.lastPlaying, isTrue);
+
+      await playFuture;
+      expect(container.read(playerNotifierProvider).currentTrack, second);
+    });
+
+    test('暂停状态切换新曲失败时恢复原意图和实际静音音量', () async {
+      final first = _track(
+        songId: 41,
+        title: '失败回滚旧曲',
+        streamUrl: 'https://example.com/rollback-old.m4s',
+      );
+      final second = _track(
+        songId: 42,
+        title: '失败回滚新曲',
+        streamUrl: 'https://example.com/rollback-new.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(first, queue: [first, second]);
+      await notifier.pause();
+      fakePlayerRepository.volumeCalls.clear();
+      fakePlayerRepository.playError = StateError('play failed');
+
+      await expectLater(
+        notifier.playTrack(second, queue: [first, second]),
+        throwsA(isA<StateError>()),
+      );
+
+      final state = container.read(playerNotifierProvider);
+      expect(state.currentTrack, first);
+      expect(state.isPlaying, isFalse);
+      expect(fakeAudioHandler.lastPlaying, isFalse);
+      expect(fakePlayerRepository.volumeCalls, isNot(contains(1)));
+      expect(fakePlayerRepository.volumeCalls.last, 0);
+    });
+
+    test('暂停先渐出到静音再暂停且恢复时重新渐入', () async {
+      final track = _track(
+        songId: 22,
+        title: '暂停渐变歌曲',
+        streamUrl: 'https://example.com/pause-fade.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+
+      await notifier.pause();
+      expect(fakePlayerRepository.volumeCalls, [0.5, 0]);
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+
+      fakePlayerRepository.volumeCalls.clear();
+      await notifier.resume();
+      expect(fakePlayerRepository.volumeCalls, [0.5, 1]);
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+    });
+
+    test('暂停点击后立即更新意图并在渐出完成后暂停引擎', () async {
+      final track = _track(
+        songId: 31,
+        title: '即时暂停状态歌曲',
+        streamUrl: 'https://example.com/immediate-pause.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+      fadeDelay.gated = true;
+
+      final pauseFuture = notifier.pause();
+      await fadeDelay.waitForPendingCount(1);
+
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+      expect(fakeAudioHandler.lastPlaying, isFalse);
+      expect(fakePlayerRepository.pauseCallCount, 0);
+
+      fadeDelay.completeNext();
+      await fadeDelay.waitForPendingCount(1);
+      fadeDelay.completeNext();
+      await pauseFuture;
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 0]);
+      expect(fakePlayerRepository.pauseCallCount, 1);
+    });
+
+    test('恢复点击后立即更新意图且不会先把当前音量强制归零', () async {
+      final track = _track(
+        songId: 32,
+        title: '即时恢复状态歌曲',
+        streamUrl: 'https://example.com/immediate-resume.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      await notifier.pause();
+      fakePlayerRepository.volumeCalls.clear();
+      fadeDelay.gated = true;
+
+      final resumeFuture = notifier.resume();
+      await fadeDelay.waitForPendingCount(1);
+
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      expect(fakeAudioHandler.lastPlaying, isTrue);
+      expect(fakePlayerRepository.resumeCallCount, 1);
+      expect(fakePlayerRepository.volumeCalls, isEmpty);
+
+      fadeDelay.completeNext();
+      await fadeDelay.waitForPendingCount(1);
+      fadeDelay.completeNext();
+      await resumeFuture;
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 1]);
+    });
+
+    test('渐出一半时恢复会从当前音量平滑反向且旧暂停失效', () async {
+      final track = _track(
+        songId: 33,
+        title: '渐出反向歌曲',
+        streamUrl: 'https://example.com/reverse-fade-out.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+      fadeDelay.gated = true;
+
+      final pauseFuture = notifier.pause();
+      await fadeDelay.waitForPendingCount(1);
+      fadeDelay.completeNext();
+      await fadeDelay.waitForPendingCount(1);
+      expect(fakePlayerRepository.volumeCalls, [0.5]);
+
+      final resumeFuture = notifier.resume();
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      await fadeDelay.waitForPendingCount(2);
+      expect(fakePlayerRepository.volumeCalls, [0.5]);
+
+      fadeDelay.completeNext();
+      fadeDelay.completeNext();
+      await Future.wait([pauseFuture, resumeFuture]);
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 1]);
+      expect(fakePlayerRepository.pauseCallCount, 0);
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+    });
+
+    test('渐入一半时暂停会从当前音量平滑反向并保留暂停意图', () async {
+      final track = _track(
+        songId: 34,
+        title: '渐入反向歌曲',
+        streamUrl: 'https://example.com/reverse-fade-in.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      await notifier.pause();
+      fakePlayerRepository.pauseCallCount = 0;
+      fakePlayerRepository.volumeCalls.clear();
+      fadeDelay.gated = true;
+
+      final resumeFuture = notifier.resume();
+      await fadeDelay.waitForPendingCount(1);
+      fadeDelay.completeNext();
+      await fadeDelay.waitForPendingCount(1);
+      expect(fakePlayerRepository.volumeCalls, [0.5]);
+
+      final pauseFuture = notifier.pause();
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+      await fadeDelay.waitForPendingCount(2);
+
+      fadeDelay.completeNext();
+      fadeDelay.completeNext();
+      await Future.wait([resumeFuture, pauseFuture]);
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 0]);
+      expect(fakePlayerRepository.pauseCallCount, 1);
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+    });
+
+    test('快速暂停播放反复点击始终以最后一次播放意图为准', () async {
+      final track = _track(
+        songId: 38,
+        title: '快速反复点击歌曲',
+        streamUrl: 'https://example.com/rapid-toggle.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+      fadeDelay.gated = true;
+
+      final pauseOne = notifier.pause();
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+      await fadeDelay.waitForPendingCount(1);
+
+      final resumeOne = notifier.resume();
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      final pauseTwo = notifier.pause();
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+      await fadeDelay.waitForPendingCount(2);
+
+      final resumeTwo = notifier.resume();
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+
+      fadeDelay.completeNext();
+      fadeDelay.completeNext();
+      await Future.wait([pauseOne, resumeOne, pauseTwo, resumeTwo]);
+
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      expect(fakePlayerRepository.pauseCallCount, 0);
+      expect(fakePlayerRepository.volumeCalls, isNot(contains(0)));
+    });
+
+    test('旧暂停已进入引擎时恢复命令仍会在其后执行', () async {
+      final track = _track(
+        songId: 35,
+        title: '传输串行歌曲',
+        streamUrl: 'https://example.com/serialized-transport.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      final pauseGate = Completer<void>();
+      fakePlayerRepository.pauseGate = pauseGate;
+
+      final pauseFuture = notifier.pause();
+      while (fakePlayerRepository.pauseCallCount == 0) {
+        await Future<void>.delayed(Duration.zero);
+      }
+
+      final resumeFuture = notifier.resume();
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      expect(fakePlayerRepository.resumeCallCount, 0);
+
+      pauseGate.complete();
+      await Future.wait([pauseFuture, resumeFuture]);
+
+      expect(fakePlayerRepository.resumeCallCount, 1);
+      expect(fakePlayerRepository.transportCalls, ['pause', 'resume']);
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+    });
+
+    test('暂停失败时只回滚当前命令并恢复播放意图与音量', () async {
+      final track = _track(
+        songId: 36,
+        title: '暂停失败恢复歌曲',
+        streamUrl: 'https://example.com/pause-failure.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+      fakePlayerRepository.transportCalls.clear();
+      fakePlayerRepository.pauseError = StateError('pause failed');
+
+      await expectLater(notifier.pause(), throwsA(isA<StateError>()));
+
+      expect(container.read(playerNotifierProvider).isPlaying, isTrue);
+      expect(fakeAudioHandler.lastPlaying, isTrue);
+      expect(fakePlayerRepository.transportCalls, ['pause', 'resume']);
+      expect(fakePlayerRepository.volumeCalls.last, 1);
+    });
+
+    test('恢复失败时回滚暂停意图并保持底层静音', () async {
+      final track = _track(
+        songId: 37,
+        title: '恢复失败回滚歌曲',
+        streamUrl: 'https://example.com/resume-failure.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      await notifier.pause();
+      fakePlayerRepository.volumeCalls.clear();
+      fakePlayerRepository.transportCalls.clear();
+      fakePlayerRepository.resumeError = StateError('resume failed');
+
+      await expectLater(notifier.resume(), throwsA(isA<StateError>()));
+
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+      expect(fakeAudioHandler.lastPlaying, isFalse);
+      expect(fakePlayerRepository.transportCalls, ['resume', 'pause']);
+      expect(fakePlayerRepository.volumeCalls, [0]);
+    });
+
+    test('手动切歌先渐出旧曲再让新曲渐入', () async {
+      final first = _track(
+        songId: 23,
+        title: '切歌第一首',
+        streamUrl: 'https://example.com/first.m4s',
+      );
+      final second = _track(
+        songId: 24,
+        title: '切歌第二首',
+        streamUrl: 'https://example.com/second.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(first, queue: [first, second]);
+      fakePlayerRepository.volumeCalls.clear();
+
+      await notifier.next();
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 0, 0, 0.5, 1]);
+      expect(fakePlayerRepository.playedTracks.last.title, '切歌第二首');
+      expect(container.read(playerNotifierProvider).currentIndex, 1);
+    });
+
+    test('自然结束前渐出且完成事件切歌时不重复渐出', () async {
+      final first = _track(
+        songId: 25,
+        title: '自然结束第一首',
+        streamUrl: 'https://example.com/natural-first.m4s',
+      );
+      final second = _track(
+        songId: 26,
+        title: '自然结束第二首',
+        streamUrl: 'https://example.com/natural-second.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(first, queue: [first, second]);
+      fakePlayerRepository.volumeCalls.clear();
+
+      fakePlayerRepository.emitPosition(
+        const Duration(minutes: 2, seconds: 59, milliseconds: 500),
+      );
+      await _settle();
+      expect(fakePlayerRepository.volumeCalls, [0]);
+
+      fakePlayerRepository.emitCompleted();
+      await _settle();
+
+      expect(fakePlayerRepository.volumeCalls, [0, 0, 0.5, 1]);
+      expect(fakePlayerRepository.playedTracks.last.title, '自然结束第二首');
+    });
+
+    test('单曲循环自然结束后重新打开当前歌曲并渐入', () async {
+      final track = _track(
+        songId: 29,
+        title: '单曲循环歌曲',
+        streamUrl: 'https://example.com/repeat-one.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      notifier.setMode(PlayMode.repeatOne);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+
+      fakePlayerRepository.emitPosition(
+        const Duration(minutes: 2, seconds: 59, milliseconds: 500),
+      );
+      await _settle();
+      fakePlayerRepository.emitCompleted();
+      await _settle();
+
+      expect(fakePlayerRepository.playedTracks, [track, track]);
+      expect(fakePlayerRepository.volumeCalls, [0, 0, 0.5, 1]);
+      expect(container.read(playerNotifierProvider).currentIndex, 0);
+    });
+
+    test('从歌曲末尾跳回渐变窗口外会取消自然渐出并恢复目标音量', () async {
+      final track = _track(
+        songId: 30,
+        title: '跳出渐变窗口歌曲',
+        streamUrl: 'https://example.com/seek-out.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.volumeCalls.clear();
+
+      fakePlayerRepository.emitPosition(
+        const Duration(minutes: 2, seconds: 59, milliseconds: 500),
+      );
+      await _settle();
+      expect(fakePlayerRepository.volumeCalls, [0]);
+
+      await notifier.seekTo(const Duration(seconds: 30));
+      await _settle();
+
+      expect(fakePlayerRepository.volumeCalls.last, 1);
+      expect(
+        container.read(playerNotifierProvider).position,
+        const Duration(seconds: 30),
+      );
+    });
+
+    test('关闭播放渐变后播放和暂停保持即时行为', () async {
+      SharedPreferences.setMockInitialValues({'playback_fade_enabled': false});
+      final track = _track(
+        songId: 27,
+        title: '无渐变歌曲',
+        streamUrl: 'https://example.com/no-fade.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await _settle();
+      fakePlayerRepository.volumeCalls.clear();
+
+      await notifier.playTrack(track, queue: [track]);
+      await notifier.pause();
+
+      expect(fakePlayerRepository.volumeCalls, [1]);
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+    });
+
+    test('stop 渐出后重置位置并清除活动播放状态', () async {
+      final track = _track(
+        songId: 28,
+        title: '停止歌曲',
+        streamUrl: 'https://example.com/stop.m4s',
+      );
+      final notifier = container.read(playerNotifierProvider.notifier);
+      await notifier.playTrack(track, queue: [track]);
+      fakePlayerRepository.emitPosition(const Duration(seconds: 20));
+      await _settle();
+      fakePlayerRepository.volumeCalls.clear();
+
+      await notifier.stop();
+
+      expect(fakePlayerRepository.volumeCalls, [0.5, 0]);
+      expect(fakePlayerRepository.stopCallCount, 1);
+      expect(container.read(playerNotifierProvider).position, Duration.zero);
+      expect(container.read(playerNotifierProvider).isPlaying, isFalse);
+    });
+
     test('resume 会忽略不存在的本地路径并重新解析远端流', () async {
       final tempDir = await Directory.systemTemp.createTemp(
         'player_missing_local_',
@@ -450,10 +908,22 @@ class _FakePlayerRepository implements PlayerRepository {
   final List<AudioTrack> playedTracks = [];
   final List<Duration> seekCalls = [];
   final List<double> volumeCalls = [];
+  final List<String> transportCalls = [];
+  Completer<void>? pauseGate;
+  Completer<void>? resumeGate;
+  Object? playError;
+  Object? pauseError;
+  Object? resumeError;
+  int pauseCallCount = 0;
+  int resumeCallCount = 0;
   int stopCallCount = 0;
 
   void emitPosition(Duration position) {
     _positionController.add(position);
+  }
+
+  void emitCompleted() {
+    _completedController.add(null);
   }
 
   @override
@@ -472,12 +942,17 @@ class _FakePlayerRepository implements PlayerRepository {
 
   @override
   Future<void> pause() async {
+    pauseCallCount++;
+    transportCalls.add('pause');
+    await pauseGate?.future;
+    if (pauseError != null) throw pauseError!;
     _playingController.add(false);
   }
 
   @override
   Future<void> play(AudioTrack track) async {
     playedTracks.add(track);
+    if (playError != null) throw playError!;
     _playingController.add(true);
     _durationController.add(track.duration);
   }
@@ -490,6 +965,10 @@ class _FakePlayerRepository implements PlayerRepository {
 
   @override
   Future<void> resume() async {
+    resumeCallCount++;
+    transportCalls.add('resume');
+    await resumeGate?.future;
+    if (resumeError != null) throw resumeError!;
     _playingController.add(true);
   }
 
@@ -508,6 +987,33 @@ class _FakePlayerRepository implements PlayerRepository {
   Future<void> stop() async {
     stopCallCount++;
     _playingController.add(false);
+  }
+}
+
+class _SwitchableFadeDelay {
+  final List<Completer<void>> _pending = [];
+  bool gated = false;
+
+  Future<void> call(Duration duration) {
+    if (!gated || duration == Duration.zero) return Future<void>.value();
+    final completer = Completer<void>();
+    _pending.add(completer);
+    return completer.future;
+  }
+
+  Future<void> waitForPendingCount(int count) async {
+    for (var attempt = 0; attempt < 100; attempt++) {
+      if (_pending.length >= count) return;
+      await Future<void>.delayed(Duration.zero);
+    }
+    fail('Timed out waiting for $count pending fade delays');
+  }
+
+  void completeNext() {
+    if (_pending.isEmpty) {
+      fail('No pending fade delay to complete');
+    }
+    _pending.removeAt(0).complete();
   }
 }
 

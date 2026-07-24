@@ -281,6 +281,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preferredQuality => '首选音质';
 
   @override
+  String get playbackFade => '播放渐入渐出';
+
+  @override
+  String get playbackFadeDescription => '在播放开始、停止或切歌时平滑调整音量';
+
+  @override
+  String get playbackFadeDuration => '渐变时长';
+
+  @override
+  String get halfSecond => '0.5 秒';
+
+  @override
+  String get oneSecond => '1 秒';
+
+  @override
+  String get twoSeconds => '2 秒';
+
+  @override
   String get about => '关于';
 
   @override

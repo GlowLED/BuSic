@@ -18,7 +18,10 @@ mixin _$PlayerState {
  AudioTrack? get currentTrack;/// The playback queue (ordered list of tracks).
  List<AudioTrack> get queue;/// Current playback position.
  Duration get position;/// Total duration of the current track.
- Duration get duration;/// Whether audio is currently playing (not paused/stopped).
+ Duration get duration;/// The user's latest playback intent shown by UI and media controls.
+///
+/// During a pause fade-out this becomes false before the engine pauses;
+/// during resume it becomes true before the fade-in completes.
  bool get isPlaying;/// Current playback mode.
  PlayMode get playMode;/// Current volume level (0.0 to 1.0).
  double get volume;/// Index of the current track in the queue.
@@ -255,7 +258,10 @@ class _PlayerState implements PlayerState {
 @override@JsonKey() final  Duration position;
 /// Total duration of the current track.
 @override@JsonKey() final  Duration duration;
-/// Whether audio is currently playing (not paused/stopped).
+/// The user's latest playback intent shown by UI and media controls.
+///
+/// During a pause fade-out this becomes false before the engine pauses;
+/// during resume it becomes true before the fade-in completes.
 @override@JsonKey() final  bool isPlaying;
 /// Current playback mode.
 @override@JsonKey() final  PlayMode playMode;
