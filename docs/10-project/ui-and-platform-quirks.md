@@ -59,7 +59,22 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 - `lib/core/window/tray_service.dart`
 - `lib/core/window/window_service.dart`
 
-## 5. 极简模式不是普通主题变体
+## 5. macOS App Sandbox 网络权限
+
+macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 entitlement 都必须声明：
+
+- `com.apple.security.network.client = true`
+
+该权限是所有出站网络请求的共同前提。缺失时，更新检查、B 站接口、网络封面和内置 Web 登录会统一出现 `SocketException: Operation not permitted`；这不是 Dio、目标站点或 CocoaPods 故障。
+
+当前真源：
+
+- `macos/Runner/DebugProfile.entitlements`
+- `macos/Runner/Release.entitlements`
+
+修改 macOS 签名或沙箱配置时必须同时检查两份文件，避免 Debug 可用但 Release 失去网络能力。
+
+## 6. 极简模式不是普通主题变体
 
 极简模式当前是：
 - 独立路由 `/minimal`
@@ -68,7 +83,7 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 - 有自己的独立生命周期策略
 - 它不是点击底部播放栏后打开的全屏播放页；全屏播放页是独立路由 `/player`
 
-## 6. 极简模式生命周期策略
+## 7. 极简模式生命周期策略
 
 这是 BuSic 很特化的一条规则：
 - `paused / resumed / hidden`：**不干预播放**
@@ -77,7 +92,7 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 原因是 Flutter 无法可靠区分锁屏和切后台。
 如果在 `paused` 里暂停，锁屏听歌会断；如果在 `resumed` 里做播放切换，解锁会误触发。
 
-## 7. 全屏播放器与其他页面的手势关系
+## 8. 全屏播放器与其他页面的手势关系
 
 全屏播放器并不只是一个静态页面：
 - 点击底部 `PlayerBar` 的封面或歌曲信息会进入独立路由 `/player`
@@ -90,7 +105,7 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 
 改全屏播放器 UI 时，不要只看单个 Widget，还要看整套 PageView 与手势冲突。
 
-## 8. 最常见误区
+## 9. 最常见误区
 
 - 以为桌面端关闭就等于退出
 - 以为极简模式只是换皮
@@ -99,7 +114,7 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 - 以为移动端横屏仍然使用底部文字导航
 - 只在一个平台验证就提交
 
-## 9. 修改这部分时要一起看什么？
+## 10. 修改这部分时要一起看什么？
 
 - `lib/shared/widgets/responsive_scaffold.dart`
 - `lib/shared/widgets/desktop_window_resize_frame.dart`
