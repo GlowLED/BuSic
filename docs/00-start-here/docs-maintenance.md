@@ -245,3 +245,15 @@ BuSic 的 docs 统一遵守以下原则：
 这些文档不应被写成教学型长文，否则会降低冷启动效率。
 
 尤其是 `00-start-here/agent-quickstart.md` 里的高频命令说明，要明确标注沙箱行为和提权预期；不要只列命令，不写 agent 在当前环境里怎么执行它们。
+
+## 9. 维护收尾检查
+
+每次集中维护 `docs/` 后至少完成这些检查：
+
+1. 用 `rg --files docs | sort` 核对目录结构与导航描述。
+2. 用 `rg --files test -g '*_test.dart' | sort` 核对 `testing-guide.md` 的覆盖矩阵。
+3. 对照 `source-of-truth.md` 列出的代码、CI、Manifest 和版本文件复核易漂移事实。
+4. 验证所有本地 Markdown 链接都能解析，且默认阅读路径不会误入 `90-archive/`。
+5. 用 `git diff --check -- docs` 检查空白错误，再用 `git diff -- docs` 审阅最终范围。
+
+文档维护不应顺手改业务代码；如果审计发现代码问题，只记录真源和风险，另开开发任务处理。

@@ -23,7 +23,7 @@
 - `flutter analyze` 输出 `No issues found!`
 - `flutter test` 全量通过
 
-测试数量不要在本文长期固定；实际数量以最新一次 `flutter test -r expanded` 输出为准。维护覆盖矩阵时先用 `find test -type f -name '*_test.dart'` 重新核对测试文件。
+测试数量不要在本文长期固定；实际数量以最新一次 `flutter test -r expanded` 输出为准。维护覆盖矩阵时先用 `rg --files test -g '*_test.dart'` 重新核对测试文件。
 
 CI 当前执行顺序与本地保持一致：
 
@@ -235,14 +235,14 @@ group('备份导出不含下载路径', () {
 | `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
 | `features/app_update` | `data` + `domain/models` | 覆盖较好 | 后续补 `application` / `presentation` |
 | `features/download` | `download_cache_mechanism_test.dart` + `presentation/download_screen_test.dart` | 缓存主链路与下载页缓存语义已覆盖 | 后续补 Notifier 边界回归 |
-| `features/playlist` | `presentation/widgets/playlist_tile_test.dart` | 覆盖偏浅 | 优先补 `data` / `application` |
-| `features/search_and_parse` | `data` 层 3 个文件 + `application` + `domain/models` + `presentation` 层 2 个文件 | 覆盖较好 | 后续补 `presentation/search_screen.dart` 交互回归 |
+| `features/playlist` | `presentation/playlist_list_screen_test.dart` + `presentation/widgets/playlist_tile_test.dart` | 页面与卡片已有回归，数据和状态层仍偏浅 | 优先补 `data` / `application` |
+| `features/search_and_parse` | `data` 层 2 个文件 + `application` + `domain/models` + `presentation` 层 3 个文件 | 搜索、解析、视频互动与详情 UI 覆盖较好 | 后续按真实 bug 补分页和交互边界 |
 | `features/settings` | `application/settings_notifier_test.dart` | 局部覆盖 | 改设置持久化时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
-| `features/auth` | `domain/bili_login_cookies_test.dart` + `data/auth_repository_impl_test.dart` + `application/auth_notifier_test.dart` + `presentation/login_screen_test.dart` | Cookie 解析、登录校验、会话编排和三登录入口 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
-| `features/comment` | `presentation/comment_text_selection_test.dart` | 文本选择已覆盖 | 需要新增请求适配和状态测试 |
+| `features/auth` | `domain` 1 个 + `data` 2 个 + `application` 2 个 + `presentation` 1 个测试文件 | Cookie 解析、登录校验、Web 登录可用性、Linux 托管浏览器、会话编排和登录 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
+| `features/comment` | `presentation/comment_section_appearance_test.dart` + `presentation/comment_text_selection_test.dart` | 评论外观和文本选择已覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
-| `features/player` | `application/player_notifier_test.dart` + `presentation/player_bar_favorite_test.dart` + `presentation/widgets/player_section_switcher_test.dart` + `presentation/widgets/draggable_progress_bar_test.dart` | 主链路状态、收藏显示和关键控件已覆盖 | 后续补 `presentation/full_player_screen.dart` 交互回归 |
+| `features/player` | `application/player_notifier_test.dart` + `presentation` 层 5 个测试文件 | 主链路状态、MPRIS 禁用边界、收藏显示、封面、AppBar、分段切换和进度条已覆盖 | 后续补 `presentation/full_player_screen.dart` 整页交互回归 |
 | `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` + `presentation/widgets/lyrics_panel_test.dart` | 缓存、重试、当前曲目终态和错误重试 UI 已覆盖 | 后续补播放器时间轴与歌词滚动联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 
@@ -261,17 +261,17 @@ group('备份导出不含下载路径', () {
 ### P1
 
 - 为已部分覆盖 feature 补齐层级缺口
-- 优先顺序：`comment` -> `playlist` -> `search_and_parse` -> `settings` -> `app_update`
+- 优先顺序：`comment` -> `playlist` -> `settings` -> `app_update`
 
 原因：
 
-- `comment` 仅有 presentation 层文本选择测试，缺少请求适配和状态测试
+- `comment` 仍只有 presentation 层外观与文本选择测试，缺少请求适配和状态测试
 - 其余已有局部测试，继续补齐成本更低
 - 有利于把目录结构逐步拉回推荐形态
 
 ### P2
 
-- 继续加深 `player` / `subtitle` / `download` / `share` 的 `presentation` 或更细粒度状态回归；`auth` 后续重点是平台 WebView 行为验证
+- 继续加深 `player` / `search_and_parse` / `subtitle` / `download` / `share` 的 `presentation` 或更细粒度状态回归；`auth` 后续重点是平台 WebView 行为验证
 
 原因：
 

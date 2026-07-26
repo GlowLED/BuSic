@@ -19,7 +19,7 @@
 ## 2. 启动与路由
 
 - `lib/main.dart`
-  - 启动初始化、数据库注入、音频服务、窗口 / 托盘、极简模式入口
+  - 启动初始化、数据库注入、音频服务、窗口 / 托盘
 
 - `lib/app.dart`
   - `MaterialApp.router`、主题、多语言、静默更新检查
@@ -104,6 +104,12 @@
 
 - `lib/core/window/tray_service.dart`
   - 托盘行为
+
+- `lib/core/services/mpris_service.dart`
+  - Linux MPRIS / D-Bus 媒体控制实现
+
+- `lib/features/player/application/player_notifier.dart`
+  - MPRIS 的 Linux-only Provider、播放器桥接和空安全销毁
 
 - `lib/features/minimal/presentation/minimal_screen.dart`
   - 极简模式生命周期策略

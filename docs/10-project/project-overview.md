@@ -89,12 +89,14 @@ lib/
 - 当前播放状态
 - 队列管理
 - 锁屏 / 通知栏媒体控制
+- Linux 桌面 MPRIS 媒体控制
 - 恢复上次播放状态
 - 离线优先播放
 
 最重要的实现点：
 
 - `PlayerNotifier` 是 `keepAlive`
+- `playerMprisServiceProvider` 只在 Linux 创建 `MprisService`，其它平台返回 `null`
 - 播放器恢复时会重新解析 URL 或补查本地缓存路径
 - 下载完成会触发队列的 `localPath` 刷新
 

@@ -74,7 +74,23 @@ macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 enti
 
 修改 macOS 签名或沙箱配置时必须同时检查两份文件，避免 Debug 可用但 Release 失去网络能力。
 
-## 6. 极简模式不是普通主题变体
+## 6. Linux MPRIS 只能按平台启用
+
+Linux 桌面通过 MPRIS / D-Bus 接入系统媒体控件、桌面壳层和硬件媒体键。当前平台边界是：
+
+- `playerMprisServiceProvider` 只在 Linux 返回 `MprisService`
+- Windows、macOS、Android 和 iOS 返回 `null`，不能尝试创建 D-Bus client
+- `PlayerNotifier` 对初始化、状态同步和销毁都使用空安全调用
+
+真源：
+
+- `lib/features/player/application/player_notifier.dart`
+- `lib/core/services/mpris_service.dart`
+- `lib/core/services/mpris_service_dbus.dart`
+
+修改播放器生命周期或媒体会话时，要保留这个平台门禁；仅在 `MprisService.init()` 内再次判断平台不足以避免非 Linux 构造或销毁阶段的异常。
+
+## 7. 极简模式不是普通主题变体
 
 极简模式当前是：
 - 独立路由 `/minimal`
@@ -83,7 +99,7 @@ macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 enti
 - 有自己的独立生命周期策略
 - 它不是点击底部播放栏后打开的全屏播放页；全屏播放页是独立路由 `/player`
 
-## 7. 极简模式生命周期策略
+## 8. 极简模式生命周期策略
 
 这是 BuSic 很特化的一条规则：
 - `paused / resumed / hidden`：**不干预播放**
@@ -92,7 +108,7 @@ macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 enti
 原因是 Flutter 无法可靠区分锁屏和切后台。
 如果在 `paused` 里暂停，锁屏听歌会断；如果在 `resumed` 里做播放切换，解锁会误触发。
 
-## 8. 全屏播放器与其他页面的手势关系
+## 9. 全屏播放器与其他页面的手势关系
 
 全屏播放器并不只是一个静态页面：
 - 点击底部 `PlayerBar` 的封面或歌曲信息会进入独立路由 `/player`
@@ -105,20 +121,23 @@ macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 enti
 
 改全屏播放器 UI 时，不要只看单个 Widget，还要看整套 PageView 与手势冲突。
 
-## 9. 最常见误区
+## 10. 最常见误区
 
 - 以为桌面端关闭就等于退出
+- 以为 MPRIS 可以在所有桌面平台直接实例化
 - 以为极简模式只是换皮
 - 以为主壳层仍然是默认 `NavigationRail` / `NavigationBar`
 - 以为紧凑侧栏仍然会显示文字或 tooltip
 - 以为移动端横屏仍然使用底部文字导航
 - 只在一个平台验证就提交
 
-## 10. 修改这部分时要一起看什么？
+## 11. 修改这部分时要一起看什么？
 
 - `lib/shared/widgets/responsive_scaffold.dart`
 - `lib/shared/widgets/desktop_window_resize_frame.dart`
 - `lib/core/window/window_service.dart`
 - `lib/core/window/tray_service.dart`
+- `lib/core/services/mpris_service.dart`
+- `lib/features/player/application/player_notifier.dart`
 - `lib/features/minimal/presentation/minimal_screen.dart`
 - `lib/features/player/presentation/full_player_screen.dart`
