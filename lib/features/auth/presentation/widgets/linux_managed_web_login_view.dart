@@ -195,22 +195,21 @@ class _LinuxManagedWebLoginViewState extends State<LinuxManagedWebLoginView> {
               )
             else
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: busy ? null : _checkCookies,
-                      icon: _isChecking || widget.isVerifying
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.check_circle_outline),
-                      label: Text(
-                        _isChecking || widget.isVerifying
-                            ? l10n.webLoginChecking
-                            : l10n.webLoginCompleted,
-                      ),
+                  FilledButton.icon(
+                    onPressed: busy ? null : _checkCookies,
+                    icon: _isChecking || widget.isVerifying
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.check_circle_outline),
+                    label: Text(
+                      _isChecking || widget.isVerifying
+                          ? l10n.webLoginChecking
+                          : l10n.webLoginCompleted,
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -150,6 +150,23 @@ void main() {
     expect(loginService.startCallCount, 1);
     expect(find.text('I have logged in'), findsOneWidget);
 
+    final completedButton = find.ancestor(
+      of: find.text('I have logged in'),
+      matching: find.byType(FilledButton),
+    );
+    final cancelButton = find.ancestor(
+      of: find.text('Cancel'),
+      matching: find.byType(OutlinedButton),
+    );
+    final completedButtonRect = tester.getRect(completedButton);
+    final cancelButtonRect = tester.getRect(cancelButton);
+
+    expect(completedButtonRect.width, lessThan(cardRect.width / 2));
+    expect(
+      (completedButtonRect.left + cancelButtonRect.right) / 2,
+      closeTo(cardRect.center.dx, 1),
+    );
+
     await tester.tap(find.text('I have logged in'));
     await tester.pumpAndSettle();
 
