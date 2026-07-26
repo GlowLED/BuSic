@@ -245,7 +245,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: _buildInputBar(
             l10n,
             parseState,
-            docked: inputDocked,
             compact: compact,
             showSubmitButton: !mobileLayout,
           ),
@@ -433,7 +432,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildInputBar(
     AppLocalizations l10n,
     ParseState parseState, {
-    required bool docked,
     required bool compact,
     required bool showSubmitButton,
   }) {
@@ -445,58 +443,51 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     final field = SizedBox(
       height: _searchInputHeight,
-      child: DecoratedBox(
-        key: const ValueKey('search_input_surface'),
-        decoration: BoxDecoration(
-          color: palette.surfacePrimary.withValues(alpha: 0.58),
-          borderRadius: radii.largeRadius,
-        ),
-        child: TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          textAlignVertical: TextAlignVertical.center,
-          decoration: InputDecoration(
-            hintText: l10n.parseInput,
-            filled: false,
-            fillColor: Colors.transparent,
-            prefixIcon: Icon(
-              Icons.manage_search_rounded,
-              color: palette.textSecondary,
-            ),
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: _searchInputHeight,
-              minHeight: _searchInputHeight,
-            ),
-            suffixIcon: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (showClearButton)
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    tooltip: l10n.clearSearchInput,
-                    onPressed: isParsing ? null : _handleClearSearchInput,
-                  ),
-                IconButton(
-                  icon: const Icon(Icons.content_paste_rounded),
-                  tooltip: l10n.pasteFromClipboard,
-                  onPressed: isParsing ? null : _onPaste,
-                ),
-              ],
-            ),
-            suffixIconConstraints: const BoxConstraints(
-              minHeight: _searchInputHeight,
-            ),
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(horizontal: spacing.sm),
+      child: TextField(
+        controller: _controller,
+        focusNode: _focusNode,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          hintText: l10n.parseInput,
+          filled: false,
+          fillColor: Colors.transparent,
+          prefixIcon: Icon(
+            Icons.manage_search_rounded,
+            color: palette.textSecondary,
           ),
-          textInputAction: TextInputAction.search,
-          onEditingComplete: () {},
-          onSubmitted: (_) => _handleSubmit(),
-          enabled: !isParsing,
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: _searchInputHeight,
+            minHeight: _searchInputHeight,
+          ),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showClearButton)
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: l10n.clearSearchInput,
+                  onPressed: isParsing ? null : _handleClearSearchInput,
+                ),
+              IconButton(
+                icon: const Icon(Icons.content_paste_rounded),
+                tooltip: l10n.pasteFromClipboard,
+                onPressed: isParsing ? null : _onPaste,
+              ),
+            ],
+          ),
+          suffixIconConstraints: const BoxConstraints(
+            minHeight: _searchInputHeight,
+          ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: spacing.sm),
         ),
+        textInputAction: TextInputAction.search,
+        onEditingComplete: () {},
+        onSubmitted: (_) => _handleSubmit(),
+        enabled: !isParsing,
       ),
     );
 
@@ -536,7 +527,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return AppPanel(
       key: const ValueKey('search_bar_surface'),
-      padding: EdgeInsets.all(docked ? spacing.xxs : spacing.sm),
+      padding: EdgeInsets.all(spacing.xxs),
       borderRadius: radii.largeRadius,
       child: content,
     );
