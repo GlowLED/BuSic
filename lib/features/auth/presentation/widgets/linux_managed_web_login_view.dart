@@ -130,65 +130,55 @@ class _LinuxManagedWebLoginViewState extends State<LinuxManagedWebLoginView> {
     final sessionStarted = _session != null;
     final busy = _isStarting || _isChecking || widget.isVerifying;
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.open_in_browser, size: 36, color: colorScheme.primary),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.webLoginLinuxTitle,
-                      style: context.textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      sessionStarted
-                          ? l10n.webLoginLinuxWaiting
-                          : l10n.webLoginLinuxDesc,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+    return SizedBox.expand(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.open_in_browser, size: 36, color: colorScheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              l10n.webLoginLinuxTitle,
+              textAlign: TextAlign.center,
+              style: context.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              sessionStarted
+                  ? l10n.webLoginLinuxWaiting
+                  : l10n.webLoginLinuxDesc,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            if (_hasError) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_outlined,
+                    size: 18,
+                    color: colorScheme.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.webLoginLinuxStartFailed,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.error,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
-          ),
-          if (_hasError) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(
-                  Icons.warning_amber_outlined,
-                  size: 18,
-                  color: colorScheme.error,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l10n.webLoginLinuxStartFailed,
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.error,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 24),
-          if (!sessionStarted)
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
+            const SizedBox(height: 24),
+            if (!sessionStarted)
+              FilledButton.icon(
                 onPressed: busy ? null : _startLogin,
                 icon: _isStarting
                     ? const SizedBox(
@@ -202,37 +192,37 @@ class _LinuxManagedWebLoginViewState extends State<LinuxManagedWebLoginView> {
                       ? l10n.webLoginPreparing
                       : l10n.webLoginLinuxOpenBrowser,
                 ),
-              ),
-            )
-          else
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: busy ? null : _checkCookies,
-                    icon: _isChecking || widget.isVerifying
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.check_circle_outline),
-                    label: Text(
-                      _isChecking || widget.isVerifying
-                          ? l10n.webLoginChecking
-                          : l10n.webLoginCompleted,
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: busy ? null : _checkCookies,
+                      icon: _isChecking || widget.isVerifying
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.check_circle_outline),
+                      label: Text(
+                        _isChecking || widget.isVerifying
+                            ? l10n.webLoginChecking
+                            : l10n.webLoginCompleted,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
-                  onPressed: busy ? null : _cancelLogin,
-                  icon: const Icon(Icons.close),
-                  label: Text(l10n.webLoginLinuxCancel),
-                ),
-              ],
-            ),
-        ],
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: busy ? null : _cancelLogin,
+                    icon: const Icon(Icons.close),
+                    label: Text(l10n.webLoginLinuxCancel),
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }
