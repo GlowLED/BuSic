@@ -27,7 +27,7 @@
 
 ## 当前 feature 地图
 
-- `player`：播放队列、恢复、媒体会话、离线优先播放
+- `player`：播放队列、恢复、媒体会话、离线优先播放、Linux MPRIS
 - `playlist`：歌单 CRUD、本地元数据、自定义封面、“我喜欢”、收藏夹导入
 - `search_and_parse`：搜索、BV 解析、音频流 URL
 - `download`：下载任务、缓存联动、音质替换 / 去重
@@ -60,6 +60,9 @@
 
 - **不要忽略桌面端关闭行为。**
   自定义标题栏的关闭按钮和窗口关闭事件默认是“隐藏到托盘”，不是退出。
+
+- **不要把 MPRIS 当成所有桌面平台的公共能力。**
+  MPRIS 只在 Linux 创建和连接 D-Bus；Windows / macOS 等平台的 Provider 必须保持返回 `null`，销毁时也要使用空安全调用。
 
 - **不要在极简模式里随意改生命周期逻辑。**
   它刻意不在 `paused/resumed` 干预播放，只在 `detached` 彻底停止。

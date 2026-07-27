@@ -43,8 +43,7 @@ lib/
 4. 初始化 `BiliDio` Cookie 存储
 5. 初始化 `audio_service`
 6. 桌面端初始化窗口和托盘
-7. 读取极简模式开关
-8. 通过 `ProviderScope.overrides` 注入关键依赖
+7. 通过 `ProviderScope.overrides` 注入关键依赖
 
 `lib/app.dart` 当前负责：
 

@@ -39,6 +39,8 @@ void main() {
 
         expect(inputRect.top, greaterThan(200));
         expect((inputRect.center.dy - 400).abs(), lessThan(80));
+        expect(inputRect.height, closeTo(56, 0.1));
+        _expectSingleLayerSearchBarSurface(tester);
       },
     );
 
@@ -58,6 +60,8 @@ void main() {
       );
 
       await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      final centeredRect = _inputBarRect(tester);
       await tester.enterText(find.byType(TextField), 'night drive');
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
@@ -73,7 +77,9 @@ void main() {
       expect(inputRect.center.dy, lessThan(140));
       expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
       expect(resultsRect.top - inputRect.bottom, lessThan(24));
-      _expectDockedSearchBarSurface(tester);
+      expect(inputRect.height, closeTo(centeredRect.height, 0.1));
+      expect(inputRect.height, closeTo(56, 0.1));
+      _expectSingleLayerSearchBarSurface(tester);
     });
 
     testWidgets('clears a submitted desktop search and recenters the input', (
@@ -281,6 +287,8 @@ void main() {
       final inputRect = _inputBarRect(tester);
       expect(inputRect.top, greaterThan(250));
       expect((inputRect.center.dy - 422).abs(), lessThan(100));
+      expect(inputRect.height, closeTo(56, 0.1));
+      _expectSingleLayerSearchBarSurface(tester);
     });
 
     testWidgets('mobile portrait submits with keyboard search action', (
@@ -321,7 +329,9 @@ void main() {
       expect(inputRect.width, greaterThanOrEqualTo(centeredRect.width));
       expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
       expect(resultsRect.top - inputRect.bottom, lessThan(24));
-      _expectDockedSearchBarSurface(tester);
+      expect(inputRect.height, closeTo(centeredRect.height, 0.1));
+      expect(inputRect.height, closeTo(56, 0.1));
+      _expectSingleLayerSearchBarSurface(tester);
     });
 
     testWidgets('mobile clear button animates the input back to center', (
@@ -611,15 +621,30 @@ Rect _inputBarRect(WidgetTester tester) {
   return tester.getRect(find.byKey(const ValueKey('search_bar_surface')));
 }
 
-void _expectDockedSearchBarSurface(WidgetTester tester) {
+void _expectSingleLayerSearchBarSurface(WidgetTester tester) {
+  final searchBarFinder = find.byKey(const ValueKey('search_bar_surface'));
   final searchBarSurface = _searchBarSurface(tester);
-  final inputDecoration = _inputSurfaceDecoration(tester);
+  final inputDecoration = tester
+      .widget<TextField>(find.byType(TextField))
+      .decoration!;
 
   expect(searchBarSurface.borderRadius, _themeLargeRadius(tester));
   expect(searchBarSurface.boxShadow, isNull);
-  expect(inputDecoration.borderRadius, _themeLargeRadius(tester));
-  expect(inputDecoration.border, isNull);
-  expect(inputDecoration.boxShadow, isNull);
+  expect(searchBarSurface.padding, EdgeInsets.all(_themeSpacing(tester).xxs));
+  expect(
+    find.descendant(
+      of: searchBarFinder,
+      matching: find.byType(AppPanel),
+      matchRoot: true,
+    ),
+    findsOneWidget,
+  );
+  expect(find.byKey(const ValueKey('search_input_surface')), findsNothing);
+  expect(inputDecoration.filled, isFalse);
+  expect(inputDecoration.border, InputBorder.none);
+  expect(inputDecoration.enabledBorder, InputBorder.none);
+  expect(inputDecoration.focusedBorder, InputBorder.none);
+  expect(inputDecoration.disabledBorder, InputBorder.none);
 }
 
 AppPanel _searchBarSurface(WidgetTester tester) {
@@ -628,16 +653,14 @@ AppPanel _searchBarSurface(WidgetTester tester) {
   );
 }
 
-BoxDecoration _inputSurfaceDecoration(WidgetTester tester) {
-  final inputSurface = tester.widget<DecoratedBox>(
-    find.byKey(const ValueKey('search_input_surface')),
-  );
-  return inputSurface.decoration as BoxDecoration;
-}
-
 BorderRadius _themeLargeRadius(WidgetTester tester) {
   final context = tester.element(find.byType(SearchScreen));
   return Theme.of(context).extension<AppThemeRadii>()!.largeRadius;
+}
+
+AppThemeSpacing _themeSpacing(WidgetTester tester) {
+  final context = tester.element(find.byType(SearchScreen));
+  return Theme.of(context).extension<AppThemeSpacing>()!;
 }
 
 bool _inputHasFocus(WidgetTester tester) {

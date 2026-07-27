@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,6 +10,7 @@ import 'package:busic/features/auth/domain/models/bili_login_cookies.dart';
 import 'package:busic/features/auth/domain/models/qr_poll_result.dart';
 import 'package:busic/features/auth/domain/models/user.dart';
 import 'package:busic/features/auth/presentation/login_screen.dart';
+import 'package:busic/features/auth/presentation/widgets/linux_managed_web_login_view.dart';
 
 import '../../../test_helpers/test_app.dart';
 
@@ -114,11 +116,56 @@ void main() {
 
     expect(find.text('Linux Web Login'), findsOneWidget);
 
+    final loginView = find.byType(LinuxManagedWebLoginView);
+    final loginCard = find.ancestor(of: loginView, matching: find.byType(Card));
+    final cardRect = tester.getRect(loginCard);
+    final iconRect = tester.getRect(find.byIcon(Icons.open_in_browser));
+    final titleRect = tester.getRect(find.text('Linux Web Login'));
+    final descriptionRect = tester.getRect(
+      find.text(
+        'BuSic will open a temporary browser window and only read cookies '
+        'from that isolated login session.',
+      ),
+    );
+    final openButton = find.ancestor(
+      of: find.text('Open login window'),
+      matching: find.byType(FilledButton),
+    );
+    final buttonRect = tester.getRect(openButton);
+
+    expect(titleRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(descriptionRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(buttonRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(buttonRect.width, lessThan(cardRect.width - 48));
+    expect(
+      (iconRect.top + buttonRect.bottom) / 2,
+      closeTo(cardRect.center.dy, 1),
+    );
+    expect(titleRect.bottom, lessThan(descriptionRect.top));
+    expect(descriptionRect.bottom, lessThan(buttonRect.top));
+
     await tester.tap(find.text('Open login window'));
     await tester.pumpAndSettle();
 
     expect(loginService.startCallCount, 1);
     expect(find.text('I have logged in'), findsOneWidget);
+
+    final completedButton = find.ancestor(
+      of: find.text('I have logged in'),
+      matching: find.byType(FilledButton),
+    );
+    final cancelButton = find.ancestor(
+      of: find.text('Cancel'),
+      matching: find.byType(OutlinedButton),
+    );
+    final completedButtonRect = tester.getRect(completedButton);
+    final cancelButtonRect = tester.getRect(cancelButton);
+
+    expect(completedButtonRect.width, lessThan(cardRect.width / 2));
+    expect(
+      (completedButtonRect.left + cancelButtonRect.right) / 2,
+      closeTo(cardRect.center.dx, 1),
+    );
 
     await tester.tap(find.text('I have logged in'));
     await tester.pumpAndSettle();

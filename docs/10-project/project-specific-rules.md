@@ -85,6 +85,7 @@
 
 - 桌面关闭窗口默认隐藏到托盘
 - `ResponsiveScaffold` 决定桌面 / 移动端壳层差异
+- MPRIS 是 Linux-only D-Bus 能力；非 Linux 平台不能实例化或销毁真实 `MprisService`
 - 极简模式不是普通页面样式变体，而是单独路由和特殊生命周期策略
 - 极简模式不在 `paused / resumed` 中干预播放，只在 `detached` 做彻底清理
 
