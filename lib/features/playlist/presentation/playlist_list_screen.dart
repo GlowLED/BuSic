@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../shared/extensions/context_extensions.dart';
-import '../../../shared/widgets/app_panel.dart';
 import '../../../shared/widgets/common_dialogs.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../share/application/share_notifier.dart';
@@ -17,39 +17,65 @@ import 'widgets/cover_selection_dialog.dart';
 import 'widgets/create_playlist_dialog.dart';
 import 'widgets/playlist_tile.dart';
 
+const _playlistTileMaxExtent = 216.0;
+const _playlistPrimaryActionSize = 48.0;
+
 /// Screen displaying all user playlists.
 ///
 /// Features:
-/// - Grid or list view of playlists with cover art
-/// - "Create playlist" floating action button
-/// - Long press for rename/delete context menu
+/// - Responsive cover-first playlist grid
+/// - Header entry for creating or importing playlists
+/// - Visible and long-press access to playlist management actions
 class PlaylistListScreen extends ConsumerWidget {
   const PlaylistListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playlistsAsync = ref.watch(playlistListNotifierProvider);
+    final spacing = context.appSpacing;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: _CreatePlaylistFab(
-        onTap: () => _createPlaylist(context, ref),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
-        child: playlistsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(child: Text(error.toString())),
-          data: (playlists) => _PlaylistHomeContent(
-            playlists: playlists,
-            onOpenPlaylist: (playlist) {
-              context.go('/playlists/${playlist.id}');
-            },
-            onShowPlaylistMenu: (playlist) {
-              if (playlist.isFavorite) return;
-              _showPlaylistMenu(context, ref, playlist.id, playlist.name);
-            },
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding =
+                constraints.maxWidth >= AppTheme.compactBreakpoint
+                ? spacing.lg
+                : spacing.md;
+
+            return Column(
+              children: [
+                _PlaylistPageActions(
+                  horizontalPadding: horizontalPadding,
+                  onCreatePlaylist: () => _createPlaylist(context, ref),
+                ),
+                Expanded(
+                  child: playlistsAsync.when(
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, _) => Center(child: Text(error.toString())),
+                    data: (playlists) => _PlaylistHomeContent(
+                      playlists: playlists,
+                      horizontalPadding: horizontalPadding,
+                      onOpenPlaylist: (playlist) {
+                        context.go('/playlists/${playlist.id}');
+                      },
+                      onShowPlaylistMenu: (playlist) {
+                        if (playlist.isFavorite) return;
+                        _showPlaylistMenu(
+                          context,
+                          ref,
+                          playlist.id,
+                          playlist.name,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -215,65 +241,67 @@ class PlaylistListScreen extends ConsumerWidget {
     final l10n = context.l10n;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      showDragHandle: true,
       builder: (ctx) => SafeArea(
+        top: false,
         child: Padding(
-          padding: EdgeInsets.all(context.appSpacing.md),
-          child: AppPanel(
-            padding: EdgeInsets.all(context.appSpacing.sm),
-            borderRadius: context.appRadii.xLargeRadius,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _PlaylistMenuAction(
-                  icon: Icons.edit_rounded,
-                  title: l10n.renamePlaylist,
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    final newName = await CommonDialogs.showInputDialog(
-                      context,
-                      title: l10n.renamePlaylist,
-                      hint: l10n.title,
-                      initialValue: currentName,
-                    );
-                    if (newName != null && newName.trim().isNotEmpty) {
-                      await ref
-                          .read(playlistListNotifierProvider.notifier)
-                          .renamePlaylist(id, newName.trim());
-                    }
-                  },
-                ),
-                _PlaylistMenuAction(
-                  icon: Icons.image_outlined,
-                  title: l10n.changeCover,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    showDialog(
-                      context: context,
-                      builder: (_) => CoverSelectionDialog(playlistId: id),
-                    );
-                  },
-                ),
-                _PlaylistMenuAction(
-                  icon: Icons.delete_rounded,
-                  title: l10n.deletePlaylist,
-                  destructive: true,
-                  onTap: () async {
-                    Navigator.pop(ctx);
-                    final confirmed = await CommonDialogs.showConfirmDialog(
-                      context,
-                      title: l10n.deletePlaylist,
-                      message: '${l10n.deletePlaylist}?',
-                    );
-                    if (confirmed == true) {
-                      await ref
-                          .read(playlistListNotifierProvider.notifier)
-                          .deletePlaylist(id);
-                    }
-                  },
-                ),
-              ],
-            ),
+          padding: EdgeInsets.fromLTRB(
+            ctx.appSpacing.sm,
+            0,
+            ctx.appSpacing.sm,
+            ctx.appSpacing.sm,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _PlaylistMenuAction(
+                icon: Icons.edit_rounded,
+                title: l10n.renamePlaylist,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final newName = await CommonDialogs.showInputDialog(
+                    context,
+                    title: l10n.renamePlaylist,
+                    hint: l10n.title,
+                    initialValue: currentName,
+                  );
+                  if (newName != null && newName.trim().isNotEmpty) {
+                    await ref
+                        .read(playlistListNotifierProvider.notifier)
+                        .renamePlaylist(id, newName.trim());
+                  }
+                },
+              ),
+              _PlaylistMenuAction(
+                icon: Icons.image_outlined,
+                title: l10n.changeCover,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  showDialog(
+                    context: context,
+                    builder: (_) => CoverSelectionDialog(playlistId: id),
+                  );
+                },
+              ),
+              _PlaylistMenuAction(
+                icon: Icons.delete_rounded,
+                title: l10n.deletePlaylist,
+                destructive: true,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final confirmed = await CommonDialogs.showConfirmDialog(
+                    context,
+                    title: l10n.deletePlaylist,
+                    message: '${l10n.deletePlaylist}?',
+                  );
+                  if (confirmed == true) {
+                    await ref
+                        .read(playlistListNotifierProvider.notifier)
+                        .deletePlaylist(id);
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -284,17 +312,33 @@ class PlaylistListScreen extends ConsumerWidget {
 class _PlaylistHomeContent extends StatelessWidget {
   const _PlaylistHomeContent({
     required this.playlists,
+    required this.horizontalPadding,
     required this.onOpenPlaylist,
     required this.onShowPlaylistMenu,
   });
 
   final List<Playlist> playlists;
+  final double horizontalPadding;
   final ValueChanged<Playlist> onOpenPlaylist;
   final ValueChanged<Playlist> onShowPlaylistMenu;
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final titleLineHeight = _scaledLineHeight(
+      textScaler,
+      context.textTheme.titleSmall,
+      14,
+    );
+    final metadataLineHeight = _scaledLineHeight(
+      textScaler,
+      context.textTheme.bodySmall,
+      12,
+    );
+    final metadataExtent =
+        (spacing.sm + (titleLineHeight * 2) + spacing.xxs + metadataLineHeight)
+            .ceilToDouble();
 
     return CustomScrollView(
       slivers: [
@@ -303,9 +347,9 @@ class _PlaylistHomeContent extends StatelessWidget {
             hasScrollBody: false,
             child: Padding(
               padding: EdgeInsets.fromLTRB(
-                spacing.lg,
+                horizontalPadding,
                 0,
-                spacing.lg,
+                horizontalPadding,
                 spacing.xl,
               ),
               child: const _PlaylistEmptyState(),
@@ -314,28 +358,48 @@ class _PlaylistHomeContent extends StatelessWidget {
         else ...[
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
-              spacing.lg,
-              spacing.sm,
-              spacing.lg,
+              horizontalPadding,
+              spacing.xs,
+              horizontalPadding,
               spacing.xl,
             ),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 220,
-                childAspectRatio: 0.82,
-                crossAxisSpacing: spacing.md,
-                mainAxisSpacing: spacing.md,
-              ),
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final playlist = playlists[index];
-                return PlaylistTile(
-                  playlist: playlist.isFavorite
-                      ? playlist.copyWith(name: context.l10n.myFavorites)
-                      : playlist,
-                  onTap: () => onOpenPlaylist(playlist),
-                  onLongPress: () => onShowPlaylistMenu(playlist),
+            sliver: SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount =
+                    ((constraints.crossAxisExtent + spacing.md) /
+                            (_playlistTileMaxExtent + spacing.md))
+                        .ceil()
+                        .clamp(1, 100)
+                        .toInt();
+                final tileWidth =
+                    (constraints.crossAxisExtent -
+                        (spacing.md * (crossAxisCount - 1))) /
+                    crossAxisCount;
+
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisExtent: tileWidth + metadataExtent,
+                    crossAxisSpacing: spacing.md,
+                    mainAxisSpacing: spacing.md,
+                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final playlist = playlists[index];
+                    return PlaylistTile(
+                      playlist: playlist.isFavorite
+                          ? playlist.copyWith(name: context.l10n.myFavorites)
+                          : playlist,
+                      onTap: () => onOpenPlaylist(playlist),
+                      onLongPress: playlist.isFavorite
+                          ? null
+                          : () => onShowPlaylistMenu(playlist),
+                      onMorePressed: playlist.isFavorite
+                          ? null
+                          : () => onShowPlaylistMenu(playlist),
+                    );
+                  }, childCount: playlists.length),
                 );
-              }, childCount: playlists.length),
+              },
             ),
           ),
         ],
@@ -344,32 +408,62 @@ class _PlaylistHomeContent extends StatelessWidget {
   }
 }
 
-class _CreatePlaylistFab extends StatelessWidget {
-  const _CreatePlaylistFab({required this.onTap});
+class _PlaylistPageActions extends StatelessWidget {
+  const _PlaylistPageActions({
+    required this.horizontalPadding,
+    required this.onCreatePlaylist,
+  });
+
+  final double horizontalPadding;
+  final VoidCallback onCreatePlaylist;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.appSpacing;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        spacing.sm,
+        horizontalPadding,
+        spacing.xs,
+      ),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: _CreatePlaylistButton(onTap: onCreatePlaylist),
+      ),
+    );
+  }
+}
+
+class _CreatePlaylistButton extends StatelessWidget {
+  const _CreatePlaylistButton({required this.onTap});
 
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.appPalette;
-    const size = 56.0;
 
     return Tooltip(
       message: context.l10n.createPlaylist,
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Material(
-          color: palette.accentStrong,
-          borderRadius: context.appRadii.largeRadius,
-          elevation: 0,
-          child: InkWell(
-            borderRadius: context.appRadii.largeRadius,
-            onTap: onTap,
-            child: Icon(
-              Icons.add_rounded,
-              size: 28,
-              color: context.colorScheme.onPrimary,
+      child: Semantics(
+        button: true,
+        label: context.l10n.createPlaylist,
+        child: SizedBox.square(
+          dimension: _playlistPrimaryActionSize,
+          child: Material(
+            color: palette.accentStrong,
+            borderRadius: context.appRadii.mediumRadius,
+            elevation: 0,
+            child: InkWell(
+              borderRadius: context.appRadii.mediumRadius,
+              onTap: onTap,
+              child: Icon(
+                Icons.add_rounded,
+                size: 24,
+                color: context.colorScheme.onPrimary,
+              ),
             ),
           ),
         ),
@@ -386,25 +480,46 @@ class _PlaylistEmptyState extends StatelessWidget {
     final spacing = context.appSpacing;
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.library_music_outlined,
-            size: 64,
-            color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            context.l10n.noPlaylists,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 320),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.library_music_outlined,
+              size: 48,
+              color: context.appPalette.textMuted,
             ),
-          ),
-        ],
+            SizedBox(height: spacing.md),
+            Text(
+              context.l10n.noPlaylists,
+              textAlign: TextAlign.center,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: context.appPalette.textPrimary,
+              ),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              context.l10n.noPlaylistsHint,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.appPalette.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+double _scaledLineHeight(
+  TextScaler textScaler,
+  TextStyle? style,
+  double fallbackFontSize,
+) {
+  final fontSize = style?.fontSize ?? fallbackFontSize;
+  return textScaler.scale(fontSize) * (style?.height ?? 1.2);
 }
 
 class _PlaylistMenuAction extends StatelessWidget {

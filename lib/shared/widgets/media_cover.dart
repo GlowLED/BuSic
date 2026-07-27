@@ -22,6 +22,7 @@ class MediaCover extends StatelessWidget {
     this.borderRadius,
     this.fit = BoxFit.cover,
     this.placeholderIcon = Icons.music_note_rounded,
+    this.placeholderBackgroundColor,
   });
 
   final String? coverUrl;
@@ -31,6 +32,24 @@ class MediaCover extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
   final BoxFit fit;
   final IconData placeholderIcon;
+  final Color? placeholderBackgroundColor;
+
+  /// Resolves the image source used by media covers for consumers that need
+  /// the same local or cached-network image provider, such as palette
+  /// extraction.
+  static ImageProvider<Object>? imageProviderFor(String? coverUrl) {
+    final cover = coverUrl;
+    if (cover == null || cover.isEmpty) return null;
+
+    if (_isLocalPath(cover)) {
+      final path = cover.startsWith('file://')
+          ? Uri.parse(cover).toFilePath()
+          : cover;
+      return FileImage(File(path));
+    }
+
+    return CachedNetworkImageProvider(cover);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,17 +126,20 @@ class MediaCover extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [palette.accentSoft, palette.surfaceSecondary],
-        ),
+        color: placeholderBackgroundColor,
+        gradient: placeholderBackgroundColor == null
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [palette.accentSoft, palette.surfaceSecondary],
+              )
+            : null,
       ),
       child: Center(child: Icon(placeholderIcon, color: palette.textSecondary)),
     );
   }
 
-  bool _isLocalPath(String path) {
+  static bool _isLocalPath(String path) {
     return path.startsWith('/') ||
         path.startsWith('file://') ||
         RegExp(r'^[A-Za-z]:[/\\]').hasMatch(path);

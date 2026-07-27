@@ -9,10 +9,58 @@ import 'package:busic/shared/widgets/media_cover.dart';
 import '../../test_helpers/test_app.dart';
 
 void main() {
+  test('resolves shared local, file URI, and cached network providers', () {
+    final tempDir = Directory.systemTemp.createTempSync('media_cover_provider');
+    addTearDown(() => tempDir.deleteSync(recursive: true));
+    final file = File('${tempDir.path}/cover.png')..writeAsBytesSync(const []);
+
+    expect(MediaCover.imageProviderFor(null), isNull);
+    expect(MediaCover.imageProviderFor(''), isNull);
+
+    final localProvider = MediaCover.imageProviderFor(file.path);
+    expect(localProvider, isA<FileImage>());
+    expect((localProvider! as FileImage).file.path, file.path);
+
+    final uriProvider = MediaCover.imageProviderFor(file.uri.toString());
+    expect(uriProvider, isA<FileImage>());
+    expect((uriProvider! as FileImage).file.path, file.path);
+
+    const remoteUrl = 'https://example.com/cover.png';
+    final remoteProvider = MediaCover.imageProviderFor(remoteUrl);
+    expect(remoteProvider, isA<CachedNetworkImageProvider>());
+    expect((remoteProvider! as CachedNetworkImageProvider).url, remoteUrl);
+  });
+
   testWidgets('shows placeholder icon when cover is missing', (tester) async {
     await tester.pumpWidget(buildTestApp(const Center(child: MediaCover())));
 
     expect(find.byIcon(Icons.music_note_rounded), findsOneWidget);
+  });
+
+  testWidgets('supports a flat solid placeholder background', (tester) async {
+    const placeholderColor = Color(0xFFEEEEEE);
+
+    await tester.pumpWidget(
+      buildTestApp(
+        const Center(
+          child: MediaCover(
+            width: 72,
+            height: 72,
+            placeholderBackgroundColor: placeholderColor,
+          ),
+        ),
+      ),
+    );
+
+    final decorations = tester
+        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+        .map((widget) => widget.decoration)
+        .whereType<BoxDecoration>();
+    final placeholderDecoration = decorations.singleWhere(
+      (decoration) => decoration.color == placeholderColor,
+    );
+
+    expect(placeholderDecoration.gradient, isNull);
   });
 
   testWidgets('keeps placeholder visible while remote cover is unresolved', (
