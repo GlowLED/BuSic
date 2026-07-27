@@ -381,6 +381,7 @@ class _DesktopNavigationItem extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: context.appRadii.xLargeRadius,
+        mouseCursor: SystemMouseCursors.click,
         onTap: onTap,
         splashFactory: NoSplash.splashFactory,
         splashColor: Colors.transparent,

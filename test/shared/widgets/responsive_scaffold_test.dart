@@ -42,6 +42,20 @@ void main() {
     expect(find.text('Settings'), findsNothing);
   });
 
+  testWidgets('uses click cursor for desktop sidebar destinations', (
+    tester,
+  ) async {
+    await _pumpShell(tester, const Size(1600, 900));
+
+    final searchItem = find.ancestor(
+      of: find.byIcon(Icons.search_outlined),
+      matching: find.byType(InkWell),
+    );
+    final inkWell = tester.widget<InkWell>(searchItem);
+
+    expect(inkWell.mouseCursor, SystemMouseCursors.click);
+  });
+
   testWidgets('uses label-only bottom navigation in mobile portrait', (
     tester,
   ) async {
