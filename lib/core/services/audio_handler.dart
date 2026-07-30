@@ -23,9 +23,6 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> Function()? onSkipToPrevious;
   Future<void> Function(Duration position)? onSeek;
   Future<void> Function()? onStop;
-
-  BusicAudioHandler();
-
   @override
   Future<void> play() async {
     await onPlay?.call();
@@ -83,7 +80,13 @@ class BusicAudioHandler extends BaseAudioHandler with SeekHandler {
       PlaybackState(
         controls: [
           MediaControl.skipToPrevious,
-          playing ? MediaControl.pause : MediaControl.play,
+          MediaControl(
+            androidIcon: playing
+                ? 'drawable/audio_service_pause'
+                : 'drawable/audio_service_play_arrow',
+            label: 'PlayPause',
+            action: MediaAction.playPause,
+          ),
           MediaControl.skipToNext,
         ],
         systemActions: const {

@@ -4,6 +4,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'app.dart';
 import 'core/api/bili_dio.dart';
@@ -54,7 +55,13 @@ Future<void> main() async {
           androidStopForegroundOnPause: true,
         ),
       );
-
+      // Android: Get Permission
+      if (PlatformUtils.isAndroid) {
+        var notificationStatus = await Permission.notification.status;
+        if (!notificationStatus.isGranted) {
+          notificationStatus = await Permission.notification.request();
+        }
+      }
       // Desktop-specific: initialize window manager and system tray
       if (PlatformUtils.isDesktop) {
         await WindowService.initialize();
