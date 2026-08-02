@@ -23,7 +23,7 @@ void main() {
 
     final uriProvider = MediaCover.imageProviderFor(file.uri.toString());
     expect(uriProvider, isA<FileImage>());
-    expect((uriProvider! as FileImage).file.path, file.path);
+    expect((uriProvider! as FileImage).file.absolute.uri, file.absolute.uri);
 
     const remoteUrl = 'https://example.com/cover.png';
     final remoteProvider = MediaCover.imageProviderFor(remoteUrl);
@@ -83,10 +83,13 @@ void main() {
     final image = tester.widget<CachedNetworkImage>(
       find.byType(CachedNetworkImage),
     );
-    final expectedCacheSize = (72 * tester.view.devicePixelRatio * 2).ceil();
+    final expectedCacheSize = _bucketCacheDimension(
+      72 * tester.view.devicePixelRatio * 2,
+    );
 
     expect(image.filterQuality, FilterQuality.high);
     expect(image.memCacheWidth, expectedCacheSize);
+    expect(image.useOldImageOnUrlChange, isTrue);
     // 只约束宽度，保持宽高比，避免长图被压扁。
     expect(image.memCacheHeight, isNull);
     expect(find.byIcon(Icons.music_note_rounded), findsOneWidget);
@@ -109,8 +112,48 @@ void main() {
 
     final image = tester.widget<Image>(find.byType(Image));
     final provider = image.image;
+    expect(image.gaplessPlayback, isTrue);
     expect(provider, isA<ResizeImage>());
     // fit 策略保持原始宽高比，长图不会被压扁成正方形位图。
     expect((provider as ResizeImage).policy, ResizeImagePolicy.fit);
   });
+
+  testWidgets(
+    'buckets responsive cache widths and keeps the old network frame',
+    (tester) async {
+      const coverUrl = 'https://example.com/responsive-cover.png';
+      final scale = tester.view.devicePixelRatio * 2;
+
+      Future<CachedNetworkImage> pumpAtRawWidth(double rawWidth) async {
+        await tester.pumpWidget(
+          buildTestApp(
+            Center(
+              child: SizedBox(
+                width: rawWidth / scale,
+                height: 72,
+                child: const MediaCover(coverUrl: coverUrl),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        return tester.widget<CachedNetworkImage>(
+          find.byType(CachedNetworkImage),
+        );
+      }
+
+      final first = await pumpAtRawWidth(140);
+      final sameBucket = await pumpAtRawWidth(250);
+      final nextBucket = await pumpAtRawWidth(260);
+
+      expect(first.memCacheWidth, 256);
+      expect(sameBucket.memCacheWidth, first.memCacheWidth);
+      expect(nextBucket.memCacheWidth, 384);
+      expect(nextBucket.useOldImageOnUrlChange, isTrue);
+    },
+  );
+}
+
+int _bucketCacheDimension(double value) {
+  return ((value / 128).ceil() * 128).clamp(128, 1024).toInt();
 }

@@ -254,6 +254,7 @@ context.showSnackBar('操作成功');
 - 网络图片：使用 `cached_network_image` 库缓存
 - 本地图片：使用 `File` + `Image.file()`
 - 占位图：默认使用渐变色背景 + 音符图标；需要扁平内容面的场景可通过 `placeholderBackgroundColor` 改为实色背景
+- 响应式 `MediaCover` 会将物理解码尺寸按稳定档位缓存，并在档位切换时保留上一帧；不要改回随窗口每像素变化的 provider，避免桌面缩放时封面闪回占位图
 
 ```dart
 // 优先级：本地 → 网络 → 占位

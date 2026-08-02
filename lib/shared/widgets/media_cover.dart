@@ -9,6 +9,7 @@ import '../extensions/context_extensions.dart';
 const _mediaCoverCacheOversample = 2.0;
 const _mediaCoverMinCacheDimension = 128.0;
 const _mediaCoverMaxCacheDimension = 1024.0;
+const _mediaCoverCacheDimensionStep = 128.0;
 
 /// Shared media cover widget that handles local files, remote images,
 /// and consistent placeholder fallbacks.
@@ -105,6 +106,7 @@ class MediaCover extends StatelessWidget {
         image: provider,
         fit: fit,
         filterQuality: FilterQuality.high,
+        gaplessPlayback: true,
         errorBuilder: (_, __, ___) => _buildPlaceholder(context),
       );
     }
@@ -116,6 +118,7 @@ class MediaCover extends StatelessWidget {
       // 只约束宽度以保持宽高比：CachedNetworkImage 不暴露 ResizeImagePolicy，
       // 同时给定 memCacheWidth/Height 会按 exact 策略把长图压扁。
       memCacheWidth: cacheSize?.width,
+      useOldImageOnUrlChange: true,
       placeholder: (_, __) => _buildPlaceholder(context),
       errorWidget: (_, __, ___) => _buildPlaceholder(context),
     );
@@ -195,9 +198,18 @@ class MediaCover extends StatelessWidget {
         : 1.0;
 
     return (
-      width: math.max(1, (rawWidth * scale).ceil()),
-      height: math.max(1, (rawHeight * scale).ceil()),
+      width: _bucketCacheDimension(rawWidth * scale),
+      height: _bucketCacheDimension(rawHeight * scale),
     );
+  }
+
+  int _bucketCacheDimension(double value) {
+    final bucketed =
+        (value / _mediaCoverCacheDimensionStep).ceil() *
+        _mediaCoverCacheDimensionStep;
+    return bucketed
+        .clamp(_mediaCoverMinCacheDimension, _mediaCoverMaxCacheDimension)
+        .toInt();
   }
 
   double? _finiteDimension(double? value) {
