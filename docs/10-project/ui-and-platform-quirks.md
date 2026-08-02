@@ -55,6 +55,8 @@ Windows 桌面端的中文正文使用全局主题里的系统字体策略：
 - 点击托盘恢复窗口
 - Quit 时显式销毁窗口和托盘
 
+Windows 的 `tray_manager` 通过 Win32 `LoadImage(..., IMAGE_ICON)` 从文件系统加载托盘图标，因此必须传入 `.ico`，不能复用 PNG。当前 `windows/CMakeLists.txt` 会把 `windows/runner/resources/app_icon.ico` 复制到运行目录的 `data/flutter_assets/assets/images/app_icon.ico`，`TrayService` 再使用该相对 asset 路径；Linux / macOS 继续使用 PNG。
+
 如果你改桌面退出、窗口隐藏、语言切换后的托盘菜单，必须一起看：
 - `lib/core/window/tray_service.dart`
 - `lib/core/window/window_service.dart`

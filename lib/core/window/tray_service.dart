@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -63,48 +64,14 @@ class TrayService with TrayListener {
 
   /// Resolve the tray icon file path.
   ///
-  /// On Windows we use the .ico bundled in runner/resources.
+  /// On Windows we use the .ico copied into the runtime Flutter assets.
   /// On Linux/macOS we use the PNG from flutter assets.
   Future<String?> _resolveIconPath() async {
-    if (Platform.isWindows) {
-      // In a packaged Windows app the .exe sits next to data/
-      final exeDir = p.dirname(Platform.resolvedExecutable);
-      final ico = p.join(
-        exeDir,
-        'data',
-        'flutter_assets',
-        'assets',
-        'images',
-        'app_icon.png',
-      );
-      if (await File(ico).exists()) return ico;
-      // Fallback: runner resources
-      return p.join(exeDir, 'runner', 'resources', 'app_icon.ico');
-    }
-
-    // Linux / macOS
-    final exeDir = p.dirname(Platform.resolvedExecutable);
-    final bundled = p.join(
-      exeDir,
-      'data',
-      'flutter_assets',
-      'assets',
-      'images',
-      'app_icon.png',
+    return resolveTrayIconPath(
+      isWindows: Platform.isWindows,
+      resolvedExecutable: Platform.resolvedExecutable,
+      currentDirectory: Directory.current.path,
     );
-    if (await File(bundled).exists()) return bundled;
-
-    // Development fallback
-    final fallbackBundled = p.join(
-      Directory.current.path,
-      'assets',
-      'images',
-      'app_icon.png',
-    );
-    if (await File(fallbackBundled).exists()) {
-      return fallbackBundled;
-    }
-    return null;
   }
 
   // ─── TrayListener callbacks ───
@@ -150,4 +117,65 @@ class TrayService with TrayListener {
     await trayManager.destroy();
     _initialized = false;
   }
+}
+
+const _windowsTrayIconAssetPath = 'assets/images/app_icon.ico';
+
+/// Resolves a tray icon path without invoking the native tray plugin.
+@visibleForTesting
+Future<String?> resolveTrayIconPath({
+  required bool isWindows,
+  required String resolvedExecutable,
+  required String currentDirectory,
+}) async {
+  final exeDir = p.dirname(resolvedExecutable);
+
+  if (isWindows) {
+    final bundled = p.join(
+      exeDir,
+      'data',
+      'flutter_assets',
+      'assets',
+      'images',
+      'app_icon.ico',
+    );
+    if (await File(bundled).exists()) {
+      // tray_manager resolves relative paths from data/flutter_assets.
+      return _windowsTrayIconAssetPath;
+    }
+
+    // Development fallback before CMake has copied the runtime asset.
+    final sourceIcon = p.join(
+      currentDirectory,
+      'windows',
+      'runner',
+      'resources',
+      'app_icon.ico',
+    );
+    if (await File(sourceIcon).exists()) return sourceIcon;
+    return null;
+  }
+
+  // Linux / macOS
+  final bundled = p.join(
+    exeDir,
+    'data',
+    'flutter_assets',
+    'assets',
+    'images',
+    'app_icon.png',
+  );
+  if (await File(bundled).exists()) return bundled;
+
+  // Development fallback
+  final fallbackBundled = p.join(
+    currentDirectory,
+    'assets',
+    'images',
+    'app_icon.png',
+  );
+  if (await File(fallbackBundled).exists()) {
+    return fallbackBundled;
+  }
+  return null;
 }

@@ -85,7 +85,8 @@ test/
 ├── core/
 │   ├── router/
 │   ├── services/
-│   └── theme/
+│   ├── theme/
+│   └── window/
 ├── features/
 │   ├── auth/
 │   ├── app_update/
@@ -233,6 +234,7 @@ group('备份导出不含下载路径', () {
 | `test/core/router` | `app_router_test.dart` | 已覆盖 | 路由结构变动时同步补回归 |
 | `test/core/services` | `audio_handler_test.dart` | 已覆盖异步媒体命令等待语义 | 媒体会话接口变动时同步补回归 |
 | `test/core/theme` | `app_theme_test.dart` | 已覆盖 | 改主题 token 时补断言 |
+| `test/core/window` | `tray_service_test.dart` | 已覆盖 Windows ICO 路径解析与非 Windows PNG 回归 | 改托盘资源路径或平台打包时同步补回归 |
 | `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` / `desktop_window_resize_frame` | 部分覆盖 | 新增共享组件时同步补 widget tests |
 | `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
 | `features/app_update` | `data` + `domain/models` | 覆盖较好 | 后续补 `application` / `presentation` |
