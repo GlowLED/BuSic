@@ -497,7 +497,9 @@ class _PlayerBarSurface extends StatelessWidget {
         child: Container(
           height: height,
           decoration: BoxDecoration(
-            color: context.colorScheme.surfaceContainerHighest,
+            color: context.colorScheme.surfaceContainerHighest.withValues(
+              alpha: context.appPalette.surfaceOpacity,
+            ),
             borderRadius: BorderRadius.circular(height / 2),
             border: bordered
                 ? Border.all(

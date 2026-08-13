@@ -222,7 +222,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
         curve: Curves.easeOut,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: palette.surfacePrimary,
+          color: palette.surfacePrimary.withValues(
+            alpha: palette.surfaceOpacity,
+          ),
           borderRadius: radii.largeRadius,
         ),
         foregroundDecoration: BoxDecoration(

@@ -132,6 +132,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         : playlist?.name;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: songsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
@@ -143,7 +144,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
               SliverAppBar(
                 pinned: true,
                 expandedHeight: 160,
-                backgroundColor: context.appPalette.surfacePrimary,
+                backgroundColor: context.appPalette.surfacePrimary.withValues(
+                  alpha: context.appPalette.surfaceOpacity,
+                ),
                 surfaceTintColor: Colors.transparent,
                 scrolledUnderElevation: 0,
                 leading: _editMode != _EditMode.none
@@ -173,8 +176,12 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          context.colorScheme.primaryContainer,
-                          context.colorScheme.surface,
+                          context.colorScheme.primaryContainer.withValues(
+                            alpha: context.appPalette.surfaceOpacity,
+                          ),
+                          context.colorScheme.surface.withValues(
+                            alpha: context.appPalette.surfaceOpacity,
+                          ),
                         ],
                       ),
                     ),

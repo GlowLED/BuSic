@@ -63,19 +63,38 @@ class AppTheme {
   static const Color _lightSurface = Color(0xFFFFFFFF);
   static const Color _lightSurfaceRaised = Color(0xFFFFFFFF);
 
-  static ThemeData lightTheme({required Color seedColor}) {
-    return _buildTheme(seedColor: seedColor, brightness: Brightness.light);
+  static ThemeData lightTheme({
+    required Color seedColor,
+    double surfaceOpacity = 1.0,
+  }) {
+    return _buildTheme(
+      seedColor: seedColor,
+      brightness: Brightness.light,
+      surfaceOpacity: surfaceOpacity,
+    );
   }
 
-  static ThemeData darkTheme({required Color seedColor}) {
-    return _buildTheme(seedColor: seedColor, brightness: Brightness.dark);
+  static ThemeData darkTheme({
+    required Color seedColor,
+    double surfaceOpacity = 1.0,
+  }) {
+    return _buildTheme(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+      surfaceOpacity: surfaceOpacity,
+    );
   }
 
   static ThemeData _buildTheme({
     required Color seedColor,
     required Brightness brightness,
+    double surfaceOpacity = 1.0,
   }) {
-    final bundle = _buildBundle(seedColor: seedColor, brightness: brightness);
+    final bundle = _buildBundle(
+      seedColor: seedColor,
+      brightness: brightness,
+      surfaceOpacity: surfaceOpacity,
+    );
     final typography = brightness == Brightness.dark
         ? Typography.material2021().white
         : Typography.material2021().black;
@@ -114,7 +133,9 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: bundle.palette.surfacePrimary,
+        color: bundle.palette.surfacePrimary.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         clipBehavior: Clip.antiAlias,
         elevation: 0,
         margin: EdgeInsets.zero,
@@ -150,7 +171,9 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: bundle.palette.surfaceElevated,
+        backgroundColor: bundle.palette.surfaceElevated.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         surfaceTintColor: Colors.transparent,
         shadowColor: bundle.depth.shadow,
         shape: RoundedRectangleBorder(borderRadius: _radii.xLargeRadius),
@@ -158,9 +181,13 @@ class AppTheme {
         contentTextStyle: textTheme.bodyMedium,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: bundle.palette.surfaceElevated,
+        backgroundColor: bundle.palette.surfaceElevated.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         surfaceTintColor: Colors.transparent,
-        modalBackgroundColor: bundle.palette.surfaceElevated,
+        modalBackgroundColor: bundle.palette.surfaceElevated.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(_radii.xLarge),
@@ -224,7 +251,9 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: bundle.palette.surfaceSecondary,
+        fillColor: bundle.palette.surfaceSecondary.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         hintStyle: textTheme.bodyMedium?.copyWith(
           color: bundle.palette.textMuted,
         ),
@@ -342,7 +371,9 @@ class AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: bundle.palette.surfaceElevated,
+        color: bundle.palette.surfaceElevated.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: _radii.largeRadius),
         elevation: 0,
@@ -396,7 +427,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: bundle.palette.surfaceElevated,
+        backgroundColor: bundle.palette.surfaceElevated.withValues(
+          alpha: bundle.palette.surfaceOpacity,
+        ),
         contentTextStyle: textTheme.bodyMedium?.copyWith(
           color: bundle.palette.textPrimary,
         ),
@@ -444,7 +477,9 @@ class AppTheme {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: bundle.palette.surfaceElevated,
+          color: bundle.palette.surfaceElevated.withValues(
+            alpha: bundle.palette.surfaceOpacity,
+          ),
           borderRadius: _radii.mediumRadius,
           border: Border.all(
             color: bundle.palette.borderSubtle,
@@ -461,6 +496,7 @@ class AppTheme {
   static _AppThemeBundle _buildBundle({
     required Color seedColor,
     required Brightness brightness,
+    double surfaceOpacity = 1.0,
   }) {
     final accentStrong = _normalizeSeed(seedColor, brightness);
     final baseScheme = ColorScheme.fromSeed(
@@ -534,6 +570,7 @@ class AppTheme {
           ? Colors.white.withValues(alpha: 0.14)
           : const Color(0xFF0D1117).withValues(alpha: 0.16),
       coverGlow: accentStrong.withValues(alpha: isDark ? 0.38 : 0.20),
+      surfaceOpacity: surfaceOpacity,
     );
 
     final secondary = _blend(

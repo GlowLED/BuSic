@@ -220,6 +220,13 @@ void main() {
 
     expect(find.byType(ImageFiltered), findsOneWidget);
     expect(find.byType(Image), findsWidgets);
+
+    // opacity 0.5 -> surfaceOpacity 0.9 - 0.35*0.5 = 0.725, applied to
+    // the shell player bar surface.
+    final palette = Theme.of(
+      tester.element(find.byType(PlayerBar)),
+    ).extension<AppThemePalette>()!;
+    expect(palette.surfaceOpacity, closeTo(0.725, 0.001));
   });
 
   testWidgets('skips blur pipeline when background blur is zero', (
@@ -247,6 +254,12 @@ void main() {
 
     expect(find.byType(ImageFiltered), findsNothing);
     expect(find.byType(Image), findsNothing);
+
+    // Without a background image surfaces stay fully opaque.
+    final palette = Theme.of(
+      tester.element(find.byType(PlayerBar)),
+    ).extension<AppThemePalette>()!;
+    expect(palette.surfaceOpacity, 1.0);
   });
 }
 
@@ -288,6 +301,17 @@ Future<void> _pumpShell(
   final db = AppDatabase.forTesting(NativeDatabase.memory());
   addTearDown(db.close);
 
+  // Mirror the surfaceOpacity mapping used by app.dart: a background image
+  // makes component surfaces translucent, floored for readability.
+  final backgroundPath = prefs['background_image_path'] as String?;
+  final backgroundOpacity =
+      (prefs['background_image_opacity'] as num?)?.toDouble() ?? 0;
+  final hasBackground =
+      backgroundPath != null && backgroundPath.isNotEmpty && backgroundOpacity > 0;
+  final surfaceOpacity = hasBackground
+      ? (0.9 - 0.35 * backgroundOpacity).clamp(0.55, 0.9)
+      : 1.0;
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -302,7 +326,10 @@ Future<void> _pumpShell(
             locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            theme: AppTheme.lightTheme(seedColor: AppTheme.greenSeed),
+            theme: AppTheme.lightTheme(
+              seedColor: AppTheme.greenSeed,
+              surfaceOpacity: surfaceOpacity,
+            ),
             routerConfig: ref.watch(appRouterProvider),
           );
         },

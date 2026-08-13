@@ -36,6 +36,17 @@
 - 模糊度为 0 时**跳过 `ImageFiltered`**（避免无谓的模糊管线开销）；解码尺寸按屏幕分辨率降采样（上限 1024，参考极简模式策略）；文件缺失或解码失败时平滑回落到主题渐变
 - 仅主壳层四个主页面生效。全屏播放器 `/player`、极简模式 `/minimal` 是独立沉浸路由、自带封面模糊 / 毛玻璃背景，**不叠加**背景图片；`/login` 也保持现状
 
+### 1.2 背景图片模式下的组件半透明
+
+有背景图片时，主壳层内所有组件表面（面板、卡片、列表行、`PlayerBar`、设置分区、对话框 / 底部弹层 / 菜单 / 输入框）统一变为半透明，让背景图全应用透出。无背景图片时完全保持现状（全不透明）。
+
+- 联动规则：组件不透明度 `surfaceOpacity = 0.9 − 0.35 × backgroundImageOpacity`，钳制在 `[0.55, 0.9]`——背景越明显组件越透明，保底区间保证文字可读
+  - 背景透明度 0.5（默认）→ 组件 0.725；1.0 → 0.55；接近 0 → 0.9
+- 实现：`AppThemePalette` 新增 `surfaceOpacity` token（默认 1.0），`AppTheme.lightTheme/darkTheme` 新增同名可选参数；`app.dart` 根据 `settings.backgroundImagePath/Opacity` 计算后传入。主题级 `cardTheme / dialogTheme / bottomSheetTheme / popupMenuTheme / snackBarTheme / tooltipTheme / inputDecorationTheme` 背景色统一乘 `surfaceOpacity`；局部不走主题的组件（`SettingsSectionPanel`、`PlaylistTile`、`_PlayerBarSurface`、视频详情 Tab 头、歌单详情页 header）单独读取该 token
+- 弹层（对话框 / 底部弹层 / 菜单）一并半透明；`_ShellBackdrop` 底层渐变保留不透明作兜底
+- 已带固定透明度的小徽标 / 按钮底 / 角标（如 `_VideoBadge` 0.72、`_AccessoryPill` 0.9 等）保持现状，不做乘法联动
+- 独立沉浸路由 `/player`、`/minimal`、`/login` 不联动
+
 ## 2. Windows 中文字体渲染
 
 Windows 桌面端的中文正文使用全局主题里的系统字体策略：
