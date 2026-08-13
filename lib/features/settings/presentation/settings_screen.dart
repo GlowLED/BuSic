@@ -5,6 +5,7 @@ import '../../../shared/extensions/context_extensions.dart';
 import 'widgets/about_section.dart';
 import 'widgets/account_section.dart';
 import 'widgets/appearance_section.dart';
+import 'widgets/background_section.dart';
 import 'widgets/data_management_section.dart';
 import 'widgets/language_section.dart';
 import 'widgets/playback_section.dart';
@@ -70,6 +71,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
             SizedBox(height: spacing.lg),
             const AppearanceSection(),
+            SizedBox(height: spacing.md),
+            const BackgroundSection(),
             SizedBox(height: spacing.md),
             const LanguageSection(),
             SizedBox(height: spacing.md),

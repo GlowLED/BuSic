@@ -1064,6 +1064,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceSettings => '外观';
 
   @override
+  String get backgroundSettings => '背景';
+
+  @override
+  String get backgroundImage => '背景图片';
+
+  @override
+  String get backgroundImageDescription => '选择一张图片作为应用全局背景';
+
+  @override
+  String get removeBackgroundImage => '移除背景图片';
+
+  @override
+  String get backgroundOpacity => '透明度';
+
+  @override
+  String get backgroundBlur => '模糊度';
+
+  @override
+  String get backgroundImageUpdated => '背景图片已更新';
+
+  @override
+  String get backgroundImageRemoved => '背景图片已移除';
+
+  @override
+  String get backgroundImageFailed => '背景图片设置失败';
+
+  @override
   String get languageSettings => '语言';
 
   @override

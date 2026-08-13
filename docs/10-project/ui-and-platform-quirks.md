@@ -26,6 +26,16 @@
 - 移动端竖屏底部 dock 与横屏左侧图标栏
 - `PlayerBar` 是否仍正确显示
 
+## 1.1 全局背景图片
+
+设置在「设置 → 背景」中，由 `BackgroundSection` 管理：
+
+- 用户选择本地图片后，**复制到应用私有目录** `Documents/busic/backgrounds/`（`PlatformUtils.getDataPath()`），路径以字符串存入 SharedPreferences；移除 / 更换背景时清理旧副本。不引用原图路径，原图被移动或删除不影响
+- 渲染位置是 `ResponsiveScaffold` 的 `_ShellBackdrop`：主题渐变始终保留在底层作兜底，图片层叠加在渐变之上、所有内容（标题栏 / 侧栏 / 内容 / `PlayerBar`）之下
+- 三个设置字段都持久化在 `UserPreferences`：`backgroundImagePath`（null = 无背景）、`backgroundImageOpacity`（0.0–1.0，默认 0.5）、`backgroundImageBlur`（sigma 0–60，默认 0）
+- 模糊度为 0 时**跳过 `ImageFiltered`**（避免无谓的模糊管线开销）；解码尺寸按屏幕分辨率降采样（上限 1024，参考极简模式策略）；文件缺失或解码失败时平滑回落到主题渐变
+- 仅主壳层四个主页面生效。全屏播放器 `/player`、极简模式 `/minimal` 是独立沉浸路由、自带封面模糊 / 毛玻璃背景，**不叠加**背景图片；`/login` 也保持现状
+
 ## 2. Windows 中文字体渲染
 
 Windows 桌面端的中文正文使用全局主题里的系统字体策略：
@@ -131,6 +141,7 @@ Linux 桌面通过 MPRIS / D-Bus 接入系统媒体控件、桌面壳层和硬�
 - 以为主壳层仍然是默认 `NavigationRail` / `NavigationBar`
 - 以为紧凑侧栏仍然会显示文字或 tooltip
 - 以为移动端横屏仍然使用底部文字导航
+- 以为全局背景图片会覆盖全屏播放器和极简模式
 - 只在一个平台验证就提交
 
 ## 11. 修改这部分时要一起看什么？

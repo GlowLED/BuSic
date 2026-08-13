@@ -31,6 +31,15 @@ abstract class UserPreferences with _$UserPreferences {
 
     /// Duration of a single fade-in or fade-out transition.
     @Default(1000) int playbackFadeDurationMs,
+
+    /// Path to the app-wide background image (null = no background).
+    String? backgroundImagePath,
+
+    /// Opacity of the background image, 0.0 to 1.0.
+    @Default(0.5) double backgroundImageOpacity,
+
+    /// Gaussian blur sigma of the background image, 0 to 60.
+    @Default(0) double backgroundImageBlur,
   }) = _UserPreferences;
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>

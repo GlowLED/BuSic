@@ -53,7 +53,7 @@ final class SettingsNotifierProvider
   }
 }
 
-String _$settingsNotifierHash() => r'08051650bbfdff9b5b1e913f413a64096e750588';
+String _$settingsNotifierHash() => r'0e409b3ce9190a9fb8fbc19b98141eff31c9e1be';
 
 /// State notifier managing user preferences / settings.
 ///

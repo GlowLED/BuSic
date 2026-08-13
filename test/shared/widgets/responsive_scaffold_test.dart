@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:busic/core/database/app_database.dart';
@@ -201,10 +203,82 @@ void main() {
     expect(playerRect.height, closeTo(64, 0.1));
     expect(searchRect.bottom, closeTo(playerRect.top, 0.1));
   });
+
+  testWidgets('renders background image layer with blur when path is set', (
+    tester,
+  ) async {
+    final imagePath = _writeTempPng();
+    await _pumpShell(
+      tester,
+      const Size(1000, 800),
+      prefs: {
+        'background_image_path': imagePath,
+        'background_image_opacity': 0.5,
+        'background_image_blur': 12.0,
+      },
+    );
+
+    expect(find.byType(ImageFiltered), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
+  });
+
+  testWidgets('skips blur pipeline when background blur is zero', (
+    tester,
+  ) async {
+    final imagePath = _writeTempPng();
+    await _pumpShell(
+      tester,
+      const Size(1000, 800),
+      prefs: {
+        'background_image_path': imagePath,
+        'background_image_opacity': 0.8,
+        'background_image_blur': 0.0,
+      },
+    );
+
+    expect(find.byType(ImageFiltered), findsNothing);
+    expect(find.byType(Image), findsWidgets);
+  });
+
+  testWidgets('shows only the theme gradient without a background image', (
+    tester,
+  ) async {
+    await _pumpShell(tester, const Size(1000, 800));
+
+    expect(find.byType(ImageFiltered), findsNothing);
+    expect(find.byType(Image), findsNothing);
+  });
 }
 
-Future<void> _pumpShell(WidgetTester tester, Size size) async {
-  SharedPreferences.setMockInitialValues({});
+/// Writes a 1x1 transparent PNG to a temp file and returns its path.
+String _writeTempPng() {
+  final dir = Directory.systemTemp.createTempSync('busic_bg_test_');
+  addTearDown(() {
+    try {
+      dir.deleteSync(recursive: true);
+    } catch (_) {}
+  });
+  final file = File(p.join(dir.path, 'bg.png'));
+  file.writeAsBytesSync(_kTransparentPngBytes);
+  return file.path;
+}
+
+/// Minimal valid 1x1 transparent PNG.
+const _kTransparentPngBytes = <int>[
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, //
+  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, //
+  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00, //
+  0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x62, 0x00, 0x01, 0x00, 0x00, //
+  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, //
+  0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+];
+
+Future<void> _pumpShell(
+  WidgetTester tester,
+  Size size, {
+  Map<String, Object> prefs = const {},
+}) async {
+  SharedPreferences.setMockInitialValues(prefs);
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);

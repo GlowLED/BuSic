@@ -2060,6 +2060,60 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get appearanceSettings;
 
+  /// No description provided for @backgroundSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get backgroundSettings;
+
+  /// No description provided for @backgroundImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Background image'**
+  String get backgroundImage;
+
+  /// No description provided for @backgroundImageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an image shown across the app background'**
+  String get backgroundImageDescription;
+
+  /// No description provided for @removeBackgroundImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove background image'**
+  String get removeBackgroundImage;
+
+  /// No description provided for @backgroundOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity'**
+  String get backgroundOpacity;
+
+  /// No description provided for @backgroundBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get backgroundBlur;
+
+  /// No description provided for @backgroundImageUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Background image updated'**
+  String get backgroundImageUpdated;
+
+  /// No description provided for @backgroundImageRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Background image removed'**
+  String get backgroundImageRemoved;
+
+  /// No description provided for @backgroundImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to set background image'**
+  String get backgroundImageFailed;
+
   /// No description provided for @languageSettings.
   ///
   /// In en, this message translates to:

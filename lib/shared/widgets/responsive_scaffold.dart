@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +11,7 @@ import '../../core/utils/platform_utils.dart';
 import '../../features/auth/presentation/widgets/user_avatar_widget.dart';
 
 import '../../features/player/presentation/player_bar.dart';
+import '../../features/settings/application/settings_notifier.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../extensions/context_extensions.dart';
 
@@ -627,14 +632,21 @@ class _ShellContentFrame extends StatelessWidget {
   }
 }
 
-class _ShellBackdrop extends StatelessWidget {
+class _ShellBackdrop extends ConsumerWidget {
   const _ShellBackdrop({required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.appPalette;
+    final settings = ref.watch(settingsNotifierProvider);
+
+    final path = settings.backgroundImagePath;
+    final showImage = path != null &&
+        path.isNotEmpty &&
+        settings.backgroundImageOpacity > 0 &&
+        File(path).existsSync();
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -644,7 +656,87 @@ class _ShellBackdrop extends StatelessWidget {
           colors: [palette.backgroundPrimary, palette.backgroundSecondary],
         ),
       ),
-      child: Stack(fit: StackFit.expand, children: [child]),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (showImage)
+            _BackgroundImageLayer(
+              path: path,
+              opacity: settings.backgroundImageOpacity,
+              blur: settings.backgroundImageBlur,
+            ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// App-wide background image layer rendered behind the shell content.
+///
+/// Applies the configured opacity and optional Gaussian blur. Falls back to
+/// the theme gradient below when the file is missing or fails to decode.
+class _BackgroundImageLayer extends StatelessWidget {
+  const _BackgroundImageLayer({
+    required this.path,
+    required this.opacity,
+    required this.blur,
+  });
+
+  final String path;
+  final double opacity;
+  final double blur;
+
+  @override
+  Widget build(BuildContext context) {
+    final cacheSize = _backgroundCacheSize(context);
+    final image = Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      filterQuality: FilterQuality.high,
+      cacheWidth: cacheSize?.width,
+      cacheHeight: cacheSize?.height,
+      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+    );
+
+    // Skip the blur pipeline entirely when blur is zero to avoid an
+    // unnecessary ImageFiltered layer on every frame.
+    return Opacity(
+      opacity: opacity,
+      child: blur > 0
+          ? ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+              child: image,
+            )
+          : image,
+    );
+  }
+
+  /// Decode the background at a fraction of the screen resolution so large
+  /// images do not blow up memory. Mirrors the minimal mode strategy.
+  ({int width, int height})? _backgroundCacheSize(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width <= 0 || screenSize.height <= 0) return null;
+
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    const oversample = 1.5;
+    const minDimension = 256.0;
+    const maxDimension = 1024.0;
+
+    final rawWidth = screenSize.width * pixelRatio * oversample;
+    final rawHeight = screenSize.height * pixelRatio * oversample;
+    final rawMax = math.max(rawWidth, rawHeight);
+    if (!rawMax.isFinite || rawMax <= 0) return null;
+
+    final scale = rawMax < minDimension
+        ? minDimension / rawMax
+        : rawMax > maxDimension
+        ? maxDimension / rawMax
+        : 1.0;
+
+    return (
+      width: math.max(1, (rawWidth * scale).ceil()),
+      height: math.max(1, (rawHeight * scale).ceil()),
     );
   }
 }
