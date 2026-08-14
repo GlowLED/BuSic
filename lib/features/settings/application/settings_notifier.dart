@@ -27,6 +27,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyBackgroundImagePath = 'background_image_path';
   static const _keyBackgroundImageOpacity = 'background_image_opacity';
   static const _keyBackgroundImageBlur = 'background_image_blur';
+  static const _keyReduceTransparency = 'reduce_transparency';
   static const _keyMinimalPlaylistId = 'minimal_playlist_id';
 
   @override
@@ -54,6 +55,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     final backgroundImagePath = prefs.getString(_keyBackgroundImagePath);
     final storedOpacity = prefs.getDouble(_keyBackgroundImageOpacity);
     final storedBlur = prefs.getDouble(_keyBackgroundImageBlur);
+    final reduceTransparency = prefs.getBool(_keyReduceTransparency) ?? false;
 
     state = UserPreferences(
       themeMode: themeModeIndex != null
@@ -69,6 +71,7 @@ class SettingsNotifier extends _$SettingsNotifier {
       backgroundImagePath: backgroundImagePath,
       backgroundImageOpacity: (storedOpacity ?? 0.5).clamp(0.0, 1.0).toDouble(),
       backgroundImageBlur: (storedBlur ?? 0).clamp(0.0, 60.0).toDouble(),
+      reduceTransparency: reduceTransparency,
     );
   }
 
@@ -207,6 +210,13 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.setDouble(_keyBackgroundImageBlur, normalized);
   }
 
+  /// Enable or disable reduced-transparency glass panels.
+  Future<void> setReduceTransparency(bool enabled) async {
+    state = state.copyWith(reduceTransparency: enabled);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyReduceTransparency, enabled);
+  }
+
   /// Reset all settings to defaults.
   Future<void> resetToDefaults() async {
     state = const UserPreferences();
@@ -222,6 +232,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyBackgroundImagePath);
     await prefs.remove(_keyBackgroundImageOpacity);
     await prefs.remove(_keyBackgroundImageBlur);
+    await prefs.remove(_keyReduceTransparency);
 
     // Cleanup startup recommendation keys left by older builds.
     await prefs.remove('is_minimal_mode');

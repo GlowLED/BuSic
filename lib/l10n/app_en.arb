@@ -520,6 +520,8 @@
   "decreaseInterfaceScale": "Decrease interface scale",
   "increaseInterfaceScale": "Increase interface scale",
   "resetInterfaceScale": "Reset interface scale",
+  "reduceTransparency": "Reduce transparency",
+  "reduceTransparencyDescription": "Disable glass panel blur for smoother rendering on slow devices",
   "settingsPageSubtitle": "Tune playback, account, storage and maintenance controls.",
   "appearanceSettings": "Appearance",
   "backgroundSettings": "Background",

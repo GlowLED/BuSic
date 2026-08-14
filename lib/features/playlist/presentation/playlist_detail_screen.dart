@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/formatters.dart';
 import '../../../shared/extensions/context_extensions.dart';
+import '../../../shared/widgets/cover_precache.dart';
 import '../../../shared/widgets/media_cover.dart';
 import '../../../shared/widgets/media_row.dart';
 import '../../../shared/widgets/song_tile.dart';
@@ -107,6 +108,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
     final songsAsync = ref.watch(playlistDetailNotifierProvider(playlistId));
     final playlistAsync = ref.watch(playlistListNotifierProvider);
     final favState = ref.watch(favoriteNotifierProvider);
+    // Watch only the fields song rows depend on, so 60Hz position ticks do
+    // not rebuild the whole song list. Position itself is unused by any row.
+    final playingSnapshot = ref.watch(
+      playerNotifierProvider.select(
+        (s) => (s.currentTrack?.songId, s.isPlaying),
+      ),
+    );
+    final currentSongId = playingSnapshot.$1;
+    final isPlaying = playingSnapshot.$2;
     final l10n = context.l10n;
 
     // 加载收藏状态
@@ -137,8 +147,6 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
         data: (songs) {
-          final playerState = ref.watch(playerNotifierProvider);
-
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -224,8 +232,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                   itemBuilder: (context, index) {
                     final song = songs[index];
                     final isCurrentSong =
-                        playerState.currentTrack?.songId == song.id &&
-                        playerState.isPlaying;
+                        currentSongId == song.id && isPlaying;
 
                     return Padding(
                       key: ValueKey(song.id),
@@ -248,8 +255,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final song = songs[index];
-                    final isCurrentSong =
-                        playerState.currentTrack?.songId == song.id;
+
+                    // Pre-warm the next ~6 covers so scrolling stays smooth.
+                    for (var lookahead = 1; lookahead <= 6; lookahead++) {
+                      final nextIndex = index + lookahead;
+                      if (nextIndex >= songs.length) break;
+                      precacheNextCover(context, songs[nextIndex].coverUrl);
+                    }
+
+                    final isCurrentSong = currentSongId == song.id;
                     final isSelected = _selectedSongIds.contains(song.id);
                     return _editMode == _EditMode.batchSelect
                         ? Padding(
@@ -262,8 +276,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                             child: _buildBatchSelectSongRow(
                               context: context,
                               song: song,
-                              isCurrentSong:
-                                  isCurrentSong && playerState.isPlaying,
+                              isCurrentSong: isCurrentSong && isPlaying,
                               isSelected: isSelected,
                             ),
                           )
@@ -281,7 +294,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                               duration: Formatters.formatDuration(
                                 Duration(seconds: song.duration),
                               ),
-                              isPlaying: isCurrentSong && playerState.isPlaying,
+                              isPlaying: isCurrentSong && isPlaying,
                               isCached: song.isCached,
                               qualityLabel: song.isCached
                                   ? song.qualityLabel
@@ -300,7 +313,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
                                     .toggleFavorite(song.id);
                               },
                               onTap: () {
-                                if (isCurrentSong && playerState.isPlaying) {
+                                if (isCurrentSong && isPlaying) {
                                   ref
                                       .read(playerNotifierProvider.notifier)
                                       .pause();

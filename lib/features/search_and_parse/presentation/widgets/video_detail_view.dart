@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/app_panel.dart';
+import '../../../../shared/widgets/desktop_selection_area.dart';
 import '../../../../shared/widgets/media_cover.dart';
 import '../../../../shared/widgets/playlist_picker_dialog.dart';
 import '../../../auth/application/auth_notifier.dart';
@@ -410,7 +411,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   Widget _buildTitleBlock(BvidInfo videoInfo) {
     final palette = context.appPalette;
 
-    return SelectionArea(
+    return DesktopSelectionArea(
       child: Text(
         videoInfo.title,
         style: context.textTheme.titleLarge?.copyWith(
@@ -528,7 +529,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SelectionArea(
+          DesktopSelectionArea(
             child: Text(
               displayText,
               maxLines: _isDescriptionExpanded || description.isEmpty

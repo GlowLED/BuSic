@@ -24,6 +24,7 @@ _UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
           (json['backgroundImageOpacity'] as num?)?.toDouble() ?? 0.5,
       backgroundImageBlur:
           (json['backgroundImageBlur'] as num?)?.toDouble() ?? 0,
+      reduceTransparency: json['reduceTransparency'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
@@ -39,6 +40,7 @@ Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
       'backgroundImagePath': instance.backgroundImagePath,
       'backgroundImageOpacity': instance.backgroundImageOpacity,
       'backgroundImageBlur': instance.backgroundImageBlur,
+      'reduceTransparency': instance.reduceTransparency,
     };
 
 const _$ThemeModeEnumMap = {

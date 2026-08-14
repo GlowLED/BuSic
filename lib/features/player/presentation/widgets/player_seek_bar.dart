@@ -22,7 +22,13 @@ class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
 
   @override
   Widget build(BuildContext context) {
-    final playerState = ref.watch(playerNotifierProvider);
+    // Watch only position/duration so 60Hz ticks don't rebuild parent screens.
+    final position = ref.watch(
+      playerNotifierProvider.select((s) => s.position),
+    );
+    final duration = ref.watch(
+      playerNotifierProvider.select((s) => s.duration),
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -41,14 +47,14 @@ class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
             child: Slider(
               value:
                   _dragValue ??
-                  (playerState.duration.inMilliseconds > 0
-                      ? playerState.position.inMilliseconds.toDouble().clamp(
+                  (duration.inMilliseconds > 0
+                      ? position.inMilliseconds.toDouble().clamp(
                           0,
-                          playerState.duration.inMilliseconds.toDouble(),
+                          duration.inMilliseconds.toDouble(),
                         )
                       : 0),
-              max: playerState.duration.inMilliseconds > 0
-                  ? playerState.duration.inMilliseconds.toDouble()
+              max: duration.inMilliseconds > 0
+                  ? duration.inMilliseconds.toDouble()
                   : 1,
               onChangeStart: (value) {
                 setState(() => _dragValue = value);
@@ -73,12 +79,12 @@ class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
                   Formatters.formatDuration(
                     _dragValue != null
                         ? Duration(milliseconds: _dragValue!.toInt())
-                        : playerState.position,
+                        : position,
                   ),
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
                 Text(
-                  Formatters.formatDuration(playerState.duration),
+                  Formatters.formatDuration(duration),
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],

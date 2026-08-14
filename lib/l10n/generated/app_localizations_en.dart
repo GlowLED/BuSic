@@ -1092,6 +1092,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetInterfaceScale => 'Reset interface scale';
 
   @override
+  String get reduceTransparency => 'Reduce transparency';
+
+  @override
+  String get reduceTransparencyDescription =>
+      'Disable glass panel blur for smoother rendering on slow devices';
+
+  @override
   String get settingsPageSubtitle =>
       'Tune playback, account, storage and maintenance controls.';
 

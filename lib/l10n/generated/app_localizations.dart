@@ -2072,6 +2072,18 @@ abstract class AppLocalizations {
   /// **'Reset interface scale'**
   String get resetInterfaceScale;
 
+  /// No description provided for @reduceTransparency.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce transparency'**
+  String get reduceTransparency;
+
+  /// No description provided for @reduceTransparencyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable glass panel blur for smoother rendering on slow devices'**
+  String get reduceTransparencyDescription;
+
   /// No description provided for @settingsPageSubtitle.
   ///
   /// In en, this message translates to:

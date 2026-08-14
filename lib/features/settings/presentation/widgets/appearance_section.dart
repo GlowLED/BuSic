@@ -137,6 +137,19 @@ class AppearanceSection extends ConsumerWidget {
               ],
             ),
           ),
+        SettingsTile(
+          icon: Icons.grain_rounded,
+          title: l10n.reduceTransparency,
+          subtitle: l10n.reduceTransparencyDescription,
+          trailing: Switch(
+            value: settings.reduceTransparency,
+            onChanged: (enabled) => unawaited(
+              ref
+                  .read(settingsNotifierProvider.notifier)
+                  .setReduceTransparency(enabled),
+            ),
+          ),
+        ),
       ],
     );
   }

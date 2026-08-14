@@ -175,9 +175,11 @@ class _MinimalScreenState extends ConsumerState<MinimalScreen>
 
   @override
   Widget build(BuildContext context) {
-    // ★ watch playerState：1) 保持 provider 存活  2) 自动刷新 UI（切歌/封面）
-    final playerState = ref.watch(playerNotifierProvider);
-    final currentTrack = playerState.currentTrack;
+    // ★ watch currentTrack：1) 保持 provider 存活  2) 自动刷新封面/切歌。
+    //    只订阅曲目本身，60Hz 的 position tick 不会重建整屏。
+    final currentTrack = ref.watch(
+      playerNotifierProvider.select((s) => s.currentTrack),
+    );
 
     return Scaffold(
       backgroundColor: Colors.black,

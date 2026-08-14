@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/app_panel.dart';
+import '../../../shared/widgets/desktop_selection_area.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../application/comment_notifier.dart';
 import '../domain/models/comment.dart';
@@ -174,7 +176,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        SelectionArea(
+                        DesktopSelectionArea(
                           child: Text(
                             widget.rootComment.content,
                             style: textTheme.bodyMedium,
@@ -206,6 +208,9 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                       },
                       child: ListView.builder(
                         controller: scrollController,
+                        // Pre-build replies ahead of the viewport so fast
+                        // scrolling inside the sheet stays smooth.
+                        scrollCacheExtent: const ScrollCacheExtent.pixels(600),
                         itemCount: _replies.length + (_isEnd ? 0 : 1),
                         itemBuilder: (context, index) {
                           if (index >= _replies.length) {
@@ -323,7 +328,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  SelectionArea(
+                  DesktopSelectionArea(
                     child: Text(reply.content, style: textTheme.bodySmall),
                   ),
                   if (reply.images.isNotEmpty) ...[

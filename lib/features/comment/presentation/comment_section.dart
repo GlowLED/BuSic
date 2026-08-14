@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -203,6 +204,9 @@ class _CommentSectionState extends ConsumerState<CommentSection> {
                     }
 
                     return CustomScrollView(
+                      // Pre-build comments ahead of the viewport so infinite
+                      // scrolling stays smooth.
+                      scrollCacheExtent: const ScrollCacheExtent.pixels(600),
                       primary: widget.usePrimaryScrollController ? true : null,
                       controller: widget.usePrimaryScrollController
                           ? null

@@ -12,7 +12,6 @@ import '../../comment/presentation/comment_section.dart';
 import '../application/player_notifier.dart';
 import '../domain/models/audio_track.dart';
 import '../domain/models/play_mode.dart';
-import '../domain/models/player_state.dart';
 import 'widgets/cover_image.dart';
 import 'widgets/draggable_progress_bar.dart';
 import 'widgets/player_favorite_button.dart';
@@ -83,15 +82,20 @@ class PlayerBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerNotifierProvider);
-    final track = playerState.currentTrack;
-
-    final progress = playerState.duration.inMilliseconds > 0
-        ? (playerState.position.inMilliseconds /
-                  playerState.duration.inMilliseconds)
-              .clamp(0.0, 1.0)
-              .toDouble()
-        : 0.0;
+    // Watch only transport fields so position ticks (60Hz) rebuild just the
+    // progress/time leaves below instead of the whole bar.
+    final snapshot = ref.watch(
+      playerNotifierProvider.select(
+        (s) => (
+          s.currentTrack,
+          s.isPlaying,
+          s.playMode,
+          s.playlistName,
+          s.volume,
+        ),
+      ),
+    );
+    final track = snapshot.$1;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -101,8 +105,7 @@ class PlayerBar extends ConsumerWidget {
         if (isMobileLayout) {
           return _MobilePlayerBar(
             track: track,
-            progress: progress,
-            isPlaying: playerState.isPlaying,
+            isPlaying: snapshot.$2,
             onPlayPause: () => _togglePlayback(ref),
             onShowQueue: track == null ? null : () => _showQueueSheet(context),
           );
@@ -110,8 +113,10 @@ class PlayerBar extends ConsumerWidget {
 
         return _DesktopPlayerBar(
           track: track,
-          progress: progress,
-          playerState: playerState,
+          isPlaying: snapshot.$2,
+          playMode: snapshot.$3,
+          playlistName: snapshot.$4,
+          volume: snapshot.$5,
           playModeIcon: _playModeIcon,
           playModeLabel: _playModeLabel,
           nextMode: _nextMode,
@@ -155,8 +160,10 @@ class PlayerBar extends ConsumerWidget {
 class _DesktopPlayerBar extends ConsumerWidget {
   const _DesktopPlayerBar({
     required this.track,
-    required this.progress,
-    required this.playerState,
+    required this.isPlaying,
+    required this.playMode,
+    required this.playlistName,
+    required this.volume,
     required this.playModeIcon,
     required this.playModeLabel,
     required this.nextMode,
@@ -166,8 +173,10 @@ class _DesktopPlayerBar extends ConsumerWidget {
   });
 
   final AudioTrack? track;
-  final double progress;
-  final PlayerState playerState;
+  final bool isPlaying;
+  final PlayMode playMode;
+  final String? playlistName;
+  final double volume;
   final IconData Function(PlayMode mode) playModeIcon;
   final String Function(PlayMode mode) playModeLabel;
   final PlayMode Function(PlayMode mode) nextMode;
@@ -201,7 +210,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
               _CircularCover(
                 size: _desktopPlayerBarHeight,
                 coverUrl: currentTrack.coverUrl,
-                isPlaying: playerState.isPlaying,
+                isPlaying: isPlaying,
                 onTap: () => context.push(AppRoutes.player),
               ),
               Expanded(
@@ -229,8 +238,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
                               Text(
                                 [
                                   currentTrack.artist,
-                                  if (playerState.playlistName != null)
-                                    playerState.playlistName!,
+                                  if (playlistName != null) playlistName!,
                                 ].join(' · '),
                                 style: context.textTheme.bodySmall?.copyWith(
                                   color: context.colorScheme.onSurfaceVariant,
@@ -270,18 +278,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
                           ),
                         ),
                       if (context.isDesktop)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Text(
-                            '${Formatters.formatDuration(playerState.position)} / ${Formatters.formatDuration(playerState.duration)}',
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
-                              fontFeatures: [
-                                const FontFeature.tabularFigures(),
-                              ],
-                            ),
-                          ),
-                        ),
+                        const _DesktopTimeLabel(),
                       PlayerFavoriteButton(
                         track: currentTrack,
                         iconSize: 20,
@@ -300,14 +297,14 @@ class _DesktopPlayerBar extends ConsumerWidget {
                       ),
                       IconButton(
                         icon: Icon(
-                          playModeIcon(playerState.playMode),
+                          playModeIcon(playMode),
                           size: 20,
                           color: context.colorScheme.onSurfaceVariant,
                         ),
-                        tooltip: playModeLabel(playerState.playMode),
+                        tooltip: playModeLabel(playMode),
                         visualDensity: VisualDensity.compact,
                         onPressed: () {
-                          final next = nextMode(playerState.playMode);
+                          final next = nextMode(playMode);
                           ref
                               .read(playerNotifierProvider.notifier)
                               .setMode(next);
@@ -328,7 +325,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
                       ),
                       if (context.isDesktop)
                         VolumeButton(
-                          volume: playerState.volume,
+                          volume: volume,
                           onChanged: (v) {
                             ref
                                 .read(playerNotifierProvider.notifier)
@@ -344,7 +341,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
                       ),
                       IconButton(
                         icon: Icon(
-                          playerState.isPlaying
+                          isPlaying
                               ? Icons.pause_circle_filled
                               : Icons.play_circle_filled,
                           size: 36,
@@ -370,9 +367,7 @@ class _DesktopPlayerBar extends ConsumerWidget {
             left: _desktopPlayerBarHeight,
             right: 0,
             height: 20,
-            child: DraggableProgressBar(
-              progress: progress,
-              duration: playerState.duration,
+            child: _DesktopProgressBar(
               onSeek: (pos) {
                 ref.read(playerNotifierProvider.notifier).seekTo(pos);
               },
@@ -387,14 +382,12 @@ class _DesktopPlayerBar extends ConsumerWidget {
 class _MobilePlayerBar extends StatelessWidget {
   const _MobilePlayerBar({
     required this.track,
-    required this.progress,
     required this.isPlaying,
     required this.onPlayPause,
     required this.onShowQueue,
   });
 
   final AudioTrack? track;
-  final double progress;
   final bool isPlaying;
   final VoidCallback onPlayPause;
   final VoidCallback? onShowQueue;
@@ -437,8 +430,7 @@ class _MobilePlayerBar extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: 6),
-          _CircularProgressPlayButton(
-            progress: hasTrack ? progress : 0,
+          _MobileProgressPlayButton(
             isPlaying: isPlaying,
             onPressed: hasTrack ? onPlayPause : null,
           ),
@@ -514,6 +506,65 @@ class _PlayerBarSurface extends StatelessWidget {
                 : null,
           ),
           child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Desktop progress bar leaf.
+///
+/// Watches position/duration so 60Hz ticks only repaint this thin bar instead
+/// of rebuilding the whole desktop bar surface.
+class _DesktopProgressBar extends ConsumerWidget {
+  const _DesktopProgressBar({required this.onSeek});
+
+  final ValueChanged<Duration> onSeek;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final position = ref.watch(
+      playerNotifierProvider.select((s) => s.position),
+    );
+    final duration = ref.watch(
+      playerNotifierProvider.select((s) => s.duration),
+    );
+    final progress = duration.inMilliseconds > 0
+        ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+        : 0.0;
+
+    return DraggableProgressBar(
+      progress: progress,
+      duration: duration,
+      onSeek: onSeek,
+    );
+  }
+}
+
+/// Desktop "position / duration" label leaf.
+///
+/// Watches position/duration so 60Hz ticks only rebuild this tiny text.
+class _DesktopTimeLabel extends ConsumerWidget {
+  const _DesktopTimeLabel();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final position = ref.watch(
+      playerNotifierProvider.select((s) => s.position),
+    );
+    final duration = ref.watch(
+      playerNotifierProvider.select((s) => s.duration),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Text(
+        '${Formatters.formatDuration(position)} / ${Formatters.formatDuration(duration)}',
+        style: context.textTheme.labelSmall?.copyWith(
+          color: context.colorScheme.onSurfaceVariant,
+          fontFeatures: [
+            const FontFeature.tabularFigures(),
+          ],
         ),
       ),
     );
@@ -790,6 +841,37 @@ class _MobileTrackLine extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: context.textTheme.bodyMedium,
+    );
+  }
+}
+
+class _MobileProgressPlayButton extends ConsumerWidget {
+  const _MobileProgressPlayButton({
+    required this.isPlaying,
+    required this.onPressed,
+  });
+
+  final bool isPlaying;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Progress ring watches position/duration so 60Hz ticks only repaint this
+    // small leaf instead of rebuilding the whole mobile bar.
+    final position = ref.watch(
+      playerNotifierProvider.select((s) => s.position),
+    );
+    final duration = ref.watch(
+      playerNotifierProvider.select((s) => s.duration),
+    );
+    final progress = duration.inMilliseconds > 0
+        ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+        : 0.0;
+
+    return _CircularProgressPlayButton(
+      progress: progress,
+      isPlaying: isPlaying,
+      onPressed: onPressed,
     );
   }
 }

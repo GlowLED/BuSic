@@ -1070,6 +1070,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetInterfaceScale => '恢复默认缩放';
 
   @override
+  String get reduceTransparency => '减少毛玻璃效果';
+
+  @override
+  String get reduceTransparencyDescription => '关闭面板毛玻璃模糊，低性能设备渲染更流畅';
+
+  @override
   String get settingsPageSubtitle => '集中管理播放、账号、存储和维护选项。';
 
   @override

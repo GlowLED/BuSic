@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/extensions/context_extensions.dart';
+import '../../../../shared/widgets/cover_precache.dart';
 import '../../../../shared/widgets/media_cover.dart';
 import '../../../../shared/widgets/media_row.dart';
 import '../../domain/models/bvid_info.dart';
@@ -119,6 +121,8 @@ class _SearchResultsListViewState extends State<_SearchResultsListView> {
         widget.storageKey ?? 'search_results_page_${widget.currentPage}',
       ),
       controller: widget.useScrollController ? _scrollController : null,
+      // Pre-build ~a screen of rows ahead so rapid scrolling stays smooth.
+      scrollCacheExtent: const ScrollCacheExtent.pixels(1200),
       padding: EdgeInsets.fromLTRB(
         spacing.md,
         spacing.md,
@@ -133,6 +137,13 @@ class _SearchResultsListViewState extends State<_SearchResultsListView> {
         }
 
         final video = widget.results[index];
+
+        // Pre-warm the next ~6 covers so fast scrolling doesn't stall on them.
+        for (var lookahead = 1; lookahead <= 6; lookahead++) {
+          final nextIndex = index + lookahead;
+          if (nextIndex >= widget.results.length) break;
+          precacheNextCover(context, widget.results[nextIndex].coverUrl);
+        }
 
         return MediaRow(
           cover: MediaCover(

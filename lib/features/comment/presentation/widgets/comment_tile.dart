@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../shared/extensions/context_extensions.dart';
+import '../../../../shared/widgets/desktop_selection_area.dart';
 import '../../domain/models/comment.dart';
 import 'comment_image_list.dart';
 
@@ -78,7 +79,7 @@ class CommentTile extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 // Comment content
-                SelectionArea(
+                DesktopSelectionArea(
                   child: Text(comment.content, style: textTheme.bodyMedium),
                 ),
                 if (comment.images.isNotEmpty) ...[
@@ -144,7 +145,7 @@ class CommentTile extends StatelessWidget {
                         for (final reply in comment.replies.take(3))
                           Padding(
                             padding: const EdgeInsets.only(bottom: 4),
-                            child: SelectionArea(
+                            child: DesktopSelectionArea(
                               child: Text.rich(
                                 TextSpan(
                                   children: [

@@ -43,6 +43,12 @@ abstract class UserPreferences with _$UserPreferences {
 
     /// Gaussian blur sigma of the background image, 0 to 60.
     @Default(0) double backgroundImageBlur,
+
+    /// Whether to skip glass BackdropFilter panels for performance.
+    ///
+    /// When enabled, panels render with their opaque gradient instead of
+    /// sampling the backdrop every frame, which helps on low-end devices.
+    @Default(false) bool reduceTransparency,
   }) = _UserPreferences;
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) =>

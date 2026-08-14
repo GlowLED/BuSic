@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../../subtitle/presentation/widgets/lyrics_panel.dart';
 import '../application/player_notifier.dart';
+import '../domain/models/audio_track.dart';
 import 'widgets/cover_image.dart';
 import 'widgets/player_app_bar.dart';
 import 'widgets/player_comment_panel.dart';
@@ -49,8 +50,11 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final playerState = ref.watch(playerNotifierProvider);
-    final track = playerState.currentTrack;
+    // Watch only the current track so 60Hz position ticks don't rebuild the
+    // whole screen (including the full-screen blurred background).
+    final track = ref.watch(
+      playerNotifierProvider.select((s) => s.currentTrack),
+    );
     final screenSize = MediaQuery.sizeOf(context);
     final isWide = screenSize.width > screenSize.height;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -64,16 +68,18 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
           // Blurred background
           if (track?.coverUrl != null)
-            ClipRect(
-              child: ImageFiltered(
-                imageFilter: ImageFilter.blur(
-                  sigmaX: _backgroundBlurSigma,
-                  sigmaY: _backgroundBlurSigma,
-                ),
-                child: Transform.scale(
-                  scale: _backgroundImageScale,
-                  filterQuality: FilterQuality.high,
-                  child: _buildBackground(track!.coverUrl!, isDark),
+            RepaintBoundary(
+              child: ClipRect(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: _backgroundBlurSigma,
+                    sigmaY: _backgroundBlurSigma,
+                  ),
+                  child: Transform.scale(
+                    scale: _backgroundImageScale,
+                    filterQuality: FilterQuality.high,
+                    child: _buildBackground(track!.coverUrl!, isDark),
+                  ),
                 ),
               ),
             ),
@@ -81,7 +87,11 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
           _buildBackgroundScrim(isDark),
 
           // Content
-          SafeArea(child: isWide ? _buildWideLayout() : _buildPortraitLayout()),
+          SafeArea(
+            child: isWide
+                ? _buildWideLayout(track)
+                : _buildPortraitLayout(track),
+          ),
         ],
       ),
     );
@@ -89,10 +99,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
   // ── Portrait layout ──────────────────────────────────────────────
 
-  Widget _buildPortraitLayout() {
-    final playerState = ref.watch(playerNotifierProvider);
-    final track = playerState.currentTrack;
-
+  Widget _buildPortraitLayout(AudioTrack? track) {
     return Column(
       children: [
         PlayerAppBar(track: track),
@@ -134,9 +141,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen> {
 
   // ── Wide (landscape) layout ──────────────────────────────────────
 
-  Widget _buildWideLayout() {
-    final playerState = ref.watch(playerNotifierProvider);
-    final track = playerState.currentTrack;
+  Widget _buildWideLayout(AudioTrack? track) {
     final l10n = context.l10n;
 
     return Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -341,6 +342,9 @@ class _PlaylistHomeContent extends StatelessWidget {
             .ceilToDouble();
 
     return CustomScrollView(
+      // Pre-build ~a screen of tiles ahead of the viewport so scrolling into
+      // them doesn't jank on first paint.
+      scrollCacheExtent: const ScrollCacheExtent.pixels(800),
       slivers: [
         if (playlists.isEmpty)
           SliverFillRemaining(

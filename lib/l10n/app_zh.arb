@@ -512,6 +512,8 @@
   "decreaseInterfaceScale": "缩小界面",
   "increaseInterfaceScale": "放大界面",
   "resetInterfaceScale": "恢复默认缩放",
+  "reduceTransparency": "减少毛玻璃效果",
+  "reduceTransparencyDescription": "关闭面板毛玻璃模糊，低性能设备渲染更流畅",
   "settingsPageSubtitle": "集中管理播放、账号、存储和维护选项。",
   "appearanceSettings": "外观",
   "backgroundSettings": "背景",

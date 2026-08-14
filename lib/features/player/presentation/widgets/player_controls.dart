@@ -13,17 +13,23 @@ class PlayerControls extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerNotifierProvider);
+    // Watch only transport state so 60Hz position ticks don't rebuild controls.
+    final playerState = ref.watch(
+      playerNotifierProvider.select((s) => (s.isPlaying, s.playMode)),
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 400;
 
         final modeBtn = IconButton(
-          icon: Icon(_modeIcon(playerState.playMode), color: Colors.white70),
+          icon: Icon(
+            _modeIcon(playerState.$2),
+            color: Colors.white70,
+          ),
           onPressed: () {
             const modes = PlayMode.values;
-            final next = (playerState.playMode.index + 1) % modes.length;
+            final next = (playerState.$2.index + 1) % modes.length;
             ref.read(playerNotifierProvider.notifier).setMode(modes[next]);
           },
         );
@@ -43,7 +49,7 @@ class PlayerControls extends ConsumerWidget {
           child: IconButton(
             iconSize: 40,
             icon: Icon(
-              playerState.isPlaying ? Icons.pause : Icons.play_arrow,
+              playerState.$1 ? Icons.pause : Icons.play_arrow,
               color: Colors.black87,
             ),
             onPressed: () {

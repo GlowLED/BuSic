@@ -16,7 +16,13 @@ class PlayQueueSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerState = ref.watch(playerNotifierProvider);
+    // Watch only queue/index so 60Hz position ticks don't rebuild the sheet.
+    // The queue list is replaced by the notifier on every mutation, so the
+    // reference comparison in select is reliable.
+    final queue = ref.watch(playerNotifierProvider.select((s) => s.queue));
+    final currentIndex = ref.watch(
+      playerNotifierProvider.select((s) => s.currentIndex),
+    );
     final l10n = context.l10n;
 
     return DraggableScrollableSheet(
@@ -49,7 +55,7 @@ class PlayQueueSheet extends ConsumerWidget {
                   Text(l10n.queue, style: context.textTheme.titleMedium),
                   const SizedBox(width: 8),
                   Text(
-                    '(${playerState.queue.length})',
+                    '(${queue.length})',
                     style: context.textTheme.bodySmall,
                   ),
                 ],
@@ -58,7 +64,7 @@ class PlayQueueSheet extends ConsumerWidget {
             const SizedBox(height: 8),
             // Queue list
             Expanded(
-              child: playerState.queue.isEmpty
+              child: queue.isEmpty
                   ? Center(
                       child: Text(
                         l10n.noSongs,
@@ -69,7 +75,7 @@ class PlayQueueSheet extends ConsumerWidget {
                     )
                   : ReorderableListView.builder(
                       scrollController: scrollController,
-                      itemCount: playerState.queue.length,
+                      itemCount: queue.length,
                       onReorderItem: (oldIndex, newIndex) {
                         final legacyNewIndex = newIndex > oldIndex
                             ? newIndex + 1
@@ -79,8 +85,8 @@ class PlayQueueSheet extends ConsumerWidget {
                             .reorderQueue(oldIndex, legacyNewIndex);
                       },
                       itemBuilder: (context, index) {
-                        final track = playerState.queue[index];
-                        final isCurrent = index == playerState.currentIndex;
+                        final track = queue[index];
+                        final isCurrent = index == currentIndex;
 
                         return Dismissible(
                           key: ValueKey('queue_${track.songId}_$index'),
@@ -129,7 +135,7 @@ class PlayQueueSheet extends ConsumerWidget {
                             onTap: () {
                               ref
                                   .read(playerNotifierProvider.notifier)
-                                  .playTrack(track, queue: playerState.queue);
+                                  .playTrack(track, queue: queue);
                             },
                             trailing: ReorderableDragStartListener(
                               index: index,
