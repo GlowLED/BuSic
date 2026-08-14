@@ -1058,6 +1058,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get colorScheme => '配色方案';
 
   @override
+  String get interfaceScale => '界面缩放';
+
+  @override
+  String get decreaseInterfaceScale => '缩小界面';
+
+  @override
+  String get increaseInterfaceScale => '放大界面';
+
+  @override
+  String get resetInterfaceScale => '恢复默认缩放';
+
+  @override
   String get settingsPageSubtitle => '集中管理播放、账号、存储和维护选项。';
 
   @override

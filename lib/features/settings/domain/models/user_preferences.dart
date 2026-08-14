@@ -26,6 +26,9 @@ abstract class UserPreferences with _$UserPreferences {
     /// Theme seed color value.
     @Default(0xFF4CAF50) int themeSeedColor,
 
+    /// Desktop interface scale. Mobile platforms always render at 100%.
+    @Default(1.0) double uiScale,
+
     /// Whether playback boundaries use volume fade transitions.
     @Default(true) bool playbackFadeEnabled,
 

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/platform_utils.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
 import 'settings_panel.dart';
@@ -71,6 +74,69 @@ class AppearanceSection extends ConsumerWidget {
             ],
           ),
         ),
+        if (PlatformUtils.isDesktop)
+          SettingsTile(
+            icon: Icons.display_settings_rounded,
+            title: l10n.interfaceScale,
+            subtitle: '${(settings.uiScale * 100).round()}%',
+            trailing: IconButton(
+              tooltip: l10n.resetInterfaceScale,
+              onPressed: settings.uiScale == SettingsNotifier.defaultUiScale
+                  ? null
+                  : () => unawaited(
+                      ref
+                          .read(settingsNotifierProvider.notifier)
+                          .resetUiScale(),
+                    ),
+              icon: const Icon(Icons.restart_alt_rounded),
+            ),
+            body: Row(
+              children: [
+                IconButton(
+                  tooltip: l10n.decreaseInterfaceScale,
+                  onPressed:
+                      settings.uiScale ==
+                          SettingsNotifier.supportedUiScales.first
+                      ? null
+                      : () => unawaited(
+                          ref
+                              .read(settingsNotifierProvider.notifier)
+                              .decreaseUiScale(),
+                        ),
+                  icon: const Icon(Icons.remove_rounded),
+                ),
+                Expanded(
+                  child: Slider(
+                    value: settings.uiScale,
+                    min: SettingsNotifier.supportedUiScales.first,
+                    max: SettingsNotifier.supportedUiScales.last,
+                    divisions: SettingsNotifier.supportedUiScales.length - 1,
+                    label: '${(settings.uiScale * 100).round()}%',
+                    semanticFormatterCallback: (value) =>
+                        '${(value * 100).round()}%',
+                    onChanged: (value) => unawaited(
+                      ref
+                          .read(settingsNotifierProvider.notifier)
+                          .setUiScale(value),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.increaseInterfaceScale,
+                  onPressed:
+                      settings.uiScale ==
+                          SettingsNotifier.supportedUiScales.last
+                      ? null
+                      : () => unawaited(
+                          ref
+                              .read(settingsNotifierProvider.notifier)
+                              .increaseUiScale(),
+                        ),
+                  icon: const Icon(Icons.add_rounded),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

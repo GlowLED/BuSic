@@ -13,12 +13,15 @@ part 'settings_notifier.g.dart';
 @Riverpod(name: 'settingsNotifierProvider')
 class SettingsNotifier extends _$SettingsNotifier {
   static const supportedPlaybackFadeDurations = [500, 1000, 2000];
+  static const supportedUiScales = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5];
+  static const defaultUiScale = 1.0;
 
   static const _keyThemeMode = 'theme_mode';
   static const _keyLocale = 'locale';
   static const _keyCachePath = 'cache_path';
   static const _keyPreferredQuality = 'preferred_quality';
   static const _keyThemeSeedColor = 'theme_seed_color';
+  static const _keyUiScale = 'ui_scale';
   static const _keyPlaybackFadeEnabled = 'playback_fade_enabled';
   static const _keyPlaybackFadeDurationMs = 'playback_fade_duration_ms';
   static const _keyMinimalPlaylistId = 'minimal_playlist_id';
@@ -37,6 +40,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     final cachePath = prefs.getString(_keyCachePath);
     final preferredQuality = prefs.getInt(_keyPreferredQuality) ?? 0;
     final themeSeedColor = prefs.getInt(_keyThemeSeedColor) ?? 0xFF4CAF50;
+    final uiScale = normalizeUiScale(prefs.getDouble(_keyUiScale));
     final playbackFadeEnabled = prefs.getBool(_keyPlaybackFadeEnabled) ?? true;
     final storedPlaybackFadeDurationMs =
         prefs.getInt(_keyPlaybackFadeDurationMs) ?? 1000;
@@ -53,6 +57,7 @@ class SettingsNotifier extends _$SettingsNotifier {
       cachePath: cachePath,
       preferredQuality: preferredQuality,
       themeSeedColor: themeSeedColor,
+      uiScale: uiScale,
       playbackFadeEnabled: playbackFadeEnabled,
       playbackFadeDurationMs: playbackFadeDurationMs,
     );
@@ -101,6 +106,54 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.setInt(_keyThemeSeedColor, colorValue);
   }
 
+  /// Normalize a stored or requested desktop interface scale.
+  static double normalizeUiScale(double? scale) {
+    if (scale == null || !scale.isFinite) return defaultUiScale;
+    if (scale < supportedUiScales.first || scale > supportedUiScales.last) {
+      return defaultUiScale;
+    }
+
+    var closest = supportedUiScales.first;
+    var closestDistance = (scale - closest).abs();
+    for (final candidate in supportedUiScales.skip(1)) {
+      final distance = (scale - candidate).abs();
+      if (distance < closestDistance) {
+        closest = candidate;
+        closestDistance = distance;
+      }
+    }
+    return closest;
+  }
+
+  /// Set the desktop interface scale and persist it locally.
+  Future<void> setUiScale(double scale) async {
+    final normalized = normalizeUiScale(scale);
+    state = state.copyWith(uiScale: normalized);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyUiScale, normalized);
+  }
+
+  /// Increase the desktop interface scale by one supported step.
+  Future<void> increaseUiScale() {
+    final currentIndex = supportedUiScales.indexOf(
+      normalizeUiScale(state.uiScale),
+    );
+    final nextIndex = (currentIndex + 1).clamp(0, supportedUiScales.length - 1);
+    return setUiScale(supportedUiScales[nextIndex]);
+  }
+
+  /// Decrease the desktop interface scale by one supported step.
+  Future<void> decreaseUiScale() {
+    final currentIndex = supportedUiScales.indexOf(
+      normalizeUiScale(state.uiScale),
+    );
+    final nextIndex = (currentIndex - 1).clamp(0, supportedUiScales.length - 1);
+    return setUiScale(supportedUiScales[nextIndex]);
+  }
+
+  /// Reset only the desktop interface scale to 100%.
+  Future<void> resetUiScale() => setUiScale(defaultUiScale);
+
   /// Enable or disable playback fade transitions.
   Future<void> setPlaybackFadeEnabled(bool enabled) async {
     state = state.copyWith(playbackFadeEnabled: enabled);
@@ -127,6 +180,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyCachePath);
     await prefs.remove(_keyPreferredQuality);
     await prefs.remove(_keyThemeSeedColor);
+    await prefs.remove(_keyUiScale);
     await prefs.remove(_keyPlaybackFadeEnabled);
     await prefs.remove(_keyPlaybackFadeDurationMs);
 

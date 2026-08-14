@@ -2048,6 +2048,30 @@ abstract class AppLocalizations {
   /// **'Color Scheme'**
   String get colorScheme;
 
+  /// No description provided for @interfaceScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface scale'**
+  String get interfaceScale;
+
+  /// No description provided for @decreaseInterfaceScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease interface scale'**
+  String get decreaseInterfaceScale;
+
+  /// No description provided for @increaseInterfaceScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase interface scale'**
+  String get increaseInterfaceScale;
+
+  /// No description provided for @resetInterfaceScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset interface scale'**
+  String get resetInterfaceScale;
+
   /// No description provided for @settingsPageSubtitle.
   ///
   /// In en, this message translates to:

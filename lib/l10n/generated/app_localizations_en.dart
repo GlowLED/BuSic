@@ -1080,6 +1080,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorScheme => 'Color Scheme';
 
   @override
+  String get interfaceScale => 'Interface scale';
+
+  @override
+  String get decreaseInterfaceScale => 'Decrease interface scale';
+
+  @override
+  String get increaseInterfaceScale => 'Increase interface scale';
+
+  @override
+  String get resetInterfaceScale => 'Reset interface scale';
+
+  @override
   String get settingsPageSubtitle =>
       'Tune playback, account, storage and maintenance controls.';
 

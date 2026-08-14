@@ -235,13 +235,13 @@ group('备份导出不含下载路径', () {
 | `test/core/services` | `audio_handler_test.dart` | 已覆盖异步媒体命令等待语义 | 媒体会话接口变动时同步补回归 |
 | `test/core/theme` | `app_theme_test.dart` | 已覆盖 | 改主题 token 时补断言 |
 | `test/core/window` | `tray_service_test.dart` | 已覆盖 Windows ICO 路径解析与非 Windows PNG 回归 | 改托盘资源路径或平台打包时同步补回归 |
-| `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` / `desktop_window_resize_frame` | 部分覆盖 | 新增共享组件时同步补 widget tests |
+| `test/shared/widgets` | `app_panel` / `media_cover` / `song_tile` / `responsive_scaffold` / `desktop_window_resize_frame` / `app_ui_scaler` / `ui_scale_shortcuts` | 已覆盖全局缩放几何、命中坐标和快捷键传播，其他共享组件部分覆盖 | 新增共享组件时同步补 widget tests |
 | `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
 | `features/app_update` | `data` + `domain/models` | 覆盖较好 | 后续补 `application` / `presentation` |
 | `features/download` | `download_cache_mechanism_test.dart` + `presentation/download_screen_test.dart` | 缓存主链路与下载页缓存语义已覆盖 | 后续补 Notifier 边界回归 |
 | `features/playlist` | `presentation/playlist_list_screen_test.dart` + `presentation/widgets/playlist_tile_test.dart` | 页面与卡片已有回归，数据和状态层仍偏浅 | 优先补 `data` / `application` |
 | `features/search_and_parse` | `data` 层 2 个文件 + `application` + `domain/models` + `presentation` 层 3 个文件 | 搜索、解析、视频互动与详情 UI 覆盖较好 | 后续按真实 bug 补分页和交互边界 |
-| `features/settings` | `application/settings_notifier_test.dart` + `presentation/playback_section_test.dart` | 设置持久化与播放渐变设置 UI 已覆盖 | 改设置持久化时继续补 |
+| `features/settings` | `application/settings_notifier_test.dart` + `presentation/playback_section_test.dart` + `presentation/appearance_section_test.dart` | 设置持久化、播放渐变和桌面界面缩放 UI 已覆盖 | 改设置持久化或外观控制时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
 | `features/auth` | `domain` 1 个 + `data` 2 个 + `application` 2 个 + `presentation` 1 个测试文件 | Cookie 解析、登录校验、Web 登录可用性、Linux 托管浏览器、会话编排和登录 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
 | `features/comment` | `presentation/comment_section_appearance_test.dart` + `presentation/comment_text_selection_test.dart` | 评论外观和文本选择已覆盖 | 需要新增请求适配和状态测试 |

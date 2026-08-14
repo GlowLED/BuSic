@@ -97,6 +97,18 @@ static const double desktopBreakpoint = 840;
 static const double compactBreakpoint = 600;
 ```
 
+### 桌面界面缩放
+
+Windows、macOS 和 Linux 支持 80%–150% 的全局界面缩放，步长为 10%，
+设置由 `SettingsNotifier` 持久化。Android 和 iOS 始终保持 100%。
+
+- `AppUiScaler` 在应用根部同时缩放文字、组件、间距和路由 overlay。
+- 缩放后的逻辑视口会反向换算，因此 `ResponsiveScaffold` 继续按有效宽度响应式重排。
+- 系统 `TextScaler` 不会被覆盖，系统文字缩放会继续叠加。
+- Linux 窗口 resize 命中边缘位于缩放层之外，不随界面缩放。
+- 桌面快捷键为 `Ctrl + + / - / 0`；macOS 同时支持对应的 `Command` 组合。
+- 主键盘的 `Ctrl + =` 和数字键盘的加、减、零同样受支持。
+
 ## 主题系统
 
 ### AppTheme 设计系统入口

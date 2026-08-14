@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,8 +10,11 @@ import 'core/theme/app_theme.dart';
 import 'features/app_update/application/update_notifier.dart';
 import 'features/auth/application/auth_notifier.dart';
 import 'features/settings/application/settings_notifier.dart';
+import 'core/utils/platform_utils.dart';
 import 'shared/extensions/context_extensions.dart';
+import 'shared/widgets/app_ui_scaler.dart';
 import 'shared/widgets/desktop_window_resize_frame.dart';
+import 'shared/widgets/ui_scale_shortcuts.dart';
 
 /// Root application widget.
 ///
@@ -67,8 +72,28 @@ class _AppState extends ConsumerState<App> {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
+        final isDesktop = PlatformUtils.isDesktop;
+        final uiScale = isDesktop ? settings.uiScale : 1.0;
         return DesktopWindowResizeFrame(
-          child: _StartupAuthProbe(child: child ?? const SizedBox.shrink()),
+          child: _StartupAuthProbe(
+            child: UiScaleShortcuts(
+              enabled: isDesktop,
+              enableMetaShortcuts: PlatformUtils.isMacOS,
+              onIncrease: () => unawaited(
+                ref.read(settingsNotifierProvider.notifier).increaseUiScale(),
+              ),
+              onDecrease: () => unawaited(
+                ref.read(settingsNotifierProvider.notifier).decreaseUiScale(),
+              ),
+              onReset: () => unawaited(
+                ref.read(settingsNotifierProvider.notifier).resetUiScale(),
+              ),
+              child: AppUiScaler(
+                scale: uiScale,
+                child: child ?? const SizedBox.shrink(),
+              ),
+            ),
+          ),
         );
       },
     );
