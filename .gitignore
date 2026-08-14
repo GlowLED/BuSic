@@ -130,6 +130,9 @@ temp/
 # Claude Code
 .claude/
 
+# ZCode
+.zcode/
+
 CLAUDE.md
 AGENTS.md
 .codex
