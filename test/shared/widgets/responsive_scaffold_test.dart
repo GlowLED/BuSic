@@ -247,6 +247,35 @@ void main() {
     expect(find.byType(Image), findsWidgets);
   });
 
+  testWidgets(
+    'background image decoded with fit policy to preserve aspect ratio',
+    (tester) async {
+      final imagePath = _writeTempPng();
+      await _pumpShell(
+        tester,
+        const Size(1000, 800),
+        prefs: {
+          'background_image_path': imagePath,
+          'background_image_opacity': 0.5,
+          'background_image_blur': 0.0,
+        },
+      );
+
+      // The background layer must decode with ResizeImagePolicy.fit so the
+      // source keeps its intrinsic aspect ratio instead of being stretched to
+      // the window's aspect ratio (default exact policy).
+      final resize = tester
+          .widgetList<Image>(find.byType(Image))
+          .map((widget) => widget.image)
+          .whereType<ResizeImage>()
+          .first;
+
+      expect(resize.policy, ResizeImagePolicy.fit);
+      expect(resize.width, isNotNull);
+      expect(resize.height, isNotNull);
+    },
+  );
+
   testWidgets('shows only the theme gradient without a background image', (
     tester,
   ) async {

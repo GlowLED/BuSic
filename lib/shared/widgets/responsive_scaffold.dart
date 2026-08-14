@@ -690,12 +690,22 @@ class _BackgroundImageLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cacheSize = _backgroundCacheSize(context);
-    final image = Image.file(
-      File(path),
+    final fileProvider = FileImage(File(path));
+    // 用 ResizeImagePolicy.fit 在缓存上界内保持原始宽高比解码，避免按窗口
+    // 宽高比拉伸变形（默认 exact 策略会按精确尺寸解码）；随后 BoxFit.cover
+    // 按真实宽高比裁切铺满窗口。
+    final ImageProvider provider = cacheSize == null
+        ? fileProvider
+        : ResizeImage(
+            fileProvider,
+            width: cacheSize.width,
+            height: cacheSize.height,
+            policy: ResizeImagePolicy.fit,
+          );
+    final image = Image(
+      image: provider,
       fit: BoxFit.cover,
       filterQuality: FilterQuality.high,
-      cacheWidth: cacheSize?.width,
-      cacheHeight: cacheSize?.height,
       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
     );
 
