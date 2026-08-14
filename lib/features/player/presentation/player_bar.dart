@@ -251,7 +251,12 @@ class _DesktopPlayerBar extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: context.colorScheme.tertiaryContainer,
+                              color: context.colorScheme.tertiaryContainer
+                                  .withValues(
+                                    alpha: context
+                                        .appPalette
+                                        .surfaceOpacity,
+                                  ),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -497,7 +502,9 @@ class _PlayerBarSurface extends StatelessWidget {
         child: Container(
           height: height,
           decoration: BoxDecoration(
-            color: context.colorScheme.surfaceContainerHighest,
+            color: context.colorScheme.surfaceContainerHighest.withValues(
+              alpha: context.appPalette.surfaceOpacity,
+            ),
             borderRadius: BorderRadius.circular(height / 2),
             border: bordered
                 ? Border.all(
@@ -654,7 +661,9 @@ class _RecordDisc extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF20242A).withValues(alpha: 0.94),
+              color: const Color(0xFF20242A).withValues(
+                alpha: 0.94 * context.appPalette.surfaceOpacity,
+              ),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.28),
                 width: 1,
@@ -815,7 +824,9 @@ class _CircularProgressPlayButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Material(
-            color: Colors.white,
+            color: Colors.white.withValues(
+              alpha: context.appPalette.surfaceOpacity,
+            ),
             shape: const CircleBorder(),
             child: InkWell(
               customBorder: const CircleBorder(),

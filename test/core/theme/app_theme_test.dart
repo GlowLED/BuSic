@@ -115,6 +115,44 @@ void main() {
         }
       },
     );
+
+    test('default surfaceOpacity keeps all surfaces fully opaque', () {
+      final theme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
+      final palette = theme.extension<AppThemePalette>()!;
+
+      expect(palette.surfaceOpacity, 1.0);
+      expect(theme.cardTheme.color!.a, 1.0);
+      expect(theme.dialogTheme.backgroundColor!.a, 1.0);
+      expect(theme.bottomSheetTheme.backgroundColor!.a, 1.0);
+      expect(theme.bottomSheetTheme.modalBackgroundColor!.a, 1.0);
+      expect(theme.popupMenuTheme.color!.a, 1.0);
+      expect(theme.snackBarTheme.backgroundColor!.a, 1.0);
+    });
+
+    test('surfaceOpacity applies translucency to component themes', () {
+      for (final brightness in Brightness.values) {
+        final theme = brightness == Brightness.light
+            ? AppTheme.lightTheme(
+                seedColor: AppTheme.greenSeed,
+                surfaceOpacity: 0.7,
+              )
+            : AppTheme.darkTheme(
+                seedColor: AppTheme.pinkSeed,
+                surfaceOpacity: 0.7,
+              );
+        final palette = theme.extension<AppThemePalette>()!;
+
+        expect(palette.surfaceOpacity, 0.7);
+        expect(theme.cardTheme.color!.a, closeTo(0.7, 0.001));
+        expect(theme.dialogTheme.backgroundColor!.a, closeTo(0.7, 0.001));
+        expect(
+          theme.bottomSheetTheme.modalBackgroundColor!.a,
+          closeTo(0.7, 0.001),
+        );
+        expect(theme.popupMenuTheme.color!.a, closeTo(0.7, 0.001));
+        expect(theme.snackBarTheme.backgroundColor!.a, closeTo(0.7, 0.001));
+      }
+    });
   });
 }
 

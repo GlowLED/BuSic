@@ -41,8 +41,12 @@ class AppPanel extends StatelessWidget {
     final effectiveColors =
         backgroundColors ??
         [
-          palette.surfaceElevated.withValues(alpha: 0.96),
-          palette.surfaceSecondary.withValues(alpha: 0.92),
+          palette.surfaceElevated.withValues(
+            alpha: 0.96 * palette.surfaceOpacity,
+          ),
+          palette.surfaceSecondary.withValues(
+            alpha: 0.92 * palette.surfaceOpacity,
+          ),
         ];
 
     return Container(

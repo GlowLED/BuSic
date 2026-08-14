@@ -50,13 +50,29 @@ class _AppState extends ConsumerState<App> {
     final settings = ref.watch(settingsNotifierProvider);
     final seedColor = Color(settings.themeSeedColor);
 
+    // With a background image, component surfaces turn translucent so the
+    // image shows through everywhere. More visible background -> more
+    // translucent components, floored to keep content readable.
+    final hasBackground = settings.backgroundImagePath != null &&
+        settings.backgroundImagePath!.isNotEmpty &&
+        settings.backgroundImageOpacity > 0;
+    final surfaceOpacity = hasBackground
+        ? (0.9 - 0.35 * settings.backgroundImageOpacity).clamp(0.55, 0.9)
+        : 1.0;
+
     return MaterialApp.router(
       title: 'BuSic',
       debugShowCheckedModeBanner: false,
 
       // Theme
-      theme: AppTheme.lightTheme(seedColor: seedColor),
-      darkTheme: AppTheme.darkTheme(seedColor: seedColor),
+      theme: AppTheme.lightTheme(
+        seedColor: seedColor,
+        surfaceOpacity: surfaceOpacity,
+      ),
+      darkTheme: AppTheme.darkTheme(
+        seedColor: seedColor,
+        surfaceOpacity: surfaceOpacity,
+      ),
       themeMode: settings.themeMode,
 
       // Routing

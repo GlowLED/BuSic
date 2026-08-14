@@ -14,6 +14,8 @@ import 'widgets/linux_managed_web_login_view.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../../../shared/extensions/context_extensions.dart';
 
+const _cookieLoginCardMaxWidth = 480.0;
+
 /// Login screen with QR code display and cookie login for Bilibili authentication.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -553,78 +555,85 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Widget _buildCookieTab(ColorScheme colorScheme) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Card(
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                context.l10n.cookieLoginTitle,
-                style: context.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                context.l10n.cookieLoginDesc,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: _sessdataController,
-                decoration: InputDecoration(
-                  labelText: 'SESSDATA',
-                  hintText: context.l10n.cookieSessdataHint,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.cookie_outlined),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _biliJctController,
-                decoration: InputDecoration(
-                  labelText: 'bili_jct',
-                  hintText: context.l10n.cookieBiliJctHint,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.cookie_outlined),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _dedeUserIdController,
-                decoration: InputDecoration(
-                  labelText: 'DedeUserID',
-                  hintText: context.l10n.cookieDedeUserIdHint,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.person_outlined),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: _isCookieLogging ? null : _loginWithCookie,
-                  icon: _isCookieLogging
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.login),
-                  label: Text(
-                    _isCookieLogging
-                        ? context.l10n.loggingIn
-                        : context.l10n.login,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _cookieLoginCardMaxWidth),
+          child: Card(
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    context.l10n.cookieLoginTitle,
+                    style: context.textTheme.titleLarge,
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.cookieLoginDesc,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: _sessdataController,
+                    decoration: InputDecoration(
+                      labelText: 'SESSDATA',
+                      hintText: context.l10n.cookieSessdataHint,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.cookie_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _biliJctController,
+                    decoration: InputDecoration(
+                      labelText: 'bili_jct',
+                      hintText: context.l10n.cookieBiliJctHint,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.cookie_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _dedeUserIdController,
+                    decoration: InputDecoration(
+                      labelText: 'DedeUserID',
+                      hintText: context.l10n.cookieDedeUserIdHint,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.center,
+                    child: FilledButton.icon(
+                      onPressed: _isCookieLogging ? null : _loginWithCookie,
+                      icon: _isCookieLogging
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.login),
+                      label: Text(
+                        _isCookieLogging
+                            ? context.l10n.loggingIn
+                            : context.l10n.login,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

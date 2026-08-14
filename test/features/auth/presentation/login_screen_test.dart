@@ -52,6 +52,105 @@ void main() {
     );
   });
 
+  testWidgets('Cookie login card is compact and centered on wide screens', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 800);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
+          webLoginAvailabilityProvider.overrideWith(
+            (ref) async => const WebLoginAvailability.unsupportedPlatform(),
+          ),
+        ],
+        child: buildTestApp(const LoginScreen()),
+      ),
+    );
+
+    await tester.pump();
+    await tester.tap(find.text('Cookie Login'));
+    await tester.pumpAndSettle();
+
+    final description = find.text(
+      'Paste the Bilibili cookies from your browser. Find them on '
+      'bilibili.com in DevTools > Application > Cookies.',
+    );
+    final loginButton = find.ancestor(
+      of: find.text('Login'),
+      matching: find.byType(FilledButton),
+    );
+    final cookieCard = find.ancestor(
+      of: find.widgetWithText(TextField, 'SESSDATA'),
+      matching: find.byType(Card),
+    );
+    final title = find.descendant(
+      of: cookieCard,
+      matching: find.text('Cookie Login'),
+    );
+
+    final cardRect = tester.getRect(cookieCard);
+    final viewportCenterX = tester.view.physicalSize.width / 2;
+    final titleRect = tester.getRect(title);
+    final descriptionRect = tester.getRect(description);
+    final buttonRect = tester.getRect(loginButton);
+
+    expect(cardRect.width, closeTo(480, 1));
+    expect(cardRect.center.dx, closeTo(viewportCenterX, 1));
+    expect(titleRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(descriptionRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(buttonRect.center.dx, closeTo(cardRect.center.dx, 1));
+    expect(buttonRect.width, lessThan(cardRect.width - 48));
+    expect(titleRect.bottom, lessThan(descriptionRect.top));
+    expect(descriptionRect.bottom, lessThan(buttonRect.top));
+  });
+
+  testWidgets('Cookie login card shrinks without overflow on narrow screens', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+          authQrPollIntervalProvider.overrideWithValue(
+            const Duration(hours: 1),
+          ),
+          webLoginAvailabilityProvider.overrideWith(
+            (ref) async => const WebLoginAvailability.unsupportedPlatform(),
+          ),
+        ],
+        child: buildTestApp(const LoginScreen()),
+      ),
+    );
+
+    await tester.pump();
+    await tester.tap(find.text('Cookie Login'));
+    await tester.pumpAndSettle();
+
+    final cookieCard = find.ancestor(
+      of: find.widgetWithText(TextField, 'SESSDATA'),
+      matching: find.byType(Card),
+    );
+    final cardRect = tester.getRect(cookieCard);
+
+    expect(cardRect.width, lessThanOrEqualTo(390 - 48));
+    expect(cardRect.center.dx, closeTo(390 / 2, 1));
+    expect(find.byType(TextField), findsNWidgets(3));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'LoginScreen explains missing supported browser on Linux web login',
     (tester) async {

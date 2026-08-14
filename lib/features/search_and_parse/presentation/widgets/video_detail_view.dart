@@ -1179,7 +1179,9 @@ class _VideoDetailTabsThemeSignature {
 
     return _VideoDetailTabsThemeSignature(
       brightness: Theme.of(context).brightness,
-      backgroundPrimary: palette.backgroundPrimary,
+      backgroundPrimary: palette.backgroundPrimary.withValues(
+        alpha: palette.surfaceOpacity,
+      ),
       accentStrong: palette.accentStrong,
       textSecondary: palette.textSecondary,
       borderSubtle: palette.borderSubtle,

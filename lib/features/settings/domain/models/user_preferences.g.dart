@@ -19,6 +19,11 @@ _UserPreferences _$UserPreferencesFromJson(Map<String, dynamic> json) =>
       playbackFadeEnabled: json['playbackFadeEnabled'] as bool? ?? true,
       playbackFadeDurationMs:
           (json['playbackFadeDurationMs'] as num?)?.toInt() ?? 1000,
+      backgroundImagePath: json['backgroundImagePath'] as String?,
+      backgroundImageOpacity:
+          (json['backgroundImageOpacity'] as num?)?.toDouble() ?? 0.5,
+      backgroundImageBlur:
+          (json['backgroundImageBlur'] as num?)?.toDouble() ?? 0,
     );
 
 Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
@@ -31,6 +36,9 @@ Map<String, dynamic> _$UserPreferencesToJson(_UserPreferences instance) =>
       'uiScale': instance.uiScale,
       'playbackFadeEnabled': instance.playbackFadeEnabled,
       'playbackFadeDurationMs': instance.playbackFadeDurationMs,
+      'backgroundImagePath': instance.backgroundImagePath,
+      'backgroundImageOpacity': instance.backgroundImageOpacity,
+      'backgroundImageBlur': instance.backgroundImageBlur,
     };
 
 const _$ThemeModeEnumMap = {

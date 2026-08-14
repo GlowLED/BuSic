@@ -24,6 +24,9 @@ class SettingsNotifier extends _$SettingsNotifier {
   static const _keyUiScale = 'ui_scale';
   static const _keyPlaybackFadeEnabled = 'playback_fade_enabled';
   static const _keyPlaybackFadeDurationMs = 'playback_fade_duration_ms';
+  static const _keyBackgroundImagePath = 'background_image_path';
+  static const _keyBackgroundImageOpacity = 'background_image_opacity';
+  static const _keyBackgroundImageBlur = 'background_image_blur';
   static const _keyMinimalPlaylistId = 'minimal_playlist_id';
 
   @override
@@ -48,6 +51,9 @@ class SettingsNotifier extends _$SettingsNotifier {
         supportedPlaybackFadeDurations.contains(storedPlaybackFadeDurationMs)
         ? storedPlaybackFadeDurationMs
         : 1000;
+    final backgroundImagePath = prefs.getString(_keyBackgroundImagePath);
+    final storedOpacity = prefs.getDouble(_keyBackgroundImageOpacity);
+    final storedBlur = prefs.getDouble(_keyBackgroundImageBlur);
 
     state = UserPreferences(
       themeMode: themeModeIndex != null
@@ -60,6 +66,9 @@ class SettingsNotifier extends _$SettingsNotifier {
       uiScale: uiScale,
       playbackFadeEnabled: playbackFadeEnabled,
       playbackFadeDurationMs: playbackFadeDurationMs,
+      backgroundImagePath: backgroundImagePath,
+      backgroundImageOpacity: (storedOpacity ?? 0.5).clamp(0.0, 1.0).toDouble(),
+      backgroundImageBlur: (storedBlur ?? 0).clamp(0.0, 60.0).toDouble(),
     );
   }
 
@@ -171,6 +180,33 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.setInt(_keyPlaybackFadeDurationMs, normalized);
   }
 
+  /// Update the app-wide background image path (null = no background).
+  Future<void> setBackgroundImagePath(String? path) async {
+    state = state.copyWith(backgroundImagePath: path);
+    final prefs = await SharedPreferences.getInstance();
+    if (path != null) {
+      await prefs.setString(_keyBackgroundImagePath, path);
+    } else {
+      await prefs.remove(_keyBackgroundImagePath);
+    }
+  }
+
+  /// Set the opacity of the background image (0.0 to 1.0).
+  Future<void> setBackgroundImageOpacity(double opacity) async {
+    final normalized = opacity.clamp(0.0, 1.0).toDouble();
+    state = state.copyWith(backgroundImageOpacity: normalized);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyBackgroundImageOpacity, normalized);
+  }
+
+  /// Set the Gaussian blur sigma of the background image (0 to 60).
+  Future<void> setBackgroundImageBlur(double blur) async {
+    final normalized = blur.clamp(0.0, 60.0).toDouble();
+    state = state.copyWith(backgroundImageBlur: normalized);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_keyBackgroundImageBlur, normalized);
+  }
+
   /// Reset all settings to defaults.
   Future<void> resetToDefaults() async {
     state = const UserPreferences();
@@ -183,6 +219,9 @@ class SettingsNotifier extends _$SettingsNotifier {
     await prefs.remove(_keyUiScale);
     await prefs.remove(_keyPlaybackFadeEnabled);
     await prefs.remove(_keyPlaybackFadeDurationMs);
+    await prefs.remove(_keyBackgroundImagePath);
+    await prefs.remove(_keyBackgroundImageOpacity);
+    await prefs.remove(_keyBackgroundImageBlur);
 
     // Cleanup startup recommendation keys left by older builds.
     await prefs.remove('is_minimal_mode');

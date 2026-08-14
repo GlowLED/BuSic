@@ -1099,6 +1099,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettings => 'Appearance';
 
   @override
+  String get backgroundSettings => 'Background';
+
+  @override
+  String get backgroundImage => 'Background image';
+
+  @override
+  String get backgroundImageDescription =>
+      'Pick an image shown across the app background';
+
+  @override
+  String get removeBackgroundImage => 'Remove background image';
+
+  @override
+  String get backgroundOpacity => 'Opacity';
+
+  @override
+  String get backgroundBlur => 'Blur';
+
+  @override
+  String get backgroundImageUpdated => 'Background image updated';
+
+  @override
+  String get backgroundImageRemoved => 'Background image removed';
+
+  @override
+  String get backgroundImageFailed => 'Failed to set background image';
+
+  @override
   String get languageSettings => 'Language';
 
   @override

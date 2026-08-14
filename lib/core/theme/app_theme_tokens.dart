@@ -28,6 +28,7 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
     required this.overlayMedium,
     required this.overlayStrong,
     required this.coverGlow,
+    this.surfaceOpacity = 1.0,
   });
 
   final Color backgroundPrimary;
@@ -54,6 +55,12 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
   final Color overlayStrong;
   final Color coverGlow;
 
+  /// Opacity applied to component surfaces (panels, cards, bars, overlays).
+  ///
+  /// 1.0 keeps surfaces fully opaque; lower values make every surface
+  /// translucent so an app-wide background image shows through.
+  final double surfaceOpacity;
+
   @override
   AppThemePalette copyWith({
     Color? backgroundPrimary,
@@ -79,6 +86,7 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
     Color? overlayMedium,
     Color? overlayStrong,
     Color? coverGlow,
+    double? surfaceOpacity,
   }) {
     return AppThemePalette(
       backgroundPrimary: backgroundPrimary ?? this.backgroundPrimary,
@@ -104,6 +112,7 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
       overlayMedium: overlayMedium ?? this.overlayMedium,
       overlayStrong: overlayStrong ?? this.overlayStrong,
       coverGlow: coverGlow ?? this.coverGlow,
+      surfaceOpacity: surfaceOpacity ?? this.surfaceOpacity,
     );
   }
 
@@ -152,6 +161,7 @@ class AppThemePalette extends ThemeExtension<AppThemePalette> {
       overlayMedium: Color.lerp(overlayMedium, other.overlayMedium, t)!,
       overlayStrong: Color.lerp(overlayStrong, other.overlayStrong, t)!,
       coverGlow: Color.lerp(coverGlow, other.coverGlow, t)!,
+      surfaceOpacity: lerpDouble(surfaceOpacity, other.surfaceOpacity, t)!,
     );
   }
 }

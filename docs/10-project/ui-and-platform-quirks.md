@@ -26,7 +26,29 @@
 - 移动端竖屏底部 dock 与横屏左侧图标栏
 - `PlayerBar` 是否仍正确显示
 
-### 1.1 桌面界面缩放与响应式重排
+### 1.1 全局背景图片
+
+设置在「设置 → 背景」中，由 `BackgroundSection` 管理：
+
+- 用户选择本地图片后，**复制到应用私有目录** `Documents/busic/backgrounds/`（`PlatformUtils.getDataPath()`），路径以字符串存入 SharedPreferences；移除 / 更换背景时清理旧副本。不引用原图路径，原图被移动或删除不影响
+- 渲染位置是 `ResponsiveScaffold` 的 `_ShellBackdrop`：主题渐变始终保留在底层作兜底，图片层叠加在渐变之上、所有内容（标题栏 / 侧栏 / 内容 / `PlayerBar`）之下
+- 三个设置字段都持久化在 `UserPreferences`：`backgroundImagePath`（null = 无背景）、`backgroundImageOpacity`（0.0–1.0，默认 0.5）、`backgroundImageBlur`（sigma 0–60，默认 0）
+- 模糊度为 0 时**跳过 `ImageFiltered`**（避免无谓的模糊管线开销）；解码尺寸按屏幕分辨率降采样（上限 1024，参考极简模式策略）；文件缺失或解码失败时平滑回落到主题渐变
+- 仅主壳层四个主页面生效。全屏播放器 `/player`、极简模式 `/minimal` 是独立沉浸路由、自带封面模糊 / 毛玻璃背景，**不叠加**背景图片；`/login` 也保持现状
+
+### 1.2 背景图片模式下的组件半透明
+
+有背景图片时，主壳层内所有组件表面（面板、卡片、列表行、`PlayerBar`、设置分区、对话框 / 底部弹层 / 菜单 / 输入框）统一变为半透明，让背景图全应用透出。无背景图片时完全保持现状（全不透明）。
+
+- 联动规则：组件不透明度 `surfaceOpacity = 0.9 − 0.35 × backgroundImageOpacity`，钳制在 `[0.55, 0.9]`——背景越明显组件越透明，保底区间保证文字可读
+  - 背景透明度 0.5（默认）→ 组件 0.725；1.0 → 0.55；接近 0 → 0.9
+- 实现：`AppThemePalette` 新增 `surfaceOpacity` token（默认 1.0），`AppTheme.lightTheme/darkTheme` 新增同名可选参数；`app.dart` 根据 `settings.backgroundImagePath/Opacity` 计算后传入。主题级 `cardTheme / dialogTheme / bottomSheetTheme / popupMenuTheme / snackBarTheme / tooltipTheme / inputDecorationTheme` 背景色统一乘 `surfaceOpacity`；局部不走主题的组件（`SettingsSectionPanel`、`PlaylistTile`、`_PlayerBarSurface`、视频详情 Tab 头、歌单详情页 header）单独读取该 token
+- `AppPanel` 默认毛玻璃渐变（0.96 / 0.92）同样乘 `surfaceOpacity`，搜索条与搜索结果卡片自动联动；搜索框本身 `filled: false` 透明。播放条内音质徽标、移动端转盘 hub、圆形播放按钮也同步联动
+- 弹层（对话框 / 底部弹层 / 菜单）一并半透明；`_ShellBackdrop` 底层渐变保留不透明作兜底
+- 已带固定透明度的小徽标 / 按钮底 / 角标（如 `_VideoBadge` 0.72、`_AccessoryPill` 0.9 等）保持现状，不做乘法联动
+- 独立沉浸路由 `/player`、`/minimal`、`/login` 不联动
+
+### 1.3 桌面界面缩放与响应式重排
 
 桌面端提供统一界面缩放，当前范围为 80%–150%、步长 10%、默认 100%，
 并通过 `SettingsNotifier` 写入本地偏好。移动端不显示该设置且固定使用 100%。
@@ -149,6 +171,7 @@ Linux 桌面通过 MPRIS / D-Bus 接入系统媒体控件、桌面壳层和硬�
 - 以为主壳层仍然是默认 `NavigationRail` / `NavigationBar`
 - 以为紧凑侧栏仍然会显示文字或 tooltip
 - 以为移动端横屏仍然使用底部文字导航
+- 以为全局背景图片会覆盖全屏播放器和极简模式
 - 只在一个平台验证就提交
 
 ## 11. 修改这部分时要一起看什么？

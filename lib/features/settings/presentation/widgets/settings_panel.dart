@@ -24,7 +24,9 @@ class SettingsSectionPanel extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.all(spacing.md),
-      color: palette.backgroundPrimary,
+      color: palette.backgroundPrimary.withValues(
+        alpha: palette.surfaceOpacity,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
