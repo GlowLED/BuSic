@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../../../core/utils/logger.dart';
 import '../../../../core/utils/platform_utils.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../application/settings_notifier.dart';
@@ -106,15 +107,15 @@ class BackgroundSection extends ConsumerWidget {
     final l10n = context.l10n;
     final currentPath = ref.read(settingsNotifierProvider).backgroundImagePath;
 
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
-    if (result == null || result.files.isEmpty) return;
-    final sourcePath = result.files.single.path;
-    if (sourcePath == null || sourcePath.isEmpty) return;
-
     try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final sourcePath = result.files.single.path;
+      if (sourcePath == null || sourcePath.isEmpty) return;
+
       final dataPath = await PlatformUtils.getDataPath();
       final backgroundsDir = Directory(p.join(dataPath, 'backgrounds'));
       await backgroundsDir.create(recursive: true);
@@ -140,7 +141,8 @@ class BackgroundSection extends ConsumerWidget {
       if (context.mounted) {
         context.showSnackBar(l10n.backgroundImageUpdated);
       }
-    } catch (_) {
+    } catch (e) {
+      AppLogger.error('选择背景图片失败', tag: 'Settings', error: e);
       if (context.mounted) {
         context.showSnackBar(l10n.backgroundImageFailed);
       }

@@ -101,20 +101,23 @@ Windows 的 `tray_manager` 通过 Win32 `LoadImage(..., IMAGE_ICON)` 从文件�
 - `lib/core/window/tray_service.dart`
 - `lib/core/window/window_service.dart`
 
-## 5. macOS App Sandbox 网络权限
+## 5. macOS App Sandbox 权限
 
 macOS Runner 启用了 App Sandbox，因此 Debug / Profile 和 Release 的 entitlement 都必须声明：
 
 - `com.apple.security.network.client = true`
+- `com.apple.security.files.user-selected.read-write = true`
 
-该权限是所有出站网络请求的共同前提。缺失时，更新检查、B 站接口、网络封面和内置 Web 登录会统一出现 `SocketException: Operation not permitted`；这不是 Dio、目标站点或 CocoaPods 故障。
+网络权限是所有出站网络请求的共同前提。缺失时，更新检查、B 站接口、网络封面和内置 Web 登录会统一出现 `SocketException: Operation not permitted`；这不是 Dio、目标站点或 CocoaPods 故障。
+
+文件访问权限是 `file_picker` 弹窗（NSOpenPanel / NSSavePanel）的共同前提。缺失时选择背景图片、歌单封面、备份导入 / 导出会直接抛 `PlatformException(ENTITLEMENT_NOT_FOUND)`，且**不会弹出文件选择框**；这不是 file_picker 或平台通道故障。选择 read-write 而不是 read-only，是因为备份导出还要写入用户所选位置。
 
 当前真源：
 
 - `macos/Runner/DebugProfile.entitlements`
 - `macos/Runner/Release.entitlements`
 
-修改 macOS 签名或沙箱配置时必须同时检查两份文件，避免 Debug 可用但 Release 失去网络能力。
+修改 macOS 签名或沙箱配置时必须同时检查两份文件，避免 Debug 可用但 Release 失去网络或文件访问能力。
 
 ## 6. Linux MPRIS 只能按平台启用
 
