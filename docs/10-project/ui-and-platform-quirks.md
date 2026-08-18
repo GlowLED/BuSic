@@ -33,7 +33,7 @@
 - 用户选择本地图片后，**复制到应用私有目录** `Documents/busic/backgrounds/`（`PlatformUtils.getDataPath()`），路径以字符串存入 SharedPreferences；移除 / 更换背景时清理旧副本。不引用原图路径，原图被移动或删除不影响
 - 渲染位置是 `ResponsiveScaffold` 的 `_ShellBackdrop`：主题渐变始终保留在底层作兜底，图片层叠加在渐变之上、所有内容（标题栏 / 侧栏 / 内容 / `PlayerBar`）之下
 - 三个设置字段都持久化在 `UserPreferences`：`backgroundImagePath`（null = 无背景）、`backgroundImageOpacity`（0.0–1.0，默认 0.5）、`backgroundImageBlur`（sigma 0–60，默认 0）
-- 模糊度为 0 时**跳过 `ImageFiltered`**（避免无谓的模糊管线开销）；解码尺寸按屏幕分辨率降采样（上限 1024，参考极简模式策略），用 `ResizeImagePolicy.fit` 保持图片原始宽高比、再由 `BoxFit.cover` 裁切铺满窗口，图片不会为了适配窗口而拉伸变形；文件缺失或解码失败时平滑回落到主题渐变
+- 模糊度为 0 时**跳过 `ImageFiltered`**（避免无谓的模糊管线开销）；背景使用固定 `1024 × 1024` 解码上界和稳定缓存 key，不随窗口每像素变化而重复解码，合法切换图片时会保留上一帧；`ResizeImagePolicy.fit` 保持图片原始宽高比、再由 `BoxFit.cover` 裁切铺满窗口，图片不会为了适配窗口而拉伸变形；文件缺失或解码失败时平滑回落到主题渐变
 - 仅主壳层四个主页面生效。全屏播放器 `/player`、极简模式 `/minimal` 是独立沉浸路由、自带封面模糊 / 毛玻璃背景，**不叠加**背景图片；`/login` 也保持现状
 
 ### 1.2 背景图片模式下的组件半透明

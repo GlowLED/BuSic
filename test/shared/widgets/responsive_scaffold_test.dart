@@ -247,34 +247,53 @@ void main() {
     expect(find.byType(Image), findsWidgets);
   });
 
-  testWidgets(
-    'background image decoded with fit policy to preserve aspect ratio',
-    (tester) async {
-      final imagePath = _writeTempPng();
-      await _pumpShell(
-        tester,
-        const Size(1000, 800),
-        prefs: {
-          'background_image_path': imagePath,
-          'background_image_opacity': 0.5,
-          'background_image_blur': 0.0,
-        },
-      );
+  testWidgets('keeps background decode key stable while the window resizes', (
+    tester,
+  ) async {
+    final imagePath = _writeTempPng();
+    await _pumpShell(
+      tester,
+      const Size(1000, 800),
+      prefs: {
+        'background_image_path': imagePath,
+        'background_image_opacity': 0.5,
+        'background_image_blur': 0.0,
+      },
+    );
 
-      // The background layer must decode with ResizeImagePolicy.fit so the
-      // source keeps its intrinsic aspect ratio instead of being stretched to
-      // the window's aspect ratio (default exact policy).
-      final resize = tester
-          .widgetList<Image>(find.byType(Image))
-          .map((widget) => widget.image)
-          .whereType<ResizeImage>()
-          .first;
+    ResizeImage backgroundProvider() => tester
+        .widgetList<Image>(find.byType(Image))
+        .map((widget) => widget.image)
+        .whereType<ResizeImage>()
+        .first;
+    Image backgroundImage() => tester
+        .widgetList<Image>(find.byType(Image))
+        .firstWhere((widget) => widget.image is ResizeImage);
 
-      expect(resize.policy, ResizeImagePolicy.fit);
-      expect(resize.width, isNotNull);
-      expect(resize.height, isNotNull);
-    },
-  );
+    // The background layer must decode with ResizeImagePolicy.fit so the
+    // source keeps its intrinsic aspect ratio instead of being stretched to
+    // the window's aspect ratio (default exact policy).
+    final firstProvider = backgroundProvider();
+    final firstKey = await firstProvider.obtainKey(ImageConfiguration.empty);
+
+    expect(firstProvider.policy, ResizeImagePolicy.fit);
+    expect(firstProvider.width, 1024);
+    expect(firstProvider.height, 1024);
+    expect(backgroundImage().gaplessPlayback, isTrue);
+
+    tester.view.physicalSize = const Size(1200, 760);
+    await tester.pump();
+
+    final resizedProvider = backgroundProvider();
+    final resizedKey = await resizedProvider.obtainKey(
+      ImageConfiguration.empty,
+    );
+
+    expect(resizedKey, firstKey);
+    expect(resizedProvider.width, firstProvider.width);
+    expect(resizedProvider.height, firstProvider.height);
+    expect(backgroundImage().gaplessPlayback, isTrue);
+  });
 
   testWidgets('shows only the theme gradient without a background image', (
     tester,
@@ -336,7 +355,9 @@ Future<void> _pumpShell(
   final backgroundOpacity =
       (prefs['background_image_opacity'] as num?)?.toDouble() ?? 0;
   final hasBackground =
-      backgroundPath != null && backgroundPath.isNotEmpty && backgroundOpacity > 0;
+      backgroundPath != null &&
+      backgroundPath.isNotEmpty &&
+      backgroundOpacity > 0;
   final surfaceOpacity = hasBackground
       ? (0.9 - 0.35 * backgroundOpacity).clamp(0.55, 0.9)
       : 1.0;

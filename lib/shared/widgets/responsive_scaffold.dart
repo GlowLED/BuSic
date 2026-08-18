@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -643,7 +642,8 @@ class _ShellBackdrop extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
 
     final path = settings.backgroundImagePath;
-    final showImage = path != null &&
+    final showImage =
+        path != null &&
         path.isNotEmpty &&
         settings.backgroundImageOpacity > 0 &&
         File(path).existsSync();
@@ -689,23 +689,23 @@ class _BackgroundImageLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cacheSize = _backgroundCacheSize(context);
     final fileProvider = FileImage(File(path));
-    // 用 ResizeImagePolicy.fit 在缓存上界内保持原始宽高比解码，避免按窗口
-    // 宽高比拉伸变形（默认 exact 策略会按精确尺寸解码）；随后 BoxFit.cover
-    // 按真实宽高比裁切铺满窗口。
-    final ImageProvider provider = cacheSize == null
-        ? fileProvider
-        : ResizeImage(
-            fileProvider,
-            width: cacheSize.width,
-            height: cacheSize.height,
-            policy: ResizeImagePolicy.fit,
-          );
+    // Keep the decode key independent from the live window size. A
+    // MediaQuery-derived width or height changes on every resize frame and
+    // forces Flutter to decode a new image for every distinct ResizeImageKey.
+    // The fixed upper bound preserves the existing memory cap, while the fit
+    // policy keeps the source aspect ratio before BoxFit.cover crops it.
+    final ImageProvider provider = ResizeImage(
+      fileProvider,
+      width: 1024,
+      height: 1024,
+      policy: ResizeImagePolicy.fit,
+    );
     final image = Image(
       image: provider,
       fit: BoxFit.cover,
       filterQuality: FilterQuality.high,
+      gaplessPlayback: true,
       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
     );
 
@@ -719,34 +719,6 @@ class _BackgroundImageLayer extends StatelessWidget {
               child: image,
             )
           : image,
-    );
-  }
-
-  /// Decode the background at a fraction of the screen resolution so large
-  /// images do not blow up memory. Mirrors the minimal mode strategy.
-  ({int width, int height})? _backgroundCacheSize(BuildContext context) {
-    final screenSize = MediaQuery.sizeOf(context);
-    if (screenSize.width <= 0 || screenSize.height <= 0) return null;
-
-    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
-    const oversample = 1.5;
-    const minDimension = 256.0;
-    const maxDimension = 1024.0;
-
-    final rawWidth = screenSize.width * pixelRatio * oversample;
-    final rawHeight = screenSize.height * pixelRatio * oversample;
-    final rawMax = math.max(rawWidth, rawHeight);
-    if (!rawMax.isFinite || rawMax <= 0) return null;
-
-    final scale = rawMax < minDimension
-        ? minDimension / rawMax
-        : rawMax > maxDimension
-        ? maxDimension / rawMax
-        : 1.0;
-
-    return (
-      width: math.max(1, (rawWidth * scale).ceil()),
-      height: math.max(1, (rawHeight * scale).ceil()),
     );
   }
 }
