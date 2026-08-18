@@ -57,7 +57,7 @@ void main() {
       _expectTextInSelectionArea('Comment 0');
     });
 
-    testWidgets('桌面布局下封面收窄且随简介滚动上移', (tester) async {
+    testWidgets('桌面布局下封面与信息双栏排列且随简介滚动上移', (tester) async {
       _setDesktopViewport(tester);
 
       await _pumpVideoDetail(
@@ -67,11 +67,14 @@ void main() {
       );
 
       final cover = find.byKey(const ValueKey('video-detail-cover'));
+      final info = find.byKey(const ValueKey('video-detail-info'));
       final initialTop = tester.getTopLeft(cover).dy;
-      final coverSize = tester.getSize(cover);
+      final coverRect = tester.getRect(cover);
+      final infoRect = tester.getRect(info);
 
-      expect(coverSize.width, lessThanOrEqualTo(680));
-      expect(coverSize.height, lessThan(390));
+      expect(coverRect.right, lessThan(infoRect.left));
+      expect(coverRect.width, lessThan(infoRect.width));
+      expect((coverRect.top - infoRect.top).abs(), lessThanOrEqualTo(1));
 
       await tester.drag(find.byType(NestedScrollView), const Offset(0, -180));
       await tester.pumpAndSettle();
@@ -104,7 +107,7 @@ void main() {
       expect(tester.getTopLeft(cover).dy, lessThan(initialTop));
     });
 
-    testWidgets('桌面布局下返回按钮位于封面外侧左上角', (tester) async {
+    testWidgets('返回按钮以扁平工具栏形式位于封面上方', (tester) async {
       _setDesktopViewport(tester);
       var didBack = false;
 
@@ -125,8 +128,8 @@ void main() {
       final backRect = tester.getRect(backButton);
 
       expect(backButton, findsOneWidget);
-      expect(backRect.right, lessThan(coverRect.left));
-      expect((backRect.top - coverRect.top).abs(), lessThanOrEqualTo(1));
+      expect(backRect.bottom, lessThan(coverRect.top));
+      expect((backRect.left - coverRect.left).abs(), lessThanOrEqualTo(1));
 
       await tester.tap(backButton);
       expect(didBack, isTrue);
@@ -138,7 +141,8 @@ void main() {
       expect(tester.getRect(backButton).top, lessThan(initialTop));
     });
 
-    testWidgets('渲染 B 站式简介页结构和返回按钮', (tester) async {
+    testWidgets('渲染扁平详情结构并保留全部操作入口', (tester) async {
+      _setDesktopViewport(tester);
       var didBack = false;
       final repository = _FakeVideoInteractionRepository(
         initialState: const VideoInteractionState(isLiked: true, coinsGiven: 1),
@@ -156,10 +160,15 @@ void main() {
       expect(find.text('Comments 17'), findsAtLeastNWidgets(1));
       expect(find.text(_video.title), findsOneWidget);
       expect(find.text('BuSic UP'), findsOneWidget);
-      expect(find.text('UID 42 / Music'), findsOneWidget);
-      expect(find.text('vocal'), findsOneWidget);
-      expect(find.text('Liked'), findsOneWidget);
-      expect(find.text('1 coined'), findsOneWidget);
+      expect(find.text('UP · UID 42 / Music'), findsOneWidget);
+      expect(find.text('#vocal'), findsOneWidget);
+      expect(find.text('Play'), findsOneWidget);
+      expect(find.text('Add to Playlist'), findsOneWidget);
+      expect(find.text('Downloads'), findsOneWidget);
+      expect(find.byTooltip('Liked'), findsOneWidget);
+      expect(find.byTooltip('1 coined'), findsOneWidget);
+      expect(find.byTooltip('Favorite'), findsOneWidget);
+      expect(find.byTooltip('Share'), findsOneWidget);
 
       await tester.tap(
         find.widgetWithIcon(IconButton, Icons.arrow_back_rounded),
@@ -170,6 +179,7 @@ void main() {
     testWidgets('updates tab bar colors when the theme changes', (
       tester,
     ) async {
+      _setDesktopViewport(tester);
       final repository = _FakeVideoInteractionRepository();
       final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
       final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
@@ -208,6 +218,7 @@ void main() {
     testWidgets('updates pinned tab bar colors without another scroll', (
       tester,
     ) async {
+      _setDesktopViewport(tester);
       final repository = _FakeVideoInteractionRepository();
       final lightTheme = AppTheme.lightTheme(seedColor: AppTheme.greenSeed);
       final darkTheme = AppTheme.darkTheme(seedColor: AppTheme.greenSeed);
@@ -259,6 +270,7 @@ void main() {
     testWidgets('keeps the description expand control available', (
       tester,
     ) async {
+      _setDesktopViewport(tester);
       final video = _video.copyWith(
         description: List.filled(
           8,
@@ -283,6 +295,7 @@ void main() {
     });
 
     testWidgets('多 P 状态展示分 P 选择和已选数量', (tester) async {
+      _setDesktopViewport(tester);
       await _pumpVideoDetail(
         tester,
         interactionRepository: _FakeVideoInteractionRepository(),
@@ -295,9 +308,63 @@ void main() {
       expect(find.text('Selected 1/2 pages'), findsOneWidget);
       expect(find.text('P1 Opening'), findsOneWidget);
       expect(find.text('P2 Ending'), findsOneWidget);
+      expect(find.byKey(const ValueKey('video-detail-pages')), findsOneWidget);
+    });
+
+    testWidgets('移动端按封面、信息和分层操作纵向排列', (tester) async {
+      _setMobileViewport(tester);
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: const ParseState.success(_video),
+        showBackButton: true,
+      );
+
+      final coverRect = tester.getRect(
+        find.byKey(const ValueKey('video-detail-cover')),
+      );
+      final infoRect = tester.getRect(
+        find.byKey(const ValueKey('video-detail-info')),
+      );
+      final actions = find.byKey(const ValueKey('video-detail-actions'));
+      final playButton = find.descendant(
+        of: actions,
+        matching: find.widgetWithText(FilledButton, 'Play'),
+      );
+      final secondaryButtons = find.descendant(
+        of: actions,
+        matching: find.byType(OutlinedButton),
+      );
+
+      expect(coverRect.bottom, lessThan(infoRect.top));
+      expect(playButton, findsOneWidget);
+      expect(secondaryButtons, findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('横屏断点下双栏操作区不会溢出', (tester) async {
+      _setLandscapeViewport(tester);
+
+      await _pumpVideoDetail(
+        tester,
+        interactionRepository: _FakeVideoInteractionRepository(),
+        parseState: const ParseState.success(_video),
+      );
+
+      final coverRect = tester.getRect(
+        find.byKey(const ValueKey('video-detail-cover')),
+      );
+      final infoRect = tester.getRect(
+        find.byKey(const ValueKey('video-detail-info')),
+      );
+
+      expect(coverRect.right, lessThan(infoRect.left));
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('收藏按钮选择 B 站收藏夹并调用互动 Notifier', (tester) async {
+      _setDesktopViewport(tester);
       final repository = _FakeVideoInteractionRepository();
 
       await _pumpVideoDetail(
@@ -309,9 +376,7 @@ void main() {
         ],
       );
 
-      await tester.drag(find.byType(NestedScrollView), const Offset(0, -420));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Favorite'));
+      await tester.tap(find.byIcon(Icons.star_border_rounded));
       await tester.pumpAndSettle();
 
       expect(find.text('Stage Folder'), findsOneWidget);
@@ -371,6 +436,20 @@ TabBar _tabBar(WidgetTester tester) {
 void _setDesktopViewport(WidgetTester tester) {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(1000, 800);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+}
+
+void _setMobileViewport(WidgetTester tester) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = const Size(390, 844);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+}
+
+void _setLandscapeViewport(WidgetTester tester) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = const Size(844, 390);
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
 }

@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/extensions/context_extensions.dart';
-import '../../../../shared/widgets/app_panel.dart';
 import '../../../../shared/widgets/desktop_selection_area.dart';
 import '../../../../shared/widgets/media_cover.dart';
 import '../../../../shared/widgets/playlist_picker_dialog.dart';
@@ -83,7 +83,8 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final contentMaxWidth = _contentMaxWidth(constraints.maxWidth);
-          final mediaMaxWidth = _mediaMaxWidth(constraints.maxWidth);
+          final isWideLayout =
+              constraints.maxWidth >= AppTheme.desktopBreakpoint;
 
           return NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -102,7 +103,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                         videoInfo,
                         selectedPages,
                         isMultiPage,
-                        mediaMaxWidth,
+                        isWideLayout,
                       ),
                     ),
                   ),
@@ -138,60 +139,47 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     BvidInfo videoInfo,
     List<PageInfo> selectedPages,
     bool isMultiPage,
-    double mediaMaxWidth,
+    bool isWideLayout,
   ) {
     final spacing = context.appSpacing;
-
-    Widget mediaHeader() {
-      return Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: mediaMaxWidth),
-          child: _buildMediaHeader(videoInfo, selectedPages, isMultiPage),
-        ),
-      );
-    }
-
-    Widget backButton() {
-      return _HeaderBackButton(
-        tooltip: context.l10n.backToSearchResults,
-        onPressed: widget.onBack,
-      );
-    }
-
-    if (!widget.showBackButton) {
-      return mediaHeader();
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableWidth = constraints.maxWidth;
-        final coverMaxWidth = mediaMaxWidth.isFinite
-            ? mediaMaxWidth
-            : availableWidth;
-        final coverWidth = coverMaxWidth.clamp(0.0, availableWidth).toDouble();
-        final sideGutterWidth = (availableWidth - coverWidth) / 2;
-        const buttonExtent = _HeaderBackButton.dimension;
-        final hasSideGutter = sideGutterWidth >= buttonExtent + spacing.sm;
-
-        if (!hasSideGutter) {
-          return Column(
+    final cover = _buildMediaHeader(videoInfo, selectedPages, isMultiPage);
+    final info = _buildVideoInfo(
+      videoInfo,
+      selectedPages,
+      isMultiPage,
+      isWideLayout,
+    );
+    final content = isWideLayout
+        ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              backButton(),
-              SizedBox(height: spacing.sm),
-              mediaHeader(),
+              Expanded(flex: 44, child: cover),
+              SizedBox(width: spacing.lg),
+              Expanded(flex: 56, child: info),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cover,
+              SizedBox(height: spacing.lg),
+              info,
             ],
           );
-        }
 
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            mediaHeader(),
-            Positioned(left: 0, top: 0, child: backButton()),
-          ],
-        );
-      },
+    return Column(
+      key: const ValueKey('video-detail-header'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.showBackButton) ...[
+          _HeaderBackButton(
+            tooltip: context.l10n.backToSearchResults,
+            onPressed: widget.onBack,
+          ),
+          SizedBox(height: spacing.sm),
+        ],
+        content,
+      ],
     );
   }
 
@@ -200,72 +188,79 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     List<PageInfo> selectedPages,
     bool isMultiPage,
   ) {
-    final spacing = context.appSpacing;
     final palette = context.appPalette;
     final canPlay = !isMultiPage || selectedPages.isNotEmpty;
     final duration = _videoDuration(videoInfo);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: context.appRadii.xLargeRadius,
-        boxShadow: context.appDepth.coverGlowShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: context.appRadii.xLargeRadius,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            MediaCover(
-              key: const ValueKey('video-detail-cover'),
-              coverUrl: videoInfo.coverUrl,
-              width: double.infinity,
-              aspectRatio: 16 / 9,
-              borderRadius: BorderRadius.zero,
-              placeholderIcon: Icons.video_library_rounded,
-            ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      palette.overlayStrong.withValues(alpha: 0.28),
-                      palette.overlaySoft.withValues(alpha: 0.08),
-                      palette.overlayStrong.withValues(alpha: 0.42),
-                    ],
-                  ),
+    return ClipRRect(
+      borderRadius: context.appRadii.largeRadius,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          MediaCover(
+            key: const ValueKey('video-detail-cover'),
+            coverUrl: videoInfo.coverUrl,
+            width: double.infinity,
+            aspectRatio: 16 / 9,
+            borderRadius: BorderRadius.zero,
+            placeholderIcon: Icons.video_library_rounded,
+          ),
+          Material(
+            color: palette.overlayStrong.withValues(alpha: 0.62),
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: canPlay
+                  ? () => _playParsedVideo(context, videoInfo, selectedPages)
+                  : null,
+              child: Padding(
+                padding: EdgeInsets.all(context.appSpacing.sm),
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  size: 40,
+                  color: canPlay
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.45),
                 ),
               ),
             ),
-            Material(
-              color: palette.overlayStrong.withValues(alpha: 0.58),
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: canPlay
-                    ? () => _playParsedVideo(context, videoInfo, selectedPages)
-                    : null,
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.md),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    size: 42,
-                    color: canPlay
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.45),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: spacing.sm,
-              bottom: spacing.sm,
-              child: _OverlayBadge(label: Formatters.formatDuration(duration)),
-            ),
-          ],
-        ),
+          ),
+          Positioned(
+            right: context.appSpacing.sm,
+            bottom: context.appSpacing.sm,
+            child: _OverlayBadge(label: Formatters.formatDuration(duration)),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildVideoInfo(
+    BvidInfo videoInfo,
+    List<PageInfo> selectedPages,
+    bool isMultiPage,
+    bool isWideLayout,
+  ) {
+    final spacing = context.appSpacing;
+
+    return Column(
+      key: const ValueKey('video-detail-info'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTitleBlock(videoInfo),
+        SizedBox(height: spacing.sm),
+        _buildOwnerRow(videoInfo),
+        SizedBox(height: spacing.md),
+        _buildStatsRow(videoInfo),
+        SizedBox(height: spacing.lg),
+        _buildBusicActions(videoInfo, selectedPages, isMultiPage, isWideLayout),
+        if (videoInfo.aid != null) ...[
+          SizedBox(height: spacing.md),
+          Divider(color: context.appPalette.borderSubtle),
+          SizedBox(height: spacing.xs),
+          _buildInteractionRow(videoInfo),
+        ],
+      ],
     );
   }
 
@@ -294,27 +289,15 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildOwnerRow(videoInfo),
-                    SizedBox(height: spacing.md),
-                    _buildTitleBlock(videoInfo),
-                    SizedBox(height: spacing.sm),
-                    _buildStatsRow(videoInfo),
-                    if (videoInfo.rights.noReprint) ...[
-                      SizedBox(height: spacing.sm),
-                      _buildNoReprintNotice(),
-                    ],
-                    SizedBox(height: spacing.md),
                     _buildDescriptionBlock(videoInfo),
                     if (videoInfo.tags.isNotEmpty) ...[
                       SizedBox(height: spacing.md),
                       _buildTagRow(videoInfo),
                     ],
-                    if (videoInfo.aid != null) ...[
-                      SizedBox(height: spacing.lg),
-                      _buildInteractionRow(videoInfo),
+                    if (videoInfo.rights.noReprint) ...[
+                      SizedBox(height: spacing.md),
+                      _buildNoReprintNotice(),
                     ],
-                    SizedBox(height: spacing.lg),
-                    _buildBusicActions(videoInfo, selectedPages, isMultiPage),
                     if (isMultiPage) ...[
                       SizedBox(height: spacing.lg),
                       _buildPageSelection(videoInfo, selectedPages),
@@ -352,7 +335,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   Widget _buildOwnerRow(BvidInfo videoInfo) {
     final spacing = context.appSpacing;
     final palette = context.appPalette;
-    final meta = <String>[
+    final ownerDetails = <String>[
       if (videoInfo.ownerUid != null)
         context.l10n.videoOwnerUid(videoInfo.ownerUid!),
       if (videoInfo.tname != null && videoInfo.tname!.isNotEmpty)
@@ -363,8 +346,8 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
       children: [
         MediaCover(
           coverUrl: videoInfo.ownerFace,
-          width: 44,
-          height: 44,
+          width: 40,
+          height: 40,
           borderRadius: context.appRadii.pillRadius,
           placeholderIcon: Icons.person_rounded,
         ),
@@ -373,34 +356,27 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      videoInfo.owner,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        color: palette.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: spacing.xs),
-                  _TinyLabel(label: context.l10n.videoUpOwner),
-                ],
-              ),
-              if (meta.isNotEmpty) ...[
-                SizedBox(height: spacing.xxs),
-                Text(
-                  meta.join(' / '),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: palette.textSecondary,
-                  ),
+              Text(
+                videoInfo.owner,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: palette.textPrimary,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+              ),
+              SizedBox(height: spacing.xxs),
+              Text(
+                [
+                  context.l10n.videoUpOwner,
+                  if (ownerDetails.isNotEmpty) ownerDetails.join(' / '),
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: palette.textSecondary,
+                ),
+              ),
             ],
           ),
         ),
@@ -423,24 +399,24 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   }
 
   Widget _buildStatsRow(BvidInfo videoInfo) {
-    final badges = <Widget>[
-      _VideoBadge(
+    final items = <Widget>[
+      _VideoMetaItem(
         icon: Icons.visibility_rounded,
         label: context.l10n.videoStatsViews(
           _formatCompactCount(context, videoInfo.stats.view),
         ),
       ),
-      _VideoBadge(
+      _VideoMetaItem(
         icon: Icons.subtitles_rounded,
         label: context.l10n.videoStatsDanmaku(
           _formatCompactCount(context, videoInfo.stats.danmaku),
         ),
       ),
-      _VideoBadge(
+      _VideoMetaItem(
         icon: Icons.comment_rounded,
         label: context.l10n.commentCount(videoInfo.stats.reply),
       ),
-      _VideoBadge(
+      _VideoMetaItem(
         icon: Icons.fingerprint_rounded,
         label: videoInfo.bvid,
         onTap: () => _copyBvidToClipboard(context, videoInfo.bvid),
@@ -448,9 +424,9 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     ];
 
     if (videoInfo.pubdate != null && videoInfo.pubdate! > 0) {
-      badges.insert(
+      items.insert(
         2,
-        _VideoBadge(
+        _VideoMetaItem(
           icon: Icons.schedule_rounded,
           label: context.l10n.videoStatsPublished(
             _formatPubdate(videoInfo.pubdate!),
@@ -462,7 +438,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     return Wrap(
       spacing: context.appSpacing.sm,
       runSpacing: context.appSpacing.xs,
-      children: badges,
+      children: items,
     );
   }
 
@@ -483,33 +459,19 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final palette = context.appPalette;
     final spacing = context.appSpacing;
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.sm,
-        vertical: spacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: palette.warningSoft.withValues(alpha: 0.72),
-        borderRadius: context.appRadii.largeRadius,
-        border: Border.all(
-          color: palette.warning.withValues(alpha: 0.3),
-          width: context.appDepth.outline,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.report_problem_rounded, size: 18, color: palette.warning),
-          SizedBox(width: spacing.xs),
-          Expanded(
-            child: Text(
-              context.l10n.videoNoReprint,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: palette.textPrimary,
-              ),
+    return Row(
+      children: [
+        Icon(Icons.report_problem_rounded, size: 18, color: palette.warning),
+        SizedBox(width: spacing.xs),
+        Expanded(
+          child: Text(
+            context.l10n.videoNoReprint,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: palette.textSecondary,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -522,60 +484,55 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
         : description;
     final showToggle = description.length > 120 || description.contains('\n');
 
-    return AppPanel(
-      padding: EdgeInsets.all(spacing.md),
-      borderRadius: context.appRadii.largeRadius,
-      boxShadow: const [],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DesktopSelectionArea(
-            child: Text(
-              displayText,
-              maxLines: _isDescriptionExpanded || description.isEmpty
-                  ? null
-                  : 4,
-              overflow: _isDescriptionExpanded || description.isEmpty
-                  ? null
-                  : TextOverflow.ellipsis,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: description.isEmpty
-                    ? palette.textMuted
-                    : palette.textPrimary,
-                height: 1.45,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DesktopSelectionArea(
+          child: Text(
+            displayText,
+            maxLines: _isDescriptionExpanded || description.isEmpty ? null : 4,
+            overflow: _isDescriptionExpanded || description.isEmpty
+                ? null
+                : TextOverflow.ellipsis,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: description.isEmpty
+                  ? palette.textMuted
+                  : palette.textPrimary,
+              height: 1.5,
             ),
           ),
-          if (showToggle) ...[
-            SizedBox(height: spacing.xs),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isDescriptionExpanded = !_isDescriptionExpanded;
-                  });
-                },
-                child: Text(
-                  _isDescriptionExpanded
-                      ? context.l10n.collapse
-                      : context.l10n.expand,
-                ),
-              ),
+        ),
+        if (showToggle) ...[
+          SizedBox(height: spacing.xs),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _isDescriptionExpanded = !_isDescriptionExpanded;
+              });
+            },
+            child: Text(
+              _isDescriptionExpanded
+                  ? context.l10n.collapse
+                  : context.l10n.expand,
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 
   Widget _buildTagRow(BvidInfo videoInfo) {
     return Wrap(
-      spacing: context.appSpacing.xs,
+      spacing: context.appSpacing.sm,
       runSpacing: context.appSpacing.xs,
       children: [
         for (final tag in videoInfo.tags)
-          Chip(visualDensity: VisualDensity.compact, label: Text(tag.name)),
+          Text(
+            '#${tag.name}',
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.appPalette.textSecondary,
+            ),
+          ),
       ],
     );
   }
@@ -589,61 +546,57 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     );
     final state = asyncState.value ?? const VideoInteractionState();
     final isBusy = state.isBusy || asyncState.isLoading;
-    final spacing = context.appSpacing;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _InteractionActionButton(
-            icon: state.isLiked
-                ? Icons.thumb_up_alt_rounded
-                : Icons.thumb_up_alt_outlined,
-            label: state.isLiked
-                ? context.l10n.videoLiked
-                : context.l10n.videoLike,
-            count: _formatCompactCount(context, videoInfo.stats.like),
-            selected: state.isLiked,
-            isBusy: isBusy,
-            onTap: () => _handleLike(context, videoInfo),
-          ),
-          SizedBox(width: spacing.sm),
-          _InteractionActionButton(
-            icon: state.coinsGiven >= 2
-                ? Icons.paid_rounded
-                : Icons.paid_outlined,
-            label: state.coinsGiven > 0
-                ? context.l10n.videoCoined(state.coinsGiven)
-                : context.l10n.videoCoin,
-            count: _formatCompactCount(context, videoInfo.stats.coin),
-            selected: state.coinsGiven > 0,
-            isBusy: isBusy || state.coinsGiven >= 2,
-            onTap: () => _handleCoin(context, videoInfo, state),
-          ),
-          SizedBox(width: spacing.sm),
-          _InteractionActionButton(
-            icon: state.isFavorited
-                ? Icons.star_rounded
-                : Icons.star_border_rounded,
-            label: state.isFavorited
-                ? context.l10n.videoFavorited
-                : context.l10n.videoFavorite,
-            count: _formatCompactCount(context, videoInfo.stats.favorite),
-            selected: state.isFavorited,
-            isBusy: isBusy || state.isFavorited,
-            onTap: () => _handleFavorite(context, videoInfo),
-          ),
-          SizedBox(width: spacing.sm),
-          _InteractionActionButton(
-            icon: Icons.ios_share_rounded,
-            label: context.l10n.videoShare,
-            count: _formatCompactCount(context, videoInfo.stats.share),
-            selected: false,
-            isBusy: isBusy,
-            onTap: () => _handleShare(context, videoInfo),
-          ),
-        ],
-      ),
+    return Wrap(
+      key: const ValueKey('video-detail-interactions'),
+      spacing: context.appSpacing.sm,
+      runSpacing: context.appSpacing.xs,
+      children: [
+        _InteractionActionButton(
+          icon: state.isLiked
+              ? Icons.thumb_up_alt_rounded
+              : Icons.thumb_up_alt_outlined,
+          label: state.isLiked
+              ? context.l10n.videoLiked
+              : context.l10n.videoLike,
+          count: _formatCompactCount(context, videoInfo.stats.like),
+          selected: state.isLiked,
+          isBusy: isBusy,
+          onTap: () => _handleLike(context, videoInfo),
+        ),
+        _InteractionActionButton(
+          icon: state.coinsGiven >= 2
+              ? Icons.paid_rounded
+              : Icons.paid_outlined,
+          label: state.coinsGiven > 0
+              ? context.l10n.videoCoined(state.coinsGiven)
+              : context.l10n.videoCoin,
+          count: _formatCompactCount(context, videoInfo.stats.coin),
+          selected: state.coinsGiven > 0,
+          isBusy: isBusy || state.coinsGiven >= 2,
+          onTap: () => _handleCoin(context, videoInfo, state),
+        ),
+        _InteractionActionButton(
+          icon: state.isFavorited
+              ? Icons.star_rounded
+              : Icons.star_border_rounded,
+          label: state.isFavorited
+              ? context.l10n.videoFavorited
+              : context.l10n.videoFavorite,
+          count: _formatCompactCount(context, videoInfo.stats.favorite),
+          selected: state.isFavorited,
+          isBusy: isBusy || state.isFavorited,
+          onTap: () => _handleFavorite(context, videoInfo),
+        ),
+        _InteractionActionButton(
+          icon: Icons.ios_share_rounded,
+          label: context.l10n.videoShare,
+          count: _formatCompactCount(context, videoInfo.stats.share),
+          selected: false,
+          isBusy: isBusy,
+          onTap: () => _handleShare(context, videoInfo),
+        ),
+      ],
     );
   }
 
@@ -651,56 +604,57 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     BvidInfo videoInfo,
     List<PageInfo> selectedPages,
     bool isMultiPage,
+    bool isWideLayout,
   ) {
     final spacing = context.appSpacing;
     final disabled = isMultiPage && selectedPages.isEmpty;
+    final play = FilledButton.icon(
+      onPressed: disabled
+          ? null
+          : () => _playParsedVideo(context, videoInfo, selectedPages),
+      icon: const Icon(Icons.play_arrow_rounded),
+      label: Text(context.l10n.play),
+    );
+    final add = OutlinedButton.icon(
+      onPressed: disabled ? null : () => _addToPlaylist(context),
+      icon: const Icon(Icons.playlist_add_rounded),
+      label: Text(context.l10n.addToPlaylist),
+    );
+    final download = OutlinedButton.icon(
+      onPressed: disabled
+          ? null
+          : () => _downloadParsedVideo(context, videoInfo, selectedPages),
+      icon: const Icon(Icons.download_rounded),
+      label: Text(context.l10n.downloads),
+    );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 560;
-        final play = FilledButton.icon(
-          onPressed: disabled
-              ? null
-              : () => _playParsedVideo(context, videoInfo, selectedPages),
-          icon: const Icon(Icons.play_arrow_rounded),
-          label: Text(context.l10n.play),
-        );
-        final add = FilledButton.tonalIcon(
-          onPressed: disabled ? null : () => _addToPlaylist(context),
-          icon: const Icon(Icons.playlist_add_rounded),
-          label: Text(context.l10n.addToPlaylist),
-        );
-        final download = OutlinedButton.icon(
-          onPressed: disabled
-              ? null
-              : () => _downloadParsedVideo(context, videoInfo, selectedPages),
-          icon: const Icon(Icons.download_rounded),
-          label: Text(context.l10n.downloads),
-        );
+    if (isWideLayout) {
+      return Row(
+        key: const ValueKey('video-detail-actions'),
+        children: [
+          Expanded(child: play),
+          SizedBox(width: spacing.xs),
+          Expanded(child: add),
+          SizedBox(width: spacing.xs),
+          Expanded(child: download),
+        ],
+      );
+    }
 
-        if (compact) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              play,
-              SizedBox(height: spacing.sm),
-              add,
-              SizedBox(height: spacing.sm),
-              download,
-            ],
-          );
-        }
-
-        return Row(
+    return Column(
+      key: const ValueKey('video-detail-actions'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        play,
+        SizedBox(height: spacing.sm),
+        Row(
           children: [
-            Expanded(child: play),
-            SizedBox(width: spacing.sm),
             Expanded(child: add),
             SizedBox(width: spacing.sm),
             Expanded(child: download),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -710,74 +664,73 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
     final spacing = context.appSpacing;
     final palette = context.appPalette;
 
-    return AppPanel(
-      padding: EdgeInsets.all(spacing.md),
-      borderRadius: context.appRadii.xLargeRadius,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Checkbox(
-                value: allSelected
-                    ? true
-                    : selectedPages.isEmpty
-                    ? false
-                    : null,
-                tristate: true,
-                onChanged: (value) {
-                  if (value == true) {
-                    notifier.selectAllPages();
-                  } else {
-                    notifier.deselectAllPages();
-                  }
-                },
-              ),
-              SizedBox(width: spacing.xs),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.selectPages,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        color: palette.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: spacing.xxs),
-                    Text(
-                      context.l10n.selectedPagesCount(
-                        selectedPages.length,
-                        videoInfo.pages.length,
-                      ),
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: palette.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: spacing.sm),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 280),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: videoInfo.pages.length,
-              separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
-              itemBuilder: (context, index) {
-                final page = videoInfo.pages[index];
-                final isSelected = selectedPages.any((p) => p.cid == page.cid);
-                return _PageSelectionRow(
-                  page: page,
-                  isSelected: isSelected,
-                  onTap: () => notifier.togglePageSelection(page),
-                );
+    return Column(
+      key: const ValueKey('video-detail-pages'),
+      children: [
+        Row(
+          children: [
+            Checkbox(
+              value: allSelected
+                  ? true
+                  : selectedPages.isEmpty
+                  ? false
+                  : null,
+              tristate: true,
+              onChanged: (value) {
+                if (value == true) {
+                  notifier.selectAllPages();
+                } else {
+                  notifier.deselectAllPages();
+                }
               },
             ),
-          ),
-        ],
-      ),
+            SizedBox(width: spacing.xs),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.selectPages,
+                    style: context.textTheme.titleSmall?.copyWith(
+                      color: palette.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: spacing.xxs),
+                  Text(
+                    context.l10n.selectedPagesCount(
+                      selectedPages.length,
+                      videoInfo.pages.length,
+                    ),
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: palette.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: spacing.sm),
+        Divider(height: 1, color: palette.borderSubtle),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: videoInfo.pages.length,
+          separatorBuilder: (_, __) =>
+              Divider(height: 1, color: palette.borderSubtle),
+          itemBuilder: (context, index) {
+            final page = videoInfo.pages[index];
+            final isSelected = selectedPages.any((p) => p.cid == page.cid);
+            return _PageSelectionRow(
+              page: page,
+              isSelected: isSelected,
+              onTap: () => notifier.togglePageSelection(page),
+            );
+          },
+        ),
+        Divider(height: 1, color: palette.borderSubtle),
+      ],
     );
   }
 
@@ -1115,11 +1068,7 @@ class _VideoDetailViewState extends ConsumerState<VideoDetailView> {
   }
 
   double _contentMaxWidth(double availableWidth) {
-    return availableWidth >= 960 ? 920.0 : double.infinity;
-  }
-
-  double _mediaMaxWidth(double availableWidth) {
-    return availableWidth >= 840 ? 680.0 : double.infinity;
+    return availableWidth >= 1080 ? 1080.0 : double.infinity;
   }
 }
 
@@ -1397,54 +1346,36 @@ class _InteractionActionButton extends StatelessWidget {
     final palette = context.appPalette;
     final color = selected ? palette.accentStrong : palette.textSecondary;
 
-    return Tooltip(
-      message: label,
-      child: SizedBox(
-        width: 82,
-        height: 72,
-        child: Material(
-          color: selected
-              ? palette.accentSoft.withValues(alpha: 0.58)
-              : palette.surfaceSecondary.withValues(alpha: 0.5),
-          borderRadius: context.appRadii.largeRadius,
-          child: InkWell(
-            borderRadius: context.appRadii.largeRadius,
-            onTap: isBusy ? null : onTap,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: context.appRadii.largeRadius,
-                border: Border.all(
-                  color: selected
-                      ? palette.accentStrong.withValues(alpha: 0.36)
-                      : palette.borderSubtle,
-                  width: context.appDepth.outline,
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.appSpacing.xs,
-                  vertical: context.appSpacing.xs,
-                ),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '$label $count',
+      child: Tooltip(
+        message: label,
+        child: Opacity(
+          opacity: isBusy ? 0.45 : 1,
+          child: SizedBox(
+            width: 64,
+            height: 56,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: context.appRadii.pillRadius,
+                onTap: isBusy ? null : onTap,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(icon, color: color, size: 22),
                     SizedBox(height: context.appSpacing.xxs),
                     Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.labelSmall?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
                       count,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: context.textTheme.labelSmall?.copyWith(
-                        color: palette.textMuted,
+                        color: color,
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                       ),
                     ),
                   ],
@@ -1461,37 +1392,18 @@ class _InteractionActionButton extends StatelessWidget {
 class _HeaderBackButton extends StatelessWidget {
   const _HeaderBackButton({required this.tooltip, required this.onPressed});
 
-  static const double dimension = 44;
-
   final String tooltip;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.appPalette;
-
-    return Material(
-      color: palette.surfacePrimary.withValues(alpha: 0.92),
-      shape: const CircleBorder(),
-      elevation: 0,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: palette.borderSubtle,
-            width: context.appDepth.outline,
-          ),
-          boxShadow: context.appDepth.floatingShadow,
-        ),
-        child: SizedBox.square(
-          dimension: dimension,
-          child: IconButton(
-            tooltip: tooltip,
-            padding: EdgeInsets.zero,
-            onPressed: onPressed,
-            icon: Icon(Icons.arrow_back_rounded, color: palette.textPrimary),
-          ),
-        ),
+    return IconButton(
+      key: const ValueKey('video-detail-back-button'),
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.arrow_back_rounded,
+        color: context.appPalette.textPrimary,
       ),
     );
   }
@@ -1511,7 +1423,7 @@ class _OverlayBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: context.appPalette.overlayStrong.withValues(alpha: 0.62),
-        borderRadius: context.appRadii.pillRadius,
+        borderRadius: context.appRadii.smallRadius,
       ),
       child: Text(
         label,
@@ -1524,37 +1436,8 @@ class _OverlayBadge extends StatelessWidget {
   }
 }
 
-class _TinyLabel extends StatelessWidget {
-  const _TinyLabel({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.appPalette;
-
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.appSpacing.xs,
-        vertical: context.appSpacing.xxs,
-      ),
-      decoration: BoxDecoration(
-        color: palette.accentSoft.withValues(alpha: 0.58),
-        borderRadius: context.appRadii.pillRadius,
-      ),
-      child: Text(
-        label,
-        style: context.textTheme.labelSmall?.copyWith(
-          color: palette.accentStrong,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _VideoBadge extends StatelessWidget {
-  const _VideoBadge({required this.icon, required this.label, this.onTap});
+class _VideoMetaItem extends StatelessWidget {
+  const _VideoMetaItem({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
@@ -1565,53 +1448,30 @@ class _VideoBadge extends StatelessWidget {
     final palette = context.appPalette;
     final color = palette.textSecondary;
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.appSpacing.sm,
-        vertical: context.appSpacing.xxs,
-      ),
-      decoration: BoxDecoration(
-        color: palette.surfaceSecondary.withValues(alpha: 0.72),
-        borderRadius: context.appRadii.pillRadius,
-        border: Border.all(
-          color: color.withValues(alpha: 0.22),
-          width: context.appDepth.outline,
-        ),
-      ),
+    final content = Padding(
+      padding: EdgeInsets.symmetric(vertical: context.appSpacing.xxs),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
           SizedBox(width: context.appSpacing.xxs),
-          _BadgeText(
+          Text(
             label,
             style: context.textTheme.labelSmall?.copyWith(color: color),
-            onTap: onTap,
           ),
         ],
       ),
     );
-  }
-}
+    if (onTap == null) return content;
 
-class _BadgeText extends StatelessWidget {
-  const _BadgeText(this.label, {required this.style, this.onTap});
-
-  final String label;
-  final TextStyle? style;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Text(label, style: style);
-    if (onTap != null) {
-      return InkWell(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: context.appRadii.smallRadius,
         onTap: onTap,
-        borderRadius: BorderRadius.circular(4),
-        child: text,
-      );
-    }
-    return text;
+        child: content,
+      ),
+    );
   }
 }
 
@@ -1632,58 +1492,45 @@ class _PageSelectionRow extends StatelessWidget {
     final palette = context.appPalette;
 
     return Material(
-      color: isSelected
-          ? palette.accentSoft.withValues(alpha: 0.5)
-          : palette.surfacePrimary.withValues(alpha: 0.42),
-      borderRadius: context.appRadii.largeRadius,
+      color: Colors.transparent,
       child: InkWell(
-        borderRadius: context.appRadii.largeRadius,
         onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: context.appRadii.largeRadius,
-            border: Border.all(
-              color: isSelected
-                  ? palette.accentStrong.withValues(alpha: 0.42)
-                  : palette.borderSubtle.withValues(alpha: 0.72),
-              width: context.appDepth.outline,
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: spacing.sm,
-              vertical: spacing.xs,
-            ),
-            child: Row(
-              children: [
-                Checkbox(value: isSelected, onChanged: (_) => onTap()),
-                SizedBox(width: spacing.xs),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'P${page.page} ${page.partTitle}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          color: palette.textPrimary,
-                        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: spacing.xs),
+          child: Row(
+            children: [
+              Checkbox(value: isSelected, onChanged: (_) => onTap()),
+              SizedBox(width: spacing.xs),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'P${page.page} ${page.partTitle}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        color: isSelected
+                            ? palette.accentStrong
+                            : palette.textPrimary,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                       ),
-                      SizedBox(height: spacing.xxs),
-                      Text(
-                        Formatters.formatDuration(
-                          Duration(seconds: page.duration),
-                        ),
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: palette.textSecondary,
-                        ),
+                    ),
+                    SizedBox(height: spacing.xxs),
+                    Text(
+                      Formatters.formatDuration(
+                        Duration(seconds: page.duration),
                       ),
-                    ],
-                  ),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: palette.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

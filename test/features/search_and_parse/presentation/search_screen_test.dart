@@ -122,6 +122,43 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
+    testWidgets('打开视频详情后返回会恢复搜索结果和滚动位置', (tester) async {
+      _setDesktopViewport(tester);
+      final results = _pageResults('Result', 20);
+      final notifier = _FakeParseNotifier(
+        searchResults: results,
+        parsedVideo: results[17],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+      await _scrollSearchResultsUntilVisible(tester, 'Result 18');
+
+      final scrollOffset = _searchResultsScrollableState(
+        tester,
+        keyword: 'night drive',
+      ).position.pixels;
+
+      await tester.tap(find.text('Result 18'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('video-detail-header')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('video-detail-back-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Result 18'), findsOneWidget);
+      expect(
+        _searchResultsScrollableState(
+          tester,
+          keyword: 'night drive',
+        ).position.pixels,
+        closeTo(scrollOffset, 1),
+      );
+    });
+
     testWidgets('clear keeps a pending search from restoring stale results', (
       tester,
     ) async {
@@ -736,6 +773,7 @@ class _FakeParseNotifier extends ParseNotifier {
     this.searchResults = const [],
     this.searchResultsByPage,
     this.searchResultsByKeywordAndPage,
+    this.parsedVideo,
     this.searchDelay,
     this.numPages = 1,
     this.numPagesByKeyword = const {},
@@ -745,6 +783,7 @@ class _FakeParseNotifier extends ParseNotifier {
   final List<BvidInfo> searchResults;
   final Map<int, List<BvidInfo>>? searchResultsByPage;
   final Map<String, Map<int, List<BvidInfo>>>? searchResultsByKeywordAndPage;
+  final BvidInfo? parsedVideo;
   final Future<void>? searchDelay;
   final int numPages;
   final Map<String, int> numPagesByKeyword;
@@ -759,6 +798,9 @@ class _FakeParseNotifier extends ParseNotifier {
   @override
   Future<void> parseInput(String input) async {
     state = const ParseState.parsing();
+    if (parsedVideo != null) {
+      state = ParseState.success(parsedVideo!);
+    }
   }
 
   @override
