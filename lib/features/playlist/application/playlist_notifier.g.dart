@@ -37,7 +37,7 @@ final class PlaylistListNotifierProvider
 }
 
 String _$playlistListNotifierHash() =>
-    r'dc949eb60909e9a3cd625101ec35138dbae665e4';
+    r'7431af1e3b8db8b4872b1a21fbf1748292da0f90';
 
 /// State notifier managing playlist list and CRUD operations.
 

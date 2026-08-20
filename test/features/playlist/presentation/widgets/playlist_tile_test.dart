@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:busic/core/theme/app_theme.dart';
 import 'package:busic/core/theme/app_theme_tokens.dart';
 import 'package:busic/features/playlist/domain/models/playlist.dart';
+import 'package:busic/features/playlist/domain/playlist_activity.dart';
 import 'package:busic/features/playlist/presentation/widgets/playlist_tile.dart';
 import 'package:busic/shared/widgets/app_panel.dart';
 import 'package:busic/shared/widgets/media_cover.dart';
@@ -77,6 +78,52 @@ void main() {
 
     expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
     expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
+  });
+
+  testWidgets('compact tile hides metadata and the more action', (tester) async {
+    await _pumpTile(
+      tester,
+      PlaylistTile(
+        playlist: _playlist(),
+        tier: PlaylistTier.compact,
+        onMorePressed: () {},
+      ),
+    );
+
+    expect(find.text('Road Trip'), findsOneWidget);
+    expect(find.text('12 songs'), findsNothing);
+    expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
+    final title = _titleStyle(tester);
+    expect(
+      title.style.fontSize,
+      lessThanOrEqualTo(
+        (Theme.of(tester.element(find.byType(PlaylistTile))).textTheme.titleSmall)
+                ?.fontSize ??
+            0,
+      ),
+    );
+  });
+
+  testWidgets('featured tile shows an activity badge and larger title', (
+    tester,
+  ) async {
+    await _pumpTile(
+      tester,
+      PlaylistTile(playlist: _playlist(), tier: PlaylistTier.featured),
+    );
+
+    expect(
+      find.byKey(const ValueKey<String>('playlist-tile-activity-badge')),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.bolt_rounded), findsOneWidget);
+    expect(find.text('Active'), findsOneWidget);
+    expect(find.text('12 songs'), findsOneWidget);
+    final title = _titleStyle(tester);
+    final titleSmall = Theme.of(
+      tester.element(find.byType(PlaylistTile)),
+    ).textTheme.titleSmall;
+    expect(title.style.fontSize, greaterThan(titleSmall?.fontSize ?? 0));
   });
 
   testWidgets('uses one functional gradient without glass, shadow, or glow', (

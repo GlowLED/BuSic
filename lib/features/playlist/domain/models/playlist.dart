@@ -24,6 +24,12 @@ abstract class Playlist with _$Playlist {
 
     /// Creation timestamp.
     required DateTime createdAt,
+
+    /// Number of active events (song plays / detail visits).
+    @Default(0) int playCount,
+
+    /// Timestamp of the most recent active event, null if never active.
+    DateTime? lastPlayedAt,
   }) = _Playlist;
 
   factory Playlist.fromJson(Map<String, dynamic> json) =>

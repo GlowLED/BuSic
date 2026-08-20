@@ -13,6 +13,10 @@ _Playlist _$PlaylistFromJson(Map<String, dynamic> json) => _Playlist(
   songCount: (json['songCount'] as num?)?.toInt() ?? 0,
   isFavorite: json['isFavorite'] as bool? ?? false,
   createdAt: DateTime.parse(json['createdAt'] as String),
+  playCount: (json['playCount'] as num?)?.toInt() ?? 0,
+  lastPlayedAt: json['lastPlayedAt'] == null
+      ? null
+      : DateTime.parse(json['lastPlayedAt'] as String),
 );
 
 Map<String, dynamic> _$PlaylistToJson(_Playlist instance) => <String, dynamic>{
@@ -22,4 +26,6 @@ Map<String, dynamic> _$PlaylistToJson(_Playlist instance) => <String, dynamic>{
   'songCount': instance.songCount,
   'isFavorite': instance.isFavorite,
   'createdAt': instance.createdAt.toIso8601String(),
+  'playCount': instance.playCount,
+  'lastPlayedAt': instance.lastPlayedAt?.toIso8601String(),
 };

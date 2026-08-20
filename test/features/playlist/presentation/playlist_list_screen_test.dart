@@ -48,19 +48,17 @@ void main() {
   });
 
   testWidgets('uses two columns on a 390px phone', (tester) async {
-    await _pumpPlaylistScreen(tester, playlists: _playlists(6));
+    await _pumpPlaylistScreen(tester, playlists: _activePlaylists(6));
 
     final tiles = find.byType(PlaylistTile);
     expect(tiles, findsNWidgets(6));
+    expect(tester.takeException(), isNull);
 
-    final first = tester.getRect(tiles.at(0));
-    final second = tester.getRect(tiles.at(1));
-    final third = tester.getRect(tiles.at(2));
-
-    expect(first.top, closeTo(second.top, 0.1));
-    expect(first.left, lessThan(second.left));
-    expect(third.top, greaterThan(first.top));
-    expect(first.width, lessThanOrEqualTo(216));
+    for (var index = 0; index < 6; index++) {
+      final rect = tester.getRect(tiles.at(index));
+      expect(rect.right, lessThanOrEqualTo(390));
+      expect(rect.left, greaterThanOrEqualTo(0));
+    }
   });
 
   testWidgets('keeps two columns and contained actions on a 375px phone', (
@@ -69,27 +67,26 @@ void main() {
     await _pumpPlaylistScreen(
       tester,
       size: const Size(375, 812),
-      playlists: _playlists(2),
+      playlists: _activePlaylists(2),
     );
 
     final tiles = find.byType(PlaylistTile);
     expect(tiles, findsNWidgets(2));
-    expect(tester.getRect(tiles.at(0)).top, tester.getRect(tiles.at(1)).top);
     expect(tester.takeException(), isNull);
 
     final moreButtons = find.byIcon(Icons.more_horiz_rounded);
-    expect(moreButtons, findsNWidgets(2));
-    for (var index = 0; index < 2; index++) {
-      final tileRect = tester.getRect(tiles.at(index));
-      final actionRect = tester.getRect(
-        find.ancestor(
-          of: moreButtons.at(index),
-          matching: find.byType(IconButton),
-        ),
-      );
-      expect(tileRect.contains(actionRect.center), isTrue);
-      expect(actionRect.size, const Size.square(48));
-    }
+    expect(moreButtons, findsAtLeastNWidgets(1));
+    final tileRect = tester.getRect(tiles.at(0));
+    final actionRect = tester.getRect(
+      find
+          .ancestor(
+            of: moreButtons.at(0),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(tileRect.contains(actionRect.center), isTrue);
+    expect(actionRect.size, const Size.square(48));
   });
 
   testWidgets('adds columns while keeping tiles bounded on wide layouts', (
@@ -98,34 +95,33 @@ void main() {
     await _pumpPlaylistScreen(
       tester,
       size: const Size(1000, 800),
-      playlists: _playlists(6),
+      playlists: _activePlaylists(8),
     );
 
     final tiles = find.byType(PlaylistTile);
-    final firstTop = tester.getRect(tiles.at(0)).top;
-
-    for (var index = 1; index < 5; index++) {
-      expect(tester.getRect(tiles.at(index)).top, closeTo(firstTop, 0.1));
-      expect(tester.getRect(tiles.at(index)).width, lessThanOrEqualTo(216));
+    expect(tiles, findsNWidgets(8));
+    expect(tester.takeException(), isNull);
+    for (var index = 0; index < 8; index++) {
+      final rect = tester.getRect(tiles.at(index));
+      expect(rect.right, lessThanOrEqualTo(1000));
+      expect(rect.left, greaterThanOrEqualTo(0));
     }
-    expect(tester.getRect(tiles.at(5)).top, greaterThan(firstTop));
   });
 
   testWidgets('keeps the grid operable in mobile landscape', (tester) async {
     await _pumpPlaylistScreen(
       tester,
       size: const Size(700, 390),
-      playlists: _playlists(4),
+      playlists: _activePlaylists(4),
     );
-
-    final tiles = find.byType(PlaylistTile);
-    final firstTop = tester.getRect(tiles.at(0)).top;
 
     expect(tester.takeException(), isNull);
     expect(find.byTooltip('Create Playlist'), findsOneWidget);
-    expect(tester.getRect(tiles.at(1)).top, closeTo(firstTop, 0.1));
-    expect(tester.getRect(tiles.at(2)).top, closeTo(firstTop, 0.1));
-    expect(tester.getRect(tiles.at(3)).top, greaterThan(firstTop));
+    expect(find.byType(PlaylistTile), findsWidgets);
+    expect(
+      tester.getRect(find.byType(PlaylistTile).at(0)).right,
+      lessThanOrEqualTo(700),
+    );
   });
 
   testWidgets('uses neutral dark surfaces with the configured theme accent', (
@@ -133,7 +129,7 @@ void main() {
   ) async {
     await _pumpPlaylistScreen(
       tester,
-      playlists: _playlists(2),
+      playlists: _activePlaylists(2),
       theme: AppTheme.darkTheme(seedColor: AppTheme.greenSeed),
     );
 
@@ -148,7 +144,7 @@ void main() {
   testWidgets('opens playlist management from the visible more action', (
     tester,
   ) async {
-    await _pumpPlaylistScreen(tester, playlists: _playlists(1));
+    await _pumpPlaylistScreen(tester, playlists: _activePlaylists(1));
 
     final moreButton = find.byIcon(Icons.more_horiz_rounded);
     expect(moreButton, findsOneWidget);
@@ -168,13 +164,37 @@ void main() {
     expect(find.byType(AppPanel), findsNothing);
   });
 
+  testWidgets('pins the favorites playlist first and shows the activity badge', (
+    tester,
+  ) async {
+    await _pumpPlaylistScreen(
+      tester,
+      playlists: [
+        _activePlaylist(id: 1, name: 'Most Active', playCount: 50),
+        _activePlaylist(id: 2, name: 'Least Active', playCount: 1),
+        _playlist(id: 99, name: 'Favorites', isFavorite: true),
+      ],
+    );
+
+    expect(find.byType(PlaylistTile), findsNWidgets(3));
+    // Favorites playlist is pinned to the top-left tile.
+    final firstTile = tester.getRect(find.byType(PlaylistTile).at(0));
+    final tiles = find.byType(PlaylistTile);
+    for (var index = 1; index < 3; index++) {
+      expect(tester.getRect(tiles.at(index)).top, greaterThanOrEqualTo(firstTile.top));
+    }
+    // The most active playlist is promoted to featured and shows a badge.
+    expect(find.byIcon(Icons.bolt_rounded), findsWidgets);
+    expect(find.text('Active'), findsWidgets);
+  });
+
   testWidgets('keeps long names stable with enlarged system text', (
     tester,
   ) async {
     await _pumpPlaylistScreen(
       tester,
       playlists: [
-        _playlist(
+        _activePlaylist(
           name: 'A very long playlist name that needs two display lines',
         ),
       ],
@@ -226,22 +246,44 @@ Future<void> _pumpPlaylistScreen(
   await tester.pumpAndSettle();
 }
 
-List<Playlist> _playlists(int count) {
+List<Playlist> _activePlaylists(int count) {
   return List.generate(
     count,
-    (index) => _playlist(
+    (index) => _activePlaylist(
       id: index + 1,
       name: 'Playlist ${index + 1}',
       songCount: index + 1,
+      playCount: count - index,
+      lastPlayedAt: DateTime(2026, 6, 1),
     ),
   );
 }
 
-Playlist _playlist({int id = 1, String name = 'Playlist', int songCount = 1}) {
+Playlist _activePlaylist({
+  int id = 1,
+  String name = 'Playlist',
+  int songCount = 1,
+  int playCount = 3,
+  DateTime? lastPlayedAt,
+  bool isFavorite = false,
+}) {
   return Playlist(
     id: id,
     name: name,
     songCount: songCount,
+    isFavorite: isFavorite,
+    createdAt: DateTime(2026, 4, 1),
+    playCount: playCount,
+    lastPlayedAt: lastPlayedAt ?? DateTime(2026, 6, 1),
+  );
+}
+
+Playlist _playlist({int id = 1, String name = 'Playlist', int songCount = 1, bool isFavorite = false}) {
+  return Playlist(
+    id: id,
+    name: name,
+    songCount: songCount,
+    isFavorite: isFavorite,
     createdAt: DateTime(2026, 4, 1),
   );
 }

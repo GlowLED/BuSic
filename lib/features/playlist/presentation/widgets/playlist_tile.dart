@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/media_cover.dart';
 import '../../domain/models/playlist.dart';
+import '../../domain/playlist_activity.dart';
 
 const _playlistTileStateDuration = Duration(milliseconds: 160);
 const _playlistCoverHoverDuration = Duration(milliseconds: 240);
@@ -101,16 +102,24 @@ double _contrastRatio(Color first, Color second) {
 }
 
 /// A full-bleed, cover-first playlist tile used by the playlist library.
+///
+/// The card adapts to its activity [tier]: featured cards render with a larger
+/// title and an activity badge, compact cards collapse to a single-line label.
 class PlaylistTile extends StatefulWidget {
   const PlaylistTile({
     super.key,
     required this.playlist,
+    this.tier = PlaylistTier.standard,
     this.onTap,
     this.onLongPress,
     this.onMorePressed,
   });
 
   final Playlist playlist;
+
+  /// Activity tier that controls the card's visual variant.
+  final PlaylistTier tier;
+
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onMorePressed;
@@ -178,10 +187,12 @@ class _PlaylistTileState extends State<PlaylistTile> {
     final radii = context.appRadii;
     final depth = context.appDepth;
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
+    final isFeatured = widget.tier == PlaylistTier.featured;
+    final isCompact = widget.tier == PlaylistTier.compact;
     final hasPrimaryInteraction =
         widget.onTap != null || widget.onLongPress != null;
     final hasMoreAction =
-        !widget.playlist.isFavorite && widget.onMorePressed != null;
+        !isCompact && !widget.playlist.isFavorite && widget.onMorePressed != null;
 
     final bottomColor =
         _coverColorScheme?.primaryContainer ?? palette.surfacePrimary;
@@ -312,7 +323,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
                   right: hasMoreAction
                       ? spacing.xs + 48 + spacing.xxs
                       : spacing.sm,
-                  bottom: spacing.sm,
+                  bottom: isCompact ? spacing.xs : spacing.sm,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,34 +334,84 @@ class _PlaylistTileState extends State<PlaylistTile> {
                         ),
                         duration: paletteDuration,
                         curve: Curves.easeOutCubic,
-                        style:
-                            (context.textTheme.titleSmall ?? const TextStyle())
-                                .copyWith(color: titleColor),
+                        style: ((isFeatured
+                              ? context.textTheme.titleLarge
+                              : context.textTheme.titleSmall) ??
+                          const TextStyle()).copyWith(color: titleColor),
                         child: Text(
                           widget.playlist.name,
-                          maxLines: 2,
+                          maxLines: isCompact ? 1 : 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(height: spacing.xxs),
-                      AnimatedDefaultTextStyle(
-                        key: const ValueKey<String>(
-                          'playlist-tile-metadata-style',
+                      if (!isCompact) ...[
+                        SizedBox(height: spacing.xxs),
+                        AnimatedDefaultTextStyle(
+                          key: const ValueKey<String>(
+                            'playlist-tile-metadata-style',
+                          ),
+                          duration: paletteDuration,
+                          curve: Curves.easeOutCubic,
+                          style:
+                              (context.textTheme.bodySmall ?? const TextStyle())
+                                  .copyWith(color: mutedColor),
+                          child: Text(
+                            context.l10n.songsTotal(widget.playlist.songCount),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        duration: paletteDuration,
-                        curve: Curves.easeOutCubic,
-                        style:
-                            (context.textTheme.bodySmall ?? const TextStyle())
-                                .copyWith(color: mutedColor),
-                        child: Text(
-                          context.l10n.songsTotal(widget.playlist.songCount),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
+                if (isFeatured)
+                  Positioned(
+                    left: spacing.sm,
+                    top: spacing.sm,
+                    child: IgnorePointer(
+                      child: AnimatedContainer(
+                        key: const ValueKey<String>(
+                          'playlist-tile-activity-badge',
+                        ),
+                        duration: paletteDuration,
+                        curve: Curves.easeOutCubic,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.xs,
+                          vertical: spacing.xxs,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color.alphaBlend(
+                            palette.overlayStrong,
+                            palette.surfaceSecondary,
+                          ),
+                          borderRadius: radii.smallRadius,
+                          border: Border.all(
+                            color: palette.accentSoft.withValues(
+                              alpha: 0.55,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.bolt_rounded,
+                              size: 16,
+                              color: palette.accentStrong,
+                            ),
+                            SizedBox(width: spacing.xxs),
+                            Text(
+                              context.l10n.activePlaylist,
+                              style: (context.textTheme.labelSmall ??
+                                      const TextStyle())
+                                  .copyWith(color: palette.textPrimary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 if (hasMoreAction)
                   Positioned(
                     right: spacing.xs,

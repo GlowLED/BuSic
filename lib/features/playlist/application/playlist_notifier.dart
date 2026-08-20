@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/application/auth_notifier.dart';
@@ -9,20 +10,24 @@ import '../domain/models/song_item.dart';
 
 part 'playlist_notifier.g.dart';
 
+/// Provides the playlist repository across playlist providers and screens.
+final playlistRepositoryProvider = Provider<PlaylistRepository>((ref) {
+  return PlaylistRepositoryImpl(db: ref.read(databaseProvider));
+});
+
 /// State notifier managing playlist list and CRUD operations.
 @Riverpod(name: 'playlistListNotifierProvider')
 class PlaylistListNotifier extends _$PlaylistListNotifier {
-  late PlaylistRepository _repository;
-
   @override
   Future<List<Playlist>> build() async {
-    _repository = PlaylistRepositoryImpl(db: ref.read(databaseProvider));
-    return _repository.getAllPlaylists();
+    return ref.read(playlistRepositoryProvider).getAllPlaylists();
   }
 
   /// Create a new playlist with [name]. Returns the created playlist.
   Future<Playlist> createPlaylist(String name) async {
-    final playlist = await _repository.createPlaylist(name);
+    final playlist = await ref
+        .read(playlistRepositoryProvider)
+        .createPlaylist(name);
     ref.invalidateSelf();
     return playlist;
   }
@@ -37,7 +42,7 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
         return; // Cannot delete favorites playlist
       }
     }
-    await _repository.deletePlaylist(id);
+    await ref.read(playlistRepositoryProvider).deletePlaylist(id);
     ref.invalidateSelf();
   }
 
@@ -51,13 +56,19 @@ class PlaylistListNotifier extends _$PlaylistListNotifier {
         return; // Cannot rename favorites playlist
       }
     }
-    await _repository.renamePlaylist(id, name);
+    await ref.read(playlistRepositoryProvider).renamePlaylist(id, name);
     ref.invalidateSelf();
   }
 
   /// Update playlist cover.
   Future<void> updatePlaylistCover(int id, String? coverUrl) async {
-    await _repository.updatePlaylistCover(id, coverUrl);
+    await ref.read(playlistRepositoryProvider).updatePlaylistCover(id, coverUrl);
+    ref.invalidateSelf();
+  }
+
+  /// Record an active event and refresh the list ordering.
+  Future<void> recordPlaylistActivity(int id) async {
+    await ref.read(playlistRepositoryProvider).recordPlaylistActivity(id);
     ref.invalidateSelf();
   }
 }

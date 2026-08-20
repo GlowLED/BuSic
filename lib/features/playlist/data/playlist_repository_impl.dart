@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
 import '../domain/models/playlist.dart' as domain;
 import '../domain/models/song_item.dart';
+import '../domain/playlist_activity.dart';
 import 'playlist_repository.dart';
 
 /// Concrete implementation of [PlaylistRepository] using Drift database.
@@ -23,6 +24,8 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
       songCount: songCount,
       isFavorite: row.isFavorite,
       createdAt: row.createdAt,
+      playCount: row.playCount,
+      lastPlayedAt: row.lastPlayedAt,
     );
   }
 
@@ -61,9 +64,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
   @override
   Future<List<domain.Playlist>> getAllPlaylists() async {
-    final rows = await (_db.select(
-      _db.playlists,
-    )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
+    final rows = await _db.select(_db.playlists).get();
 
     final result = <domain.Playlist>[];
     for (final row in rows) {
@@ -83,7 +84,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
         ),
       );
     }
-    return result;
+    return PlaylistActivity.sortByActivity(result);
   }
 
   @override
@@ -139,6 +140,21 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   Future<void> updatePlaylistCover(int id, String? coverUrl) async {
     await (_db.update(_db.playlists)..where((t) => t.id.equals(id))).write(
       PlaylistsCompanion(coverUrl: Value(coverUrl)),
+    );
+  }
+
+  @override
+  Future<void> recordPlaylistActivity(int id) async {
+    final row = await (_db.select(
+      _db.playlists,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    if (row == null || row.isFavorite) return;
+
+    await (_db.update(_db.playlists)..where((t) => t.id.equals(id))).write(
+      PlaylistsCompanion(
+        playCount: Value(row.playCount + 1),
+        lastPlayedAt: Value(DateTime.now()),
+      ),
     );
   }
 

@@ -59,6 +59,18 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
   _EditMode _editMode = _EditMode.none;
   final Set<int> _selectedSongIds = {};
 
+  @override
+  void initState() {
+    super.initState();
+    // Opening the detail page counts as an active event.
+    Future.microtask(() {
+      if (!mounted) return;
+      ref
+          .read(playlistListNotifierProvider.notifier)
+          .recordPlaylistActivity(playlistId);
+    });
+  }
+
   void _toggleEditMode(_EditMode mode) {
     setState(() {
       if (_editMode == mode) {
@@ -611,6 +623,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
           playlistId: playlistId,
           playlistName: playlistName,
         );
+    ref
+        .read(playlistListNotifierProvider.notifier)
+        .recordPlaylistActivity(playlistId);
   }
 
   IconData _playModeIcon(PlayMode mode) {
@@ -655,6 +670,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen> {
           playlistId: playlistId,
           playlistName: playlistName,
         );
+    ref
+        .read(playlistListNotifierProvider.notifier)
+        .recordPlaylistActivity(playlistId);
   }
 
   /// 显示分享方式选择弹窗

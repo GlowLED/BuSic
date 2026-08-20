@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/extensions/context_extensions.dart';
 import '../../../shared/widgets/common_dialogs.dart';
+import '../../../shared/widgets/masonry_grid.dart';
 import '../../auth/application/auth_notifier.dart';
 import '../../share/application/share_notifier.dart';
 import '../../share/domain/models/share_state.dart';
@@ -13,6 +14,7 @@ import '../../share/domain/models/shared_playlist.dart';
 import '../../share/presentation/widgets/import_preview_dialog.dart';
 import '../application/playlist_notifier.dart';
 import '../domain/models/playlist.dart';
+import '../domain/playlist_activity.dart';
 import 'widgets/bili_fav_import_dialog.dart';
 import 'widgets/cover_selection_dialog.dart';
 import 'widgets/create_playlist_dialog.dart';
@@ -20,6 +22,8 @@ import 'widgets/playlist_tile.dart';
 
 const _playlistTileMaxExtent = 216.0;
 const _playlistPrimaryActionSize = 48.0;
+const _playlistFeaturedExtentRatio = 0.7;
+const _playlistCompactExtentRatio = 0.72;
 
 /// Screen displaying all user playlists.
 ///
@@ -326,20 +330,10 @@ class _PlaylistHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.appSpacing;
-    final textScaler = MediaQuery.textScalerOf(context);
-    final titleLineHeight = _scaledLineHeight(
-      textScaler,
-      context.textTheme.titleSmall,
-      14,
-    );
-    final metadataLineHeight = _scaledLineHeight(
-      textScaler,
-      context.textTheme.bodySmall,
-      12,
-    );
-    final metadataExtent =
-        (spacing.sm + (titleLineHeight * 2) + spacing.xxs + metadataLineHeight)
-            .ceilToDouble();
+    final sorted = PlaylistActivity.sortByActivity(playlists);
+    final tiers = sorted
+        .map((playlist) => PlaylistActivity.tierFor(playlist, sorted))
+        .toList(growable: false);
 
     return CustomScrollView(
       // Pre-build ~a screen of tiles ahead of the viewport so scrolling into
@@ -369,30 +363,33 @@ class _PlaylistHomeContent extends StatelessWidget {
             ),
             sliver: SliverLayoutBuilder(
               builder: (context, constraints) {
-                final crossAxisCount =
-                    ((constraints.crossAxisExtent + spacing.md) /
-                            (_playlistTileMaxExtent + spacing.md))
-                        .ceil()
-                        .clamp(1, 100)
-                        .toInt();
-                final tileWidth =
-                    (constraints.crossAxisExtent -
-                        (spacing.md * (crossAxisCount - 1))) /
-                    crossAxisCount;
-
                 return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    mainAxisExtent: tileWidth + metadataExtent,
-                    crossAxisSpacing: spacing.md,
+                  gridDelegate: MasonryGridDelegate(
+                    childCount: sorted.length,
                     mainAxisSpacing: spacing.md,
+                    crossAxisSpacing: spacing.md,
+                    maxCrossAxisExtent: _playlistTileMaxExtent + spacing.md,
+                    itemExtentResolver: (index) {
+                      return switch (tiers[index]) {
+                        PlaylistTier.featured => (
+                            span: 2,
+                            extentRatio: _playlistFeaturedExtentRatio,
+                          ),
+                        PlaylistTier.compact => (
+                            span: 1,
+                            extentRatio: _playlistCompactExtentRatio,
+                          ),
+                        PlaylistTier.standard => (span: 1, extentRatio: 1),
+                      };
+                    },
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    final playlist = playlists[index];
+                    final playlist = sorted[index];
                     return PlaylistTile(
                       playlist: playlist.isFavorite
                           ? playlist.copyWith(name: context.l10n.myFavorites)
                           : playlist,
+                      tier: tiers[index],
                       onTap: () => onOpenPlaylist(playlist),
                       onLongPress: playlist.isFavorite
                           ? null
@@ -401,7 +398,7 @@ class _PlaylistHomeContent extends StatelessWidget {
                           ? null
                           : () => onShowPlaylistMenu(playlist),
                     );
-                  }, childCount: playlists.length),
+                  }, childCount: sorted.length),
                 );
               },
             ),
@@ -515,15 +512,6 @@ class _PlaylistEmptyState extends StatelessWidget {
       ),
     );
   }
-}
-
-double _scaledLineHeight(
-  TextScaler textScaler,
-  TextStyle? style,
-  double fallbackFontSize,
-) {
-  final fontSize = style?.fontSize ?? fallbackFontSize;
-  return textScaler.scale(fontSize) * (style?.height ?? 1.2);
 }
 
 class _PlaylistMenuAction extends StatelessWidget {

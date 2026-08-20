@@ -349,6 +349,7 @@
   "favoritesCannotRename": "「我喜欢」歌单不可重命名",
   "createPlaylistManual": "直接自定义歌单",
   "createPlaylistManualDesc": "输入歌单名称创建空歌单",
+  "activePlaylist": "活跃",
   "importFromBiliFav": "从 B 站收藏夹导入",
   "importFromBiliFavDesc": "登录后选择收藏夹一键导入",
   "myFavFolders": "我的收藏夹",

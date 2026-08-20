@@ -27,6 +27,12 @@ abstract class PlaylistRepository {
   /// Update the cover URL for a playlist.
   Future<void> updatePlaylistCover(int id, String? coverUrl);
 
+  /// Record an active event (song play or detail visit) for a playlist.
+  ///
+  /// Increments [playCount] and refreshes [lastPlayedAt]. No-op for the
+  /// system favorites playlist.
+  Future<void> recordPlaylistActivity(int id);
+
   // ── Songs within Playlist ─────────────────────────────────────────────
 
   /// Get all songs in a playlist, ordered by [sortOrder].

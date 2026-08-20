@@ -20,4 +20,10 @@ class Playlists extends Table {
 
   /// Timestamp when the playlist was created.
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// Number of active events (song plays / detail visits) recorded.
+  IntColumn get playCount => integer().withDefault(const Constant(0))();
+
+  /// Timestamp of the most recent active event, null if never active.
+  DateTimeColumn get lastPlayedAt => dateTime().nullable()();
 }

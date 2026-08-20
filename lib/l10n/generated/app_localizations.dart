@@ -1676,6 +1676,12 @@ abstract class AppLocalizations {
   /// **'Enter a name to create an empty playlist'**
   String get createPlaylistManualDesc;
 
+  /// No description provided for @activePlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activePlaylist;
+
   /// No description provided for @importFromBiliFav.
   ///
   /// In en, this message translates to:

@@ -852,6 +852,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter a name to create an empty playlist';
 
   @override
+  String get activePlaylist => 'Active';
+
+  @override
   String get importFromBiliFav => 'Import from Bilibili Favorites';
 
   @override

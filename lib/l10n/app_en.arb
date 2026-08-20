@@ -357,6 +357,7 @@
   "favoritesCannotRename": "My Favorites playlist cannot be renamed",
   "createPlaylistManual": "Create Custom Playlist",
   "createPlaylistManualDesc": "Enter a name to create an empty playlist",
+  "activePlaylist": "Active",
   "importFromBiliFav": "Import from Bilibili Favorites",
   "importFromBiliFavDesc": "Sign in to import from your favorite folders",
   "myFavFolders": "My Folders",

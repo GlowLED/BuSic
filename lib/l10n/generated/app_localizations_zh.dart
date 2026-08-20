@@ -834,6 +834,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createPlaylistManualDesc => '输入歌单名称创建空歌单';
 
   @override
+  String get activePlaylist => '活跃';
+
+  @override
   String get importFromBiliFav => '从 B 站收藏夹导入';
 
   @override

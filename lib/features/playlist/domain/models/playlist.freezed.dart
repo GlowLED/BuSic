@@ -21,7 +21,9 @@ mixin _$Playlist {
  String? get coverUrl;/// Number of songs in this playlist.
  int get songCount;/// Whether this is the system "My Favorites" playlist.
  bool get isFavorite;/// Creation timestamp.
- DateTime get createdAt;
+ DateTime get createdAt;/// Number of active events (song plays / detail visits).
+ int get playCount;/// Timestamp of the most recent active event, null if never active.
+ DateTime? get lastPlayedAt;
 /// Create a copy of Playlist
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +36,16 @@ $PlaylistCopyWith<Playlist> get copyWith => _$PlaylistCopyWithImpl<Playlist>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Playlist&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Playlist&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,coverUrl,songCount,isFavorite,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,coverUrl,songCount,isFavorite,createdAt,playCount,lastPlayedAt);
 
 @override
 String toString() {
-  return 'Playlist(id: $id, name: $name, coverUrl: $coverUrl, songCount: $songCount, isFavorite: $isFavorite, createdAt: $createdAt)';
+  return 'Playlist(id: $id, name: $name, coverUrl: $coverUrl, songCount: $songCount, isFavorite: $isFavorite, createdAt: $createdAt, playCount: $playCount, lastPlayedAt: $lastPlayedAt)';
 }
 
 
@@ -54,7 +56,7 @@ abstract mixin class $PlaylistCopyWith<$Res>  {
   factory $PlaylistCopyWith(Playlist value, $Res Function(Playlist) _then) = _$PlaylistCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String? coverUrl, int songCount, bool isFavorite, DateTime createdAt
+ int id, String name, String? coverUrl, int songCount, bool isFavorite, DateTime createdAt, int playCount, DateTime? lastPlayedAt
 });
 
 
@@ -71,7 +73,7 @@ class _$PlaylistCopyWithImpl<$Res>
 
 /// Create a copy of Playlist
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? coverUrl = freezed,Object? songCount = null,Object? isFavorite = null,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? coverUrl = freezed,Object? songCount = null,Object? isFavorite = null,Object? createdAt = null,Object? playCount = null,Object? lastPlayedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -79,7 +81,9 @@ as String,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: c
 as String?,songCount: null == songCount ? _self.songCount : songCount // ignore: cast_nullable_to_non_nullable
 as int,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,playCount: null == playCount ? _self.playCount : playCount // ignore: cast_nullable_to_non_nullable
+as int,lastPlayedAt: freezed == lastPlayedAt ? _self.lastPlayedAt : lastPlayedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -164,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt,  int playCount,  DateTime? lastPlayedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Playlist() when $default != null:
-return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt,_that.playCount,_that.lastPlayedAt);case _:
   return orElse();
 
 }
@@ -185,10 +189,10 @@ return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt,  int playCount,  DateTime? lastPlayedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Playlist():
-return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt,_that.playCount,_that.lastPlayedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +209,10 @@ return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? coverUrl,  int songCount,  bool isFavorite,  DateTime createdAt,  int playCount,  DateTime? lastPlayedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Playlist() when $default != null:
-return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavorite,_that.createdAt,_that.playCount,_that.lastPlayedAt);case _:
   return null;
 
 }
@@ -220,7 +224,7 @@ return $default(_that.id,_that.name,_that.coverUrl,_that.songCount,_that.isFavor
 @JsonSerializable()
 
 class _Playlist implements Playlist {
-  const _Playlist({required this.id, required this.name, this.coverUrl, this.songCount = 0, this.isFavorite = false, required this.createdAt});
+  const _Playlist({required this.id, required this.name, this.coverUrl, this.songCount = 0, this.isFavorite = false, required this.createdAt, this.playCount = 0, this.lastPlayedAt});
   factory _Playlist.fromJson(Map<String, dynamic> json) => _$PlaylistFromJson(json);
 
 /// Database primary key.
@@ -235,6 +239,10 @@ class _Playlist implements Playlist {
 @override@JsonKey() final  bool isFavorite;
 /// Creation timestamp.
 @override final  DateTime createdAt;
+/// Number of active events (song plays / detail visits).
+@override@JsonKey() final  int playCount;
+/// Timestamp of the most recent active event, null if never active.
+@override final  DateTime? lastPlayedAt;
 
 /// Create a copy of Playlist
 /// with the given fields replaced by the non-null parameter values.
@@ -249,16 +257,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Playlist&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Playlist&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.coverUrl, coverUrl) || other.coverUrl == coverUrl)&&(identical(other.songCount, songCount) || other.songCount == songCount)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.playCount, playCount) || other.playCount == playCount)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,coverUrl,songCount,isFavorite,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,coverUrl,songCount,isFavorite,createdAt,playCount,lastPlayedAt);
 
 @override
 String toString() {
-  return 'Playlist(id: $id, name: $name, coverUrl: $coverUrl, songCount: $songCount, isFavorite: $isFavorite, createdAt: $createdAt)';
+  return 'Playlist(id: $id, name: $name, coverUrl: $coverUrl, songCount: $songCount, isFavorite: $isFavorite, createdAt: $createdAt, playCount: $playCount, lastPlayedAt: $lastPlayedAt)';
 }
 
 
@@ -269,7 +277,7 @@ abstract mixin class _$PlaylistCopyWith<$Res> implements $PlaylistCopyWith<$Res>
   factory _$PlaylistCopyWith(_Playlist value, $Res Function(_Playlist) _then) = __$PlaylistCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String? coverUrl, int songCount, bool isFavorite, DateTime createdAt
+ int id, String name, String? coverUrl, int songCount, bool isFavorite, DateTime createdAt, int playCount, DateTime? lastPlayedAt
 });
 
 
@@ -286,7 +294,7 @@ class __$PlaylistCopyWithImpl<$Res>
 
 /// Create a copy of Playlist
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? coverUrl = freezed,Object? songCount = null,Object? isFavorite = null,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? coverUrl = freezed,Object? songCount = null,Object? isFavorite = null,Object? createdAt = null,Object? playCount = null,Object? lastPlayedAt = freezed,}) {
   return _then(_Playlist(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -294,7 +302,9 @@ as String,coverUrl: freezed == coverUrl ? _self.coverUrl : coverUrl // ignore: c
 as String?,songCount: null == songCount ? _self.songCount : songCount // ignore: cast_nullable_to_non_nullable
 as int,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore: cast_nullable_to_non_nullable
 as bool,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,playCount: null == playCount ? _self.playCount : playCount // ignore: cast_nullable_to_non_nullable
+as int,lastPlayedAt: freezed == lastPlayedAt ? _self.lastPlayedAt : lastPlayedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
