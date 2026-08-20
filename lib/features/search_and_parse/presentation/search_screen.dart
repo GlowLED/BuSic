@@ -15,10 +15,10 @@ import 'widgets/video_detail_view.dart';
 
 const _searchBarAnimationDuration = Duration(milliseconds: 260);
 const _contentSwitchDuration = Duration(milliseconds: 180);
-const _compactSearchBreakpoint = 560.0;
 const _centeredSearchMaxWidth = 720.0;
 const _dockedSearchBarHeight = 56.0;
 const _searchInputHeight = 48.0;
+const _submitIconHoverDuration = Duration(milliseconds: 180);
 
 /// Main search screen with unified input for BV number parsing and keyword search.
 ///
@@ -238,16 +238,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final mobileLayout = constraints.maxWidth < AppTheme.desktopBreakpoint;
-        final compact = constraints.maxWidth < _compactSearchBreakpoint;
         final inputBar = _SearchInputHost(
           docked: !mobileLayout && inputDocked,
           maxWidth: constraints.maxWidth,
-          child: _buildInputBar(
-            l10n,
-            parseState,
-            compact: compact,
-            showSubmitButton: !mobileLayout,
-          ),
+          child: _buildInputBar(l10n, parseState),
         );
 
         if (mobileLayout) {
@@ -429,15 +423,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   // ── Input bar ───────────────────────────────────────────────────────
 
-  Widget _buildInputBar(
-    AppLocalizations l10n,
-    ParseState parseState, {
-    required bool compact,
-    required bool showSubmitButton,
-  }) {
+  Widget _buildInputBar(AppLocalizations l10n, ParseState parseState) {
     final isParsing = parseState.whenOrNull(parsing: () => true) == true;
     final spacing = context.appSpacing;
-    final palette = context.appPalette;
     final radii = context.appRadii;
     final showClearButton = _hasSubmittedInput && _hasInputText;
 
@@ -451,14 +439,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           hintText: l10n.parseInput,
           filled: false,
           fillColor: Colors.transparent,
-          prefixIcon: Icon(
-            Icons.manage_search_rounded,
-            color: palette.textSecondary,
-          ),
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: _searchInputHeight,
-            minHeight: _searchInputHeight,
-          ),
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -472,6 +452,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 icon: const Icon(Icons.content_paste_rounded),
                 tooltip: l10n.pasteFromClipboard,
                 onPressed: isParsing ? null : _onPaste,
+              ),
+              _SearchSubmitIconButton(
+                isParsing: isParsing,
+                enabled: _hasInputText && !isParsing,
+                onPressed: _handleSubmit,
+                tooltip: l10n.search,
               ),
             ],
           ),
@@ -491,45 +477,92 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
     );
 
-    final submit = FilledButton.icon(
-      onPressed: isParsing ? null : _handleSubmit,
-      icon: isParsing
-          ? SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: context.colorScheme.onPrimary,
-              ),
-            )
-          : const Icon(Icons.search_rounded),
-      label: Text(isParsing ? l10n.parsing : l10n.search),
-    );
-
-    final content = !showSubmitButton
-        ? field
-        : compact
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              field,
-              SizedBox(height: spacing.sm),
-              SizedBox(width: double.infinity, child: submit),
-            ],
-          )
-        : Row(
-            children: [
-              Expanded(child: field),
-              SizedBox(width: spacing.sm),
-              submit,
-            ],
-          );
-
     return AppPanel(
       key: const ValueKey('search_bar_surface'),
-      padding: EdgeInsets.all(spacing.xxs),
+      padding: EdgeInsets.all(spacing.xs),
       borderRadius: radii.largeRadius,
-      child: content,
+      child: field,
+    );
+  }
+}
+
+class _SearchSubmitIconButton extends StatefulWidget {
+  const _SearchSubmitIconButton({
+    required this.isParsing,
+    required this.enabled,
+    required this.onPressed,
+    required this.tooltip,
+  });
+
+  final bool isParsing;
+  final bool enabled;
+  final VoidCallback? onPressed;
+  final String tooltip;
+
+  @override
+  State<_SearchSubmitIconButton> createState() =>
+      _SearchSubmitIconButtonState();
+}
+
+class _SearchSubmitIconButtonState extends State<_SearchSubmitIconButton> {
+  bool _hovered = false;
+
+  void _setHovered(bool value) {
+    if (_hovered == value || !widget.enabled) return;
+    setState(() => _hovered = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.appPalette;
+    final radii = context.appRadii;
+    final enabled = widget.enabled;
+    final baseColor = enabled ? palette.textSecondary : palette.textMuted;
+    final targetColor = enabled && _hovered
+        ? context.colorScheme.primary
+        : baseColor;
+
+    final icon = widget.isParsing
+        ? SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: context.colorScheme.primary,
+            ),
+          )
+        : TweenAnimationBuilder<Color?>(
+            duration: _submitIconHoverDuration,
+            curve: Curves.easeOutCubic,
+            tween: ColorTween(begin: baseColor, end: targetColor),
+            builder: (context, color, _) {
+              return Icon(
+                Icons.search_rounded,
+                color: color ?? baseColor,
+              );
+            },
+          );
+
+    return MouseRegion(
+      cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
+      onEnter: enabled ? (_) => _setHovered(true) : null,
+      onHover: enabled ? (_) => _setHovered(true) : null,
+      onExit: enabled ? (_) => _setHovered(false) : null,
+      child: IconButton(
+        onPressed: enabled ? widget.onPressed : null,
+        tooltip: widget.tooltip,
+        icon: icon,
+        style: IconButton.styleFrom(
+          foregroundColor: baseColor,
+          disabledForegroundColor: palette.textMuted,
+          backgroundColor: Colors.transparent,
+          padding: EdgeInsets.zero,
+          minimumSize: const Size.square(40),
+          shape: RoundedRectangleBorder(
+            borderRadius: radii.mediumRadius,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,7 +40,7 @@ void main() {
 
         expect(inputRect.top, greaterThan(200));
         expect((inputRect.center.dy - 400).abs(), lessThan(80));
-        expect(inputRect.height, closeTo(56, 0.1));
+        expect(inputRect.height, closeTo(64, 0.1));
         _expectSingleLayerSearchBarSurface(tester);
       },
     );
@@ -63,6 +64,7 @@ void main() {
       await tester.pumpAndSettle();
       final centeredRect = _inputBarRect(tester);
       await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
 
@@ -78,7 +80,7 @@ void main() {
       expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
       expect(resultsRect.top - inputRect.bottom, lessThan(24));
       expect(inputRect.height, closeTo(centeredRect.height, 0.1));
-      expect(inputRect.height, closeTo(56, 0.1));
+      expect(inputRect.height, closeTo(64, 0.1));
       _expectSingleLayerSearchBarSurface(tester);
     });
 
@@ -102,6 +104,7 @@ void main() {
       final centeredRect = _inputBarRect(tester);
 
       await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
 
@@ -132,6 +135,7 @@ void main() {
 
       await _pumpSearchScreen(tester, notifier: notifier);
       await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
       await _scrollSearchResultsUntilVisible(tester, 'Result 18');
@@ -181,6 +185,7 @@ void main() {
       final centeredRect = _inputBarRect(tester);
 
       await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pump();
 
@@ -260,6 +265,7 @@ void main() {
 
       await _pumpSearchScreen(tester, notifier: notifier);
       await tester.enterText(find.byType(TextField), 'missing song');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
 
@@ -284,6 +290,7 @@ void main() {
       final centeredRect = _inputBarRect(tester);
 
       await tester.enterText(find.byType(TextField), 'missing song');
+      await tester.pump();
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
 
@@ -311,7 +318,7 @@ void main() {
       expect((inputRect.center.dy - centeredRect.center.dy).abs(), lessThan(1));
     });
 
-    testWidgets('mobile portrait centers input and hides search button', (
+    testWidgets('mobile portrait centers input with a disabled search icon', (
       tester,
     ) async {
       _setMobilePortraitViewport(tester);
@@ -319,12 +326,15 @@ void main() {
       await _pumpSearchScreen(tester);
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.search_rounded), findsNothing);
+      final searchIconButton = tester.widget<IconButton>(
+        _searchSubmitIconFinder(),
+      );
+      expect(searchIconButton.onPressed, isNull);
 
       final inputRect = _inputBarRect(tester);
       expect(inputRect.top, greaterThan(250));
       expect((inputRect.center.dy - 422).abs(), lessThan(100));
-      expect(inputRect.height, closeTo(56, 0.1));
+      expect(inputRect.height, closeTo(64, 0.1));
       _expectSingleLayerSearchBarSurface(tester);
     });
 
@@ -352,7 +362,7 @@ void main() {
       final animatingRect = _inputBarRect(tester);
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.search_rounded), findsNothing);
+      expect(find.byIcon(Icons.search_rounded), findsOneWidget);
       expect(find.text('Night Drive'), findsOneWidget);
       expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
 
@@ -367,8 +377,103 @@ void main() {
       expect(resultsRect.top - inputRect.bottom, greaterThanOrEqualTo(0));
       expect(resultsRect.top - inputRect.bottom, lessThan(24));
       expect(inputRect.height, closeTo(centeredRect.height, 0.1));
-      expect(inputRect.height, closeTo(56, 0.1));
+      expect(inputRect.height, closeTo(64, 0.1));
       _expectSingleLayerSearchBarSurface(tester);
+    });
+
+    testWidgets('mobile portrait submits by tapping the search icon', (
+      tester,
+    ) async {
+      _setMobilePortraitViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Night Drive'), findsOneWidget);
+      expect(notifier.searchCalls.single, (keyword: 'night drive', page: 1));
+    });
+
+    testWidgets('empty input keeps the search icon disabled and dimmed', (
+      tester,
+    ) async {
+      _setDesktopViewport(tester);
+
+      await _pumpSearchScreen(tester);
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<IconButton>(_searchSubmitIconFinder());
+      expect(button.onPressed, isNull);
+
+      final baseColor = _searchIconColor(tester);
+      final primary = _themePrimary(tester);
+
+      final gesture = await _createMouseGesture(tester);
+      await gesture.moveTo(tester.getCenter(find.byIcon(Icons.search_rounded)));
+      await tester.pumpAndSettle();
+
+      expect(_searchIconColor(tester), baseColor);
+      expect(_searchIconColor(tester), isNot(primary));
+    });
+
+    testWidgets('hover gradually transitions the search icon to the theme color', (
+      tester,
+    ) async {
+      _setDesktopViewport(tester);
+      final notifier = _FakeParseNotifier(
+        searchResults: const [
+          BvidInfo(
+            bvid: 'BV1xx411c7mD',
+            title: 'Night Drive',
+            owner: 'BuSic',
+            duration: 245,
+          ),
+        ],
+      );
+
+      await _pumpSearchScreen(tester, notifier: notifier);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'night drive');
+      await tester.pumpAndSettle();
+
+      final baseColor = _searchIconColor(tester);
+      final primary = _themePrimary(tester);
+
+      final gesture = await _createMouseGesture(tester);
+      final iconCenter = tester.getCenter(find.byIcon(Icons.search_rounded));
+      await gesture.moveTo(iconCenter);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 90));
+
+      final midColor = _searchIconColor(tester);
+      expect(midColor, isNot(baseColor));
+      expect(midColor, isNot(primary));
+
+      await tester.pumpAndSettle();
+      expect(_searchIconColor(tester), primary);
+
+      await gesture.moveTo(iconCenter - const Offset(300, 300));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 90));
+
+      final exitMidColor = _searchIconColor(tester);
+      expect(exitMidColor, isNot(baseColor));
+      expect(exitMidColor, isNot(primary));
+
+      await tester.pumpAndSettle();
+      expect(_searchIconColor(tester), baseColor);
     });
 
     testWidgets('mobile clear button animates the input back to center', (
@@ -667,7 +772,7 @@ void _expectSingleLayerSearchBarSurface(WidgetTester tester) {
 
   expect(searchBarSurface.borderRadius, _themeLargeRadius(tester));
   expect(searchBarSurface.boxShadow, isNull);
-  expect(searchBarSurface.padding, EdgeInsets.all(_themeSpacing(tester).xxs));
+  expect(searchBarSurface.padding, EdgeInsets.all(_themeSpacing(tester).xs));
   expect(
     find.descendant(
       of: searchBarFinder,
@@ -703,6 +808,27 @@ AppThemeSpacing _themeSpacing(WidgetTester tester) {
 bool _inputHasFocus(WidgetTester tester) {
   return tester.widget<TextField>(find.byType(TextField)).focusNode?.hasFocus ??
       false;
+}
+
+Finder _searchSubmitIconFinder() {
+  return find.widgetWithIcon(IconButton, Icons.search_rounded);
+}
+
+Color _searchIconColor(WidgetTester tester) {
+  return tester.widget<Icon>(find.byIcon(Icons.search_rounded)).color!;
+}
+
+Color _themePrimary(WidgetTester tester) {
+  final context = tester.element(find.byType(SearchScreen));
+  return Theme.of(context).colorScheme.primary;
+}
+
+Future<TestGesture> _createMouseGesture(WidgetTester tester) async {
+  final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  await gesture.addPointer(location: Offset.zero);
+  addTearDown(gesture.removePointer);
+  await tester.pump();
+  return gesture;
 }
 
 void _setDesktopViewport(WidgetTester tester) {
