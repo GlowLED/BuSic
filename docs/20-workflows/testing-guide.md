@@ -239,14 +239,14 @@ group('备份导出不含下载路径', () {
 | `test/app_test.dart` | 启动后会话刷新失败提示 | 局部覆盖 | 改 App 启动副作用或全局通知时补回归 |
 | `features/app_update` | `data` + `domain/models` | 覆盖较好 | 后续补 `application` / `presentation` |
 | `features/download` | `download_cache_mechanism_test.dart` + `presentation/download_screen_test.dart` | 缓存主链路与下载页缓存语义已覆盖 | 后续补 Notifier 边界回归 |
-| `features/playlist` | `presentation/playlist_list_screen_test.dart` + `presentation/widgets/playlist_tile_test.dart` | 页面与卡片已有回归，数据和状态层仍偏浅 | 优先补 `data` / `application` |
+| `features/playlist` | `domain/playlist_activity_test.dart` + `presentation/playlist_list_screen_test.dart` + `presentation/widgets/playlist_tile_test.dart` | 活跃度评分分档、页面与卡片已有回归，数据和状态层仍偏浅 | 优先补 `data` / `application` |
 | `features/search_and_parse` | `data` 层 2 个文件 + `application` + `domain/models` + `presentation` 层 3 个文件 | 搜索、解析、视频互动与详情 UI 覆盖较好 | 后续按真实 bug 补分页和交互边界 |
-| `features/settings` | `application/settings_notifier_test.dart` + `presentation/playback_section_test.dart` + `presentation/appearance_section_test.dart` | 设置持久化、播放渐变和桌面界面缩放 UI 已覆盖 | 改设置持久化或外观控制时继续补 |
+| `features/settings` | `application/settings_notifier_test.dart` + `presentation/playback_section_test.dart` + `presentation/appearance_section_test.dart` + `presentation/background_section_test.dart` | 设置持久化、播放渐变、桌面界面缩放和背景图片分区 UI 已覆盖 | 改设置持久化或外观控制时继续补 |
 | `features/share` | `data` 层 3 个文件 | 关键协议已覆盖 | 后续补 `application` / `presentation` |
 | `features/auth` | `domain` 1 个 + `data` 2 个 + `application` 2 个 + `presentation` 1 个测试文件 | Cookie 解析、登录校验、Web 登录可用性、Linux 托管浏览器、会话编排和登录 UI 已覆盖 | 后续补真实平台 WebView 手测记录 |
 | `features/comment` | `presentation/comment_section_appearance_test.dart` + `presentation/comment_text_selection_test.dart` | 评论外观和文本选择已覆盖 | 需要新增请求适配和状态测试 |
 | `features/minimal` | 无 | 未覆盖 | 需要新增生命周期与页面测试 |
-| `features/player` | `application` 层 2 个测试文件 + `presentation` 层 5 个测试文件 | 主链路状态、MPRIS 禁用边界、播放渐变、快速播放/暂停竞态、收藏显示、封面、AppBar、分段切换和进度条已覆盖 | 后续补 `presentation/full_player_screen.dart` 整页交互回归 |
+| `features/player` | `application` 层 2 个测试文件 + `presentation` 层 6 个测试文件 | 主链路状态、MPRIS 禁用边界、播放渐变、快速播放/暂停竞态、position tick 整树重建优化、收藏显示、封面、AppBar、分段切换和进度条已覆盖 | 后续补 `presentation/full_player_screen.dart` 整页交互回归 |
 | `features/subtitle` | `data/subtitle_repository_impl_test.dart` + `application/subtitle_notifier_test.dart` + `presentation/widgets/lyrics_panel_test.dart` | 缓存、重试、当前曲目终态和错误重试 UI 已覆盖 | 后续补播放器时间轴与歌词滚动联动回归 |
 | `test/widget_test.dart` | 占位测试 | 不计覆盖 | 后续可替换或删除 |
 

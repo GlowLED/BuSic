@@ -19,20 +19,20 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 }
 ```
 
 - 数据库文件位于 `documents/busic/busic.db`
 - 使用 `LazyDatabase` + `NativeDatabase.createInBackground` 异步初始化
-- 当前 `schemaVersion = 4`；新增迁移时递增，并在 `onUpgrade` 写明从旧版本升级的补表 / 补列逻辑
+- 当前 `schemaVersion = 5`；新增迁移时递增，并在 `onUpgrade` 写明从旧版本升级的补表 / 补列逻辑
 
 ### 现有表结构
 
 | 表 | 文件 | 关键设计 |
 |---|---|---|
 | `Songs` | `tables/songs.dart` | **元数据覆盖模式**：`originTitle/Artist` 存原始值，`customTitle/Artist` 可覆盖 |
-| `Playlists` | `tables/playlists.dart` | 歌单基本信息，含 `sortOrder` 排序 |
+| `Playlists` | `tables/playlists.dart` | 歌单基本信息，含 `sortOrder` 排序与活跃度字段（`playCount` / `lastPlayedAt`） |
 | `PlaylistSongs` | `tables/playlist_songs.dart` | 多对多联结表，`(playlistId, songId)` 复合主键 |
 | `DownloadTasks` | `tables/download_tasks.dart` | 下载状态：0=pending / 1=downloading / 2=completed / 3=failed |
 | `UserSessions` | `tables/user_sessions.dart` | B站登录凭据（sessdata, biliJct, dedeUserId 等） |

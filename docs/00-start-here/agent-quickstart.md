@@ -10,7 +10,7 @@
 - 更新系统真源：`versions-manifest.json`
 - 架构：`core / features / shared / l10n`
 - 路由：`StatefulShellRoute.indexedStack`
-- 数据库：Drift SQLite，`schemaVersion = 4`
+- 数据库：Drift SQLite，`schemaVersion = 5`
 - 后台播放：`media_kit + audio_service`
 
 ## 先看哪几个文件
@@ -31,6 +31,7 @@
 - `playlist`：歌单 CRUD、本地元数据、自定义封面、“我喜欢”、收藏夹导入
 - `search_and_parse`：搜索、BV 解析、音频流 URL
 - `download`：下载任务、缓存联动、音质替换 / 去重
+- `settings`：主题、背景图片、界面缩放、语言、播放、存储等用户偏好
 - `auth`：二维码登录、内置 Web 登录、手动 Cookie 登录、会话持久化
 - `share`：剪贴板分享、完整备份导入导出
 - `subtitle`：歌词 / 字幕获取、缓存、显示
